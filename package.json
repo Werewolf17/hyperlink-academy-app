@@ -1,0 +1,24 @@
+{
+  "name": "hyperlink-academy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mdx-js/loader": "^1.0.21",
+    "@next/mdx": "^9.0.2",
+    "next": "^9.0.5",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-hyperscript": "^3.2.0",
+    "styled-components": "^4.3.2",
+    "typescript": "^3.6.2"
+  }
+}
