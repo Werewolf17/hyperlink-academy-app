@@ -7,7 +7,7 @@ import Head from 'next/head'
 const Layout = styled('div')`
 margin: auto;
 max-width: 700px;
-font-size: 20px;
+font-size: 18px;
 padding: 10px;
 
 a:visited {
