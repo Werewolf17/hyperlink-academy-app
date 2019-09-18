@@ -10,15 +10,11 @@ If you complete at least 1 course during a semester, you **graduate** and get a
 
 <br/>
 
-[Enroll in a semester](./enrolling)
-
-[Facciliate a course](./facillitating)
-
-This is an experiment. Join the conversation about it [here](https://fns.fathom.network/t/hyperlink-academy-a-school-created-betwen-personal-sites/48)
+This is an experiment. Join the conversation [here](https://fns.fathom.network/t/hyperlink-academy-a-school-created-betwen-personal-sites/48)
 
 <br/>
 
-### Upcoming: [Semester 0](/semester/0)
+### Join: [Semester 0](/semester/0)
 
 **Starts Monday September 30th**
 
