@@ -1,4 +1,4 @@
-This project was inspired by the [Domain of One's Own](Domain of One’s Own)
+This project was inspired by the [Domain of One's Own](https://umw.domains)
 project from the University of Mary Washington. The line of reasoning is, if
 individuals can have a self-sovreign digital identity, can't an institution be
 created from the links between those identities?

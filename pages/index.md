@@ -8,13 +8,8 @@ internet (programming, communities, hardware, music, anything).
 If you complete at least 1 course during a semester, you **graduate** and get a
 ~sticker~.
 
-<br/>
 
-This is an experiment. Join the conversation [here](https://fns.fathom.network/t/hyperlink-academy-a-school-created-betwen-personal-sites/48)
-
-<br/>
-
-### Join: [Semester 0](/semester/0)
+## Join: [Semester 0](/semester/0)
 
 **Starts Monday September 30th**
 
