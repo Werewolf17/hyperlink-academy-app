@@ -26,7 +26,7 @@ export default class App extends NextApp {
         <br/>
         <hr/>
         <div style={{textAlign: 'right'}}>
-          a <a href='fathom.network'>fathom</a> project
+          a <a href='https://fathom.network'>fathom</a> project
           <br/>
           read the <a href='/rationale'>rationale</a>
         </div>
