@@ -34,9 +34,3 @@ export default class App extends NextApp {
     )
   }
 }
-
-export const EditLink = () => {
-  let router = useRouter()
-  let location = router.pathname.replace(/\/$/, "")
-  return (<a href = {'https://gitlab.com/-/ide/project/jaredpereira/hyperlink-academy/edit/master/-/pages' + location + '.md'}>edit this page</a>)
-}

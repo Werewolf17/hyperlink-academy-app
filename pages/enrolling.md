@@ -1,3 +1,5 @@
+import SignupForm from '../components/Forms/Enroll'
+
 ## Enrollment
 
 Anyone is welcome to enroll in hyperlink.academy
@@ -12,6 +14,9 @@ You must:
    - A description of what you're interested in learning
    - A link to hyperlink.academy
    - A link to any courses you've participated in
+4. Submit it below!
 
-Enrollment is on a per-semester basis, so to join, go to the page for that
-semester and follow the link to edit that page and add yourself to the list.
+Enrollment is on a per-semester basis. So if you join this semester, you're not
+automatically enrolled in the next. 
+
+<SignupForm/>

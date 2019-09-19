@@ -9,7 +9,7 @@ If you complete at least 1 course during a semester, you **graduate** and get a
 ~sticker~.
 
 
-## Join: [Semester 0](/semester/0)
+## Upcoming: [Semester 0](/semester/0)
 
 **Starts Monday September 30th**
 
