@@ -12,6 +12,7 @@ Whatever you do, a course must:
 
 1. Be hosted and described on your own website
 2. Have a clearly defined admissions criteria (i.e prequisites and how to join)
-3. Contain links to the profiles of all those who participate in the course
+3. Take place in the 6 weeks during a semester 
+4. Contain links to the profiles of all those who participate in the course
 
 <FacillitateForm/>
