@@ -14,5 +14,5 @@ If you complete at least 1 course during a semester, you **graduate** and get a
 **Starts Monday October 14, 2019**
 
 Since this is the first semester, we won't have an
-orientation week, but a Orientation Day, Friday September 27th starting with a
+orientation week, but a Orientation Day, Friday October 11th starting with a
 video call at 10AM EST. Meet [here](https://meet.jit.si/hyperlink-academy).
