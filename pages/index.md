@@ -11,7 +11,7 @@ If you complete at least 1 course during a semester, you **graduate** and get a
 
 ## Upcoming: [Semester 0](/semester/0)
 
-**Starts Monday September 30th**
+**Starts Monday October 14, 2019**
 
 Since this is the first semester, we won't have an
 orientation week, but a Orientation Day, Friday September 27th starting with a
