@@ -21,7 +21,7 @@ export const FormContainer = styled('form')`
 padding: 25px;
 border: 2px solid;
 box-shadow: 5px 5px lightblue;
-max-width: 300px;
+max-width: 400px;
 margin: auto;
 `
 

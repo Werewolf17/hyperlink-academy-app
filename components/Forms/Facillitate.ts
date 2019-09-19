@@ -45,7 +45,7 @@ export default () => {
           }
         }),
         h(TextArea, {
-          maxLength: 140,
+          maxLength: 500,
           placeholder: 'course description',
           spellCheck: false,
           onChange: (e:React.FormEvent<HTMLTextAreaElement>) => {
@@ -53,7 +53,7 @@ export default () => {
             setDescription(e.currentTarget.value)
           }
         }),
-        h(CharCount, `${description.length}/140`),
+        h(CharCount, `${description.length}/500`),
         h(Button, {type: 'submit'}, 'submit')
       ])
     case 'loading':
