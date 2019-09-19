@@ -26,7 +26,11 @@ const Semester:NextPage<{courses:Course[], learners:Learner[]} >= (props) => {
       return h('li', {}, h('a', {href: learner.webpage}, learner.name))
     }))),
     h(Section, {legend: 'Courses'}, h('ul', props.courses.map(course => {
-      return h('li', {}, h('a', {href: course.webpage}, course.name))
+      return h('li', {}, [
+        h('a', {href: course.webpage}, course.name),
+        h('div', course.description),
+        h('br')
+      ])
     })))
   ])
 }
