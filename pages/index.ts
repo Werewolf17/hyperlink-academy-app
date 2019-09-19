@@ -1,51 +1,48 @@
 import h from 'react-hyperscript'
-import {Section} from '../../components/Section'
-import {NextPage} from 'next'
-
 import airtable, {Table} from 'airtable'
+import {NextPage} from 'next'
+import Intro from './intro.mdx'
+
+import {Section} from '../components/Section'
 
 type Course = {
   name: string,
   description: string,
   webpage: string
 }
+
 type Learner = {
   name: string,
   webpage: string
 }
 
-const Semester:NextPage<{courses:Course[], learners:Learner[]} >= (props) => {
+const Landing:NextPage<{courses:Course[],learners:Learner[],children?: any}> = (props) => {
   return h('div', [
-    h('h1', 'Semester 0'),
-    h('b', 'Starts: '), 'October 14, 2019',
-    h('ul', {style: {'fontStyle': 'italic'}}, [
-      h('li', {}, h('a', {href: '/enrolling'}, 'enroll in this semseter')),
-      h('li', {}, h('a', {href: '/facillitating'}, 'facillitate a course'))
-    ]),
+    h(Intro),
     h(Section, {legend: 'Learners'}, h('ul', props.learners.map(learner => {
       return h('li', {}, h('a', {href: learner.webpage}, learner.name))
     }))),
     h(Section, {legend: 'Courses'}, h('ul', props.courses.map(course => {
       return h('li', {}, [
-        h('a', {href: course.webpage}, course.name),
+        h('h4', {}, h('a', {href: course.webpage}, course.name)),
         h('div', course.description),
-        h('br')
       ])
     })))
   ])
 }
 
-Semester.getInitialProps = async ({res}) =>{
+Landing.getInitialProps = async ({res}) =>{
   console.log('FETCHING')
   let courses: Course[] = []
   let learners: Learner[] = []
 
-  if(typeof window !== "undefined") return {learners, courses}
-  if(!res) return {learners, courses}
+  if(typeof window !== "undefined") return {courses, learners}
+  if(!res) return {courses, learners}
 
   let base = new airtable({apiKey: process.env.AIRTABLE_API_KEY}).base('appI77uDPls9eA4xr');
 
   try {
+
     let learnerRows = await (base('Learners') as Table<Learner>).select({
       fields: ["name", "webpage"],
       filterByFormula: '{approved}'
@@ -56,15 +53,16 @@ Semester.getInitialProps = async ({res}) =>{
       filterByFormula: '{approved}'
     }).firstPage()
 
-    learners =  learnerRows.map(row=> row.fields)
     courses = coursesRows.map(row => row.fields)
+    learners =  learnerRows.map(row=> row.fields)
   }
   catch(e) {
     console.log(JSON.stringify(e))
   }
 
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-  return {learners, courses}
+  return {courses, learners}
 }
 
-export default Semester
+export default Landing
+
