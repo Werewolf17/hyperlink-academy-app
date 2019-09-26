@@ -13,8 +13,13 @@ You must:
 3. Create a page on a website, ideally one you control, containing: 
    - A description of what you're interested in learning
    - A link to hyperlink.academy
-   - A link to any courses you've participated in
-4. Submit it below!
+   - A link to any courses you participate in
+4. This is your learning webpage
+5. Submit it below!
+
+To enroll in a specific course just go to it's homepage and follow the
+instructions, or contact the facillitator. Then, create a link to it on your
+learning webpage!
 
 Enrollment is on a per-semester basis. So if you join this semester, you're not
 automatically enrolled in the next. 
