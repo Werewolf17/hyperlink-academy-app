@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import styled from 'styled-components'
 import {useState } from 'react'
 
-import {Input, FormContainer, Button} from './Styles'
+import {Input, FormContainer, Button, DateInput} from './Styles'
 import Loader from '../Loader'
 
 import {FacillitateAPI} from '../../pages/api/facillitate'
@@ -12,13 +12,16 @@ export default () => {
   const [description, setDescription] = useState('')
   const [name, setName] = useState('')
   const [webpage, setWebpage] = useState('')
+  const [start, setStart] = useState('')
+  const [end, setEnd] = useState('')
 
   const [state, setState] = useState<State>('normal')
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    let data = {description, name, webpage}
+    let data = {description, name, webpage, start, end}
     setState('loading')
+    console.log(data)
     let response = await FacillitateAPI(data)
     if(response.status === 200) setState('success')
     else setState('error')
@@ -54,6 +57,24 @@ export default () => {
           }
         }),
         h(CharCount, `${description.length}/500`),
+        h(DatesInput, [
+          h('label', [
+            'Start: ', h(DateInput, {
+              type:'date',
+              onChange: (e) => {
+                setStart(e.currentTarget.value)
+              }
+            }),
+          ]),
+          h('label', [
+            'End: ', h(DateInput, {
+              type: 'date',
+              onChange: (e) => {
+                setEnd(e.currentTarget.value)
+              }
+            })
+          ])
+        ]),
         h(Button, {type: 'submit'}, 'submit')
       ])
     case 'loading':
@@ -65,6 +86,12 @@ export default () => {
   }
 
 }
+
+const DatesInput = styled('div')`
+display: grid;
+grid-gap: 10px;
+grid-template-columns: auto auto;
+`
 
 const TextArea = styled('textarea')`
 border: 2px solid;

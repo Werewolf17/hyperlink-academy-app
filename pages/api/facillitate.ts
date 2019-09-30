@@ -7,6 +7,8 @@ type Body = {
   name: string
   description: string,
   webpage: string,
+  start: string,
+  end: string
 }
 
 
@@ -20,6 +22,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           name: body.name,
           description: body.description,
           webpage: body.webpage,
+          start: body.start,
+          end: body.end,
           approved: false
         }
       }

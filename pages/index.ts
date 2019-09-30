@@ -9,6 +9,8 @@ type Course = {
   name: string,
   description: string,
   webpage: string
+  start: string,
+  end: string
 }
 
 type Learner = {
@@ -22,9 +24,24 @@ const Landing:NextPage<{courses:Course[],learners:Learner[],children?: any}> = (
     h(Section, {legend: 'Learners'}, h('ul', props.learners.map(learner => {
       return h('li', {}, h('a', {href: learner.webpage}, learner.name))
     }))),
-    h(Section, {legend: 'Courses'}, h('ul', props.courses.map(course => {
+    h(Section, {legend: 'Courses'}, h('ul', props.courses.sort((a, b) => {
+      let aDate = new Date(a.start)
+      let bDate = new Date(b.start)
+      if(aDate>bDate) return 1
+      else return -1
+    }).map(course => {
+      let start = new Date(course.start)
+      let end = new Date(course.end)
+      let dateOptions = {month: 'short', year: '2-digit', day: '2-digit', timeZone: 'UTC'}
       return h('li', {}, [
-        h('h4', {}, h('a', {href: course.webpage}, course.name)),
+        h('h4', {}, [
+          h('a', {href: course.webpage}, course.name),
+          ' @ ',
+          h('span', [
+            start.toLocaleDateString('en-US', dateOptions),
+            ' - ',
+            end.toLocaleDateString('en-US', dateOptions)]),
+        ]),
         h('div', course.description),
       ])
     })))
@@ -49,7 +66,7 @@ Landing.getInitialProps = async ({res}) =>{
     }).firstPage()
 
     let coursesRows = await (base('Courses') as Table<Course>).select({
-      fields: ["name", "webpage", "description"],
+      fields: ["name", "webpage", "description", "start", "end"],
       filterByFormula: '{approved}'
     }).firstPage()
 

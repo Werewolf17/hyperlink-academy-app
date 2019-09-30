@@ -17,6 +17,12 @@ outline: none;
 }
 `
 
+export const DateInput = styled(Input)`
+display: inline;
+width: 100%;
+color: black;
+`
+
 export const FormContainer = styled('form')`
 padding: 25px;
 border: 2px solid;
