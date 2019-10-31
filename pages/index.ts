@@ -31,7 +31,7 @@ const Landing:NextPage<{courses:Course[],learners:Learner[],children?: any}> = (
       else return -1
     }).map(course => {
       let start = new Date(course.start)
-      let end = new Date(course.end)
+      let end = course.end ? new Date(course.end) : undefined
       let dateOptions = {month: 'short', year: '2-digit', day: '2-digit', timeZone: 'UTC'}
       return h('li', {}, [
         h('h4', {}, [
@@ -40,7 +40,8 @@ const Landing:NextPage<{courses:Course[],learners:Learner[],children?: any}> = (
           h('span', [
             start.toLocaleDateString('en-US', dateOptions),
             ' - ',
-            end.toLocaleDateString('en-US', dateOptions)]),
+            end ? end.toLocaleDateString('en-US', dateOptions) : "ongoing"
+          ]),
         ]),
         h('div', course.description),
       ])
