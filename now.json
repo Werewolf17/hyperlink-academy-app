@@ -1,5 +1,6 @@
 {
   "env": {
-    "AIRTABLE_API_KEY": "@airtable-api-key"
+    "AIRTABLE_API_KEY": "@airtable-api-key",
+    "FAUNA_KEY": "@hyper-fauna-key"
   }
 }

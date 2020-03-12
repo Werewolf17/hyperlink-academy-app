@@ -4,6 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "preserve",
     "module": "esnext",
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "noEmit": true,
     "noUnusedLocals": true,
