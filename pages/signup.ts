@@ -11,31 +11,34 @@ const Login = () => {
   let [password, setPassword] = useState('')
   let [confPassword, setConfPassword] = useState('')
   let [error, setError] = useState<'user exists' | null>(null)
-  let [success, setSuccess] = useState(false)
+  let [state, setState] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
 
   useEffect(()=>{
     setError(null)
   }, [email])
 
 
-  if(success) {
+  if(state === 'success') {
     return h(Section, [
-      'Sweet, now just check your email to confirm!'
+      `Sweet, now just check your email to confirm your account! If you aren't seeing
+it, check out your Spam folder.`
     ])
   }
 
   return h(Section, {}, h(Form, {onSubmit: async (e) => {
     e.preventDefault()
+    setState('loading')
     let res = await (await fetch('/api/signup', {
       method: "POST",
       body: JSON.stringify({email, password})
     })).json()
 
     if(!res.success) {
+      setState('error')
       setError('user exists')
     }
     else {
-      setSuccess(true)
+      setState('success')
     }
   }}, [
     h('p', `Welcome to hyperlink.academy!`),
@@ -69,7 +72,7 @@ const Login = () => {
                 }
                })
     ]),
-    h(Button, {type: 'submit'}, 'login')
+    state === 'loading' ? h('div', 'Loading') : h(Button, {type: 'submit'}, 'login')
   ]))
 }
 

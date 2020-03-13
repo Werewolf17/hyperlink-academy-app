@@ -21,10 +21,11 @@ type Response = {
 }
 
 export type ActivationKey = {
-      userHash: string
-      email: string
-      id: number
-      hash: string
+  userHash: string
+  email: string
+  time: string,
+  id: number
+  hash: string
 }
 
 const createActivationKey = async (email: string, hash: string) => {
@@ -34,6 +35,7 @@ const createActivationKey = async (email: string, hash: string) => {
     data: {
       userHash: hash,
       email,
+      time: q.Now(),
       id: q.NewId(),
       hash: await bcrypt.hash(key, salt)
     }

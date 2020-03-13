@@ -18,16 +18,24 @@ export type Result = {
 } | {
   success: false
   error: 'invalid key'
+} | {
+  success: false
+  error: 'old key'
+}
+
+type User = {
+  email: string,
+  hash: string
 }
 
 const createUser = (email:string, hash:string, id: string) => {
+  let data:User = {
+    email, hash
+  }
   return client.query(q.Do([
     q.Delete(q.Select('ref', q.Get(q.Match(q.Index('activationKeyByID'), id)))),
     q.Create(q.Collection('People'), {
-      data: {
-        email,
-        hash,
-      },
+      data,
     })]))
 }
 
@@ -41,6 +49,12 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   if(!msg.key || !msg.id) return res.json({success:false, error: 'invalid message'})
 
   let key = await getActivationKey(msg.id)
+  let date = new Date(key.time)
+
+  if(( Date.now() - date.getMilliseconds())/(1000 * 60) > 30)  {
+    return res.json({success:false, error:'old key'})
+  }
+
   let salt = bcrypt.getSalt(key.hash)
   let hash = await bcrypt.hash(msg.key, salt)
   if(hash === key.hash) {
