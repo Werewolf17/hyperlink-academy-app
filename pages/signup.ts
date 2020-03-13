@@ -4,7 +4,6 @@ import { NextPageContext } from 'next'
 
 import {Section} from '../components/Section'
 import {getToken} from '../src/token'
-import { useRouter } from 'next/router'
 import {Form, Label, Button, Input, Error} from '../components/Form'
 
 const Login = () => {
@@ -12,11 +11,18 @@ const Login = () => {
   let [password, setPassword] = useState('')
   let [confPassword, setConfPassword] = useState('')
   let [error, setError] = useState<'user exists' | null>(null)
-  let router = useRouter()
+  let [success, setSuccess] = useState(false)
 
   useEffect(()=>{
     setError(null)
   }, [email])
+
+
+  if(success) {
+    return h(Section, [
+      'Sweet, now just check your email to confirm!'
+    ])
+  }
 
   return h(Section, {}, h(Form, {onSubmit: async (e) => {
     e.preventDefault()
@@ -29,7 +35,7 @@ const Login = () => {
       setError('user exists')
     }
     else {
-      router.push('/login')
+      setSuccess(true)
     }
   }}, [
     h('p', `Welcome to hyperlink.academy!`),

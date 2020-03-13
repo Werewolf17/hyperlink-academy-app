@@ -3,19 +3,7 @@ import {query as q} from 'faunadb'
 import {client} from '../../src/db'
 import bcrypt from 'bcryptjs'
 import fetch from 'isomorphic-unfetch'
-
-const createUser = (email:string, hash:string) => {
-  return client.query(q.Create(q.Collection('People'), {
-    data: {
-      email,
-      hash,
-    },
-  }))
-}
-
-const checkUser = (email:string):Promise<boolean> => {
-  return client.query(q.IsEmpty(q.Match(q.Index('personByEmail'), email)))
-}
+import sendVerificationEmail from '../../emails/verifyEmail'
 
 type Msg = {
   email: string
@@ -32,7 +20,35 @@ type Response = {
   error: 'invalid message'
 }
 
+export type ActivationKey = {
+      userHash: string
+      email: string
+      id: number
+      hash: string
+}
+
+const createActivationKey = async (email: string, hash: string) => {
+  let salt = await bcrypt.genSalt()
+  let key = await bcrypt.genSalt()
+  let txResult = await client.query(q.Create(q.Collection('ActivationKeys'), {
+    data: {
+      userHash: hash,
+      email,
+      id: q.NewId(),
+      hash: await bcrypt.hash(key, salt)
+    }
+  })) as {
+    data: ActivationKey
+  }
+  return {id: txResult.data.id, key}
+}
+
+const checkUser = (email:string):Promise<boolean> => {
+  return client.query(q.IsEmpty(q.Match(q.Index('personByEmail'), email)))
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
+
   let msg: Partial<Msg> = JSON.parse(req.body)
   if(!msg.email || !msg.password) {
     res.json({success: false, error: 'invalid message'})
@@ -46,7 +62,12 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   let salt = await bcrypt.genSalt()
   let hash = await bcrypt.hash(msg.password, salt)
 
-  await createUser(msg.email, hash)
+  let key = await createActivationKey(msg.email, hash)
+
+  let url = `${req.headers.origin}/verifyEmail?id=${key.id}&key=${key.key}`
+
+  await sendVerificationEmail(msg.email, url)
+
   res.json({success: true})
   return res.end()
 }
