@@ -1,6 +1,6 @@
 import h from 'react-hyperscript'
 import { NextPage} from 'next'
-import Intro from './intro.mdx'
+import Intro from '../copy/Intro.mdx'
 import fs from 'fs'
 import matter from 'gray-matter'
 
