@@ -1,6 +1,8 @@
 {
   "env": {
     "AIRTABLE_API_KEY": "@airtable-api-key",
-    "FAUNA_KEY": "@hyper-fauna-key"
+    "FAUNA_KEY": "@hyper-fauna-key",
+    "MAILGUN_KEY": "@mailgun-key",
+    "DISCOURSE_SECRET": "@discourse-secret"
   }
 }
