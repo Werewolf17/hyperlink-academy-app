@@ -5,7 +5,7 @@ import {useRouter} from 'next/router'
 
 export default () => {
   let router = useRouter()
-  let [result, setResult] = useState<null | 'invalid parameters' | 'success' | 'old key'>(null)
+  let [result, setResult] = useState<null | 'invalid parameters' | 'old key'>(null)
 
   useEffect(() => {
     try {
@@ -17,7 +17,7 @@ export default () => {
       fetch('/api/verifyEmail', {method: "POST", body: JSON.stringify(msg)}).then(async (res) => {
         let result:Result = await res.json()
         if(result.success) {
-          setResult('success')
+          router.push('/login')
         }
         else setResult('old key')
       })
@@ -28,8 +28,7 @@ export default () => {
   }, [])
 
   if(!result)  return h('div', 'loading')
-  if(result === 'success') {
-    router.push('/login')
+  if(result === 'old key') {
+    return h('div', 'Your email link is out of date, please try signing up again')
   }
-  return h('div', 'idk')
 }

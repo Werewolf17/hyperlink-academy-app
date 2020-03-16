@@ -63,6 +63,6 @@ export const getServerSideProps:GetServerSideProps = async ({req, res}): Promise
   }
 
   return {props: {
-    username: token as string
+    username: token?.email as string
   }}
 }
