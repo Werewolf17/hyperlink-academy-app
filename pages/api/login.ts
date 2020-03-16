@@ -5,7 +5,7 @@ import {User} from './verifyEmail'
 import {query as q} from 'faunadb'
 import bcrypt from 'bcryptjs'
 
-type Msg = {
+export type Msg = {
   email: string
   password: string
 }

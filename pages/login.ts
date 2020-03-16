@@ -1,26 +1,32 @@
 import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import { NextPageContext } from 'next'
+import {useRouter} from 'next/router'
 
 import {Section} from '../components/Section'
 import {getToken} from '../src/token'
 import {Form, Label, Button, Input, Error} from '../components/Form'
+import {Msg} from './api/login'
 
 const Login = () => {
   let [email, setEmail] = useState('')
   let [password, setPassword] = useState('')
   let [error, setError] = useState<'wrong username or password' | null>(null)
+  let router = useRouter()
+
+  let {redirect} = router.query
 
   useEffect(()=>setError(null), [email, password])
 
   return h(Section, {}, h(Form, {onSubmit: async (e) => {
     e.preventDefault()
+    let msg:Msg = {email, password}
     let res = await fetch('/api/login', {
       method: "POST",
-      body: JSON.stringify({email, password})
+      body: JSON.stringify(msg)
     })
     if(res.status === 200) {
-      window.location.assign('/')
+      window.location.assign(redirect as string || '/')
     }
     else {
       setError('wrong username or password')
