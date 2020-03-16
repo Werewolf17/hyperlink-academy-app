@@ -5,7 +5,7 @@ import {useRouter} from 'next/router'
 
 export default () => {
   let router = useRouter()
-  let [result, setResult] = useState<null | 'invalid parameters' | 'success'>(null)
+  let [result, setResult] = useState<null | 'invalid parameters' | 'success' | 'old key'>(null)
 
   useEffect(() => {
     try {
@@ -19,6 +19,7 @@ export default () => {
         if(result.success) {
           setResult('success')
         }
+        else setResult('old key')
       })
     }
     catch (e) {

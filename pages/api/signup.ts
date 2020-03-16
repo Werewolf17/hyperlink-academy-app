@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse} from 'next'
 import {query as q} from 'faunadb'
 import {client} from '../../src/db'
 import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 import sendVerificationEmail from '../../emails/verifyEmail'
 
@@ -24,21 +25,22 @@ export type ActivationKey = {
   userHash: string
   email: string
   time: string,
-  id: number
+  id: string
   hash: string
 }
 
 const createActivationKey = async (email: string, hash: string) => {
   let salt = await bcrypt.genSalt()
   let key = await bcrypt.genSalt()
-  let txResult = await client.query(q.Create(q.Collection('ActivationKeys'), {
-    data: {
+  let data:ActivationKey = {
       userHash: hash,
       email,
-      time: q.Now(),
-      id: q.NewId(),
+      time: new Date(Date.now()).toISOString(),
+      id: uuidv4(),
       hash: await bcrypt.hash(key, salt)
     }
+  let txResult = await client.query(q.Create(q.Collection('ActivationKeys'), {
+    data
   })) as {
     data: ActivationKey
   }

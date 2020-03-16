@@ -3,6 +3,7 @@ import {query as q} from 'faunadb'
 import {client} from '../../src/db'
 import {ActivationKey} from './signup'
 import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 
 export type Msg = {
@@ -25,12 +26,13 @@ export type Result = {
 
 type User = {
   email: string,
+  id: string
   hash: string
 }
 
 const createUser = (email:string, hash:string, id: string) => {
   let data:User = {
-    email, hash
+    email, hash, id: uuidv4()
   }
   return client.query(q.Do([
     q.Delete(q.Select('ref', q.Get(q.Match(q.Index('activationKeyByID'), id)))),
@@ -51,7 +53,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   let key = await getActivationKey(msg.id)
   let date = new Date(key.time)
 
-  if(( Date.now() - date.getMilliseconds())/(1000 * 60) > 30)  {
+  if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
     return res.json({success:false, error:'old key'})
   }
 
