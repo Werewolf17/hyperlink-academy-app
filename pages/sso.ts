@@ -51,7 +51,7 @@ export const getServerSideProps:GetServerSideProps = async ({req,res, query}) =>
   hmac2.update(base64Payload)
 
   res.writeHead(301, {
-    Location: "https:forum.hyperlink.academy/session/sso_login?"
+    Location: "https://forum.hyperlink.academy/session/sso_login?"
       + querystring.stringify({
         sso: base64Payload,
         sig: hmac2.digest('hex')
