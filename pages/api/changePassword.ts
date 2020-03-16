@@ -19,8 +19,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(402).end()
   }
 
-  if(await validateLogin(user, msg.oldPassword)) {
-    await updatePassword(user, msg.newPassword)
+  if(await validateLogin(user.email, msg.oldPassword)) {
+    await updatePassword(user.email, msg.newPassword)
     res.end()
   }
   else {

@@ -1,10 +1,15 @@
 import { ServerResponse, IncomingMessage } from "http";
 import cookie from 'cookie'
 
-export function setToken(res:ServerResponse, token:string) {
+export type Token = {
+  email: string,
+  id: string
+}
+
+export function setToken(res:ServerResponse, token:Token) {
   res.setHeader(
     'Set-Cookie',
-    cookie.serialize('loginToken', token, {
+    cookie.serialize('loginToken', JSON.stringify(token), {
       path: '/',
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
       httpOnly: true
@@ -17,7 +22,8 @@ export function getToken(req:IncomingMessage) {
   if (!cookies) return;
 
   const { loginToken } = cookie.parse(cookies);
-  return loginToken;
+  if(loginToken) return JSON.parse(loginToken) as Token;
+  return
 }
 
 export function removeToken(res:ServerResponse) {

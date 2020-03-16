@@ -24,7 +24,7 @@ export type Result = {
   error: 'old key'
 }
 
-type User = {
+export type User = {
   email: string,
   id: string
   hash: string

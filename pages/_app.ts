@@ -3,7 +3,7 @@ import h from 'react-hyperscript'
 import Head from 'next/head'
 import Link from 'next/link'
 import styled from 'styled-components'
-import {getToken} from '../src/token'
+import {getToken, Token} from '../src/token'
 import {Login} from '../components/Login'
 
 const Layout = styled('div')`
@@ -19,40 +19,41 @@ a:visited {
 
 type Props = {
   loggedIn: boolean,
-  username: string
+  user: Token
 }
 
 export default class App extends NextApp<Props> {
   static async getInitialProps(appContext:AppContext) {
     let {req} = appContext.ctx
     const appProps = await NextApp.getInitialProps(appContext)
-    let username
+    let user: Token | undefined
     if(req) {
-       username = getToken(req)
+       user = getToken(req)
     }
     else {
-      username = localStorage.getItem('username')
+      if(localStorage.getItem('user')) user = JSON.parse(localStorage.getItem('user') || '')
     }
-    if(username) return {...appProps, loggedIn: true, username}
+    if(user) return {...appProps, loggedIn: true, user}
     return {...appProps, loggedIn: false}
   }
   componentDidMount(){
     if(this.props.loggedIn) {
-      localStorage.setItem('username', this.props.username)
+      localStorage.setItem('user', JSON.stringify(this.props.user))
     }
     else {
-      localStorage.removeItem('username')
+      localStorage.removeItem('user')
     }
   }
   render() {
-    const { Component, pageProps, loggedIn, username} = this.props
+    const { Component, pageProps, loggedIn, user} = this.props
     return h(Layout, {}, [
-      h(Head, {children:[ h('title', 'hyperlink.academy')]}),
+      //@ts-ignore
+      h(Head, {}, h('title', 'hyperlink.academy')),
       h(Header, [
         h('h1', {}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
-        h(Login, {loggedIn, username}),
+        h(Login, {loggedIn, username:user?.email}),
       ]),
-      h(Component, {...pageProps, loggedIn}),
+      h(Component, {...pageProps, loggedIn, user}),
       h('br'),
       h('hr'),
       h('div', {style:{textAlign: 'right'}}, [
