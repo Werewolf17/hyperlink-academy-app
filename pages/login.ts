@@ -11,6 +11,7 @@ import {Msg} from './api/login'
 const Login = () => {
   let [email, setEmail] = useState('')
   let [password, setPassword] = useState('')
+  let [loading, setLoading] = useState(false)
   let [error, setError] = useState<'wrong username or password' | null>(null)
   let router = useRouter()
 
@@ -21,14 +22,17 @@ const Login = () => {
   return h(Section, {}, h(Form, {onSubmit: async (e) => {
     e.preventDefault()
     let msg:Msg = {email, password}
+    setLoading(true)
     let res = await fetch('/api/login', {
       method: "POST",
       body: JSON.stringify(msg)
     })
     if(res.status === 200) {
+      setLoading(false)
       window.location.assign(redirect as string || '/')
     }
     else {
+      setLoading(false)
       setError('wrong username or password')
     }
   }}, [
@@ -43,7 +47,7 @@ const Login = () => {
                  value: password,
                   onChange: (e)=> setPassword(e.currentTarget.value)})
     ]),
-    h(Button, {type: 'submit'}, 'login')
+    loading ? h('p', 'loading') : h(Button, {type: 'submit'}, 'login')
   ]))
 }
 
