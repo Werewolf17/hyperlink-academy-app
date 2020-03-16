@@ -5,6 +5,8 @@ import {getToken} from '../src/token'
 import {Section} from '../components/Section'
 import {Form, Input, Error, Success, Button} from '../components/Form'
 
+import {Msg as PasswordMsg} from './api/changePassword'
+
 type Props = {
   username: string
 }
@@ -25,9 +27,10 @@ const ChangePassword = () => {
     h(Form, {
       onSubmit: async e =>{
         e.preventDefault()
+        let msg:PasswordMsg = {oldPassword, newPassword}
         let res = await fetch('/api/changePassword', {
           method: "POST",
-          body: JSON.stringify({oldPassword, newPassword})
+          body: JSON.stringify(msg)
         })
         if(res.status === 200) {
           setResult('success')

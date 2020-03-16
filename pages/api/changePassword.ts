@@ -4,7 +4,7 @@ import {client} from '../../src/db'
 import {query as q} from 'faunadb'
 import bcrypt from 'bcryptjs'
 
-type Msg = {
+export type Msg = {
   oldPassword: string
   newPassword: string
 }
