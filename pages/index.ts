@@ -19,7 +19,7 @@ const Landing:NextPage<{courses:Course[]}> = (props) => {
       h('ul',
         props.courses
         .map(course => {
-          return h('li', {}, [
+          return h('li', {key: course.path}, [
             h('h4', {}, [
               h('a', {href: course.path}, course.name),
             ]),
