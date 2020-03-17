@@ -5,6 +5,7 @@ import Link from 'next/link'
 import styled from 'styled-components'
 import {getToken, Token} from '../src/token'
 import {Login} from '../components/Login'
+import { useEffect } from 'react'
 
 const Layout = styled('div')`
 margin: auto;
@@ -20,51 +21,59 @@ a:visited {
 type Props = {
   loggedIn: boolean,
   user: Token
+  Component: any,
+  pageProps: any
 }
 
-export default class App extends NextApp<Props> {
-  static async getInitialProps(appContext:AppContext) {
-    let {req} = appContext.ctx
-    const appProps = await NextApp.getInitialProps(appContext)
-    let user: Token | undefined
-    if(req) {
-       user = getToken(req)
-    }
-    else {
-      if(localStorage.getItem('user')) user = JSON.parse(localStorage.getItem('user') || '')
-    }
-    if(user) return {...appProps, loggedIn: true, user}
-    return {...appProps, loggedIn: false}
-  }
-  componentDidMount(){
-    if(this.props.loggedIn) {
-      localStorage.setItem('user', JSON.stringify(this.props.user))
+const App = ({ Component, pageProps, loggedIn, user}:Props) => {
+  useEffect(() => {
+    if(loggedIn) {
+      localStorage.setItem('user', JSON.stringify(user))
     }
     else {
       localStorage.removeItem('user')
     }
-  }
-  render() {
-    const { Component, pageProps, loggedIn, user} = this.props
-    return h(Layout, {}, [
-      //@ts-ignore
-      h(Head, {}, h('title', 'hyperlink.academy')),
-      h(Header, [
-        h('h1', {}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
-        h(Login, {loggedIn, username:user?.email}),
-      ]),
-      h(Component, {...pageProps, loggedIn, user}),
+
+  }, [loggedIn, user])
+
+  return h(Layout, {}, [
+    //@ts-ignore
+    h(Head, {}, h('title', 'hyperlink.academy')),
+    h(Header, [
+      h('h1', {}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
+      h(Login, {loggedIn, username:user?.email}),
+    ]),
+    h(Component, {...pageProps, loggedIn, user}),
+    h('br'),
+    h('hr'),
+    h('div', {style:{textAlign: 'right'}}, [
+      'a ',
+      h('a', {href:"https://fathom.network"}, 'fathom'),
+      ' project',
       h('br'),
-      h('hr'),
-      h('div', {style:{textAlign: 'right'}}, [
-        'a ',
-        h('a', {href:"https://fathom.network"}, 'fathom'),
-        ' project',
-        h('br'),
-      ])
     ])
-  }
+  ])
 }
+
+App.getInitialProps = async (appContext:AppContext) => {
+    let {req} = appContext.ctx
+    const appProps = await NextApp.getInitialProps(appContext)
+    let user: Token | undefined
+
+    if(req) {
+      user = getToken(req)
+    }
+    else {
+      let storedUserData = localStorage.getItem('user')
+      if(storedUserData) user = JSON.parse(storedUserData)
+    }
+    if(user) {
+      return {...appProps, loggedIn: true, user}
+    }
+    else return {...appProps, loggedIn: false}
+}
+
+export default App
 
 const Header = styled('div')`
 display: grid;
