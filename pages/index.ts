@@ -15,7 +15,7 @@ type Course = {
 const Landing:NextPage<{courses:Course[]}> = (props) => {
   return h('div', [
     h(Intro),
-    h(Section, {legend: 'Adventures'},[
+    h(Section, {legend: 'Courses'},[
       h('ul',
         props.courses
         .map(course => {
@@ -26,7 +26,7 @@ const Landing:NextPage<{courses:Course[]}> = (props) => {
             h('div', course.description),
           ])
         })),
-      h('a', {href:'/propose'}, 'propose your own adventure')
+      h('a', {href:'https://forum.hyperlink.academy/c/course-kindergarten/5'}, 'propose your own course')
     ])
   ])
 }
@@ -39,7 +39,6 @@ export const getServerSideProps = () => {
     let {data} = matter(content)
     return {...data, path: '/courses/' + file.slice(0, -3)}
   })
-
 
   return {
     props: {
