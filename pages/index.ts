@@ -32,18 +32,23 @@ const Landing:NextPage<{courses:Course[]}> = (props) => {
 }
 
 export const getServerSideProps = () => {
-  let courses = fs.readdirSync('./pages/courses').filter(file => {
-    return !fs.lstatSync('./pages/courses/' + file).isDirectory()
-  }).map(file => {
-    let content = fs.readFileSync('./pages/courses/' + file)
-    let {data} = matter(content)
-    return {...data, path: '/courses/' + file.slice(0, -3)}
-  })
+  console.log('fetching index page')
+  try {
+    let courses = fs.readdirSync('./pages/courses').filter(file => {
+      return !fs.lstatSync('./pages/courses/' + file).isDirectory()
+    }).map(file => {
+      let content = fs.readFileSync('./pages/courses/' + file)
+      let {data} = matter(content)
+      return {...data, path: '/courses/' + file.slice(0, -3)}
+    })
 
-  return {
-    props: {
-      courses,
+    return {
+      props: {
+        courses,
+      }
     }
+  } catch(e) {
+    console.log(e)
   }
 }
 
