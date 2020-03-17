@@ -4,5 +4,6 @@
     "FAUNA_KEY": "@hyper-fauna-key",
     "MAILGUN_KEY": "@mailgun-key",
     "DISCOURSE_SECRET": "@discourse-secret"
-  }
+  },
+  "cleanUrls": true
 }
