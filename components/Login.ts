@@ -25,7 +25,7 @@ export const Login:React.SFC<Props> = (props) => {
       h('button', {onClick: async ()=>{
         let res = await fetch('/api/logout')
         if(res.status === 200) {
-          localStorage.removeItem('username')
+          localStorage.removeItem('user')
           router.push('/')
         }
       }}, 'logout')
