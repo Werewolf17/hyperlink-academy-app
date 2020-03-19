@@ -1,8 +1,6 @@
 import h from 'react-hyperscript'
 import { NextPage} from 'next'
 import Intro from '../copy/Intro.mdx'
-import fs from 'fs'
-import matter from 'gray-matter'
 
 import {Section} from '../components/Section'
 
@@ -32,24 +30,7 @@ const Landing:NextPage<{courses:Course[]}> = (props) => {
 }
 
 export const getServerSideProps = () => {
-  console.log('fetching index page')
-  try {
-    let courses = fs.readdirSync('./pages/courses').filter(file => {
-      return !fs.lstatSync('./pages/courses/' + file).isDirectory()
-    }).map(file => {
-      let content = fs.readFileSync('./pages/courses/' + file)
-      let {data} = matter(content)
-      return {...data, path: '/courses/' + file.slice(0, -3)}
-    })
-
-    return {
-      props: {
-        courses,
-      }
-    }
-  } catch(e) {
-    console.log(e)
-  }
+  return {props: {courses: []}}
 }
 
 export default Landing
