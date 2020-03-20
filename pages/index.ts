@@ -10,12 +10,13 @@ type Course = {
   path: string
 }
 
-const Landing:NextPage<{courses:Course[]}> = (props) => {
+const Landing:NextPage<{courses:Course[]}> = () => {
   return h('div', [
     h(Intro),
     h(Section, {legend: 'Courses'},[
+      h('a', {href:'/propose'}, 'propose your own course'),
       h('ul',
-        props.courses
+        courses
         .map(course => {
           return h('li', {key: course.path}, [
             h('h4', {}, [
@@ -23,11 +24,18 @@ const Landing:NextPage<{courses:Course[]}> = (props) => {
             ]),
             h('div', course.description),
           ])
-        })),
-      h('a', {href:'https://forum.hyperlink.academy/c/course-kindergarten/5'}, 'propose your own course')
+        }))
     ])
   ])
 }
+
+const courses:Course[] = [
+  {
+    path: 'courses/internet-homesteading',
+    name: "Internet Homesteading",
+    description: 'Build a home for yourself on the internet.'
+  }
+]
 
 export const getServerSideProps = () => {
   return {props: {courses: []}}

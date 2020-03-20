@@ -7,15 +7,18 @@ export let Form = styled('form')`
 margin: 24px auto;
 max-width: 400px;
 display: grid;
-grid-gap: 8px;
+grid-gap: 32px;
 `
 
 export let Label = styled('label')`
-display: contents;
+display: grid;
 `
+
+export const Textarea = styled('textarea')``
 
 export let Input = styled('input')``
 
 export const Error = styled('div')``
 
 export const Success = styled('div')``
+

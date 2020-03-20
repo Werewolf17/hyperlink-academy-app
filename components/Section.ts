@@ -12,7 +12,7 @@ font-size: 1.2em;
 `
 
 const FieldSet = styled('fieldset')`
-padding: 5px;
+padding: 16px;
 border: 2px solid;
 box-shadow: 5px 5px lightblue;
 margin: auto;
