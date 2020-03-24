@@ -29,7 +29,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 async function validateLogin(email: string, password: string):Promise<false | string> {
   try {
     let {data} = (await client.query(q.Get(q.Match(q.Index('personByEmail'),email)))) as {data: User}
-    if(await bcrypt.compare(password, data.hash)) return false
+    if(!await bcrypt.compare(password, data.hash)) return false
     return data.id
   } catch (e) {
     return false
