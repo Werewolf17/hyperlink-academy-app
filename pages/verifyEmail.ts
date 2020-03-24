@@ -10,10 +10,9 @@ export default () => {
   useEffect(() => {
     try {
       let key = router.query.key
-      let id = router.query.id
-      if(typeof key !== 'string' || typeof id !== 'string') return setResult('invalid parameters')
+      if(typeof key !== 'string') return setResult('invalid parameters')
 
-      let msg:Msg = {key, id}
+      let msg:Msg = {key}
       fetch('/api/verifyEmail', {method: "POST", body: JSON.stringify(msg)}).then(async (res) => {
         let result:Result = await res.json()
         if(result.success) {

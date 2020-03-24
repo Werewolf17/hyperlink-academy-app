@@ -2,13 +2,12 @@ import { NextApiRequest, NextApiResponse} from 'next'
 import {query as q} from 'faunadb'
 import {client} from '../../src/db'
 import {ActivationKey} from './signup'
-import bcrypt from 'bcryptjs'
+import hmac from '../../src/hmac'
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 
 export type Msg = {
   key: string
-  id: string
 }
 
 export type Result = {
@@ -30,42 +29,38 @@ export type User = {
   hash: string
 }
 
-const createUser = (email:string, hash:string, id: string) => {
+const createUser = (email:string, hash:string, keyHash: string) => {
   let data:User = {
     email, hash, id: uuidv4()
   }
   return client.query(q.Do([
-    q.Delete(q.Select('ref', q.Get(q.Match(q.Index('activationKeyByID'), id)))),
+    q.Delete(q.Select('ref', q.Get(q.Match(q.Index('activationKeyByHash'), keyHash)))),
     q.Create(q.Collection('People'), {
       data,
     })]))
 }
 
-const getActivationKey = async (id: string)=> {
-  let txResult = await client.query(q.Get(q.Match(q.Index('activationKeyByID'), id))) as {data: ActivationKey}
+const getActivationKey = async (hash: string)=> {
+  let txResult = await client.query(q.Get(q.Match(q.Index('activationKeyByHash'), hash))) as {data: ActivationKey}
   return txResult.data
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   let msg: Partial<Msg> = JSON.parse(req.body)
-  if(!msg.key || !msg.id) return res.json({success:false, error: 'invalid message'})
+  if(!msg.key) return res.json({success:false, error: 'invalid message'})
 
-  let key = await getActivationKey(msg.id)
-  let date = new Date(key.time)
+  let keyHash = hmac(msg.key)
+  let token = await getActivationKey(keyHash)
+  if(!token) return res.json({success: false, error: 'invalid key'})
+
+  let date = new Date(token.time)
 
   if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
     return res.json({success:false, error:'old key'})
   }
 
-  let salt = bcrypt.getSalt(key.hash)
-  let hash = await bcrypt.hash(msg.key, salt)
-  if(hash === key.hash) {
-    await createUser(key.email, key.userHash, msg.id)
-    return res.json({success:true})
-  }
-  else {
-    return res.json({success: false, error: 'invalid key'})
-  }
+  await createUser(token.email, token.userHash, keyHash)
+  return res.json({success:true})
 }
 
 export const callVerifyEmail =  async (msg:Msg):Promise<Result> => {

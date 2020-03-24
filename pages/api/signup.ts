@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import {query as q} from 'faunadb'
 import {client} from '../../src/db'
+import hmac from '../../src/hmac'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
@@ -25,26 +26,21 @@ export type ActivationKey = {
   userHash: string
   email: string
   time: string,
-  id: string
   hash: string
 }
 
 const createActivationKey = async (email: string, hash: string) => {
-  let salt = await bcrypt.genSalt()
-  let key = await bcrypt.genSalt()
+  let key = uuidv4()
   let data:ActivationKey = {
       userHash: hash,
       email,
       time: new Date(Date.now()).toISOString(),
-      id: uuidv4(),
-      hash: await bcrypt.hash(key, salt)
+      hash: hmac(key)
     }
-  let txResult = await client.query(q.Create(q.Collection('ActivationKeys'), {
+  await client.query(q.Create(q.Collection('ActivationKeys'), {
     data
-  })) as {
-    data: ActivationKey
-  }
-  return {id: txResult.data.id, key}
+  }))
+  return key
 }
 
 const checkUser = (email:string):Promise<boolean> => {
@@ -68,7 +64,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
 
   let key = await createActivationKey(msg.email, hash)
 
-  let url = `${req.headers.origin}/verifyEmail?id=${key.id}&key=${key.key}`
+  let url = `${req.headers.origin}/verifyEmail?&key=${key}`
 
   await sendVerificationEmail(msg.email, url)
 
