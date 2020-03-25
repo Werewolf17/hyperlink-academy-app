@@ -16,7 +16,7 @@ export default () => {
       fetch('/api/verifyEmail', {method: "POST", body: JSON.stringify(msg)}).then(async (res) => {
         let result:Result = await res.json()
         if(result.success) {
-          router.push('/login')
+          router.push('/')
         }
         else setResult('old key')
       })

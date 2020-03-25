@@ -5,6 +5,7 @@ import {ActivationKey} from './signup'
 import hmac from '../../src/hmac'
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
+import {setToken} from '../../src/token'
 
 export type Msg = {
   key: string
@@ -29,15 +30,16 @@ export type User = {
   hash: string
 }
 
-const createUser = (email:string, hash:string, keyHash: string) => {
+const createUser = async (email:string, hash:string, keyHash: string) => {
   let data:User = {
     email, hash, id: uuidv4()
   }
-  return client.query(q.Do([
+  await client.query(q.Do([
     q.Delete(q.Select('ref', q.Get(q.Match(q.Index('activationKeyByHash'), keyHash)))),
     q.Create(q.Collection('People'), {
       data,
     })]))
+  return data.id
 }
 
 const getActivationKey = async (hash: string)=> {
@@ -59,7 +61,8 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
     return res.json({success:false, error:'old key'})
   }
 
-  await createUser(token.email, token.userHash, keyHash)
+  let id = await createUser(token.email, token.userHash, keyHash)
+  setToken(res, {email:token.email, id})
   return res.json({success:true})
 }
 
