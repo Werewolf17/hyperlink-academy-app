@@ -20,8 +20,8 @@
     "faunadb": "^2.11.1",
     "gray-matter": "^4.0.2",
     "isomorphic-unfetch": "^3.0.0",
-    "mailgun-js": "^0.22.0",
     "next": "^9.3.1",
+    "postmark": "^2.5.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-hyperscript": "^3.2.0",
@@ -35,7 +35,6 @@
     "@types/airtable": "^0.5.7",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie": "^0.3.3",
-    "@types/mailgun-js": "^0.22.4",
     "@types/react-hyperscript": "^3.0.4",
     "@types/styled-components": "^4.4.3",
     "@types/uuid": "^7.0.0"
