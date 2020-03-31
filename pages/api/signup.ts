@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse} from 'next'
-import {query as q} from 'faunadb'
-import {client} from '../../src/db'
+import {PrismaClient} from '@prisma/client'
 import hmac from '../../src/hmac'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 import sendVerificationEmail from '../../emails/verifyEmail'
+
+const prisma = new PrismaClient()
 
 type Msg = {
   email: string
@@ -22,29 +23,21 @@ type Response = {
   error: 'invalid message'
 }
 
-export type ActivationKey = {
-  userHash: string
-  email: string
-  time: string,
-  hash: string
-}
-
 const createActivationKey = async (email: string, hash: string) => {
   let key = uuidv4()
-  let data:ActivationKey = {
-      userHash: hash,
+  await prisma.activation_keys.create({
+    data: {
+      password_hash: hash,
       email,
       time: new Date(Date.now()).toISOString(),
-      hash: hmac(key)
+      key_hash: hmac(key)
     }
-  await client.query(q.Create(q.Collection('ActivationKeys'), {
-    data
-  }))
+  })
   return key
 }
 
-const checkUser = (email:string):Promise<boolean> => {
-  return client.query(q.IsEmpty(q.Match(q.Index('personByEmail'), email)))
+const checkUser = async (email:string):Promise<boolean> => {
+  return !(await prisma.people.findOne({where: {email}}))
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {

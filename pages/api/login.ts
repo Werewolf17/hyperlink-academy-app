@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import {setToken} from '../../src/token'
-import {client} from '../../src/db'
-import {User} from './verifyEmail'
-import {query as q} from 'faunadb'
 import bcrypt from 'bcryptjs'
+
+import {PrismaClient} from '@prisma/client'
+const prisma = new PrismaClient()
 
 export type Msg = {
   email: string
@@ -28,9 +28,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 async function validateLogin(email: string, password: string):Promise<false | string> {
   try {
-    let {data} = (await client.query(q.Get(q.Match(q.Index('personByEmail'),email)))) as {data: User}
-    if(!await bcrypt.compare(password, data.hash)) return false
-    return data.id
+    let person = await prisma.people.findOne({where:{email}})
+    if(!person) return false
+    if(!await bcrypt.compare(password, person.password_hash)) return false
+    return person.id
   } catch (e) {
     return false
   }

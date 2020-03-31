@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import {getToken} from '../../src/token'
-import {client} from '../../src/db'
-import {query as q} from 'faunadb'
+import {PrismaClient} from '@prisma/client'
 import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
 
 export type Msg = {
   oldPassword: string
@@ -31,22 +32,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 async function validateLogin(email: string, password: string):Promise<boolean> {
   try {
-    let hash = await client.query(q.Select(['data', 'hash'],
-                                           q.Get(
-                                             q.Match(q.Index('personByEmail'),
-                                                     email)))) as string
-    return await bcrypt.compare(password, hash)
+    let person = await prisma.people.findOne({where:{email}})
+    if(!person) return false
+    return await bcrypt.compare(password, person.password_hash)
   } catch (e) {
     return false
   }
 }
 
 async function updatePassword(email: string, newPassword: string) {
-  let hash = await bcrypt.hash(newPassword, await bcrypt.genSalt())
-  console.log(hash)
-
-  return client.query(q.Update(
-    q.Select( 'ref', q.Get(q.Match(q.Index('personByEmail'), email))),
-    {data: {hash}}
-  ))
+  let password_hash= await bcrypt.hash(newPassword, await bcrypt.genSalt())
+  await prisma.people.update({where:{email}, data:{password_hash}})
 }

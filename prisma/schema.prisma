@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URI")
+}
+
+model activation_keys {
+  email         String
+  key_hash      String @id
+  password_hash String
+  time          String
+}
+
+model password_reset_keys {
+  email    String
+  key_hash String @id
+  time     String
+}
+
+model people {
+  email         String @unique
+  id            String @id
+  password_hash String @unique
+}

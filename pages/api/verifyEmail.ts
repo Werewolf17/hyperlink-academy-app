@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse} from 'next'
-import {query as q} from 'faunadb'
-import {client} from '../../src/db'
-import {ActivationKey} from './signup'
+import {PrismaClient} from '@prisma/client'
 import hmac from '../../src/hmac'
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 import {setToken} from '../../src/token'
+
+const prisma = new PrismaClient()
 
 export type Msg = {
   key: string
@@ -24,27 +24,17 @@ export type Result = {
   error: 'old key'
 }
 
-export type User = {
-  email: string,
-  id: string
-  hash: string
-}
-
-const createUser = async (email:string, hash:string, keyHash: string) => {
-  let data:User = {
-    email, hash, id: uuidv4()
+const createUser = async (email:string, password_hash:string, key_hash: string) => {
+  let data = {
+    email, password_hash, id: uuidv4()
   }
-  await client.query(q.Do([
-    q.Delete(q.Select('ref', q.Get(q.Match(q.Index('activationKeyByHash'), keyHash)))),
-    q.Create(q.Collection('People'), {
-      data,
-    })]))
+  await prisma.people.create({data})
+  await prisma.activation_keys.delete({where:{key_hash}})
   return data.id
 }
 
 const getActivationKey = async (hash: string)=> {
-  let txResult = await client.query(q.Get(q.Match(q.Index('activationKeyByHash'), hash))) as {data: ActivationKey}
-  return txResult.data
+  return prisma.activation_keys.findOne({where: {key_hash: hash}})
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
@@ -61,7 +51,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
     return res.json({success:false, error:'old key'})
   }
 
-  let id = await createUser(token.email, token.userHash, keyHash)
+  let id = await createUser(token.email, token.password_hash, keyHash)
   setToken(res, {email:token.email, id})
   return res.json({success:true})
 }

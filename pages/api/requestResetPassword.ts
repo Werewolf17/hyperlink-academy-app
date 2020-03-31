@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse} from 'next'
-import {query as q} from 'faunadb'
-import {client} from '../../src/db'
+import {PrismaClient} from '@prisma/client'
 import hmac from '../../src/hmac'
 import { v4 as uuidv4 } from 'uuid';
 import sendResetEmail from '../../emails/resetPassword'
+
+const prisma = new PrismaClient()
 
 export type Msg = {
   email: string
@@ -23,19 +24,16 @@ export type ResetKey = {
 
 const createResetKey = async (email: string) => {
   let key = uuidv4()
-  let data:ResetKey= {
+  await prisma.password_reset_keys.create({data:{
       email,
       time: new Date(Date.now()).toISOString(),
-      hash: hmac(key)
-    }
-  await client.query(q.Create(q.Collection('ResetKeys'), {
-    data
-  }))
+      key_hash: hmac(key)
+  }})
   return key
 }
 
-const checkUser = (email:string):Promise<boolean> => {
-  return client.query(q.Not(q.IsEmpty(q.Match(q.Index('personByEmail'), email))))
+const checkUser = async (email:string):Promise<boolean> => {
+  return (await prisma.people.findMany({where: {email}})).length > 0
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {

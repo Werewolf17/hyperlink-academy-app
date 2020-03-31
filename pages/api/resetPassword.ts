@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse} from 'next'
-import {query as q} from 'faunadb'
-import {client} from '../../src/db'
-import {ResetKey} from './requestResetPassword'
+import {PrismaClient} from '@prisma/client'
 import hmac from '../../src/hmac'
 import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
 
 export type Msg = {
   key: string
@@ -15,8 +15,7 @@ export type Response = {
 }
 
 async function getResetKey(hash: string) {
-  let {data} = await client.query(q.Get(q.Match(q.Index('resetKeyByHash'), hash)))
-  return data as ResetKey
+  return prisma.password_reset_keys.findOne({where:{key_hash:hash}})
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
@@ -28,6 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
 
   let hash = hmac(msg.key)
   let resetKey = await getResetKey(hash)
+  if(!resetKey) return res.json({success:false})
 
   let date = new Date(resetKey.time)
 
@@ -45,13 +45,9 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   }
 }
 
-export async function updatePassword(email: string, newPassword: string, resetHash: string) {
-  let hash = await bcrypt.hash(newPassword, await bcrypt.genSalt())
-  return client.query(q.Do([
-    q.Delete(q.Select('ref', q.Get(q.Match(q.Index('resetKeyByHash'), resetHash)))),
-    q.Update(
-      q.Select( 'ref', q.Get(q.Match(q.Index('personByEmail'), email))),
-      {data: {hash}}
-    )
-  ]))
+export async function updatePassword(email: string, newPassword: string, key_hash: string) {
+  let password_hash = await bcrypt.hash(newPassword, await bcrypt.genSalt())
+
+  await prisma.password_reset_keys.delete({where:{key_hash}})
+  return prisma.people.update({where:{email}, data:{password_hash}})
 }
