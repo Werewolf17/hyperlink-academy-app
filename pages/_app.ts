@@ -5,7 +5,7 @@ import Link from 'next/link'
 import styled from 'styled-components'
 import {getToken, Token} from '../src/token'
 import {Login} from '../components/Login'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const Layout = styled('div')`
 margin: auto;
@@ -20,30 +20,49 @@ a:visited {
 
 type Props = {
   loggedIn: boolean,
-  user: Token
+  user?: Token
   Component: any,
   pageProps: any
 }
 
 const App = ({ Component, pageProps, loggedIn, user}:Props) => {
+  let [state, setState] = useState({loggedIn, user})
+
   useEffect(() => {
+    // Update user state in local storage
     if(loggedIn) {
       localStorage.setItem('user', JSON.stringify(user))
     }
     else {
       localStorage.removeItem('user')
     }
+    setState({loggedIn, user})
 
+    // Listen for storage events triggered from other tabs
+    let listener = (e:StorageEvent) => {
+      if(e.key !== 'user') return
+      if(e.newValue) {
+        let newUser = JSON.parse(e.newValue || '{}')
+        let newLoggedIn = !!newUser
+        setState({loggedIn: newLoggedIn, user: newUser})
+      } else {
+        setState({loggedIn: false, user:undefined})
+      }
+    }
+
+    window.addEventListener('storage', listener)
+    return ()=>{
+      window.removeEventListener('storage', listener)
+    }
   }, [loggedIn, user])
 
   return h(Layout, {}, [
-    //@ts-ignore
-    h(Head, {}, h('title', 'hyperlink.academy')),
+    h(Head, {children:[]}, h('title', 'hyperlink.academy')),
     h(Header, [
       h('h1', {}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
-      h(Login, {loggedIn, username:user?.email}),
+      h(Login, {loggedIn:state.loggedIn, username:state.user?.email}),
     ]),
-    h(Component, {...pageProps, loggedIn, user}),
+    h(Component, {...pageProps, ...state}),
     h('br'),
     h('hr'),
     h('div', {style:{textAlign: 'right'}}, [

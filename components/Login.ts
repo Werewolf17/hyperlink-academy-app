@@ -5,10 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/dist/client/router'
 
 type Props = {
-  loggedIn: false
-} | {
-  loggedIn: true,
-  username: string
+  loggedIn: boolean,
+  username?: string
 }
 
 export const Login:React.SFC<Props> = (props) => {

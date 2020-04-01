@@ -1,16 +1,20 @@
 import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import { NextPageContext } from 'next'
+import {useRouter} from 'next/router'
 
 import {Section} from '../components/Section'
 import {getToken} from '../src/token'
 import {Form, Label, Button, Input, Error} from '../components/Form'
 import TitleImg from '../components/TitleImg'
 
-const Login = () => {
+const Signup = (props:{loggedIn:boolean}) => {
   let [formState, setFormState] = useState({email:'', password:'', confPassword:''})
   let [error, setError] = useState<'user exists' | null>(null)
   let [state, setState] = useState<'normal' | 'loading' | 'success'>('normal')
+  let router = useRouter()
+
+  if(props.loggedIn) router.push('/')
 
   useEffect(()=>{
     setError(null)
@@ -18,7 +22,7 @@ const Login = () => {
 
   if(state === 'success') {
     return h(Section, [
-      `Sweet, now just check your email to confirm your account! If you aren't seeing
+      `Sweet! We sent an email to ${formState.email}, click the link there to confirm your account! If you aren't seeing
 it, check out your Spam folder.`
     ])
   }
@@ -34,6 +38,7 @@ it, check out your Spam folder.`
       })).json()
 
       if(!res.success) {
+        setState('normal')
         setError('user exists')
       }
       else {
@@ -76,9 +81,9 @@ it, check out your Spam folder.`
   ])
 }
 
-export default Login
+export default Signup
 
-Login.getInitialProps = ({req, res}:NextPageContext) => {
+Signup.getInitialProps = ({req, res}:NextPageContext) => {
   if(req && res) {
     if(getToken(req)) {
       res.writeHead(301, {Location: '/'})
