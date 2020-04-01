@@ -23,8 +23,6 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   await prisma.disconnect()
   if(!instance) return res.status(403).end()
 
-  console.log(instance)
-
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [{
@@ -37,7 +35,8 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
     success_url: `${req.headers.origin}/courses/${instance.course}/?success`,
     customer_email: user.email,
     metadata: {
-      instanceId: instance.id
+      instanceId: instance.id,
+      userId: user.id
     }
   });
 

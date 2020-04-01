@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import Stripe from 'stripe'
 import {PrismaClient} from '@prisma/client'
-import fetch from 'isomorphic-unfetch'
+import { getUsername, getGroupId, addMember} from '../../../src/discourse'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 const prisma = new PrismaClient()
@@ -31,52 +31,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   // Handle the checkout.session.completed event
-  try {
-    if (event.type === 'checkout.session.completed') {
-      const {customer_email, metadata} = event.data.object as {customer_email:string, metadata: {instanceId:string}} ;
-      console.log(event.data.object)
-      let user = await prisma.people.findOne({where: {email: customer_email}, select:{id: true}})
+  if (event.type === 'checkout.session.completed') {
+    const {metadata} = event.data.object as {customer_email:string, metadata: {instanceId:string, userId:string}} ;
 
-      console.log(user)
-      let {instanceId} = metadata
+    await prisma.people_in_instances.create({data: {
+      people: {connect: {id: metadata.userId}},
+      course_instances: {connect: {id: metadata.instanceId}}
+    }})
+    await prisma.disconnect()
 
-      console.log(instanceId)
+    let username = await getUsername(metadata.userId)
+    let groupId = await getGroupId(metadata.instanceId)
 
-      if(!user || !instanceId) return res.status(400).end()
+    if(!username || !groupId) return res.status(400).send('ERROR: Cannot find user or group id')
 
-      await prisma.people_in_instances.create({data: {
-        people:{connect: {id:user.id}},
-        course_instances: {connect: {id: instanceId}}
-      }})
+    await addMember(groupId, username)
 
-      let discourseRes = await fetch('https://forum.hyperlink.academy/u/by-external/' + user.id + '.json', {
-        method: "GET",
-        headers: {
-          "Api-Key": process.env.DISCOURSE_API_KEY || '',
-          "Api-Username": process.env.DISCOURSE_API_USERNAME || '',
-        }
-      })
-
-      console.log('request-result', discourseRes)
-
-      await fetch('https://forum.hyperlink.academy/groups/' + instanceId + '/members.json', {
-        method: "PUT",
-        headers: {
-          "Api-Key": process.env.DISCOURSE_API_KEY || '',
-          "Api-Username": process.env.DISCOURSE_API_USERNAME || '',
-          "Content-Type": 'application/json',
-        },
-        body: JSON.stringify({
-          usernames: (await discourseRes.json()).username
-        })
-      })
-
-    }
+  }
 
   res.status(200).end()
-  }
-  catch(e) {
-    console.log(e)
-    return res.status(400).send(e.message)
-  }
 }
