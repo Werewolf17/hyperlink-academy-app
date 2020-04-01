@@ -1,20 +1,34 @@
-CREATE TABLE activation_keys
+CREATE TABLE IF NOT EXISTS activation_keys
 (
-key_hash     text NOT NULL PRIMARY KEY,
-time         text NOT NULL,
-password_hash text NOT NULL,
-email        text NOT NULL
+    key_hash      text NOT NULL PRIMARY KEY,
+    created_time  text NOT NULL,
+    password_hash text NOT NULL,
+    email         text NOT NULL
 );
 
-CREATE TABLE password_reset_keys
+CREATE TABLE IF NOT EXISTS password_reset_keys
 (
-key_hash text PRIMARY KEY NOT NULL,
-time     text NOT NULL,
-email    text NOT NULL
+    key_hash      text PRIMARY KEY NOT NULL,
+    created_time  text NOT NULL,
+    email         text NOT NULL
 );
 
-CREATE TABLE people (
-id text NOT NULL PRIMARY KEY,
-email text NOT NULL UNIQUE,
-password_hash text NOT NULL UNIQUE
+CREATE TABLE IF NOT EXISTS people (
+    id            text NOT NULL UNIQUE PRIMARY KEY,
+    email         text NOT NULL UNIQUE,
+    password_hash text NOT NULL UNIQUE
 );
+
+CREATE TABLE IF NOT EXISTS course_instances (
+    id            text NOT NULL UNIQUE PRIMARY KEY,
+    cost          real NOT NULL,
+    start_date    text NOT NULL,
+    end_date      text NOT NULL,
+    course        text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS people_in_instances (
+    person_id     text REFERENCES people(id) NOT NULL,
+    instance_id   text REFERENCES course_instances(id) NOT NULL,
+    PRIMARY KEY (person_id, instance_id)
+)

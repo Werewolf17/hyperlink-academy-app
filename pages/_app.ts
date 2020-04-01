@@ -2,10 +2,14 @@ import NextApp, { AppContext } from 'next/app'
 import h from 'react-hyperscript'
 import Head from 'next/head'
 import Link from 'next/link'
+import {loadStripe} from '@stripe/stripe-js';
+import {Elements} from '@stripe/react-stripe-js'
 import styled from 'styled-components'
 import {getToken, Token} from '../src/token'
 import {Login} from '../components/Login'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, createContext, useContext} from 'react'
+
+const stripePromise = loadStripe('pk_test_LOqCqstM6XCEHlA3kVEqBBqq006vmeRRkS');
 
 const Layout = styled('div')`
 margin: auto;
@@ -17,6 +21,11 @@ a:visited {
   color: blue;
 }
 `
+
+export const UserContext = createContext<Token | undefined>(undefined);
+export const useUserContext = ()=>{
+  return useContext(UserContext)
+}
 
 type Props = {
   loggedIn: boolean,
@@ -56,22 +65,26 @@ const App = ({ Component, pageProps, loggedIn, user}:Props) => {
     }
   }, [loggedIn, user])
 
-  return h(Layout, {}, [
-    h(Head, {children:[]}, h('title', 'hyperlink.academy')),
-    h(Header, [
-      h('h1', {}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
-      h(Login, {loggedIn:state.loggedIn, username:state.user?.email}),
-    ]),
-    h(Component, {...pageProps, ...state}),
-    h('br'),
-    h('hr'),
-    h('div', {style:{textAlign: 'right'}}, [
-      'a ',
-      h('a', {href:"https://fathom.network"}, 'fathom'),
-      ' project',
-      h('br'),
-    ])
-  ])
+  return h(Elements, {stripe:stripePromise},
+           h(UserContext.Provider, {value: state.user}, [
+             h(Layout, {}, [
+               h(Head, {children: []}, h('title', 'hyperlink.academy')),
+               h(Header, [
+                 h('h1', {}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
+                 h(Login, {loggedIn:state.loggedIn, username:state.user?.email}),
+               ]),
+               h(Component, {...pageProps, ...state}),
+               h('br'),
+               h('hr'),
+               h('div', {style:{textAlign: 'right'}}, [
+                 'a ',
+                 h('a', {href:"https://fathom.network"}, 'fathom'),
+                 ' project',
+                 h('br'),
+               ])
+             ])
+           ])
+          )
 }
 
 App.getInitialProps = async (appContext:AppContext) => {

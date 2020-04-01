@@ -22,12 +22,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   if(await validateLogin(user.email, msg.oldPassword)) {
     await updatePassword(user.email, msg.newPassword)
-    res.end()
   }
   else {
     res.status(401)
-    return res.end()
   }
+  await prisma.disconnect()
+  res.end()
 }
 
 async function validateLogin(email: string, password: string):Promise<boolean> {

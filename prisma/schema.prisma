@@ -14,6 +14,15 @@ model activation_keys {
   time          String
 }
 
+model course_instances {
+  cost                Float
+  course              String
+  end_date            String
+  id                  String                @id
+  start_date          String
+  people_in_instances people_in_instances[]
+}
+
 model password_reset_keys {
   email    String
   key_hash String @id
@@ -21,7 +30,17 @@ model password_reset_keys {
 }
 
 model people {
-  email         String @unique
-  id            String @id
-  password_hash String @unique
+  email               String                @unique
+  id                  String                @id
+  password_hash       String                @unique
+  people_in_instances people_in_instances[]
+}
+
+model people_in_instances {
+  instance_id      String
+  person_id        String
+  course_instances course_instances @relation(fields: [instance_id], references: [id])
+  people           people           @relation(fields: [person_id], references: [id])
+
+  @@id([person_id, instance_id])
 }

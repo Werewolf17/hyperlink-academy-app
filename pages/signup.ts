@@ -1,20 +1,20 @@
 import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
-import { NextPageContext } from 'next'
 import {useRouter} from 'next/router'
 
 import {Section} from '../components/Section'
-import {getToken} from '../src/token'
 import {Form, Label, Button, Input, Error} from '../components/Form'
 import TitleImg from '../components/TitleImg'
+import { useUserContext } from './_app'
 
-const Signup = (props:{loggedIn:boolean}) => {
+const Signup = () => {
   let [formState, setFormState] = useState({email:'', password:'', confPassword:''})
   let [error, setError] = useState<'user exists' | null>(null)
   let [state, setState] = useState<'normal' | 'loading' | 'success'>('normal')
   let router = useRouter()
+  let user = useUserContext()
 
-  if(props.loggedIn) router.push('/')
+  if(user) router.push('/')
 
   useEffect(()=>{
     setError(null)
@@ -76,19 +76,9 @@ it, check out your Spam folder.`
                   }
                  })
       ]),
-      state === 'loading' ? h('div', 'Loading') : h(Button, {type: 'submit'}, 'login')
+      state === 'loading' ? h('div', 'Loading') : h(Button, {type: 'submit'}, 'sign up')
     ])
   ])
 }
 
 export default Signup
-
-Signup.getInitialProps = ({req, res}:NextPageContext) => {
-  if(req && res) {
-    if(getToken(req)) {
-      res.writeHead(301, {Location: '/'})
-      res.end()
-    }
-  }
-  return {}
-}
