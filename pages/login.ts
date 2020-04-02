@@ -5,7 +5,8 @@ import {useRouter} from 'next/router'
 
 import {Section} from '../components/Section'
 import {getToken} from '../src/token'
-import {Form, Button, Input, Error} from '../components/Form'
+import {Form, Input, Error, Label, Submit} from '../components/Form'
+import {Primary, LinkButton} from '../components/Button'
 import {Msg} from './api/login'
 import {Msg as ResetMsg} from './api/requestResetPassword'
 import Link from 'next/link'
@@ -13,8 +14,9 @@ import Link from 'next/link'
 const Login = () => {
   let [email, setEmail] = useState('')
   let [password, setPassword] = useState('')
-  let [loading, setLoading] = useState(false)
-  let [error, setError] = useState<'wrong username or password' | null>(null)
+
+  type Errors = 'wrong'
+  let [error, setError] = useState<Errors | null>(null)
   let router = useRouter()
   let {redirect, reset} = router.query
 
@@ -22,11 +24,9 @@ const Login = () => {
 
   if(typeof reset !== 'undefined') return h(ResetPassword)
 
-  return h(Section, {}, [
-    h(Form, {onSubmit: async (e) => {
+  const onSubmit = async (e:React.FormEvent) => {
       e.preventDefault()
       let msg:Msg = {email, password}
-      setLoading(true)
       let res = await fetch('/api/login', {
         method: "POST",
         body: JSON.stringify(msg)
@@ -35,20 +35,45 @@ const Login = () => {
         window.location.assign(redirect as string || '/')
       }
       else {
-        setLoading(false)
-        setError('wrong username or password')
+        setError('wrong')
       }
-    }}, [
-      error ? h(Error, error) : null,
-      h(Input, {type: 'email', placeholder: 'email',
-                value: email,
-                onChange: (e)=> setEmail(e.currentTarget.value)}),
-      h(Input, {type: 'password', placeholder: 'password',
-                value: password,
-                onChange: (e)=> setPassword(e.currentTarget.value)}),
-      loading ? h('p', 'loading') : h(Button, {type: 'submit'}, 'login')
+  }
+
+  const Errors: {[key in Errors]: React.ReactElement} = {
+    'wrong': h('div', [
+      "That email and password don't match. You can ",
+      h(Link, {href: '/login?reset'}, h('a', 'reset your password here')),
+      '.'
+    ])
+  }
+
+  return h('div', {}, [
+    h(Form, {onSubmit}, [
+      h('h1', 'Welcome Back!'),
+      error ? h(Error, {}, Errors[error]) : null,
+      h(Label, [
+        'Your Email',
+        h(Input, {
+          type: 'email',
+          value: email,
+          required:true,
+          onChange: (e)=> setEmail(e.currentTarget.value)
+        }),
+      ]),
+      h(Label, [
+        'Password',
+        h(Input, {
+          type: 'password',
+          value: password,
+          required:true,
+          onChange: (e)=> setPassword(e.currentTarget.value)
+        }),
+      ]),
+      h(Submit, [
+        h(Primary, {type: 'submit'}, 'Log In'),
+        h(Link, {href: '/login?reset'}, h(LinkButton, 'Reset Password'))
+      ])
     ]),
-    h(Link, {href: '/login?reset'}, h('a', 'forgot your password?'))
   ])
 }
 
@@ -58,8 +83,7 @@ const ResetPassword:React.SFC = () => {
 
   switch(status) {
     case 'normal':
-      return h(Section, [
-        h('h3', 'Reset your password'),
+      return h('div', [
         h(Form, {onSubmit: async e =>{
           e.preventDefault()
           setStatus('loading')
@@ -73,13 +97,19 @@ const ResetPassword:React.SFC = () => {
           if(res.status === 200) setStatus('success')
           else setStatus('error')
         }}, [
-          h(Input, {
-            type: 'email',
-            value: email,
-            placeholder: 'your account email',
-            onChange: e=>setEmail(e.currentTarget.value)
-          }),
-          h(Button, {type: 'submit'}, 'reset password')
+          h('h1', 'Reset your password'),
+          h(Label, [
+            'Your Account Email',
+            h(Input, {
+              type: 'email',
+              value: email,
+              placeholder: 'your account email',
+              onChange: e=>setEmail(e.currentTarget.value)
+            }),
+          ]),
+          h('div', {style: {display: 'grid', justifyItems:'end', gridGap: '8px'}}, [
+            h(Primary, {type: 'submit'}, 'reset password')
+          ])
         ])
       ])
     case 'loading': return h(Section, [h('div', 'Loading...')])

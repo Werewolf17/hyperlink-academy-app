@@ -2,8 +2,8 @@ import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 
-import {Section} from '../components/Section'
-import {Form, Label, Button, Input, Error} from '../components/Form'
+import {Form, Label, Input, Error, Submit} from '../components/Form'
+import {Primary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import { useUserContext } from './_app'
 
@@ -21,15 +21,13 @@ const Signup = () => {
   }, [formState.email])
 
   if(state === 'success') {
-    return h(Section, [
+    return h('div', [
       `Sweet! We sent an email to ${formState.email}, click the link there to confirm your account! If you aren't seeing
 it, check out your Spam folder.`
     ])
   }
 
-  return h(Section, {}, [
-    h(TitleImg, {src: '/img/start_journey.png', width: '250px'}),
-    h(Form, {onSubmit: async (e) => {
+  const onSubmit = async (e:React.FormEvent) => {
       e.preventDefault()
       setState('loading')
       let res = await (await fetch('/api/signup', {
@@ -44,25 +42,31 @@ it, check out your Spam folder.`
       else {
         setState('success')
       }
-    }}, [
-      h('p', `Welcome to hyperlink.academy!`),
+    }
+
+  return h('div', {}, [
+    h(Form, {onSubmit}, [
+      h(TitleImg, {src: '/img/start_journey.png', width: '250px'}),
+      h('h1', 'Start a journey'),
       error ? h(Error, error) : null,
       h(Label, [
+        "Your Email",
         h(Input, {type: 'email',
-                  placeholder: 'email',
                   required: true,
                   value: formState.email,
                   onChange: (e)=> setFormState({...formState, email:e.currentTarget.value})})
       ]),
       h(Label, [
-        h(Input, {type: 'password', placeholder: 'password',
+        "A Password",
+        h(Input, {type: 'password',
                   required: true,
                   minLength: 8,
                   value: formState.password,
                   onChange: (e)=> setFormState({...formState, password:e.currentTarget.value})})
       ]),
       h(Label, [
-        h(Input, {type: 'password', placeholder: 'confirm password',
+        "Confirm Password",
+        h(Input, {type: 'password',
                   required: true,
                   value: formState.confPassword,
                   onChange: (e)=> {
@@ -76,7 +80,9 @@ it, check out your Spam folder.`
                   }
                  })
       ]),
-      state === 'loading' ? h('div', 'Loading') : h(Button, {type: 'submit'}, 'sign up')
+      h(Submit, [
+        h(Primary, {type: 'submit'}, 'Submit')
+      ])
     ])
   ])
 }

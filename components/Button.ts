@@ -1,0 +1,27 @@
+import styled from "styled-components";
+import {colors} from  './Layout'
+
+export const Primary = styled('button')`
+font-family: monospace;
+background-color: ${colors.grey15};
+padding: 8px 16px;
+border-radius: 2px;
+border: none;
+font-size: inherit;
+color: white;
+
+&:hover {
+cursor: pointer;
+}
+
+`
+
+export const LinkButton = styled('a')`
+color: blue;
+text-decoration: underline;
+font-family: monospace;
+
+&:hover {
+cursor: pointer;
+}
+`
