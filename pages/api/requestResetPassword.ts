@@ -39,20 +39,22 @@ const checkUser = async (email:string):Promise<boolean> => {
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   let msg: Partial<Msg> = JSON.parse(req.body)
   if(!msg.email) {
-    res.json({success: false})
-    return res.end()
+    return res.status(403).end()
   }
+
   if(!(await checkUser(msg.email))) {
     res.json({success:true})
-    return res.end()
   }
 
-  let key = await createResetKey(msg.email)
+  else {
+    let key = await createResetKey(msg.email)
 
-  let url = `${req.headers.origin}/resetPassword?&key=${key}`
+    let url = `${req.headers.origin}/resetPassword?&key=${key}`
 
-  await sendResetEmail(msg.email, url)
+    await sendResetEmail(msg.email, url)
+    res.json({success: true})
+  }
 
-  res.json({success: true})
-  return res.end()
+  res.end()
+  await prisma.disconnect()
 }

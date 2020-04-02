@@ -2,32 +2,51 @@ import h from 'react-hyperscript'
 import { useEffect, useState} from 'react'
 import {Msg, Result} from './api/verifyEmail'
 import {useRouter} from 'next/router'
+import { Narrow } from '../components/Layout'
+import Link from 'next/link'
+import { Primary } from '../components/Button'
 
 export default () => {
   let router = useRouter()
-  let [result, setResult] = useState<null | 'invalid parameters' | 'old key'>(null)
+  let [result, setResult] = useState<null | 'invalid' | 'success'>(null)
 
   useEffect(() => {
     try {
       let key = router.query.key
-      if(typeof key !== 'string') return setResult('invalid parameters')
+      if(typeof key !== 'string') return setResult('invalid')
 
       let msg:Msg = {key}
       fetch('/api/verifyEmail', {method: "POST", body: JSON.stringify(msg)}).then(async (res) => {
         let result:Result = await res.json()
         if(result.success) {
-          router.push('/')
+          setResult('success')
         }
-        else setResult('old key')
+        else setResult('invalid')
       })
     }
     catch (e) {
-      setResult('invalid parameters')
+      setResult('invalid')
     }
   }, [])
 
-  if(!result)  return h('div', 'loading')
-  if(result === 'old key') {
-    return h('div', 'Your email link is out of date, please try signing up again')
-  }
+  useEffect(()=>{
+    if(result !== 'success') return
+    setTimeout(()=>{
+      router.push('/')
+    }, 5000)
+  }, [result])
+
+  if(result === null) return h(Narrow, [
+    h('h1', "Verifying your account..."),
+  ])
+
+  if(result === 'success') return h(Narrow, [
+    h('h1', "You're verified!"),
+    h('p', "Click the button below if you're not redirected in a couple seconds"),
+    h(Primary, {onClick: ()=> router.push('/')}, 'Back to hyperlink')
+  ])
+
+  return h(Narrow, [
+    'Your email link is invalid or out of date, please try ', h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
+  ])
 }

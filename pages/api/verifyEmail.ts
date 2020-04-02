@@ -22,14 +22,21 @@ export type Result = {
 } | {
   success: false
   error: 'old key'
+}| {
+  success: false
+  error: 'user exists'
 }
 
-const createUser = async (email:string, password_hash:string, key_hash: string) => {
+const createUser = async (email:string, password_hash:string) => {
   let data = {
     email, password_hash, id: uuidv4()
   }
-  await prisma.people.create({data})
-  await prisma.activation_keys.delete({where:{key_hash}})
+  try {
+    await prisma.people.create({data})
+    await prisma.activation_keys.deleteMany({where:{email}})
+  } catch(e) {
+    return false
+  }
   return data.id
 }
 
@@ -51,7 +58,8 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
     return res.json({success:false, error:'old key'})
   }
 
-  let id = await createUser(token.email, token.password_hash, keyHash)
+  let id = await createUser(token.email, token.password_hash)
+  if(!id) return res.json({success:false, error:'user exists'})
   setToken(res, {email:token.email, id})
   return res.json({success:true})
 }

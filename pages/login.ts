@@ -15,8 +15,7 @@ const Login = () => {
   let [email, setEmail] = useState('')
   let [password, setPassword] = useState('')
 
-  type Errors = 'wrong'
-  let [error, setError] = useState<Errors | null>(null)
+  let [error, setError] = useState<'wrong'| null>(null)
   let router = useRouter()
   let {redirect, reset} = router.query
 
@@ -39,12 +38,12 @@ const Login = () => {
       }
   }
 
-  const Errors: {[key in Errors]: React.ReactElement} = {
+  const Errors: {[key in Exclude<typeof error, null>]: React.ReactElement} = {
     'wrong': h('div', [
       "That email and password don't match. You can ",
       h(Link, {href: '/login?reset'}, h('a', 'reset your password here')),
       '.'
-    ])
+    ]),
   }
 
   return h(Narrow, {}, [

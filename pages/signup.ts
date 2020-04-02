@@ -4,14 +4,14 @@ import {useRouter} from 'next/router'
 
 import {Narrow} from '../components/Layout'
 import {Form, Label, Input, Error, Submit} from '../components/Form'
-import {Primary} from '../components/Button'
+import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import { useUserContext } from './_app'
+import Link from 'next/link'
 
 const Signup = () => {
   let [formState, setFormState] = useState({email:'', password:'', confPassword:''})
   let [error, setError] = useState<'user exists' | null>(null)
-  let [state, setState] = useState<'normal' | 'loading' | 'success'>('normal')
   let router = useRouter()
   let user = useUserContext()
 
@@ -21,35 +21,54 @@ const Signup = () => {
     setError(null)
   }, [formState.email])
 
-  if(state === 'success') {
-    return h('div', [
-      `Sweet! We sent an email to ${formState.email}, click the link there to confirm your account! If you aren't seeing
-it, check out your Spam folder.`
+  const onSubmit = async (e:React.FormEvent) => {
+    e.preventDefault()
+    let res = await (await fetch('/api/signup', {
+      method: "POST",
+      body: JSON.stringify({email:formState.email, password: formState.password})
+    })).json()
+
+    if(!res.success) {
+      setError('user exists')
+    }
+    else {
+      router.push('/signup?success')
+    }
+  }
+
+  const Errors: {[key in Exclude<typeof error, null>]: React.ReactElement} = {
+    'user exists': h('div', [
+      "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
+      '.'
     ])
   }
 
-  const onSubmit = async (e:React.FormEvent) => {
-      e.preventDefault()
-      setState('loading')
-      let res = await (await fetch('/api/signup', {
-        method: "POST",
-        body: JSON.stringify({email:formState.email, password: formState.password})
-      })).json()
+  if(router.query.success !== undefined) {
+    return h(Narrow, [
+      h('p', [
+      `Sweet! We sent an email to ${formState.email}, click the link there to confirm your account! If you aren't seeing
+it, check out your Spam folder.`,
+      ]),
+      h('div', {style: {display: 'grid', gridGap: '16px'}}, [
+      h(Primary, {
+        onClick: onSubmit
+      }, 'Send another link'),
+      h(Secondary, {
+        onClick: (e) => {
+          e.preventDefault()
+          router.push('/signup')
+        }
+      }, 'Change your email')
 
-      if(!res.success) {
-        setState('normal')
-        setError('user exists')
-      }
-      else {
-        setState('success')
-      }
-    }
+      ])
+    ])
+  }
 
   return h(Narrow, {}, [
     h(Form, {onSubmit}, [
       h(TitleImg, {src: '/img/start_journey.png', width: '250px'}),
       h('h1', 'Start a journey'),
-      error ? h(Error, error) : null,
+      error ? h(Error, {}, Errors[error]) : null,
       h(Label, [
         "Your Email",
         h(Input, {type: 'email',

@@ -13,7 +13,13 @@ color: white;
 &:hover {
 cursor: pointer;
 }
+`
 
+export const Secondary = styled(Primary)`
+border: 2px solid;
+color: black;
+border-color: ${colors.grey15};
+background-color: white;
 `
 
 export const LinkButton = styled('a')`

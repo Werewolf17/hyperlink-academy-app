@@ -29,6 +29,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 async function validateLogin(email: string, password: string):Promise<false | string> {
   try {
     let person = await prisma.people.findOne({where:{email}})
+    await prisma.disconnect()
     if(!person) return false
     if(!await bcrypt.compare(password, person.password_hash)) return false
     return person.id

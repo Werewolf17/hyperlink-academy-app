@@ -16,34 +16,32 @@ export const useUserContext = ()=>{
 }
 
 type Props = {
-  loggedIn: boolean,
   user?: Token
   Component: any,
   pageProps: any
 }
 
-const App = ({ Component, pageProps, loggedIn, user}:Props) => {
-  let [state, setState] = useState({loggedIn, user})
+const App = ({ Component, pageProps, user}:Props) => {
+  let [state, setState] = useState({user})
 
   useEffect(() => {
     // Update user state in local storage
-    if(loggedIn) {
+    if(user) {
       localStorage.setItem('user', JSON.stringify(user))
     }
     else {
       localStorage.removeItem('user')
     }
-    setState({loggedIn, user})
+    setState({user})
 
     // Listen for storage events triggered from other tabs
     let listener = (e:StorageEvent) => {
       if(e.key !== 'user') return
       if(e.newValue) {
         let newUser = JSON.parse(e.newValue || '{}')
-        let newLoggedIn = !!newUser
-        setState({loggedIn: newLoggedIn, user: newUser})
+        setState({user: newUser})
       } else {
-        setState({loggedIn: false, user:undefined})
+        setState({user:undefined})
       }
     }
 
@@ -51,7 +49,7 @@ const App = ({ Component, pageProps, loggedIn, user}:Props) => {
     return ()=>{
       window.removeEventListener('storage', listener)
     }
-  }, [loggedIn, user])
+  }, [user])
 
   return h(Elements, {stripe:stripePromise},
            h(UserContext.Provider, {value: state.user}, [
@@ -73,10 +71,7 @@ App.getInitialProps = async (appContext:AppContext) => {
       let storedUserData = localStorage.getItem('user')
       if(storedUserData) user = JSON.parse(storedUserData)
     }
-    if(user) {
-      return {...appProps, loggedIn: true, user}
-    }
-    else return {...appProps, loggedIn: false}
+    return {...appProps, user}
 }
 
 export default App
