@@ -4,6 +4,6 @@ image-rendering: pixelated;
 image-rendering: -moz-crisp-edges;
 image-rendering: crisp-edges;
 display: block;
-margin: auto;
+border: 2px solid;
 `
 export default TitleImg
