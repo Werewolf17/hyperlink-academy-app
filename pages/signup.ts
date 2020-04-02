@@ -2,6 +2,7 @@ import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 
+import {Narrow} from '../components/Layout'
 import {Form, Label, Input, Error, Submit} from '../components/Form'
 import {Primary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
@@ -44,7 +45,7 @@ it, check out your Spam folder.`
       }
     }
 
-  return h('div', {}, [
+  return h(Narrow, {}, [
     h(Form, {onSubmit}, [
       h(TitleImg, {src: '/img/start_journey.png', width: '250px'}),
       h('h1', 'Start a journey'),

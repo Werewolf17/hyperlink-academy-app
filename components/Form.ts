@@ -6,7 +6,6 @@ justify-self: right;
 
 export let Form = styled('form')`
 margin: 0px auto;
-max-width: 400px;
 display: grid;
 grid-gap: 32px;
 `

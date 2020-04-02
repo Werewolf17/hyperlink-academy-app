@@ -63,3 +63,8 @@ padding: 64px 32px;
 margin: auto;
 `
 
+
+export const Narrow = styled('div')`
+max-width: 400px;
+margin: auto;
+`

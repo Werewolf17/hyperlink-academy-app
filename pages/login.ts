@@ -2,14 +2,14 @@ import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import { NextPageContext } from 'next'
 import {useRouter} from 'next/router'
+import Link from 'next/link'
 
-import {Section} from '../components/Section'
+import {Narrow} from '../components/Layout'
 import {getToken} from '../src/token'
 import {Form, Input, Error, Label, Submit} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
 import {Msg} from './api/login'
 import {Msg as ResetMsg} from './api/requestResetPassword'
-import Link from 'next/link'
 
 const Login = () => {
   let [email, setEmail] = useState('')
@@ -47,7 +47,7 @@ const Login = () => {
     ])
   }
 
-  return h('div', {}, [
+  return h(Narrow, {}, [
     h(Form, {onSubmit}, [
       h('h1', 'Welcome Back!'),
       error ? h(Error, {}, Errors[error]) : null,
@@ -83,7 +83,7 @@ const ResetPassword:React.SFC = () => {
 
   switch(status) {
     case 'normal':
-      return h('div', [
+      return h(Narrow, [
         h(Form, {onSubmit: async e =>{
           e.preventDefault()
           setStatus('loading')
@@ -112,9 +112,9 @@ const ResetPassword:React.SFC = () => {
           ])
         ])
       ])
-    case 'loading': return h(Section, [h('div', 'Loading...')])
-    case 'success': return h(Section, [h('div', 'Sent you an email! Check there to reset your password')])
-    case 'error': return h(Section, [h(Error, 'something went wrong, please refresh and try again')])
+    case 'loading': return h(Narrow, [h('div', 'Loading...')])
+    case 'success': return h(Narrow, [h('div', 'Sent you an email! Check there to reset your password')])
+    case 'error': return h(Narrow, [h(Error, 'something went wrong, please refresh and try again')])
   }
 }
 

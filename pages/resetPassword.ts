@@ -1,10 +1,11 @@
 import h from 'react-hyperscript'
-
-import { Form, Button, Input, Error, Label} from '../components/Form'
 import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
-import {Msg, Response} from './api/resetPassword'
 import Link from 'next/link'
+
+import {Narrow} from '../components/Layout'
+import { Form, Button, Input, Error, Label} from '../components/Form'
+import {Msg, Response} from './api/resetPassword'
 
 export default ()=>{
   let [inputs, setInputs] = useState({password:'', confirmPassword: ''})
@@ -36,7 +37,7 @@ export default ()=>{
 
   switch(status) {
     case 'normal':
-      return h('div', [
+      return h(Narrow, [
         h(Form, {onSubmit}, [
           h('h1', 'Reset your password'),
           h(Label, [
