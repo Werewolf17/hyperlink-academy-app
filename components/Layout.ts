@@ -1,8 +1,10 @@
-import styled from 'styled-components'
+import styled, {createGlobalStyle} from 'styled-components'
 import {Login} from './Login'
 import Head from 'next/head'
 import Link from 'next/link'
 import h from 'react-hyperscript'
+import { useRouter } from 'next/router'
+import { useUserContext } from '../pages/_app'
 
 export const colors = {
   grey95: "#F2F2F2",
@@ -13,14 +15,20 @@ export const colors = {
 }
 
 const Layout:React.SFC = (props)=>{
+  let router = useRouter()
+  let user = useUserContext()
+
   return h(Main, [
+    h(GlobalStyles),
     h(Head, {children:[]}, [
       h('link', {href:"https://fonts.googleapis.com/css?family=Lato&display=swap",  rel:"stylesheet"})
     ]),
-    h(Header, [
-      h(Title,{}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
-      h(Login),
-    ]),
+    router.pathname === '/' && !user
+      ? null
+      : h(Header, [
+        h(Title,{}, h(Link, {href:'/'}, h("a", 'hyperlink.academy'))),
+        h(Login),
+      ]),
     h(Body, {}, [props.children as React.ReactElement]),
   ])
 }
@@ -35,6 +43,10 @@ padding: 32px 64px 24px 64px;
 border-bottom: 1px solid;
 border-color: ${colors.grey55}
 background-color: ${colors.grey95};
+
+@media(max-width: 640px) {
+padding: 32px 32px 24px 32px;
+}
 `
 
 const Title = styled('div')`
@@ -46,6 +58,21 @@ const Main = styled('div')`
 font-size: 16;
 font-family: 'Lato', sans-serif;
 
+`
+
+const Body = styled('div')`
+max-width: 640px;
+padding: 64px 32px;
+margin: auto;
+`
+
+
+export const Narrow = styled('div')`
+max-width: 400px;
+margin: auto;
+`
+
+const GlobalStyles = createGlobalStyle`
 a:visited {
   color: blue;
 }
@@ -55,16 +82,8 @@ font-family: monospace;
 margin: 0;
 font-weight: normal;
 }
-`
 
-const Body = styled('div')`
-max-width: 800px;
-padding: 64px 32px;
-margin: auto;
-`
-
-
-export const Narrow = styled('div')`
-max-width: 400px;
-margin: auto;
+h3, h4, h5, h6 {
+margin: 0;
+}
 `
