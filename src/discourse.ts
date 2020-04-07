@@ -1,4 +1,6 @@
 import fetch from 'isomorphic-unfetch'
+import crypto from 'crypto'
+import querystring from 'querystring'
 
 let authHeaders = {
       "Api-Key": process.env.DISCOURSE_API_KEY || '',
@@ -44,4 +46,37 @@ export const addMember = async (groupId:string, username: string) => {
         })
       })
   return result.status  === 200
+}
+
+export const makeSSOPayload = (params: {[key:string]: string}) => {
+  let payload = (Buffer.from(querystring.stringify(params))).toString('base64')
+  const sig = crypto.createHmac('sha256', process.env.DISCOURSE_SECRET || '');
+  sig.update(payload)
+
+  let result = querystring.stringify({
+    sso:payload,
+    sig: sig.digest('hex')
+  })
+  console.log(result)
+  return result
+}
+
+export const syncSSO = async (params: {[key:string]: string})=>{
+  let payload = (Buffer.from(querystring.stringify(params))).toString('base64')
+  const sig = crypto.createHmac('sha256', process.env.DISCOURSE_SECRET || '');
+  console.log(params)
+
+  sig.update(payload)
+  return fetch(`https://forum.hyperlink.academy/admin/users/sync_sso`, {
+    method: "POST",
+    headers: {
+      "Api-Key": process.env.DISCOURSE_API_KEY || '',
+      "Api-Username": 'system',
+      "Content-Type": 'application/json; charset=utf-8'
+    },
+    body: JSON.stringify({
+      sso: payload,
+      sig: sig.digest('hex')
+    })
+  })
 }

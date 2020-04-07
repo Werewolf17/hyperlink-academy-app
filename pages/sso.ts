@@ -1,9 +1,10 @@
 import h from 'react-hyperscript'
-import crypto from 'crypto'
 import querystring from 'querystring'
+import crypto from 'crypto'
 import {useRouter} from 'next/router'
 import {getToken} from '../src/token'
 import { GetServerSideProps } from 'next'
+import { makeSSOPayload } from '../src/discourse'
 
 type Props = {error:boolean}
 export default ({error}:Props) => {
@@ -39,22 +40,13 @@ export const getServerSideProps:GetServerSideProps = async ({req,res, query}) =>
   }
 
   let {nonce} = querystring.parse(Buffer.from(sso as string, 'base64').toString())
-  let newPayload = querystring.stringify({
-    nonce,
-    email:token.email,
-    external_id: token.id
-  })
-
-  let base64Payload = (Buffer.from(newPayload)).toString('base64')
-
-  const hmac2 = crypto.createHmac('sha256', process.env.DISCOURSE_SECRET || '');
-  hmac2.update(base64Payload)
 
   res.writeHead(301, {
     Location: "https://forum.hyperlink.academy/session/sso_login?"
-      + querystring.stringify({
-        sso: base64Payload,
-        sig: hmac2.digest('hex')
+      + makeSSOPayload({
+        nonce:nonce as string ,
+        email:token.email,
+        external_id: token.id
       })
   })
   res.end()

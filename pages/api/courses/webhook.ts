@@ -34,16 +34,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (event.type === 'checkout.session.completed') {
     const {metadata} = event.data.object as {customer_email:string, metadata: {instanceId:string, userId:string}} ;
 
+    let username = await getUsername(metadata.userId)
+    let groupId = await getGroupId(metadata.instanceId)
+
+    if(!username || !groupId) return res.status(400).send('ERROR: Cannot find user or group id')
+
     await prisma.people_in_instances.create({data: {
       people: {connect: {id: metadata.userId}},
       course_instances: {connect: {id: metadata.instanceId}}
     }})
     await prisma.disconnect()
-
-    let username = await getUsername(metadata.userId)
-    let groupId = await getGroupId(metadata.instanceId)
-
-    if(!username || !groupId) return res.status(400).send('ERROR: Cannot find user or group id')
 
     await addMember(groupId, username)
 

@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import {PrismaClient} from '@prisma/client'
 import hmac from '../../src/hmac'
+import {syncSSO, makeSSOPayload} from '../../src/discourse'
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 import {setToken} from '../../src/token'
@@ -55,11 +56,21 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   let date = new Date(token.time)
 
   if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
+    await prisma.disconnect()
     return res.json({success:false, error:'old key'})
   }
 
   let id = await createUser(token.email, token.password_hash)
+  await prisma.disconnect()
   if(!id) return res.json({success:false, error:'user exists'})
+
+  let result = await syncSSO({
+    external_id: id,
+    email: token.email
+  })
+  console.log(result)
+  console.log(await result.text())
+
   setToken(res, {email:token.email, id})
   return res.json({success:true})
 }
