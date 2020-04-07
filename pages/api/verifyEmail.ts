@@ -64,12 +64,10 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   await prisma.disconnect()
   if(!id) return res.json({success:false, error:'user exists'})
 
-  let result = await syncSSO({
+  await syncSSO({
     external_id: id,
     email: token.email
   })
-  console.log(result)
-  console.log(await result.text())
 
   setToken(res, {email:token.email, id})
   return res.json({success:true})

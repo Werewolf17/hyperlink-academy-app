@@ -11,6 +11,7 @@ export const colors = {
   grey95: "#F2F2F2",
   grey55: "#8C8C8C",
   grey15: "#272727",
+  textSecondary: '#595959',
   backgroundRed: "#F9EBE8",
   accentRed: "#C23C1E"
 }
@@ -89,13 +90,24 @@ margin: 0;
 }
 
 h2 {
-font-size: 1.75em;
+font-size: 1.75rem;
+}
+
+h3 {
+font-size: 1.25rem;
 }
 
 p { margin: 0; }
+hr {
+  width: 100%;
+  color: black;
+  size: 2;
+  border: 1px solid;
+}
 `
 
-export const Gap = styled('div')<{gap: Spacing}>`
+export const Box = styled('div')<{gap?: Spacing, mt?: Spacing}>`
 display: grid;
+margin-top: ${props => props.mt || 0}px;
 grid-gap: ${props => props.gap || 16}px;
 `

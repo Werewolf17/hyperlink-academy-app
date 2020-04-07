@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import h from 'react-hyperscript'
 
-import { colors, Gap} from '../Layout'
+import { colors, Box} from '../Layout'
 import { useRouter } from "next/router"
 
 type Props = {
@@ -16,22 +16,26 @@ export default (props:Props) => {
     onClick: ()=>{
       router.push(props.path)
     }
-  }, h(Gap, {gap: 16}, [
+  }, h(Box, {gap: 16}, [
     h('h3', props.name),
     h('p', props.description),
-    h('p', 'Next instance starts ' + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
+    h(DateContainer, 'Next instance starts ' + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
   ]))
 }
+
+let DateContainer = styled('p')`
+color: ${colors.textSecondary}
+font-size: 12px;
+`
 
 let Card = styled('a')`
 width: 300px;
 box-sizing: border-box;
-background-color: ${colors.grey15};
+border: 1px solid;
+border-color: ${colors.grey15};
 padding: 24px;
-color: white;
 
 &:hover, &:active, &:focus {
 cursor: pointer;
-box-shadow: 3px 3px white, 7px 7px ${colors.grey15};
 }
 `

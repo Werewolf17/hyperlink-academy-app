@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 
-import { Narrow, Gap} from '../components/Layout'
+import { Narrow, Box} from '../components/Layout'
 import {Form, Label, Input, Error, Submit} from '../components/Form'
 import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
@@ -45,14 +45,14 @@ const Signup = () => {
 
   if(router.query.success !== undefined) {
     return h(Narrow, [
-      h(Gap, {gap: 32}, [
+      h(Box, {gap: 32}, [
         h(TitleImg, {src: '/img/plane.gif'}),
         h('h1', 'Verify your email'),
         h('p', [
           `Sweet! We sent an email to ${formState.email}, click the link there to verify your email address! If you aren't seeing
 it, check out your Spam folder.`,
         ]),
-        h(Gap, {gap: 16}, [
+        h(Box, {gap: 16}, [
           h(Primary, {
             onClick: onSubmit
           }, 'Send another link'),

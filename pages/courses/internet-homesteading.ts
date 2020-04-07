@@ -6,7 +6,7 @@ import { useStripe } from '@stripe/react-stripe-js'
 
 import {getToken} from '../../src/token'
 import {Msg, Response} from '../api/courses/enroll'
-import { Gap, colors } from '../../components/Layout'
+import { Box, colors } from '../../components/Layout'
 import { Primary } from '../../components/Button'
 import { useRouter } from 'next/router'
 import { useUserContext } from '../_app'
@@ -27,11 +27,10 @@ export default (props:Props) => {
       month: 'long',
       day: 'numeric'
     })
-  console.log(props.instances[0].people_in_instances)
 
   return h(Main, [
-    h(Gap,{gap:16}, [
-      h(Gap, {gap: 8}, [
+    h(Box,{gap:16}, [
+      h(Box, {gap: 8}, [
         h('h1', 'Internet Homesteading'),
         h('a',{href:'https://forum.hyperlink.academy/c/internet-homesteading'},  'Check out the course forum')
       ]),
@@ -68,7 +67,7 @@ internet, to further your goals, not a companies advertising business.`),
       }, 'Enroll'),
     ]),
     h(Info,[
-      h(Gap, {gap:16}, [
+      h(Box, {gap:16}, [
         h(Cost, '$' + props.instances[0].cost),
         h('p', 'This course is intense?')
       ])

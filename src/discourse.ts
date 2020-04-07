@@ -57,14 +57,12 @@ export const makeSSOPayload = (params: {[key:string]: string}) => {
     sso:payload,
     sig: sig.digest('hex')
   })
-  console.log(result)
   return result
 }
 
 export const syncSSO = async (params: {[key:string]: string})=>{
   let payload = (Buffer.from(querystring.stringify(params))).toString('base64')
   const sig = crypto.createHmac('sha256', process.env.DISCOURSE_SECRET || '');
-  console.log(params)
 
   sig.update(payload)
   return fetch(`https://forum.hyperlink.academy/admin/users/sync_sso`, {

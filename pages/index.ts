@@ -1,26 +1,52 @@
 import h from 'react-hyperscript'
 import styled from 'styled-components'
-import { NextPage} from 'next'
+import { NextPage, GetServerSideProps} from 'next'
 import Link from 'next/link'
 
 import Intro from '../copy/Intro.mdx'
 import { Primary, Secondary } from '../components/Button'
 import CourseCard from '../components/Course/CourseCard'
-import {colors, Gap} from '../components/Layout'
+import {colors, Box} from '../components/Layout'
 import { useUserContext } from './_app'
-import { PrismaClient, coursesGetPayload } from '@prisma/client'
+import { PrismaClient, coursesGetPayload, course_instances } from '@prisma/client'
+import { getToken } from '../src/token'
 
 type CourseWithInstances = coursesGetPayload<{include: {course_instances: true}}>
-const Landing:NextPage<{courses:CourseWithInstances[]}> = (props) => {
+type Instances = course_instances
+
+type Props = {
+  courses: CourseWithInstances[],
+  instances: Instances[]
+}
+
+const Landing:NextPage<Props> = (props) => {
   let user = useUserContext()
-  return h(Gap, {gap:64}, [
-    user ? h('h1', `Hello ${user.email}!`) : h(Welcome),
-    h(Gap, {gap: 16}, [
-      h('h2', "Ongoing Courses"),
+  return h(Box, {gap:48}, [
+    !user ? h(Welcome)
+      : h(Box, [
+        h('h1', `Hello ${user.email}!`),
+        h(Box, [
+          h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
+          h('a', {href: 'https://forum.hyperlink.academy'},'Check out the forum')
+        ])
+      ]),
+    ! user ? null : h(Box, [
+      h('h2', "Your Courses"),
+      h(CoursesGrid, {}, props.instances.map(instance => {
+        return h(CourseCard, {
+          description: '',
+          start_date: new Date(instance.start_date),
+          name: instance.course,
+          path: '/courses/' +instance.course
+        })
+      }))
+    ]),
+    h('hr'),
+    h(Box, {gap: 16}, [
+      h('h2', "The Courses List"),
       h(CoursesGrid,
         props.courses
         .map(course => {
-          console.log(course)
           return h(CourseCard, {
             key: course.id,
             description: course.description,
@@ -29,30 +55,42 @@ const Landing:NextPage<{courses:CourseWithInstances[]}> = (props) => {
             path: '/courses/' + course.id}, [])
         })),
     ]),
-    h(Gap, {gap: 16}, [
+    h('hr'),
+    h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
       h('h2', 'The Course Kindergarten'),
       'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
-      h('a', {href: 'https://forum.hyperlink.academy/c/course-kindergarten/'}, h(Primary, 'Course Kindergarten' ))
+      h('a', {style: {justifySelf: 'end'}, href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},'Check out the kindergarten ➭')
     ]),
-    h('p', [
-      h(Link, {href: '/manual', passHref: true}, h(ManualBlock, 'Read The Manual'))
-    ])
   ])
 }
 
 const Welcome = ()=>{
-  return h(Gap, {gap:32, style:{paddingBottom: '48px'}}, [
-    h(Title, 'hyperlink.academy'),
-    h(Intro),
+  return h(Box, {gap:32, style:{paddingBottom: '48px'}}, [
     h(LoginButtons, [
       h(Link, {href: '/signup'}, h(Primary,  'Sign up')),
       h(Link, {href: '/login'}, h(Secondary, "Log in")),
     ]),
+    h(Title, 'hyperlink.academy'),
+    h(Intro),
   ])
 }
 
-export const getServerSideProps = async () => {
+export const getServerSideProps:GetServerSideProps = async ({req}) => {
   let prisma = new PrismaClient()
+  let user = getToken(req)
+  let instances
+  if(user) {
+    instances = await prisma.course_instances.findMany({
+      where: {
+        people_in_instances: {
+          some: {
+            person_id: user.id
+          }
+        }
+      }
+    })
+  }
+
   let courses = await prisma.courses.findMany({
     include: {
       course_instances: {
@@ -66,7 +104,9 @@ export const getServerSideProps = async () => {
       }
     }
   })
-  return {props: {courses}}
+  await prisma.disconnect()
+
+  return {props: {courses, instances: instances || null}}
 }
 
 const Title = styled('h1')`
@@ -75,7 +115,8 @@ text-decoration: underline;
 font-weight: bold;
 color: blue;
 `
-const LoginButtons = styled('p')`
+const LoginButtons = styled('div')`
+justify-content: end;
 display: grid;
 grid-gap: 16px;
 grid-template-columns: max-content max-content;
@@ -86,25 +127,5 @@ display: grid;
 grid-template-columns: repeat(auto-fill, 300px);
 grid-gap: 24px;
 `
-
-const ManualBlock = styled('a')`
-font-size: 2rem;
-color: white;
-&:visited {color:white;}
-text-decoration: none;
-display: block;
-background-color: ${colors.grey15};
-color: white;
-width: 100%;
-height: 100px;
-padding: 16px;
-box-sizing: border-box;
-
-&:hover, &:active, &:focus {
-cursor: pointer;
-box-shadow: 3px 3px white, 7px 7px ${colors.grey15};
-}
-`
-
 
 export default Landing
