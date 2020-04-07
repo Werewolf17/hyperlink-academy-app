@@ -17,7 +17,7 @@ export const Login = () => {
   ])
   else {
     return h(Container, [
-      h(Link, {href: '/profile'}, h('a', user.email)),
+      h(Link, {href: '/profile'}, h('a', 'settings')),
       ' ',
       h(Button, {onClick: async ()=>{
         let res = await fetch('/api/logout')

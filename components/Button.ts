@@ -6,6 +6,7 @@ font-family: monospace;
 background-color: ${colors.grey15};
 padding: 8px 16px;
 border-radius: 2px;
+width: fit-content
 border: none;
 font-size: inherit;
 color: white;

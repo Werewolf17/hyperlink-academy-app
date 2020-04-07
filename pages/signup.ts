@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 
-import {Narrow} from '../components/Layout'
+import { Narrow, Gap} from '../components/Layout'
 import {Form, Label, Input, Error, Submit} from '../components/Form'
 import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
@@ -45,28 +45,31 @@ const Signup = () => {
 
   if(router.query.success !== undefined) {
     return h(Narrow, [
-      h('p', [
-      `Sweet! We sent an email to ${formState.email}, click the link there to confirm your account! If you aren't seeing
+      h(Gap, {gap: 32}, [
+        h(TitleImg, {src: '/img/plane.gif'}),
+        h('h1', 'Verify your email'),
+        h('p', [
+          `Sweet! We sent an email to ${formState.email}, click the link there to verify your email address! If you aren't seeing
 it, check out your Spam folder.`,
-      ]),
-      h('div', {style: {display: 'grid', gridGap: '16px'}}, [
-      h(Primary, {
-        onClick: onSubmit
-      }, 'Send another link'),
-      h(Secondary, {
-        onClick: (e) => {
-          e.preventDefault()
-          router.push('/signup')
-        }
-      }, 'Change your email')
-
+        ]),
+        h(Gap, {gap: 16}, [
+          h(Primary, {
+            onClick: onSubmit
+          }, 'Send another link'),
+          h(Secondary, {
+            onClick: (e) => {
+              e.preventDefault()
+              router.push('/signup')
+            }
+          }, 'Change your email')
+        ])
       ])
     ])
   }
 
   return h(Narrow, {}, [
     h(Form, {onSubmit}, [
-      h(TitleImg, {src: '/img/start_journey.png', width: '250px'}),
+      h(TitleImg, {src: '/img/start_journey_crop.png'}),
       h('h1', 'Start a journey'),
       error ? h(Error, {}, Errors[error]) : null,
       h(Label, [

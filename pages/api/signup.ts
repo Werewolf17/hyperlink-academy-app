@@ -47,15 +47,19 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
     res.json({success: false, error: 'invalid message'})
     return res.end()
   }
+
   if(!(await checkUser(msg.email))) {
     res.json({success: false, error: 'user exists'})
-    return res.end()
+    res.end()
+    await prisma.disconnect()
+    return
   }
 
   let salt = await bcrypt.genSalt()
   let hash = await bcrypt.hash(msg.password, salt)
 
   let key = await createActivationKey(msg.email, hash)
+  await prisma.disconnect()
 
   let url = `${req.headers.origin}/verifyEmail?&key=${key}`
 

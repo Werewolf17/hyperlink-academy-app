@@ -5,6 +5,7 @@ import Link from 'next/link'
 import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import { useUserContext } from '../pages/_app'
+import { Fragment } from 'react'
 
 export const colors = {
   grey95: "#F2F2F2",
@@ -14,11 +15,13 @@ export const colors = {
   accentRed: "#C23C1E"
 }
 
+export type Spacing = 0 | 8 | 16 | 24 | 32 | 48 | 64 | 256
+
 const Layout:React.SFC = (props)=>{
   let router = useRouter()
   let user = useUserContext()
 
-  return h(Main, [
+  return h(Fragment, [
     h(GlobalStyles),
     h(Head, {children:[]}, [
       h('link', {href:"https://fonts.googleapis.com/css?family=Lato&display=swap",  rel:"stylesheet"})
@@ -54,18 +57,11 @@ font-weight: bold;
 font-size: 24px;
 `
 
-const Main = styled('div')`
-font-size: 16;
-font-family: 'Lato', sans-serif;
-
-`
-
 const Body = styled('div')`
 max-width: 640px;
 padding: 64px 32px;
 margin: auto;
 `
-
 
 export const Narrow = styled('div')`
 max-width: 400px;
@@ -73,17 +69,33 @@ margin: auto;
 `
 
 const GlobalStyles = createGlobalStyle`
+html {
+line-height: 1.375;
+font-size: 16px;
+font-family: 'Lato', sans-serif;
+}
+
 a:visited {
   color: blue;
 }
 
 h1, h2 {
 font-family: monospace;
-margin: 0;
 font-weight: normal;
 }
 
-h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6 {
 margin: 0;
 }
+
+h2 {
+font-size: 1.75em;
+}
+
+p { margin: 0; }
+`
+
+export const Gap = styled('div')<{gap: Spacing}>`
+display: grid;
+grid-gap: ${props => props.gap || 16}px;
 `

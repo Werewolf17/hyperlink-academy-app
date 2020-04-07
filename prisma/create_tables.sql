@@ -16,15 +16,22 @@ CREATE TABLE IF NOT EXISTS password_reset_keys
 CREATE TABLE IF NOT EXISTS people (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     email         text NOT NULL UNIQUE,
+    display_name  text NOT NULL UNIQUE,
     password_hash text NOT NULL UNIQUE
 );
+
+CREATE TABLE IF NOT EXISTS courses (
+    id            text NOT NULL UNIQUE PRIMARY KEY,
+    description   text NOT NULL
+);
+
 
 CREATE TABLE IF NOT EXISTS course_instances (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     cost          real NOT NULL,
     start_date    text NOT NULL,
     end_date      text NOT NULL,
-    course        text NOT NULL
+    course        text REFERENCES courses(id) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS people_in_instances (

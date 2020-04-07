@@ -20,7 +20,14 @@ model course_instances {
   end_date            String
   id                  String                @id
   start_date          String
+  courses             courses               @relation(fields: [course], references: [id])
   people_in_instances people_in_instances[]
+}
+
+model courses {
+  description      String
+  id               String             @id
+  course_instances course_instances[]
 }
 
 model password_reset_keys {

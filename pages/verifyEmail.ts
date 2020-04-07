@@ -3,6 +3,7 @@ import { useEffect, useState} from 'react'
 import {Msg, Result} from './api/verifyEmail'
 import {useRouter} from 'next/router'
 import { Narrow } from '../components/Layout'
+import {Error} from '../components/Form'
 import Link from 'next/link'
 import { Primary } from '../components/Button'
 
@@ -47,6 +48,7 @@ export default () => {
   ])
 
   return h(Narrow, [
-    'Your email link is invalid or out of date, please try ', h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
+    h(Error, {}, [
+      'Your email link is invalid or out of date, please try ', h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'])
   ])
 }

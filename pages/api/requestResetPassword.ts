@@ -55,6 +55,6 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
     res.json({success: true})
   }
 
-  res.end()
   await prisma.disconnect()
+  res.end()
 }

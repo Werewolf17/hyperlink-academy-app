@@ -1,13 +1,14 @@
 import styled from "styled-components"
 import h from 'react-hyperscript'
 
-import {colors} from '../Layout'
+import { colors, Gap} from '../Layout'
 import { useRouter } from "next/router"
 
 type Props = {
   name:string,
   description: string
-path: string
+  path: string
+  start_date: Date
 }
 export default (props:Props) => {
   let router = useRouter()
@@ -15,10 +16,11 @@ export default (props:Props) => {
     onClick: ()=>{
       router.push(props.path)
     }
-  }, [
+  }, h(Gap, {gap: 16}, [
     h('h3', props.name),
-    h('p', props.description)
-  ])
+    h('p', props.description),
+    h('p', 'Next instance starts ' + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
+  ]))
 }
 
 let Card = styled('a')`
