@@ -1,68 +1,181 @@
 import h from 'react-hyperscript'
 import { GetServerSideProps } from 'next'
 import {useState} from 'react'
-import {getToken} from '../src/token'
-import {Section} from '../components/Section'
-import {Form, Input, Error, Success, Button} from '../components/Form'
+import {PrismaClient} from '@prisma/client'
 
+import {getToken} from '../src/token'
+import { Narrow, Box} from '../components/Layout'
+import { Input, Error, Success, Label} from '../components/Form'
+import { Primary, Secondary} from '../components/Button'
+
+import {Msg as UpdatePersonMsg} from './api/updatePerson'
 import {Msg as PasswordMsg} from './api/changePassword'
+import Loader from '../components/Loader'
 
 type Props = {
-  username: string
+  email: string
+  display_name: string
 }
 
 export default (props:Props) => {
-  return h('div', [
-    h('h2', 'Profile: ' + props.username),
+  return h(Narrow, [
+    h(Box, {gap: 48}, [
+    h('h2', 'Your Settings'),
+    h(Box, {gap: 24}, [
+      h(ChangeName, {display_name: props.display_name}),
+      h('hr'),
+      h('div', [
+        h('h4', 'Your Email'),
+        props.email
+      ]),
+      h('hr'),
     h(ChangePassword)
+    ]),
+  ])
+    ])
+}
+
+const ChangeName = (props:{display_name: string}) => {
+  let [editing, setEditing] = useState(false)
+  let [name, setName] = useState(props.display_name)
+  let [loading, setLoading] = useState(false)
+
+  return h('form',{
+    style: {
+      display: 'grid',
+      gridTemplateRows: 'auto auto',
+      gridGap: 8
+    },
+    onSubmit: async (e:React.FormEvent)=>{
+      e.preventDefault()
+      setLoading(true)
+
+      let msg:UpdatePersonMsg = {display_name: name}
+      await fetch('/api/updatePerson', {
+        method: "POST",
+        body: JSON.stringify(msg)
+      })
+      setLoading(false)
+      setEditing(false)
+    }
+  }, [
+    h('div', {style: {
+      display: 'grid',
+      alignItems: 'center',
+      gridTemplateColumns: 'auto auto'
+    }},[
+      h('h4', 'Your Name'),
+      h('div', {
+        style:{
+          justifySelf:'end',
+        }
+      }, [
+        editing ? h(Secondary, {
+          type: 'submit',
+        }, loading ? h(Loader) : 'submit') : null,
+        ' ',
+        loading ? null : h(Primary, {
+          onClick: (e)=> {
+            e.preventDefault()
+            if(editing) {
+              setName(props.display_name)
+            }
+            setEditing(!editing)
+          }
+        }, editing ? 'cancel': 'edit' ),
+      ])
+    ]),
+    editing ? h(Input, {
+      value: name,
+      onChange: e => setName(e.currentTarget.value)
+    }) : name,
   ])
 }
 
 const ChangePassword = () => {
+  const [editing, setEditing] = useState(false)
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
-  const [result, setResult] = useState<null | 'success' | 'failure'>(null)
+  const [confPassword, setConfPassword] = useState('')
+  const [result, setResult] = useState<null | 'success' | 'failure' |'loading'>(null)
 
-  return h(Section, {legend: 'change your password'}, [
-    h(Form, {
-      onSubmit: async e =>{
-        e.preventDefault()
-        let msg:PasswordMsg = {oldPassword, newPassword}
-        let res = await fetch('/api/changePassword', {
-          method: "POST",
-          body: JSON.stringify(msg)
-        })
-        if(res.status === 200) {
-          setResult('success')
-        }
+  return h('form', {
+    style: {
+      display: 'grid',
+      gridGap: 16,
+    },
+    onSubmit: async (e:React.FormEvent) =>{
+      e.preventDefault()
+      setResult('loading')
+      let msg:PasswordMsg = {oldPassword, newPassword}
+      let res = await fetch('/api/changePassword', {
+        method: "POST",
+        body: JSON.stringify(msg)
+      })
+      if(res.status === 200) {
+        setResult('success')
+        setEditing(false)
       }
-    }, [
-      result ?
-        result === 'success'
-        ? h(Success, 'success')
-        : h(Error, 'wrong password')
-      : null,
+      else setResult('failure')
+    }
+  }, !editing ? [
+    h('h4', 'Your password'),
+    result === 'success' ? h(Success, 'success') : null,
+    h(Primary, {
+    onClick: e=> {
+      e.preventDefault()
+      setEditing(true)
+    }
+  }, 'Change your password')] : [
+    result === 'failure' ? h(Error, 'Your current password is incorrect') : null,
+    h(Label, [
+      'Current Password',
       h(Input, {type: 'password',
-                placeholder: 'old password',
                 value: oldPassword,
                 onChange: e =>setOldPassword(e.currentTarget.value)}),
+    ]),
+    h(Label, [
+      'New Password',
       h(Input, {type: 'password',
-                placeholder: 'new password',
                 value: newPassword,
                 onChange: e=> setNewPassword(e.currentTarget.value)}),
-      h(Button, {type: 'submit'}, 'submit')
+    ]),
+    h(Label, [
+      'Confirm New Password',
+      h(Input, {type: 'password',
+                value: confPassword ,
+                onChange: e=> {
+                  setConfPassword(e.currentTarget.value)
+                  if(e.currentTarget.value !== newPassword) {
+                    e.currentTarget.setCustomValidity('Passwords do not match')
+                  }
+                  else {
+                    e.currentTarget.setCustomValidity('')
+                  }
+                }}),
+    ]),
+    h('div', {style:{justifySelf:'end'}}, [
+      h(Secondary, {type: 'submit'}, result === 'loading' ? h(Loader) : 'submit'),
+      ' ',
+      result === 'loading' ? null : h(Primary, {onClick: e=>{e.preventDefault(); setEditing(false)}}, 'cancel')
     ])
   ])
 }
 
-export const getServerSideProps:GetServerSideProps = async ({req, res}): Promise<{props:Props}>=>{
+export const getServerSideProps:GetServerSideProps = async ({req, res}): Promise<{props:Props | {}}>=>{
   let token = getToken(req)
   if(!token) {
     res.writeHead(301, {Location: '/login'})
     res.end()
+    return {props:{}}
   }
 
-  return {props: {
-    username: token?.email as string
-  }}
+  let prisma = new PrismaClient()
+  let user = await prisma.people.findOne({
+    where: {id: token.id},
+    select: {email:true, display_name: true}
+  })
+  if(!user) return {props:{}}
+
+  return {props: user}
 }

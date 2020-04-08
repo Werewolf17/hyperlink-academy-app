@@ -3,6 +3,7 @@ import {colors} from  './Layout'
 
 export const Primary = styled('button')`
 font-family: monospace;
+height: fit-content;
 background-color: ${colors.grey15};
 padding: 8px 16px;
 border-radius: 2px;
