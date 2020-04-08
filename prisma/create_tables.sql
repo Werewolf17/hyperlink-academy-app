@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS activation_keys
 (
     key_hash      text NOT NULL PRIMARY KEY,
     created_time  text NOT NULL,
+    display_name  text NOT NULL,
     password_hash text NOT NULL,
     email         text NOT NULL
 );
@@ -16,7 +17,7 @@ CREATE TABLE IF NOT EXISTS password_reset_keys
 CREATE TABLE IF NOT EXISTS people (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     email         text NOT NULL UNIQUE,
-    display_name  text NOT NULL UNIQUE,
+    display_name  text NOT NULL,
     password_hash text NOT NULL UNIQUE
 );
 

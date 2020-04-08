@@ -1,16 +1,22 @@
 import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
+import Link from 'next/link'
 
 import { Narrow, Box} from '../components/Layout'
 import {Form, Label, Input, Error, Submit} from '../components/Form'
 import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import { useUserContext } from './_app'
-import Link from 'next/link'
+import {Msg} from './api/signup'
 
 const Signup = () => {
-  let [formState, setFormState] = useState({email:'', password:'', confPassword:''})
+  let [formState, setFormState] = useState({
+    email:'',
+    password:'',
+    confPassword:'',
+    display_name: ''
+  })
   let [error, setError] = useState<'user exists' | null>(null)
   let router = useRouter()
   let user = useUserContext()
@@ -23,9 +29,11 @@ const Signup = () => {
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
+
+    let msg: Msg = {email:formState.email, password: formState.password, display_name:  formState.display_name}
     let res = await (await fetch('/api/signup', {
       method: "POST",
-      body: JSON.stringify({email:formState.email, password: formState.password})
+      body: JSON.stringify(msg)
     })).json()
 
     if(!res.success) {
@@ -72,6 +80,13 @@ it, check out your Spam folder.`,
       h(TitleImg, {src: '/img/start_journey_crop.png'}),
       h('h1', 'Start a journey'),
       error ? h(Error, {}, Errors[error]) : null,
+      h(Label, [
+        "Your Name",
+        h(Input, {type: 'text',
+                  required: true,
+                  value: formState.display_name,
+                  onChange: (e)=> setFormState({...formState, display_name:e.currentTarget.value})})
+      ]),
       h(Label, [
         "Your Email",
         h(Input, {type: 'email',

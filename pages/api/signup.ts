@@ -8,8 +8,9 @@ import sendVerificationEmail from '../../emails/verifyEmail'
 
 const prisma = new PrismaClient()
 
-type Msg = {
+export type Msg = {
   email: string
+  display_name: string
   password: string
 }
 
@@ -23,12 +24,13 @@ type Response = {
   error: 'invalid message'
 }
 
-const createActivationKey = async (email: string, hash: string) => {
+const createActivationKey = async (email: string, hash: string, display_name: string) => {
   let key = uuidv4()
   await prisma.activation_keys.create({
     data: {
       password_hash: hash,
       email,
+      display_name,
       time: new Date(Date.now()).toISOString(),
       key_hash: hmac(key)
     }
@@ -43,9 +45,9 @@ const checkUser = async (email:string):Promise<boolean> => {
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
 
   let msg: Partial<Msg> = JSON.parse(req.body)
-  if(!msg.email || !msg.password) {
+  if(!msg.email || !msg.password || !msg.display_name) {
     res.json({success: false, error: 'invalid message'})
-    return res.end()
+    return res.status(403).end()
   }
 
   if(!(await checkUser(msg.email))) {
@@ -58,12 +60,12 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   let salt = await bcrypt.genSalt()
   let hash = await bcrypt.hash(msg.password, salt)
 
-  let key = await createActivationKey(msg.email, hash)
+  let key = await createActivationKey(msg.email, hash, msg.display_name)
   await prisma.disconnect()
 
   let url = `${req.headers.origin}/verifyEmail?&key=${key}`
 
-  await sendVerificationEmail(msg.email, url)
+  await sendVerificationEmail(msg.email, url, msg.display_name)
 
   res.json({success: true})
   return res.end()

@@ -17,6 +17,7 @@ type Instances = course_instances
 type Props = {
   courses: CourseWithInstances[],
   instances: Instances[]
+  display_name?: string
 }
 
 const Landing:NextPage<Props> = (props) => {
@@ -24,7 +25,7 @@ const Landing:NextPage<Props> = (props) => {
   return h(Box, {gap:48}, [
     !user ? h(Welcome)
       : h(Box, [
-        h('h1', `Hello ${user.email}!`),
+        h('h1', `Hello ${props.display_name || user.email}!`),
         h(Box, [
           h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
           h('a', {href: 'https://forum.hyperlink.academy'},'Check out the forum')
@@ -79,7 +80,13 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
   let prisma = new PrismaClient()
   let user = getToken(req)
   let instances
+  let display_name
   if(user) {
+    let data = await prisma.people.findOne({
+      where: {id: user.id},
+      select: {display_name: true}
+    })
+    if(data) display_name = data.display_name
     instances = await prisma.course_instances.findMany({
       where: {
         people_in_instances: {
@@ -106,7 +113,11 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
   })
   await prisma.disconnect()
 
-  return {props: {courses, instances: instances || null}}
+  return {props: {
+    courses,
+    instances: instances || null,
+    display_name: display_name || null
+  }}
 }
 
 const Title = styled('h1')`

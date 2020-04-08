@@ -8,6 +8,7 @@ datasource db {
 }
 
 model activation_keys {
+  display_name  String
   email         String
   key_hash      String @id
   password_hash String
@@ -37,6 +38,7 @@ model password_reset_keys {
 }
 
 model people {
+  display_name        String
   email               String                @unique
   id                  String                @id
   password_hash       String                @unique

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import {PrismaClient} from '@prisma/client'
 import hmac from '../../src/hmac'
-import {syncSSO, makeSSOPayload} from '../../src/discourse'
+import {syncSSO} from '../../src/discourse'
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 import {setToken} from '../../src/token'
@@ -28,9 +28,9 @@ export type Result = {
   error: 'user exists'
 }
 
-const createUser = async (email:string, password_hash:string) => {
+const createUser = async (email:string, password_hash:string, display_name: string) => {
   let data = {
-    email, password_hash, id: uuidv4()
+    email, password_hash, display_name, id: uuidv4()
   }
   try {
     await prisma.people.create({data})
@@ -60,7 +60,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
     return res.json({success:false, error:'old key'})
   }
 
-  let id = await createUser(token.email, token.password_hash)
+  let id = await createUser(token.email, token.password_hash, token.display_name)
   await prisma.disconnect()
   if(!id) return res.json({success:false, error:'user exists'})
 
