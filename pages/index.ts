@@ -7,7 +7,6 @@ import Intro from '../copy/Intro.mdx'
 import { Primary, Secondary } from '../components/Button'
 import CourseCard from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'
-import { useUserContext } from './_app'
 import { PrismaClient, coursesGetPayload, course_instances } from '@prisma/client'
 import { getToken } from '../src/token'
 
@@ -21,17 +20,16 @@ type Props = {
 }
 
 const Landing:NextPage<Props> = (props) => {
-  let user = useUserContext()
   return h(Box, {gap:48}, [
-    !user ? h(Welcome)
+    !props.display_name ? h(Welcome)
       : h(Box, [
-        h('h1', `Hello ${props.display_name || user.email}!`),
+        h('h1', `Hello ${props.display_name}!`),
         h(Box, [
           h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
-          h('a', {href: 'https://forum.hyperlink.academy'},'Check out the forum')
+          h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')
         ])
       ]),
-    ! user ? null : h(Box, [
+    !props.instances ? null : h(Box, [
       h('h2', "Your Courses"),
       h(CoursesGrid, {}, props.instances.map(instance => {
         return h(CourseCard, {
@@ -79,24 +77,6 @@ const Welcome = ()=>{
 export const getServerSideProps:GetServerSideProps = async ({req}) => {
   let prisma = new PrismaClient()
   let user = getToken(req)
-  let instances
-  let display_name
-  if(user) {
-    let data = await prisma.people.findOne({
-      where: {id: user.id},
-      select: {display_name: true}
-    })
-    if(data) display_name = data.display_name
-    instances = await prisma.course_instances.findMany({
-      where: {
-        people_in_instances: {
-          some: {
-            person_id: user.id
-          }
-        }
-      }
-    })
-  }
 
   let courses = await prisma.courses.findMany({
     include: {
@@ -111,13 +91,32 @@ export const getServerSideProps:GetServerSideProps = async ({req}) => {
       }
     }
   })
-  await prisma.disconnect()
 
-  return {props: {
-    courses,
-    instances: instances || null,
-    display_name: display_name || null
-  }}
+  if(user) {
+    let data = await prisma.people.findOne({
+      where: {id: user.id},
+      select: {display_name: true}
+    })
+    let instances = await prisma.course_instances.findMany({
+      where: {
+        people_in_instances: {
+          some: {
+            person_id: user.id
+          }
+        }
+      }
+    })
+
+    await prisma.disconnect()
+    return {
+      props: {
+        courses, instances, display_name: data?.display_name || user.email
+      }
+    }
+  }
+
+  await prisma.disconnect()
+  return {props: {courses }}
 }
 
 const Title = styled('h1')`
