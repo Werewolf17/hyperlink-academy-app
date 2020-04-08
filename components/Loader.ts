@@ -6,10 +6,10 @@ export default  () => {
   useEffect(() => {
     let id = setInterval(()=> {
       setDots(count => (count+1) % 4)
-    }, 500)
+    }, 250)
     return () => {
       clearInterval(id)
     }
   }, [])
-  return h('div', 'loading' + '.'.repeat(dots))
+  return h('div', '.'.repeat(dots) + '\u00a0'.repeat(3-dots))
 }

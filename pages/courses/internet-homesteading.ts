@@ -10,6 +10,8 @@ import { Box, colors } from '../../components/Layout'
 import { Primary } from '../../components/Button'
 import { useRouter } from 'next/router'
 import { useUserContext } from '../_app'
+import { useState } from 'react'
+import Loader from '../../components/Loader'
 
 
 type InstancesWithUser = course_instancesGetPayload<{include: {people_in_instances: true}}>
@@ -20,6 +22,7 @@ export default (props:Props) => {
   let router = useRouter()
   let user = useUserContext()
   let stripe = useStripe()
+  let [loading, setLoading] = useState(false)
 
   let start_date = new Date(props.instances[0].start_date)
     .toLocaleDateString(undefined, {
@@ -52,6 +55,7 @@ internet, to further your goals, not a companies advertising business.`),
         onClick: async ()=>{
           if(!user) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
           if(!stripe) return
+          setLoading(true)
           let msg:Msg = {instanceID: props.instances[0].id}
           let res = await fetch('/api/courses/enroll', {
             method: "POST",
@@ -63,8 +67,9 @@ internet, to further your goals, not a companies advertising business.`),
               sessionId
             })
           }
+          setLoading(false)
         }
-      }, 'Enroll'),
+      }, loading ? h(Loader) : 'Enroll'),
     ]),
     h(Info,[
       h(Box, {gap:16}, [

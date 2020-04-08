@@ -10,10 +10,12 @@ import {Form, Input, Error, Label, Submit} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
 import {Msg} from './api/login'
 import {Msg as ResetMsg} from './api/requestResetPassword'
+import Loader from '../components/Loader'
 
 const Login = () => {
   let [email, setEmail] = useState('')
   let [password, setPassword] = useState('')
+  let [loading, setLoading] = useState(false)
 
   let [error, setError] = useState<'wrong'| null>(null)
   let router = useRouter()
@@ -24,18 +26,20 @@ const Login = () => {
   if(typeof reset !== 'undefined') return h(ResetPassword)
 
   const onSubmit = async (e:React.FormEvent) => {
-      e.preventDefault()
-      let msg:Msg = {email, password}
-      let res = await fetch('/api/login', {
-        method: "POST",
-        body: JSON.stringify(msg)
-      })
-      if(res.status === 200) {
-        window.location.assign(redirect as string || '/')
-      }
-      else {
-        setError('wrong')
-      }
+    e.preventDefault()
+    setLoading(true)
+    let msg:Msg = {email, password}
+    let res = await fetch('/api/login', {
+      method: "POST",
+      body: JSON.stringify(msg)
+    })
+    if(res.status === 200) {
+      window.location.assign(redirect as string || '/')
+    }
+    else {
+      setLoading(false)
+      setError('wrong')
+    }
   }
 
   const Errors: {[key in Exclude<typeof error, null>]: React.ReactElement} = {
@@ -69,7 +73,7 @@ const Login = () => {
         }),
       ]),
       h(Submit, [
-        h(Primary, {type: 'submit'}, 'Log In'),
+        h(Primary, {type: 'submit'}, loading ? h(Loader) : 'Log In'),
         h(Link, {href: '/login?reset'}, h(LinkButton, 'Reset Password'))
       ])
     ]),
