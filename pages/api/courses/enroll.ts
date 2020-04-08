@@ -32,7 +32,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
       quantity: 1,
     }],
     cancel_url: `${req.headers.origin}/courses/${instance.course}`,
-    success_url: `${req.headers.origin}/courses/${instance.course}/?success`,
+    success_url: `${req.headers.origin}/courses/${instance.course}?success`,
     customer_email: user.email,
     metadata: {
       instanceId: instance.id,

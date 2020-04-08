@@ -42,4 +42,7 @@ font-family: inherit;
 color: blue;
 text-decoration: underline;
 border: none;
+&:hover {
+cursor: pointer;
+}
 `
