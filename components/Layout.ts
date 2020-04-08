@@ -1,6 +1,5 @@
 import styled, {createGlobalStyle} from 'styled-components'
 import {Login} from './Login'
-import Head from 'next/head'
 import Link from 'next/link'
 import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
@@ -24,9 +23,6 @@ const Layout:React.SFC = (props)=>{
 
   return h(Fragment, [
     h(GlobalStyles),
-    h(Head, {children:[]}, [
-      h('link', {href:"https://fonts.googleapis.com/css?family=Lato&display=swap",  rel:"stylesheet"})
-    ]),
     router.pathname === '/' && !user
       ? null
       : h(Header, [
@@ -70,6 +66,8 @@ margin: auto;
 `
 
 const GlobalStyles = createGlobalStyle`
+@import url('https://fonts.googleapis.com/css?family=Lato|Roboto+Mono&display=swap');
+
 html {
 line-height: 1.375;
 font-size: 16px;
@@ -81,7 +79,7 @@ a:visited {
 }
 
 h1, h2 {
-font-family: monospace;
+font-family: 'Roboto Mono', monospace;
 font-weight: normal;
 }
 
