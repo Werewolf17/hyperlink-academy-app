@@ -34,7 +34,7 @@ export default () => {
     if(result !== 'success') return
     setTimeout(()=>{
       router.push('/')
-    }, 5000)
+    }, 3000)
   }, [result])
 
   if(result === null) return h(Narrow, [

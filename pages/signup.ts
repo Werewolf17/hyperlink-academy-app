@@ -9,6 +9,7 @@ import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import { useUserContext } from './_app'
 import {Msg} from './api/signup'
+import Loader from '../components/Loader'
 
 const Signup = () => {
   let [formState, setFormState] = useState({
@@ -18,6 +19,7 @@ const Signup = () => {
     display_name: ''
   })
   let [error, setError] = useState<'user exists' | null>(null)
+  let [loading, setLoading] = useState(false)
   let router = useRouter()
   let user = useUserContext()
 
@@ -29,7 +31,7 @@ const Signup = () => {
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-
+    setLoading(true)
     let msg: Msg = {email:formState.email, password: formState.password, display_name:  formState.display_name}
     let res = await (await fetch('/api/signup', {
       method: "POST",
@@ -42,6 +44,7 @@ const Signup = () => {
     else {
       router.push('/signup?success')
     }
+    setLoading(false)
   }
 
   const Errors: {[key in Exclude<typeof error, null>]: React.ReactElement} = {
@@ -119,7 +122,7 @@ it, check out your Spam folder.`,
                  })
       ]),
       h(Submit, [
-        h(Primary, {type: 'submit'}, 'Submit')
+        h(Primary, {type: 'submit'}, loading ? h(Loader) : 'Submit')
       ])
     ])
   ])
