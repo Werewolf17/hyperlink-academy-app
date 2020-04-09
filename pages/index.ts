@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { NextPage, GetServerSideProps} from 'next'
 import Link from 'next/link'
 
-import Intro from '../copy/Intro.mdx'
+import Intro from '../writing/Intro.mdx'
 import { Primary, Secondary } from '../components/Button'
 import CourseCard from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'

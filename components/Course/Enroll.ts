@@ -1,6 +1,5 @@
 import h from 'react-hyperscript'
 import {useStripe} from '@stripe/react-stripe-js'
-import {course_instances} from '@prisma/client'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -8,10 +7,10 @@ import {Msg, Response} from '../../pages/api/courses/enroll'
 import { useUserContext } from '../../pages/_app'
 import {Primary} from '../Button'
 import Loader from '../Loader'
-
+import {CourseData} from '../../src/course'
 
 type Props = {
-  instances: Array<course_instances>
+  instances: CourseData['course_instances']
 }
 
 export default (props: Props) => {
@@ -19,6 +18,10 @@ export default (props: Props) => {
   let router = useRouter()
   let [loading, setLoading] = useState(false)
   let user = useUserContext()
+
+  if(props.instances[0].people_in_instances[0]) return h(Primary, {onClick: ()=>{
+    window.location.assign( 'https://forum.hyperlink.academy/g/' + props.instances[0].id)
+  }}, 'Your instance group')
 
   return h(Primary, {
     onClick: async ()=>{
