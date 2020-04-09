@@ -1,87 +1,62 @@
 import h from 'react-hyperscript'
 import styled from 'styled-components'
-import { PrismaClient, course_instancesGetPayload } from '@prisma/client'
+import { PrismaClient, coursesGetPayload } from '@prisma/client'
 import { GetServerSideProps } from 'next'
-import { useStripe } from '@stripe/react-stripe-js'
 
 import {getToken} from '../../src/token'
-import {Msg, Response} from '../api/courses/enroll'
 import { Box, colors } from '../../components/Layout'
 import { Primary } from '../../components/Button'
-import { useRouter } from 'next/router'
-import { useUserContext } from '../_app'
-import { useState } from 'react'
-import Loader from '../../components/Loader'
+import Enroll from '../../components/Course/Enroll'
 
 
-type InstancesWithUser = course_instancesGetPayload<{include: {people_in_instances: true}}>
-type Props = {
-  instances: InstancesWithUser[]
-}
+type Props = coursesGetPayload<{include: {course_instances: {include: {people_in_instances: true}}}}>
 export default (props:Props) => {
-  let router = useRouter()
-  let user = useUserContext()
-  let stripe = useStripe()
-  let [loading, setLoading] = useState(false)
-
-  let start_date = new Date(props.instances[0].start_date)
+  let start_date = new Date(props.course_instances[0].start_date)
     .toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     })
 
-  return h(Main, [
-    h(Box,{gap:16}, [
-      h(Box, {gap: 8}, [
-        h('h1', 'Internet Homesteading'),
-        h('a',{href:'https://forum.hyperlink.academy/c/internet-homesteading'},  'Check out the course forum')
-      ]),
-      h('p', `The internet, as large and loud it is, is a difficult place to settle.
+  return h(Box, {gap: 48}, [
+    h(Box, {gap: 8}, [
+      h('h1', 'Internet Homesteading'),
+      h('a',{href:'https://forum.hyperlink.academy/c/internet-homesteading'},  'Check out the course forum')
+    ]),
+    h(Main, [
+      h(Box,{gap:16}, [
+        h('p', `The internet, as large and loud it is, is a difficult place to settle.
 Currently, it's a mining frontier. You can live there, sure, but you've gotta
 sell your soul to the company store first.`),
-      h('p', `There is an alternative. Going out and building your own home in the internet
+        h('p', `There is an alternative. Going out and building your own home in the internet
 wilderness. It's definitely a lot of work. You'll have to learn how websites
 work, and how to hold your own. You'll have to learn how to write on the
 internet, to further your goals, not a companies advertising business.`),
-      h('p ', `Ultimately, it gives you a foundation in this crazy cyberspace that's all your own.)
-`),
-      h('b', `The next instance starts ${start_date}`),
-      props.instances[0].people_in_instances[0] ? h(Primary, {onClick: ()=>{
-        // @ts-ignore
-        window.location = 'https://forum.hyperlink.academy/g/' + props.instances[0].id
-      } }, 'Your instance group')  :
-      h(Primary, {
-        onClick: async ()=>{
-          if(!user) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
-          if(!stripe) return
-          setLoading(true)
-          let msg:Msg = {instanceID: props.instances[0].id}
-          let res = await fetch('/api/courses/enroll', {
-            method: "POST",
-            body: JSON.stringify(msg)
-          })
-          if(res.status === 200) {
-            let {sessionId}= await res.json() as Response
-            stripe.redirectToCheckout({
-              sessionId
-            })
-          }
-          setLoading(false)
-        }
-      }, loading ? h(Loader) : 'Enroll'),
-    ]),
-    h(Info,[
-      h(Box, {gap:16}, [
-        h(Cost, '$' + props.instances[0].cost),
-        h('p', 'This course is intense?')
+        h('p ', `Ultimately, it gives you a foundation in this crazy cyberspace that's all your own.`),
+        props.course_instances[0].people_in_instances[0] ? null : h('h3', `The next instance starts ${start_date}`),
+        props.course_instances[0].people_in_instances[0]
+          ? h(Primary, {onClick: ()=>{
+            window.location.assign( 'https://forum.hyperlink.academy/g/' + props.course_instances[0].id)
+          }}, 'Your instance group')
+          : h(Enroll, {instances: props.course_instances}),
+      ]),
+      h(Info,[
+        h(Box, {gap:16}, [
+          h(Cost, '$' + props.cost),
+          h('b', '2 weeks'),
+          h('hr'),
+          h('p', ``)
+        ])
       ])
+      
     ])
   ])
 }
 
 const Info = styled('div')`
 padding: 24px;
+width: 240px;
+box-sizing: border-box;
 background-color: ${colors.grey95};
 `
 
@@ -93,27 +68,29 @@ font-weight: bold;
 const Main = styled('div')`
 display: grid;
 grid-template-columns: auto auto;
+grid-gap: 24px;
 `
 
 export const getServerSideProps:GetServerSideProps<Props> = async ({req}) => {
   let prisma = new PrismaClient()
   let user = getToken(req)
-  let instances = await prisma.course_instances.findMany({
-    where: {
-      course: 'internet-homesteading'
-    },
-    orderBy: {
-      start_date: 'desc'
-    },
-    first: 1,
+  let data = await prisma.courses.findOne({
+    where: {id: 'internet-homesteading'},
     include: {
-      people_in_instances: {
-        where: {person_id: user?.id || 'null'}
+      course_instances: {
+        include: {
+          people_in_instances: {
+            where: {person_id: user?.id || 'null'}
+          }
+        },
+        orderBy: {
+          start_date: 'desc'
+        },
+        first: 1,
       }
+
     }
   })
-
   await prisma.disconnect()
-
-  return {props: {instances}}
+  return {props: data as Props}
 }

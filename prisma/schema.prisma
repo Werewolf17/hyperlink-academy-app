@@ -16,7 +16,6 @@ model activation_keys {
 }
 
 model course_instances {
-  cost                Float
   course              String
   end_date            String
   id                  String                @id
@@ -26,6 +25,7 @@ model course_instances {
 }
 
 model courses {
+  cost             Float
   description      String
   id               String             @id
   course_instances course_instances[]

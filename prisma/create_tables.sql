@@ -23,13 +23,13 @@ CREATE TABLE IF NOT EXISTS people (
 
 CREATE TABLE IF NOT EXISTS courses (
     id            text NOT NULL UNIQUE PRIMARY KEY,
-    description   text NOT NULL
+    description   text NOT NULL,
+    cost          real NOT NULL
 );
 
 
 CREATE TABLE IF NOT EXISTS course_instances (
     id            text NOT NULL UNIQUE PRIMARY KEY,
-    cost          real NOT NULL,
     start_date    text NOT NULL,
     end_date      text NOT NULL,
     course        text REFERENCES courses(id) NOT NULL

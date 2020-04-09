@@ -19,15 +19,24 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
 
   let prisma = new PrismaClient()
 
-  let instance = await prisma.course_instances.findOne({where: {id: msg.instanceID}})
+  let instance = await prisma.course_instances.findOne({
+    where: {id: msg.instanceID},
+    include: {
+      courses: {
+        select: {
+          cost: true
+        }
+      }
+    }
+  })
   await prisma.disconnect()
-  if(!instance) return res.status(403).end()
+  if(!instance || !instance.courses.cost) return res.status(403).end()
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [{
       name: instance.course,
-      amount: instance.cost * 100,
+      amount: instance.courses.cost * 100,
       currency: 'usd',
       quantity: 1,
     }],
