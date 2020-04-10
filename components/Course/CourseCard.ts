@@ -1,26 +1,23 @@
 import styled from "styled-components"
 import h from 'react-hyperscript'
+import Link from 'next/link'
 
 import { colors, Box} from '../Layout'
-import { useRouter } from "next/router"
 
 type Props = {
   name:string,
   description: string
   path: string
   start_date: Date
+  instance?: boolean
 }
 export default (props:Props) => {
-  let router = useRouter()
-  return h(Card, {
-    onClick: ()=>{
-      router.push(props.path)
-    }
+  return h(Link, {href: props.path, passHref: true}, h(Card, {
   }, h(Box, {gap: 16}, [
     h('h3', props.name),
     h('p', props.description),
-    h(DateContainer, 'Next instance starts ' + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
-  ]))
+    h(DateContainer, (props.instance ? 'starts ' : 'Next instance starts ') + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
+  ])))
 }
 
 let DateContainer = styled('p')`
@@ -34,6 +31,12 @@ box-sizing: border-box;
 border: 1px solid;
 border-color: ${colors.grey15};
 padding: 24px;
+text-decoration: none;
+color: black;
+
+&:visited {
+color: black;
+}
 
 &:hover, &:active, &:focus {
 cursor: pointer;
