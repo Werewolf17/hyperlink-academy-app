@@ -3,21 +3,44 @@ import styled from 'styled-components'
 import { NextPage } from 'next'
 import Link from 'next/link'
 
-import Intro from '../writing/Intro.mdx'
-import { Primary, Secondary } from '../components/Button'
 import CourseCard from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'
 import { getToken } from '../src/token'
-import { useCourses } from '../src/user'
+import { useUserInstances, useUserData, useCourses } from '../src/user'
 
-const Landing:NextPage = () => {
+const Dashboard:NextPage = () => {
+  let {data: user} = useUserData()
   let {data: courses} = useCourses()
+  let {data: instances} = useUserInstances()
+
+  if(!user || instances === undefined) {
+    return null
+  }
 
   return h(Box, {gap:48}, [
-    h(Welcome),
-    h(Box, {gap: 16}, [
+    h(Box, [
+      h('h1', `Hello ${user.display_name ? user.display_name : ''}!`),
+      h(Box, [
+        h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
+        h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')
+      ])
+    ]),
+    !instances ? null : h(Box, [
+      h('h2', "Your Courses"),
+      h(CoursesGrid, {}, instances.course_instances.map(instance => {
+        return h(CourseCard, {
+          description: '',
+          start_date: new Date(instance.start_date),
+          instance: true,
+          name: instance.course,
+          path: '/courses/' +instance.course
+        })
+      }))
+    ]),
+    h('hr'),
+    !courses ? null : h(Box, {gap: 16}, [
       h('h2', "The Courses List"),
-      !courses ? null : h(CoursesGrid,
+      h(CoursesGrid,
         courses.courses
         .map(course => {
           return h(CourseCard, {
@@ -28,6 +51,7 @@ const Landing:NextPage = () => {
             path: '/courses/' + course.id}, [])
         })),
     ]),
+    h('hr'),
     h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
       h('h2', 'The Course Kindergarten'),
       'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
@@ -36,40 +60,15 @@ const Landing:NextPage = () => {
   ])
 }
 
-Landing.getInitialProps = ({req, res}) => {
+Dashboard.getInitialProps = ({req, res}) => {
   if(req && res) {
-    if(getToken(req)) {
-      res.writeHead(301, {Location: '/dashboard'})
+    if(!getToken(req)) {
+      res.writeHead(301, {Location: '/'})
       res.end()
     }
   }
   return {}
-
 }
-
-const Welcome = ()=>{
-  return h(Box, {gap:32, style:{paddingBottom: '48px'}}, [
-    h(LoginButtons, [
-      h(Link, {href: '/signup'}, h(Primary,  'Sign up')),
-      h(Link, {href: '/login'}, h(Secondary, "Log in")),
-    ]),
-    h(Title, 'hyperlink.academy'),
-    h(Intro),
-  ])
-}
-
-const Title = styled('h1')`
-font-family: serif;
-text-decoration: underline;
-font-weight: bold;
-color: blue;
-`
-const LoginButtons = styled('div')`
-justify-content: end;
-display: grid;
-grid-gap: 16px;
-grid-template-columns: max-content max-content;
-`
 
 const CoursesGrid = styled('div')`
 display: grid;
@@ -77,4 +76,4 @@ grid-template-columns: repeat(auto-fill, 300px);
 grid-gap: 24px;
 `
 
-export default Landing
+export default Dashboard

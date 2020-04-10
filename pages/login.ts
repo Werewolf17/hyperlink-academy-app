@@ -1,16 +1,18 @@
 import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
-import { NextPageContext } from 'next'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
+import {mutate} from 'swr'
+import { NextPageContext } from 'next'
 
 import {Narrow} from '../components/Layout'
-import {getToken} from '../src/token'
 import {Form, Input, Error, Label, Submit} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
 import {Msg} from './api/login'
 import {Msg as ResetMsg} from './api/requestResetPassword'
 import Loader from '../components/Loader'
+import { getToken } from '../src/token'
+import {useUserData} from '../src/user'
 
 const Login = () => {
   let [email, setEmail] = useState('')
@@ -19,7 +21,10 @@ const Login = () => {
 
   let [error, setError] = useState<'wrong'| null>(null)
   let router = useRouter()
+  let {data} = useUserData()
+
   let {redirect, reset} = router.query
+  if(data) router.push(redirect as string || '/')
 
   useEffect(()=>setError(null), [email, password])
 
@@ -34,10 +39,14 @@ const Login = () => {
       body: JSON.stringify(msg)
     })
     if(res.status === 200) {
-      window.location.assign(redirect as string || '/')
+      mutate('/api/whoami')
+      if(redirect) {
+        if(redirect[0] === '/') router.push(redirect as string)
+        else window.location.assign(redirect as string)
+      }
+      else router.push('/dashboard')
     }
     else {
-      setLoading(false)
       setError('wrong')
     }
   }
@@ -80,9 +89,11 @@ const Login = () => {
   ])
 }
 
+
 const ResetPassword:React.SFC = () => {
   let [email, setEmail ] = useState('')
   let [status, setStatus] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
+
 
   switch(status) {
     case 'normal':
@@ -123,10 +134,10 @@ const ResetPassword:React.SFC = () => {
 
 export default Login
 
-Login.getInitialProps = ({req, res}:NextPageContext) => {
+Login.getInitialProps = ({req, res, query}:NextPageContext) => {
   if(req && res) {
     if(getToken(req)) {
-      res.writeHead(301, {Location: '/'})
+      res.writeHead(301, {Location: query.redirect || '/'})
       res.end()
     }
   }

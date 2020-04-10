@@ -7,7 +7,6 @@ import { Narrow, Box} from '../components/Layout'
 import {Form, Label, Input, Error, Submit} from '../components/Form'
 import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
-import { useUserContext } from './_app'
 import {Msg} from './api/signup'
 import Loader from '../components/Loader'
 
@@ -21,9 +20,6 @@ const Signup = () => {
   let [error, setError] = useState<'user exists' | null>(null)
   let [loading, setLoading] = useState(false)
   let router = useRouter()
-  let user = useUserContext()
-
-  if(user) router.push('/')
 
   useEffect(()=>{
     setError(null)

@@ -3,14 +3,16 @@ import styled from 'styled-components'
 import fetch from 'isomorphic-unfetch'
 import Link from 'next/link'
 import { useRouter } from 'next/dist/client/router'
-import { useUserContext } from '../pages/_app'
+import { useUserData } from '../src/user'
 
 
 export const Login = () => {
   let router = useRouter()
-  let user = useUserContext()
+  let {data, mutate} = useUserData()
 
-  if(!user) return h(Container, {}, [
+  if(data === undefined) return null
+
+  if(!data) return h(Container, {}, [
     h(Link, {href: '/login'}, h('a', 'login')),
     ' or ',
     h(Link, {href: '/signup'}, h('a', 'signup')),
@@ -24,6 +26,7 @@ export const Login = () => {
         if(res.status === 200) {
           localStorage.removeItem('user')
           router.push('/')
+          mutate(false)
         }
       }}, 'logout')
     ])
@@ -33,6 +36,13 @@ export const Login = () => {
 const Container = styled('div')`
 justify-self: right;
 align-self: center;
+
+animation: fadein 2s;
+
+@keyframes fadein {
+from {opacity: 0;}
+to {opacity: 1;}
+}
 `
 
 const Button = styled('button')`
