@@ -3,7 +3,8 @@ import cookie from 'cookie'
 
 export type Token = {
   email: string,
-  id: string
+  id: string,
+  display_name: string,
 }
 
 export function setToken(res:ServerResponse, token:Token) {

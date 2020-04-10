@@ -69,7 +69,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
     email: token.email
   })
 
-  setToken(res, {email:token.email, id})
+  setToken(res, {email:token.email, id, display_name:token.display_name})
   return res.json({success:true})
 }
 

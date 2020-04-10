@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse} from 'next'
-import {getToken} from '../../src/token'
+import {setToken, getToken} from '../../src/token'
 import {PrismaClient} from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -17,13 +17,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if(msg.display_name) {
-    await updatePerson(user.id, msg.display_name)
+    let newData = await updatePerson(user.id, msg.display_name)
+    setToken(res, {...user, display_name:newData.display_name})
   }
+
 
   await prisma.disconnect()
   res.end()
 }
 
 async function updatePerson(id:string, display_name:string) {
-  return await prisma.people.update({where:{id}, data:{display_name}})
+  return await prisma.people.update({
+    where:{id},
+    data:{display_name}
+  })
 }
