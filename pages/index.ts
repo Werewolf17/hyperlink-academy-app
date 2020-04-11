@@ -7,14 +7,19 @@ import Intro from '../writing/Intro.mdx'
 import { Primary, Secondary } from '../components/Button'
 import CourseCard from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'
-import { getToken } from '../src/token'
-import { useCourses } from '../src/user'
+import { useCourses, useUserData } from '../src/user'
 
 const Landing:NextPage = () => {
   let {data: courses} = useCourses()
+  let {data: user} = useUserData()
 
   return h(Box, {gap:48}, [
     h(Welcome),
+    h(Box, [
+      h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
+      h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
+      !user ? null : h(Link, {href:'dashboard'}, 'See your courses ')
+    ]),
     h(Box, {gap: 16}, [
       h('h2', "The Courses List"),
       !courses ? null : h(CoursesGrid,
@@ -34,17 +39,6 @@ const Landing:NextPage = () => {
       h('a', {style: {justifySelf: 'end'}, href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},'Check out the kindergarten ➭')
     ]),
   ])
-}
-
-Landing.getInitialProps = ({req, res}) => {
-  if(req && res) {
-    if(getToken(req)) {
-      res.writeHead(301, {Location: '/dashboard'})
-      res.end()
-    }
-  }
-  return {}
-
 }
 
 const Welcome = ()=>{

@@ -5,15 +5,17 @@ import Link from 'next/link'
 
 import CourseCard from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'
-import { getToken } from '../src/token'
 import { useUserInstances, useUserData, useCourses } from '../src/user'
+import { useRouter } from 'next/router'
 
 const Dashboard:NextPage = () => {
   let {data: user} = useUserData()
   let {data: courses} = useCourses()
   let {data: instances} = useUserInstances()
+  let router = useRouter()
 
   if(!user || instances === undefined) {
+    if(user === false) router.push('/')
     return null
   }
 
@@ -58,16 +60,6 @@ const Dashboard:NextPage = () => {
       h('a', {style: {justifySelf: 'end'}, href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},'Check out the kindergarten ➭')
     ]),
   ])
-}
-
-Dashboard.getInitialProps = ({req, res}) => {
-  if(req && res) {
-    if(!getToken(req)) {
-      res.writeHead(301, {Location: '/'})
-      res.end()
-    }
-  }
-  return {}
 }
 
 const CoursesGrid = styled('div')`
