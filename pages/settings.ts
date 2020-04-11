@@ -9,7 +9,6 @@ import { Input, Error, Success, Label} from '../components/Form'
 import { Primary, Secondary} from '../components/Button'
 
 import {Msg as UpdatePersonMsg} from './api/updatePerson'
-import {Msg as PasswordMsg} from './api/changePassword'
 import Loader from '../components/Loader'
 
 type Props = {
@@ -107,8 +106,8 @@ const ChangePassword = () => {
     onSubmit: async (e:React.FormEvent) =>{
       e.preventDefault()
       setResult('loading')
-      let msg:PasswordMsg = {oldPassword, newPassword}
-      let res = await fetch('/api/changePassword', {
+      let msg:UpdatePersonMsg= {password: {old: oldPassword, new:newPassword}}
+      let res = await fetch('/api/updatePerson', {
         method: "POST",
         body: JSON.stringify(msg)
       })
