@@ -4,15 +4,15 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 
 import {Narrow} from '../components/Layout'
-import { Form, Button, Input, Error, Label} from '../components/Form'
+import { Form, Button, Input, Error, Label, Info} from '../components/Form'
 import {ResetMsg, Response} from './api/resetPassword/[action]'
+import Loader from '../components/Loader'
 
 export default ()=>{
   let [inputs, setInputs] = useState({password:'', confirmPassword: ''})
   let [status, setStatus] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
   let router = useRouter()
   let {key} = router.query
-  if(!key || typeof key !== 'string') return h(Error, ['Broken link, please try to ', h(Link, {href:"/login?reset"}, h('a', 'reset your password again'))])
 
   useEffect(()=>{
     if(status === 'success') {
@@ -21,6 +21,8 @@ export default ()=>{
       }, 5000)
     }
   })
+
+  if(!key || typeof key !== 'string') return h(Error, ['Broken link, please try to ', h(Link, {href:"/login?reset"}, h('a', 'reset your password again'))])
 
   const onSubmit = async (e:React.FormEvent)=> {
     e.preventDefault()
@@ -37,6 +39,7 @@ export default ()=>{
 
   switch(status) {
     case 'normal':
+    case 'loading':
       return h(Narrow, [
         h(Form, {onSubmit}, [
           h('h1', 'Reset your password'),
@@ -56,15 +59,14 @@ export default ()=>{
               onChange: e => setInputs({...inputs, confirmPassword:e.target.value})
             })
           ]),
-          h(Button, {type: 'submit'}, 'submit')
+          h(Button, {type: 'submit'}, status === 'loading' ? h(Loader) : 'submit')
         ])
       ])
-    case 'loading': return h('div', [h('div', 'Loading...')])
-    case 'success': return h('div', [
+    case 'success': return h(Info, [
       'Awesome, we reset your password, go ahead and ',
       h(Link, {href:'/login'}, h('a', 'login'))
     ])
-    case 'error': return h('div', [h(Error, 'something went wrong, please try again')])
+    case 'error': return h(Error, 'something went wrong, please try again')
   }
 
 }

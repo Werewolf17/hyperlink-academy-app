@@ -31,6 +31,11 @@ color: ${colors.accentRed};
 padding: 16px;
 `
 
+export const Info = styled('div')`
+background-color: ${colors.grey95};
+padding: 16px;
+`
+
 export const Submit = styled('div')`
 display: grid;
 justify-items: end;

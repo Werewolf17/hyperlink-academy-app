@@ -4,7 +4,7 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 
 import { Narrow, Box} from '../components/Layout'
-import {Form, Label, Input, Error, Submit} from '../components/Form'
+import {Form, Label, Input, Error, Submit, Info} from '../components/Form'
 import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import {Msg} from './api/signup'
@@ -55,15 +55,19 @@ const Signup = () => {
       h(Box, {gap: 32}, [
         h(TitleImg, {src: '/img/plane.gif'}),
         h('h1', 'Verify your email'),
-        h('p', [
-          `Sweet! We sent an email to ${formState.email}, click the link there to verify your email address! If you aren't seeing
+        h(Box, {gap: 8}, [
+          `Sweet! We sent an email with a verification link to`,
+          h(Info, formState.email),
+          ` Click the link there to verify your email address! If you aren't seeing
 it, check out your Spam folder.`,
         ]),
         h(Box, {gap: 16}, [
           h(Primary, {
+            style: {width: '100%'},
             onClick: onSubmit
           }, 'Send another link'),
           h(Secondary, {
+            style: {width: '100%'},
             onClick: (e) => {
               e.preventDefault()
               router.push('/signup')

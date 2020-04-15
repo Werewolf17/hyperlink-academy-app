@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {mutate} from 'swr'
 
 import {Narrow} from '../components/Layout'
-import {Form, Input, Error, Label, Submit} from '../components/Form'
+import { Form, Input, Error, Label, Submit, Info} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
 import {Msg} from './api/login'
 import {RequestMsg} from './api/resetPassword/[action]'
@@ -95,6 +95,7 @@ const ResetPassword:React.SFC = () => {
 
   switch(status) {
     case 'normal':
+    case 'loading':
       return h(Narrow, [
         h(Form, {onSubmit: async e =>{
           e.preventDefault()
@@ -120,12 +121,11 @@ const ResetPassword:React.SFC = () => {
             }),
           ]),
           h('div', {style: {display: 'grid', justifyItems:'end', gridGap: '8px'}}, [
-            h(Primary, {type: 'submit'}, 'reset password')
+            h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'reset password')
           ])
         ])
       ])
-    case 'loading': return h(Narrow, [h('div', 'Loading...')])
-    case 'success': return h(Narrow, [h('div', 'Sent you an email! Check there to reset your password')])
+    case 'success': return h(Narrow, [h(Info, 'Sent you an email! Check there to reset your password')])
     case 'error': return h(Narrow, [h(Error, 'something went wrong, please refresh and try again')])
   }
 }

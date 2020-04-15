@@ -13,9 +13,8 @@ export const Login = () => {
   if(data === undefined) return null
 
   if(!data) return h(Container, {}, [
-    h(Link, {href: '/login'}, h('a', 'login')),
-    ' or ',
     h(Link, {href: '/signup'}, h('a', 'signup')),
+    h(Link, {href: '/login'}, h('a', 'login')),
   ])
   else {
     return h(Container, [
@@ -36,6 +35,9 @@ export const Login = () => {
 const Container = styled('div')`
 justify-self: right;
 align-self: center;
+display: grid;
+grid-gap: 32px;
+grid-template-columns: auto auto;
 
 animation: fadein 2s;
 
