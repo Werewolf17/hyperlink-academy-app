@@ -47,4 +47,4 @@ grid-template-columns: auto auto;
 grid-gap: 24px;
 `
 
-export const getStaticProps = getCourseData('meta')
+export const getServerSideProps = getCourseData('meta')
