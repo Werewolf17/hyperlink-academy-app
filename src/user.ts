@@ -1,24 +1,22 @@
 import useSWR from 'swr'
-import {WhoAmIResponse} from '../pages/api/whoami'
-import {Result as GetInstancesResult} from '../pages/api/courses/getInstances'
-import {Result as CourseResult} from '../pages/api/courses/getCourses'
+import {CourseResult, InstanceResult, WhoAmIResult} from '../pages/api/get/[item]'
 export const useUserData = ()=>{
-  return useSWR('/api/whoami', async (api) => {
+  return useSWR('/api/get/whoami', async (api) => {
     let res = await fetch(api)
-    let result:WhoAmIResponse = await res.json()
+    let result:WhoAmIResult = await res.json()
     return result
   })
 }
 
 export const useUserInstances = () => {
-  return useSWR('/api/courses/getInstances', async(api) => {
+  return useSWR('/api/get/user_instances', async(api) => {
     let res = await fetch(api)
-    if(res.status===200) return await res.json() as GetInstancesResult
+    if(res.status===200) return await res.json() as InstanceResult
   })
 }
 
 export const useCourses = () => {
-  return useSWR('/api/courses/getCourses', async (api) => {
+  return useSWR('/api/get/courses', async (api) => {
     let res = await fetch(api)
     return await res.json() as CourseResult
   })

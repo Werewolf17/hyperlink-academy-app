@@ -3,15 +3,13 @@ import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 import {mutate} from 'swr'
-import { NextPageContext } from 'next'
 
 import {Narrow} from '../components/Layout'
 import {Form, Input, Error, Label, Submit} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
 import {Msg} from './api/login'
-import {Msg as ResetMsg} from './api/requestResetPassword'
+import {RequestMsg} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
-import { getToken } from '../src/token'
 import {useUserData} from '../src/user'
 
 const Login = () => {
@@ -39,6 +37,7 @@ const Login = () => {
       body: JSON.stringify(msg)
     })
     if(res.status === 200) {
+      console.log(res)
       mutate('/api/whoami')
       if(redirect) {
         if(redirect[0] === '/') router.push(redirect as string)
@@ -94,16 +93,15 @@ const ResetPassword:React.SFC = () => {
   let [email, setEmail ] = useState('')
   let [status, setStatus] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
 
-
   switch(status) {
     case 'normal':
       return h(Narrow, [
         h(Form, {onSubmit: async e =>{
           e.preventDefault()
           setStatus('loading')
-          let msg:ResetMsg = {email}
+          let msg:RequestMsg= {email}
 
-          let res = await fetch('/api/requestResetPassword', {
+          let res = await fetch('/api/resetPassword/request', {
             method: "POST",
             body: JSON.stringify(msg)
           })
@@ -133,13 +131,3 @@ const ResetPassword:React.SFC = () => {
 }
 
 export default Login
-
-Login.getInitialProps = ({req, res, query}:NextPageContext) => {
-  if(req && res) {
-    if(getToken(req)) {
-      res.writeHead(301, {Location: query.redirect || '/'})
-      res.end()
-    }
-  }
-  return {}
-}

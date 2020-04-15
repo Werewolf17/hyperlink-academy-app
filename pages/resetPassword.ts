@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import {Narrow} from '../components/Layout'
 import { Form, Button, Input, Error, Label} from '../components/Form'
-import {Msg, Response} from './api/resetPassword'
+import {ResetMsg, Response} from './api/resetPassword/[action]'
 
 export default ()=>{
   let [inputs, setInputs] = useState({password:'', confirmPassword: ''})
@@ -25,8 +25,8 @@ export default ()=>{
   const onSubmit = async (e:React.FormEvent)=> {
     e.preventDefault()
     setStatus('loading')
-    let msg:Msg = {key: key as string, password: inputs.password}
-    let res = await fetch('/api/resetPassword', {
+    let msg:ResetMsg = {key: key as string, password: inputs.password}
+    let res = await fetch('/api/resetPassword/reset', {
       method: "POST",
       body: JSON.stringify(msg)
     })
