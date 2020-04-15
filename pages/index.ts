@@ -14,11 +14,13 @@ const Landing:NextPage = () => {
   let {data: user} = useUserData()
 
   return h(Box, {gap:48}, [
-    h(Welcome),
     h(Box, [
-      h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
-      h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
-      !user ? null : h(Link, {href:'dashboard'}, 'See your courses ')
+      h(Welcome),
+      h(Box, {style:{textAlign: 'right'}}, [
+        h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
+        h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
+        !user ? null : h(Link, {href:'dashboard'}, 'See your courses ')
+      ]),
     ]),
     h(Box, {gap: 16}, [
       h('h2', "The Courses List"),

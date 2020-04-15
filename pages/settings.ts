@@ -1,31 +1,29 @@
 import h from 'react-hyperscript'
-import { GetServerSideProps } from 'next'
 import {useState} from 'react'
-import {PrismaClient} from '@prisma/client'
 
-import {getToken} from '../src/token'
 import { Narrow, Box} from '../components/Layout'
 import { Input, Error, Success, Label} from '../components/Form'
 import { Primary, Secondary} from '../components/Button'
 
 import {Msg as UpdatePersonMsg} from './api/updatePerson'
 import Loader from '../components/Loader'
+import { useUserData } from '../src/user'
+import { useRouter } from 'next/router'
 
-type Props = {
-  email: string
-  display_name: string
-}
-
-export default (props:Props) => {
+export default () => {
+  let {data: user} = useUserData()
+  let router = useRouter()
+  if(user === false) router.push('/')
+  if(!user) return null
   return h(Narrow, [
     h(Box, {gap: 48}, [
     h('h2', 'Your Settings'),
     h(Box, {gap: 24}, [
-      h(ChangeName, {display_name: props.display_name}),
+      h(ChangeName, {display_name: user.display_name}),
       h('hr'),
       h('div', [
         h('h4', 'Your Email'),
-        props.email
+        user.email
       ]),
       h('hr'),
     h(ChangePassword)
@@ -159,22 +157,4 @@ const ChangePassword = () => {
       result === 'loading' ? null : h(Primary, {onClick: e=>{e.preventDefault(); setEditing(false)}}, 'cancel')
     ])
   ])
-}
-
-export const getServerSideProps:GetServerSideProps = async ({req, res}): Promise<{props:Props | {}}>=>{
-  let token = getToken(req)
-  if(!token) {
-    res.writeHead(301, {Location: '/login'})
-    res.end()
-    return {props:{}}
-  }
-
-  let prisma = new PrismaClient()
-  let user = await prisma.people.findOne({
-    where: {id: token.id},
-    select: {email:true, display_name: true}
-  })
-  if(!user) return {props:{}}
-
-  return {props: user}
 }
