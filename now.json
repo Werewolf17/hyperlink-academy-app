@@ -1,7 +1,5 @@
 {
   "env": {
-    "AIRTABLE_API_KEY": "@airtable-api-key",
-    "MAILGUN_KEY": "@mailgun-key",
     "DISCOURSE_SECRET": "@discourse-secret",
     "DISCOURSE_API_KEY": "@discourse-api-key",
     "DISCOURSE_API_USERNAME": "@discourse-api-username",
