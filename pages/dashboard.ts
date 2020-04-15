@@ -53,7 +53,6 @@ const Dashboard:NextPage = () => {
             path: '/courses/' + course.id}, [])
         })),
     ]),
-    h('hr'),
     h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
       h('h2', 'The Course Kindergarten'),
       'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',

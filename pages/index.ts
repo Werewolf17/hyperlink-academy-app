@@ -8,19 +8,21 @@ import { Primary, Secondary } from '../components/Button'
 import CourseCard from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'
 import { useCourses, useUserData } from '../src/user'
+import { useRouter } from 'next/router'
 
 const Landing:NextPage = () => {
   let {data: courses} = useCourses()
   let {data: user} = useUserData()
+  let router = useRouter()
+  if(user) router.push('/dashboard')
 
   return h(Box, {gap:48}, [
     h(Box, [
       h(Welcome),
       h(Box, {style:{textAlign: 'right'}}, [
         h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
-        h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
-        !user ? null : h(Link, {href:'dashboard'}, 'See your courses ')
-      ]),
+        h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')
+      ])
     ]),
     h(Box, {gap: 16}, [
       h('h2', "The Courses List"),
