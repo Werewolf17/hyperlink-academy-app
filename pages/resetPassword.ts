@@ -4,7 +4,8 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 
 import {Narrow} from '../components/Layout'
-import { Form, Button, Input, Error, Label, Info} from '../components/Form'
+import {Primary} from '../components/Button'
+import { Form, Input, Error, Label, Info} from '../components/Form'
 import {ResetMsg, Response} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 
@@ -59,7 +60,7 @@ export default ()=>{
               onChange: e => setInputs({...inputs, confirmPassword:e.target.value})
             })
           ]),
-          h(Button, {type: 'submit'}, status === 'loading' ? h(Loader) : 'submit')
+          h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'submit')
         ])
       ])
     case 'success': return h(Info, [

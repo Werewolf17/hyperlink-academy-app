@@ -80,7 +80,7 @@ it, check out your Spam folder.`,
 
   return h(Narrow, {}, [
     h(Form, {onSubmit}, [
-      h(TitleImg, {src: '/img/start_journey_crop.png'}),
+      h(TitleImg, {src: '/img/start_journey_crop.png', style:{width:'130px'}}),
       h('h1', 'Start a journey'),
       error ? h(Error, {}, Errors[error]) : null,
       h(Label, [

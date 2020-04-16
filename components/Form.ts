@@ -1,8 +1,5 @@
 import styled from 'styled-components'
 import {colors} from './Layout'
-export let Button = styled('button')`
-justify-self: right;
-`
 
 export let Form = styled('form')`
 margin: 0px auto;

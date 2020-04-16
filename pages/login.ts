@@ -4,13 +4,14 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 import {mutate} from 'swr'
 
-import {Narrow} from '../components/Layout'
+import {Narrow, Box} from '../components/Layout'
 import { Form, Input, Error, Label, Submit, Info} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
 import {Msg} from './api/login'
 import {RequestMsg} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import {useUserData} from '../src/user'
+import TitleImg from '../components/TitleImg'
 
 const Login = () => {
   let [email, setEmail] = useState('')
@@ -60,6 +61,7 @@ const Login = () => {
 
   return h(Narrow, {}, [
     h(Form, {onSubmit}, [
+      h(TitleImg,{src:'/img/dragon.png'}),
       h('h1', 'Welcome Back!'),
       error ? h(Error, {}, Errors[error]) : null,
       h(Label, [
@@ -125,7 +127,16 @@ const ResetPassword:React.SFC = () => {
           ])
         ])
       ])
-    case 'success': return h(Narrow, [h(Info, 'Sent you an email! Check there to reset your password')])
+    case 'success': return h(Narrow, {}, h(Box, {gap: 16}, [
+      'We sent an email with a password reset link to',
+      h(Info, email),
+      'It expires in 30 minutes.',
+      h('br'),
+      h(Primary, {
+        style: {width: '100%'},
+        onClick: ()=>setStatus('normal')
+      }, 'Send another link')
+    ]))
     case 'error': return h(Narrow, [h(Error, 'something went wrong, please refresh and try again')])
   }
 }

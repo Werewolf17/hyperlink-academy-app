@@ -48,7 +48,7 @@ border-color: ${colors.grey55}
 background-color: ${colors.grey95};
 
 @media(max-width: 640px) {
-padding: 32px 32px 24px 32px;
+padding: 24px ;
 }
 `
 
@@ -61,6 +61,10 @@ const Body = styled('div')`
 max-width: 640px;
 padding: 64px 32px;
 margin: auto;
+
+@media(max-width: 640px) {
+padding: 24px;
+}
 `
 
 export const Narrow = styled('div')`

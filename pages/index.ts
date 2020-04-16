@@ -9,6 +9,7 @@ import CourseCard from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'
 import { useCourses, useUserData } from '../src/user'
 import { useRouter } from 'next/router'
+import TitleImg from '../components/TitleImg'
 
 const Landing:NextPage = () => {
   let {data: courses} = useCourses()
@@ -51,10 +52,21 @@ const Welcome = ()=>{
       h(Link, {href: '/signup'}, h(Primary,  'Sign up')),
       h(Link, {href: '/login'}, h(Secondary, "Log in")),
     ]),
+    h(ImageContainer, [
+      h(TitleImg, {src:'/img/landing.png', style: {border: 'none'}}),
+    ]),
     h(Title, 'hyperlink.academy'),
     h(Intro),
   ])
 }
+
+const ImageContainer = styled('div')`
+overflow: hidden;
+border: 2px solid;
+@media(max-width: 600px) {
+overflow: scroll;
+}
+`
 
 const Title = styled('h1')`
 font-family: serif;
