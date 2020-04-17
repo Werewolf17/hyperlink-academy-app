@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import Intro from '../writing/Intro.mdx'
 import { Primary, Secondary } from '../components/Button'
-import CourseCard from '../components/Course/CourseCard'
+import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors, Box} from '../components/Layout'
 import { useCourses, useUserData } from '../src/user'
 import { useRouter } from 'next/router'
@@ -30,7 +30,7 @@ const Landing:NextPage = () => {
     ]),
     h(Box, {gap: 16}, [
       h('h2', "The Courses List"),
-      !courses ? null : h(CoursesGrid,
+      !courses ? null : h(CourseGrid,
         courses.courses
         .map(course => {
           return h(CourseCard, {
@@ -82,12 +82,6 @@ justify-content: end;
 display: grid;
 grid-gap: 16px;
 grid-template-columns: max-content max-content;
-`
-
-const CoursesGrid = styled('div')`
-display: grid;
-grid-template-columns: repeat(auto-fill, 300px);
-grid-gap: 24px;
 `
 
 export default Landing

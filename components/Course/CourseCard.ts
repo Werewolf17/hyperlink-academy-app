@@ -8,7 +8,7 @@ type Props = {
   name:string,
   description: string
   path: string
-  start_date: Date
+  start_date?: Date
   instance?: boolean
 }
 export default (props:Props) => {
@@ -16,7 +16,7 @@ export default (props:Props) => {
   }, h(Box, {gap: 16}, [
     h('h3', props.name),
     h('p', props.description),
-    h(DateContainer, (props.instance ? 'starts ' : 'Next instance starts ') + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
+    !props.start_date ? null : h(DateContainer, (props.instance ? 'starts ' : 'Next instance starts ') + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
   ])))
 }
 
@@ -41,4 +41,10 @@ color: black;
 &:hover, &:active, &:focus {
 cursor: pointer;
 }
+`
+
+export const CourseGrid = styled('div')`
+display: grid;
+grid-template-columns: repeat(auto-fill, 300px);
+grid-gap: 24px;
 `
