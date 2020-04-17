@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import {useState} from 'react'
+import { useState, useEffect} from 'react'
 
 import { Narrow, Box} from '../components/Layout'
 import { Input, Error, Success, Label} from '../components/Form'
@@ -13,7 +13,8 @@ import { useRouter } from 'next/router'
 export default () => {
   let {data: user} = useUserData()
   let router = useRouter()
-  if(user === false) router.push('/')
+  useEffect(()=> {if(user === false) router.push('/')})
+
   if(!user) return null
   return h(Narrow, [
     h(Box, {gap: 48}, [

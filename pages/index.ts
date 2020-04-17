@@ -10,12 +10,15 @@ import {colors, Box} from '../components/Layout'
 import { useCourses, useUserData } from '../src/user'
 import { useRouter } from 'next/router'
 import TitleImg from '../components/TitleImg'
+import { useEffect } from 'react'
 
 const Landing:NextPage = () => {
   let {data: courses} = useCourses()
   let {data: user} = useUserData()
   let router = useRouter()
-  if(user) router.push('/dashboard')
+  useEffect(()=>{
+    if(user) router.push('/dashboard')
+  }, [user])
 
   return h(Box, {gap:48}, [
     h(Box, [

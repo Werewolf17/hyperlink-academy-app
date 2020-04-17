@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import styled from 'styled-components'
 import fetch from 'isomorphic-unfetch'
 import Link from 'next/link'
-import { useRouter } from 'next/dist/client/router'
+import { useRouter } from 'next/router'
 import { useUserData } from '../src/user'
 
 
@@ -14,7 +14,7 @@ export const Login = () => {
 
   if(!data) return h(Container, {}, [
     h(Link, {href: '/signup'}, h('a', 'signup')),
-    h(Link, {href: '/login'}, h('a', 'login')),
+    h(Link, {href: '/login?redirect=' + encodeURIComponent(router.pathname)}, h('a', 'login')),
   ])
   else {
     return h(Container, [
@@ -23,8 +23,6 @@ export const Login = () => {
       h(Button, {onClick: async ()=>{
         let res = await fetch('/api/logout')
         if(res.status === 200) {
-          localStorage.removeItem('user')
-          router.push('/')
           mutate(false)
         }
       }}, 'logout')

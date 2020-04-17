@@ -21,10 +21,10 @@ export default (props: Props) => {
   let {data:user} = useUserData()
   let {data: instances} = useUserInstances()
 
-  if(user === undefined || instances === undefined) return h(Primary, {}, h(Loader))
+  if(user === undefined) return null
 
   let userInNextInstance = instances && instances.course_instances.find(instance => instance.id === props.instances[0].id)
-  if(userInNextInstance) return h('a', {
+  if(user && userInNextInstance) return h('a', {
     href: 'https://forum.hyperlink.academy/g/' + props.instances[0].id
   }, h(Primary, 'Your instance group'))
 

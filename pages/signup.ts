@@ -9,6 +9,7 @@ import {Primary, Secondary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import {Msg} from './api/signup'
 import Loader from '../components/Loader'
+import { useUserData } from '../src/user'
 
 const Signup = () => {
   let [formState, setFormState] = useState({
@@ -19,11 +20,14 @@ const Signup = () => {
   })
   let [error, setError] = useState<'user exists' | null>(null)
   let [loading, setLoading] = useState(false)
+  let {data:user} = useUserData()
   let router = useRouter()
 
   useEffect(()=>{
     setError(null)
   }, [formState.email])
+
+  useEffect(()=>{if(user) router.push('/dashboard')}, [user])
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
