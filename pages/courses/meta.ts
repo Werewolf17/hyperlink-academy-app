@@ -32,6 +32,11 @@ export default (props:CourseData) => {
 const Info = styled('div')`
 padding: 24px;
 width: 240px;
+
+@media(max-width:600px) {
+width: 100%;
+};
+
 box-sizing: border-box;
 background-color: ${colors.grey95};
 `
@@ -43,8 +48,17 @@ font-weight: bold;
 
 const Main = styled('div')`
 display: grid;
-grid-template-columns: auto auto;
+
+@media(min-width:600px) {
+  grid-template-columns: auto auto;
+}
+
+@media(max-width:600px) {
+  grid-template-rows: auto auto;
+};
+
 grid-gap: 24px;
+
 `
 
 export const getServerSideProps = getCourseData('meta')
