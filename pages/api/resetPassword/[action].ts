@@ -30,7 +30,7 @@ const createResetKey = async (email: string) => {
   let key = uuidv4()
   await prisma.password_reset_keys.create({data:{
       email,
-      time: new Date(Date.now()).toISOString(),
+      created_time: new Date(Date.now()).toISOString(),
       key_hash: hmac(key)
   }})
   return key
@@ -52,26 +52,26 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
 }
 
 const requestResetPassword = async (req:NextApiRequest, res: NextApiResponse) => {
-        let msg: Partial<RequestMsg> = JSON.parse(req.body)
-        if(!msg.email) {
-          return res.status(403).end()
-        }
+  let msg: Partial<RequestMsg> = JSON.parse(req.body)
+  if(!msg.email) {
+    return res.status(403).end()
+  }
 
-        if(!(await checkUser(msg.email))) {
-          res.json({success:true})
-        }
+  if(!(await checkUser(msg.email))) {
+    res.json({success:true})
+  }
 
-        else {
-          let key = await createResetKey(msg.email)
+  else {
+    let key = await createResetKey(msg.email)
 
-          let url = `${req.headers.origin}/resetPassword?&key=${key}`
+    let url = `${req.headers.origin}/resetPassword?&key=${key}`
 
-          await sendResetEmail(msg.email, url)
-          res.json({success: true})
-        }
+    await sendResetEmail(msg.email, url)
+    res.json({success: true})
+  }
 
-        await prisma.disconnect()
-        res.end()
+  await prisma.disconnect()
+  res.end()
 }
 
 async function getResetKey(hash: string) {
@@ -87,9 +87,12 @@ const resetPassword = async (req: NextApiRequest, res: NextApiResponse<Response>
 
   let hash = hmac(msg.key)
   let resetKey = await getResetKey(hash)
-  if(!resetKey) return res.json({success:false})
+  if(!resetKey) {
+    await prisma.disconnect()
+    return res.json({success:false})
+  }
 
-  let date = new Date(resetKey.time)
+  let date = new Date(resetKey.created_time)
 
   if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
     return res.json({success:false})
@@ -97,9 +100,11 @@ const resetPassword = async (req: NextApiRequest, res: NextApiResponse<Response>
 
   try {
     await updatePassword(resetKey.email, msg.password, hash)
+    await prisma.disconnect()
     return res.json({success:true})
   }
   catch (e){
+    await prisma.disconnect()
     console.log(e)
     return res.json({success:false})
   }

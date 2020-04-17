@@ -1,12 +1,4 @@
 {
-  "env": {
-    "DISCOURSE_SECRET": "@discourse-secret",
-    "DISCOURSE_API_KEY": "@discourse-api-key",
-    "DISCOURSE_API_USERNAME": "@discourse-api-username",
-    "POSTMARK_TOKEN": "@postmark-token",
-    "POSTGRES_URI": "@postgres-uri",
-    "STRIPE_SECRET": "@stripe-key",
-    "STRIPE_WEBHOOK": "@stripe-webhook"
-  },
+  "env": {},
   "cleanUrls": true
 }

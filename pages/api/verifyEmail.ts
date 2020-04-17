@@ -53,7 +53,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   let token = await getActivationKey(keyHash)
   if(!token) return res.json({success: false, error: 'invalid key'})
 
-  let date = new Date(token.time)
+  let date = new Date(token.created_time)
 
   if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
     await prisma.disconnect()

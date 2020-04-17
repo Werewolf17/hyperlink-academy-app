@@ -8,11 +8,11 @@ datasource db {
 }
 
 model activation_keys {
+  created_time  String
   display_name  String
   email         String
   key_hash      String @id
   password_hash String
-  time          String
 }
 
 model course_instances {
@@ -32,9 +32,9 @@ model courses {
 }
 
 model password_reset_keys {
-  email    String
-  key_hash String @id
-  time     String
+  created_time String
+  email        String
+  key_hash     String @id
 }
 
 model people {

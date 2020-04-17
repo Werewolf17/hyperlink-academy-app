@@ -31,7 +31,7 @@ const createActivationKey = async (email: string, hash: string, display_name: st
       password_hash: hash,
       email,
       display_name,
-      time: new Date(Date.now()).toISOString(),
+      created_time: new Date(Date.now()).toISOString(),
       key_hash: hmac(key)
     }
   })
