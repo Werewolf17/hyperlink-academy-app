@@ -38,6 +38,3 @@ display: grid;
 justify-items: end;
 grid-gap: 8px;
 `
-
-export const Success = styled('div')``
-

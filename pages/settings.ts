@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { useState, useEffect} from 'react'
 
 import { Narrow, Box} from '../components/Layout'
-import { Input, Error, Success, Label} from '../components/Form'
+import { Input, Error, Info, Label} from '../components/Form'
 import { Primary, Secondary} from '../components/Button'
 
 import {Msg as UpdatePersonMsg} from './api/updatePerson'
@@ -118,7 +118,7 @@ const ChangePassword = () => {
     }
   }, !editing ? [
     h('h4', 'Your password'),
-    result === 'success' ? h(Success, 'success') : null,
+    result === 'success' ? h(Info, 'Your password has been changed!') : null,
     h(Primary, {
     onClick: e=> {
       e.preventDefault()

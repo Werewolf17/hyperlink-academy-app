@@ -105,7 +105,6 @@ p { margin: 0; }
 hr {
   width: 100%;
   color: black;
-  size: 2;
   border: 1px solid;
 }
 `

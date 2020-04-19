@@ -3,14 +3,14 @@ import {colors} from  './Layout'
 
 export const Primary = styled('button')`
 font-family: monospace;
+font-size: 14px;
 height: fit-content;
+width: fit-content;
 background-color: ${colors.grey15};
+color: white;
 padding: 8px 16px;
 border-radius: 2px;
-width: fit-content
 border: none;
-font-size: 14px;
-color: white;
 
 &:hover {
 cursor: pointer;
@@ -19,8 +19,8 @@ cursor: pointer;
 
 export const Secondary = styled(Primary)`
 border: 2px solid;
-color: black;
 border-color: ${colors.grey15};
+color: black;
 background-color: white;
 `
 
