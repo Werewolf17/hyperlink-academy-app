@@ -3,7 +3,6 @@ import {PrismaClient} from '@prisma/client'
 import hmac from '../../src/hmac'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid';
-import fetch from 'isomorphic-unfetch'
 import sendVerificationEmail from '../../emails/verifyEmail'
 
 const prisma = new PrismaClient()
@@ -69,13 +68,4 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
 
   res.json({success: true})
   return res.end()
-}
-
-export const callSignup = async (msg: Msg): Promise<Response> => {
-  let res = await fetch('/api/signup', {
-    method: "POST",
-    body: JSON.stringify(msg)
-  })
-
-  return await res.json()
 }
