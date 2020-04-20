@@ -4,7 +4,9 @@ import { GetServerSideProps } from 'next'
 export type CourseData = coursesGetPayload<{include: {course_instances: true}}>
 export const getCourseData = (id:string) => {
   const getServerSideProps:GetServerSideProps= async () => {
-    let prisma = new PrismaClient()
+    let prisma = new PrismaClient({
+      forceTransactions: true
+    })
     let data = await prisma.courses.findOne({
       where: {id},
       include: {course_instances: true}

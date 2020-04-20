@@ -5,7 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs'
 import sendResetEmail from '../../../emails/resetPassword'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  forceTransactions: true
+})
 
 export type RequestMsg = {
   email: string

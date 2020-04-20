@@ -81,10 +81,10 @@ const Login = () => {
           required:true,
           onChange: (e)=> setPassword(e.currentTarget.value)
         }),
+        h(Link, {href: '/login?reset'}, h(LinkButton, 'Reset Password'))
       ]),
       h(Submit, [
         h(Primary, {type: 'submit'}, loading ? h(Loader) : 'Log In'),
-        h(Link, {href: '/login?reset'}, h(LinkButton, 'Reset Password'))
       ])
     ]),
   ])

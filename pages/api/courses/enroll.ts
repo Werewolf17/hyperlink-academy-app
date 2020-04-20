@@ -10,14 +10,16 @@ export type Msg = {
 
 export type Response = {sessionId: string}
 
+let prisma = new PrismaClient({
+  forceTransactions: true
+})
+
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   let msg: Partial<Msg> = JSON.parse(req.body)
   if(!msg.instanceID) return res.status(403).end()
 
   let user = getToken(req)
   if(!user) return res.status(403).end()
-
-  let prisma = new PrismaClient()
 
   let instance = await prisma.course_instances.findOne({
     where: {id: msg.instanceID},

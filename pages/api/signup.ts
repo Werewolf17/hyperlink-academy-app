@@ -5,7 +5,9 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid';
 import sendVerificationEmail from '../../emails/verifyEmail'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  forceTransactions: true
+})
 
 export type Msg = {
   email: string

@@ -6,7 +6,9 @@ import { v4 as uuidv4 } from 'uuid';
 import fetch from 'isomorphic-unfetch'
 import {setToken} from '../../src/token'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  forceTransactions: true
+})
 
 export type Msg = {
   key: string

@@ -17,7 +17,9 @@ export type Result = CourseResult |
   WhoAmIResult |
   string
 
-let prisma = new PrismaClient()
+let prisma = new PrismaClient({
+  forceTransactions: true
+})
 
 export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   switch(req.query.item) {

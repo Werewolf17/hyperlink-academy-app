@@ -3,7 +3,9 @@ import {setToken, getToken} from '../../src/token'
 import {PrismaClient} from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  forceTransactions: true
+})
 
 export type Msg = {
   display_name?: string,
