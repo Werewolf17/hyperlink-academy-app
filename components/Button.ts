@@ -19,6 +19,8 @@ cursor: pointer;
 
 export const Secondary = styled(Primary)`
 border: 2px solid;
+padding: 6px 16px;
+box-sizing: border-box;
 border-color: ${colors.grey15};
 color: black;
 background-color: white;

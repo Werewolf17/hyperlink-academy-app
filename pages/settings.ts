@@ -1,5 +1,6 @@
 import h from 'react-hyperscript'
-import { useState, useEffect} from 'react'
+import styled from 'styled-components'
+import { useState, useEffect, Fragment} from 'react'
 
 import { Narrow, Box} from '../components/Layout'
 import { Input, Error, Info, Label} from '../components/Form'
@@ -18,19 +19,19 @@ export default () => {
   if(!user) return null
   return h(Narrow, [
     h(Box, {gap: 48}, [
-    h('h2', 'Your Settings'),
-    h(Box, {gap: 24}, [
-      h(ChangeName, {display_name: user.display_name}),
-      h('hr'),
-      h('div', [
-        h('h4', 'Your Email'),
-        user.email
+      h('h2', 'Your Settings'),
+      h(Box, {gap: 24}, [
+        h(ChangeName, {display_name: user.display_name}),
+        h('hr'),
+        h('div', [
+          h('h3', 'Your Email'),
+          user.email
+        ]),
+        h('hr'),
+        h(ChangePassword)
       ]),
-      h('hr'),
-    h(ChangePassword)
-    ]),
-  ])
     ])
+  ])
 }
 
 const ChangeName = (props:{display_name: string}) => {
@@ -38,13 +39,7 @@ const ChangeName = (props:{display_name: string}) => {
   let [name, setName] = useState(props.display_name)
   let [loading, setLoading] = useState(false)
 
-  return h('form',{
-    style: {
-      display: 'grid',
-      gridTemplateRows: 'auto auto',
-      gridGap: 8
-    },
-    onSubmit: async (e:React.FormEvent)=>{
+  let onSubmit = async (e:React.FormEvent)=>{
       e.preventDefault()
       setLoading(true)
 
@@ -55,24 +50,24 @@ const ChangeName = (props:{display_name: string}) => {
       })
       setLoading(false)
       setEditing(false)
-    }
-  }, [
-    h('div', {style: {
+  }
+
+  return h('form', {
+    style: {
       display: 'grid',
-      alignItems: 'center',
-      gridTemplateColumns: 'auto auto'
-    }},[
-      h('h4', 'Your Name'),
-      h('div', {
+      gridTemplateRows: 'auto auto',
+      gridGap: 16
+    },
+    onSubmit
+  }, [
+    h(PropertyHeader , [
+      h('h3', 'Your Name'),
+      editing ? null : h('div', {
         style:{
           justifySelf:'end',
         }
       }, [
-        editing ? h(Secondary, {
-          type: 'submit',
-        }, loading ? h(Loader) : 'submit') : null,
-        ' ',
-        loading ? null : h(Primary, {
+        h(Primary, {
           onClick: (e)=> {
             e.preventDefault()
             if(editing) {
@@ -80,13 +75,20 @@ const ChangeName = (props:{display_name: string}) => {
             }
             setEditing(!editing)
           }
-        }, editing ? 'cancel': 'edit' ),
+        }, 'edit' ),
       ])
     ]),
-    editing ? h(Input, {
-      value: name,
-      onChange: e => setName(e.currentTarget.value)
-    }) : name,
+    editing ? h(Fragment, [
+      h(Input, {
+        value: name,
+        onChange: e => setName(e.currentTarget.value)
+      }),
+      h('div', {style:{justifySelf:'end'}}, [
+        h(Secondary, {type: 'submit'}, loading ? h(Loader) : 'submit'),
+        ' ',
+        loading ? null : h(Primary, {onClick: ()=>{setName(props.display_name); setEditing(false)}}, 'cancel')
+      ])
+    ]) : name
   ])
 }
 
@@ -97,65 +99,81 @@ const ChangePassword = () => {
   const [confPassword, setConfPassword] = useState('')
   const [result, setResult] = useState<null | 'success' | 'failure' |'loading'>(null)
 
+  let onSubmit = async (e:React.FormEvent) =>{
+    e.preventDefault()
+    setResult('loading')
+    let msg:UpdatePersonMsg= {password: {old: oldPassword, new:newPassword}}
+    let res = await fetch('/api/updatePerson', {
+      method: "POST",
+      body: JSON.stringify(msg)
+    })
+    if(res.status === 200) {
+      setResult('success')
+      setEditing(false)
+    }
+    else setResult('failure')
+  }
+
   return h('form', {
     style: {
       display: 'grid',
       gridGap: 16,
     },
-    onSubmit: async (e:React.FormEvent) =>{
-      e.preventDefault()
-      setResult('loading')
-      let msg:UpdatePersonMsg= {password: {old: oldPassword, new:newPassword}}
-      let res = await fetch('/api/updatePerson', {
-        method: "POST",
-        body: JSON.stringify(msg)
-      })
-      if(res.status === 200) {
-        setResult('success')
-        setEditing(false)
-      }
-      else setResult('failure')
-    }
-  }, !editing ? [
-    h('h4', 'Your password'),
+    onSubmit
+  }, [
+    h(PropertyHeader,[
+      h('h3', 'Your Password'),
+      h('div', {style:{justifySelf:'end'}}, [
+        editing ? null :  h(Primary, {
+          onClick: (e)=> {
+            e.preventDefault()
+            setEditing(!editing)
+          }
+        }, 'change' ),
+      ])
+    ]),
     result === 'success' ? h(Info, 'Your password has been changed!') : null,
-    h(Primary, {
-    onClick: e=> {
-      e.preventDefault()
-      setEditing(true)
-    }
-  }, 'Change your password')] : [
-    result === 'failure' ? h(Error, 'Your current password is incorrect') : null,
-    h(Label, [
-      'Current Password',
-      h(Input, {type: 'password',
-                value: oldPassword,
-                onChange: e =>setOldPassword(e.currentTarget.value)}),
-    ]),
-    h(Label, [
-      'New Password',
-      h(Input, {type: 'password',
-                value: newPassword,
-                onChange: e=> setNewPassword(e.currentTarget.value)}),
-    ]),
-    h(Label, [
-      'Confirm New Password',
-      h(Input, {type: 'password',
-                value: confPassword ,
-                onChange: e=> {
-                  setConfPassword(e.currentTarget.value)
-                  if(e.currentTarget.value !== newPassword) {
-                    e.currentTarget.setCustomValidity('Passwords do not match')
-                  }
-                  else {
-                    e.currentTarget.setCustomValidity('')
-                  }
-                }}),
-    ]),
-    h('div', {style:{justifySelf:'end'}}, [
-      h(Secondary, {type: 'submit'}, result === 'loading' ? h(Loader) : 'submit'),
-      ' ',
-      result === 'loading' ? null : h(Primary, {onClick: e=>{e.preventDefault(); setEditing(false)}}, 'cancel')
+    !editing ? null : h(Fragment,[
+      result === 'failure' ? h(Error, 'Your current password is incorrect') : null,
+      h(Label, [
+        'Current Password',
+        h(Input, {type: 'password',
+                  value: oldPassword,
+                  onChange: e =>setOldPassword(e.currentTarget.value)}),
+      ]),
+      h(Label, [
+        'New Password',
+        h(Input, {type: 'password',
+                  value: newPassword,
+                  onChange: e=> setNewPassword(e.currentTarget.value)}),
+      ]),
+      h(Label, [
+        'Confirm New Password',
+        h(Input, {type: 'password',
+                  value: confPassword ,
+                  onChange: e=> {
+                    setConfPassword(e.currentTarget.value)
+                    if(e.currentTarget.value !== newPassword) {
+                      e.currentTarget.setCustomValidity('Passwords do not match')
+                    }
+                    else {
+                      e.currentTarget.setCustomValidity('')
+                    }
+                  }}),
+      ]),
+      h('div', {style:{justifySelf:'end'}}, [
+        h(Secondary, {type: 'submit'}, result === 'loading' ? h(Loader) : 'submit'),
+        ' ',
+        result === 'loading' ? null : h(Primary, {onClick: e=>{e.preventDefault(); setEditing(false)}}, 'cancel')
+      ])
     ])
-  ])
+  ] )
 }
+
+
+const PropertyHeader = styled('div')`
+display: grid;
+height: 32px;
+align-items: center;
+grid-template-columns: auto auto;
+`
