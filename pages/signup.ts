@@ -43,7 +43,7 @@ const Signup = () => {
       setError('user exists')
     }
     else {
-      router.push('/signup?success')
+      router.push('/signup?verifyEmail')
     }
     setLoading(false)
   }
@@ -55,7 +55,7 @@ const Signup = () => {
     ])
   }
 
-  if(router.query.success !== undefined) {
+  if(router.query.verifyEmail !== undefined) {
     return h(VerifyEmail, {email: formState.email, resendEmail: onSubmit})
   }
 
@@ -127,11 +127,26 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   }
 
   useEffect(()=>{
+    if(router.query.verifyEmail) {
+      let msg:VerifyMsg = {key: router.query.verifyEmail as string}
+      fetch('/api/verifyEmail', {method: "POST", body: JSON.stringify(msg)}).then(async res=>{
+        let result:Result = await res.json()
+        if(result.success) {
+          setResult('success')
+        }
+        else setResult('invalid')
+      })
+    }
+  }, [])
+
+  useEffect(()=>{
     if(result !== 'success') return
     setTimeout(()=>{
       router.push('/dashboard')
     }, 3000)
   }, [result])
+
+  if(router.query.verifyEmail && result === null) return null
 
 
   if(result === 'success') return h(Narrow, [
@@ -146,10 +161,10 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
     h(Box, {gap: 32}, [
       h(TitleImg, {src: '/img/plane.gif'}),
       h('h1', 'Verify your email'),
-      h(Box, {gap: 8}, [
+      props.email ? h(Box, {gap: 8}, [
         `Sweet! We sent an email with a verification code to`,
         h(Info, props.email),
-      ]),
+      ]) : null,
       `Copy the code there and submit it here:`,
       result === 'invalid' ? h(Error, {}, [
         'Your email link is invalid or out of date, please try ',

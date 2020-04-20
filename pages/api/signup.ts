@@ -62,8 +62,9 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   let key = await createActivationKey(msg.email, hash, msg.display_name)
   await prisma.disconnect()
 
-  await sendVerificationEmail(msg.email, {activation_code:key, name:msg.display_name})
+  let activation_url = `${req.headers.origin}/signup?verifyEmail=${key}`
 
+  await sendVerificationEmail(msg.email, {activation_code: key, name:msg.display_name, activation_url})
   res.json({success: true})
   return res.end()
 }
