@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {colors} from  './Layout'
+import {colors} from  './Tokens'
 
 export const Primary = styled('button')`
 font-family: monospace;

@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import fetch from 'isomorphic-unfetch'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import {Primary, Secondary} from './Button'
+import {colors} from './Tokens'
 import { useUserData } from '../src/user'
 
 

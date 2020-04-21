@@ -1,7 +1,8 @@
 import h from 'react-hyperscript'
 import styled from 'styled-components'
 
-import { Box, colors } from '../../components/Layout'
+import { Box } from '../../components/Layout'
+import {colors} from '../../components/Tokens'
 import Enroll from '../../components/Course/Enroll'
 import {CourseData, getCourseData} from '../../src/course'
 

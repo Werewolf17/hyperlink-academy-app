@@ -2,7 +2,8 @@ import styled from "styled-components"
 import h from 'react-hyperscript'
 import Link from 'next/link'
 
-import { colors, Box} from '../Layout'
+import { Box} from '../Layout'
+import {colors} from '../Tokens'
 
 type Props = {
   name:string,

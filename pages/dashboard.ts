@@ -3,7 +3,8 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
-import {colors, Box} from '../components/Layout'
+import {colors} from '../components/Tokens'
+import { Box} from '../components/Layout'
 import { useUserInstances, useUserData, useCourses } from '../src/user'
 import { useRouter } from 'next/router'
 
