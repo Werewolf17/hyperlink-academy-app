@@ -62,4 +62,4 @@ grid-gap: 24px;
 
 `
 
-export const getServerSideProps = getCourseData('meta')
+export const getStaticProps = getCourseData('meta')
