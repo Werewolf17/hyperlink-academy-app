@@ -4,7 +4,6 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 
 import Intro from '../writing/Intro.mdx'
-import { Primary, Secondary } from '../components/Button'
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { Box} from '../components/Layout'
@@ -52,10 +51,6 @@ const Landing:NextPage = () => {
 
 const Welcome = ()=>{
   return h(Box, {gap:32, style:{paddingBottom: '48px'}}, [
-    h(LoginButtons, [
-      h(Link, {href: '/signup'}, h(Primary,  'Sign up')),
-      h(Link, {href: '/login'}, h(Secondary, "Log in")),
-    ]),
     h(ImageContainer, [
       h(TitleImg, {src:'/img/landing.png', style: {border: 'none'}}),
     ]),
@@ -77,12 +72,6 @@ font-family: serif;
 text-decoration: underline;
 font-weight: bold;
 color: blue;
-`
-const LoginButtons = styled('div')`
-justify-content: end;
-display: grid;
-grid-gap: 16px;
-grid-template-columns: max-content max-content;
 `
 
 export default Landing

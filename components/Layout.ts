@@ -7,7 +7,7 @@ import h from 'react-hyperscript'
 import { Fragment } from 'react'
 import { useRouter } from 'next/router'
 
-import {Spacing, colors} from './Tokens'
+import {Spacing} from './Tokens'
 
 const Layout:React.SFC = (props)=>{
   const {data: user}= useUserData()
@@ -19,11 +19,12 @@ const Layout:React.SFC = (props)=>{
       href:"https://fonts.googleapis.com/css?family=Lato|Roboto+Mono&display=swap",
       rel:"stylesheet"
     })),
-    router.pathname === '/' ? null : h(Header, [
-        h(Title,{}, h(Link, {href: user ? '/dashboard' : '/'}, h("a", 'hyperlink.academy'))),
-        h(Login),
-      ]),
-    h(Body, {}, [props.children as React.ReactElement]),
+    h(Body, {}, [
+    h(Header, [
+      router.pathname === '/' ? h('div') : h(Title,{}, h(Link, {href: user ? '/dashboard' : '/'}, h("a", 'h.'))),
+      h(Login),
+    ]),
+      props.children as React.ReactElement]),
   ])
 }
 
@@ -33,10 +34,9 @@ const Header = styled('div')`
 display: grid;
 font-family: serif;
 grid-template-columns: auto auto;
-padding: 32px 64px 24px 64px;
-border-bottom: 1px solid;
-border-color: ${colors.grey55}
-background-color: ${colors.grey95};
+height: 32px;
+padding-top: 32px;
+padding-bottom: 64px;
 
 @media(max-width: 640px) {
 padding: 24px ;
@@ -50,7 +50,6 @@ font-size: 24px;
 
 const Body = styled('div')`
 max-width: 640px;
-padding: 64px 32px;
 margin: auto;
 
 @media(max-width: 640px) {
@@ -105,4 +104,5 @@ display: grid;
 grid-auto-rows: min-content;
 margin-top: ${props => props.mt || 0}px;
 grid-gap: ${props => props.gap || 16}px;
+p
 `

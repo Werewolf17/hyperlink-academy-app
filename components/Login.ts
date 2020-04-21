@@ -7,25 +7,27 @@ import {Primary, Secondary} from './Button'
 import {colors} from './Tokens'
 import { useUserData } from '../src/user'
 
-
 export const Login = () => {
   let router = useRouter()
   let {data, mutate} = useUserData()
 
   if(data === undefined) return null
 
+  let redirect = router.pathname === '/' ? '' : '?redirect=' + encodeURIComponent(router.pathname)
   if(!data) return h(Container, {}, [
-    h(Link, {href: '/signup'}, h('a', 'signup')),
-    h(Link, {href: '/login?redirect=' + encodeURIComponent(router.pathname)}, h('a', 'login')),
+    h(Link, {href: '/signup'}, h(Primary,  'Sign up')),
+    h(Link, {href: '/login' + redirect}, h(Secondary, "Log in")),
   ])
   else {
     return h(Container, [
-      h(Link, {href: '/settings'}, h('a', 'settings')),
+      h(Link, {href: '/settings', passHref:true}, h(NavLink, 'settings')),
       ' ',
-      h(Button, {onClick: async ()=>{
+      h(NavLink, {onClick: async (e)=>{
+        e.preventDefault()
         let res = await fetch('/api/logout')
         if(res.status === 200) {
           mutate(false)
+          router.push('/')
         }
       }}, 'logout')
     ])
@@ -47,13 +49,14 @@ to {opacity: 1;}
 }
 `
 
-const Button = styled('button')`
-background: inherit;
-font-size: inherit;
-font-family: inherit;
-color: blue;
-text-decoration: underline;
-border: none;
+const NavLink = styled('a')`
+font-family: 'Roboto Mono', monospace;
+text-decoration: none;
+color: ${colors.textSecondary};
+
+&:visited {
+color: ${colors.textSecondary};
+}
 &:hover {
 cursor: pointer;
 }
