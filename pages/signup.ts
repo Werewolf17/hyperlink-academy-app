@@ -7,8 +7,7 @@ import { Narrow, Box} from '../components/Layout'
 import {Form, Label, Input, Error, Submit, Info} from '../components/Form'
 import {Primary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
-import {Msg} from './api/signup'
-import {Msg as VerifyMsg, Result} from './api/verifyEmail'
+import {VerifyEmailMsg, SignupMsg, VerifyEmailResult} from './api/signup/[action]'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/user'
 
@@ -33,8 +32,8 @@ const Signup = () => {
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    let msg: Msg = {email:formState.email, password: formState.password, display_name:  formState.display_name}
-    let res = await (await fetch('/api/signup', {
+    let msg: SignupMsg = {email:formState.email, password: formState.password, display_name:  formState.display_name}
+    let res = await (await fetch('/api/signup/request', {
       method: "POST",
       body: JSON.stringify(msg)
     })).json()
@@ -117,9 +116,10 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   const onSubmit = async (e: React.FormEvent)=>{
     e.preventDefault()
 
-    let msg:VerifyMsg = {key}
-    let res = await fetch('/api/verifyEmail', {method: "POST", body: JSON.stringify(msg)})
-    let result:Result = await res.json()
+    let msg:VerifyEmailMsg = {key}
+    setResult('loading')
+    let res = await fetch('/api/signup/verify', {method: "POST", body: JSON.stringify(msg)})
+    let result:VerifyEmailResult = await res.json()
     if(result.success) {
       setResult('success')
     }
@@ -128,9 +128,9 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
 
   useEffect(()=>{
     if(router.query.verifyEmail) {
-      let msg:VerifyMsg = {key: router.query.verifyEmail as string}
-      fetch('/api/verifyEmail', {method: "POST", body: JSON.stringify(msg)}).then(async res=>{
-        let result:Result = await res.json()
+      let msg:VerifyEmailMsg = {key: router.query.verifyEmail as string}
+      fetch('/api/signup/verify', {method: "POST", body: JSON.stringify(msg)}).then(async res=>{
+        let result:VerifyEmailResult = await res.json()
         if(result.success) {
           setResult('success')
         }
