@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse} from 'next'
-import {setToken} from '../../src/token'
+import {setToken, Token} from '../../src/token'
 import bcrypt from 'bcryptjs'
 
 import { PrismaClient, people} from '@prisma/client'
@@ -11,7 +11,9 @@ export type Msg = {
   email: string
   password: string
 }
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+
+export type Result = Token
+export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
   let msg: Partial<Msg> = JSON.parse(req.body)
   if(!msg.email || !msg.password) {
     res.status(402)
@@ -19,8 +21,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
   let person = await validateLogin(msg.email, msg.password)
   if(person) {
-    setToken(res, {email:msg.email, id:person.id, display_name:person.display_name})
-    res.end()
+    let token = {email:msg.email, id:person.id, display_name:person.display_name}
+    setToken(res, token)
+    res.status(200).json(token)
   }
   else {
     res.status(401)

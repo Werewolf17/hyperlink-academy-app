@@ -2,12 +2,11 @@ import h from 'react-hyperscript'
 import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
-import {mutate} from 'swr'
 
 import {Narrow, Box} from '../components/Layout'
 import { Form, Input, Error, Label, Submit, Info} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
-import {Msg} from './api/login'
+import {Msg, Result} from './api/login'
 import {RequestMsg} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import {useUserData} from '../src/user'
@@ -20,7 +19,7 @@ const Login = () => {
 
   let [error, setError] = useState<'wrong'| null>(null)
   let router = useRouter()
-  let {data} = useUserData()
+  let {data, mutate} = useUserData()
 
   let {redirect, reset} = router.query
   if(data) router.push(redirect as string || '/')
@@ -38,8 +37,8 @@ const Login = () => {
       body: JSON.stringify(msg)
     })
     if(res.status === 200) {
-      console.log(res)
-      mutate('/api/whoami')
+      let data = await res.json() as Result
+      await mutate(data)
       if(redirect) {
         if(redirect[0] === '/') router.push(redirect as string)
         else window.location.assign(redirect as string)
