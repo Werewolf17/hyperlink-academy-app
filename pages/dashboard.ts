@@ -34,6 +34,7 @@ const Dashboard:NextPage = () => {
           return h(CourseCard, {
             description: '',
             id: instance.course,
+            href: 'https://forum.hyperlink.academy/g/' + instance.id,
             start_date: new Date(instance.start_date),
             instance: true,
             name: instance.course,

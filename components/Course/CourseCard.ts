@@ -9,11 +9,15 @@ type Props = {
   name:string,
   description: string
   id: string,
+  href?:string,
   start_date?: Date
   instance?: boolean
 }
 export default (props:Props) => {
-  return h(Link, {href: '/courses/[id]', as: '/courses/' + props.id, passHref: true}, h(Card, {
+  return h(Link, {
+    href: props.href ? props.href : '/courses/[id]',
+    as: props.href ? props.href : '/courses/' + props.id,
+    passHref: true}, h(Card, {
   }, h(Box, {gap: 16}, [
     h('h3', props.name),
     h('p', props.description),
@@ -36,11 +40,12 @@ text-decoration: none;
 color: black;
 
 &:visited {
-color: black;
+color: inherit;
 }
 
 &:hover, &:active, &:focus {
 cursor: pointer;
+box-shadow: 4px 4px ${colors.grey15};
 }
 `
 
