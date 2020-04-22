@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
-import { Box} from '../components/Layout'
+import { MediumWidth, Box } from '../components/Layout'
 import { useCourses, useUserData } from '../src/user'
 import { useRouter } from 'next/router'
 import TitleImg from '../components/TitleImg'
@@ -20,32 +20,34 @@ const Landing:NextPage = () => {
     if(user) router.push('/dashboard')
   }, [user])
 
-  return h(Box, {gap:48}, [
-    h(Box, [
-      h(Welcome),
-      h(Box, {style:{textAlign: 'right'}}, [
-        h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
-        h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')
-      ])
-    ]),
-    h(Box, {gap: 16}, [
-      h('h2', "The Courses List"),
-      !courses ? null : h(CourseGrid,
-        courses.courses
-        .map(course => {
-          return h(CourseCard, {
-            key: course.id,
-            description: course.description,
-            start_date: new Date(course.course_instances[0].start_date),
-            name: course.id,
-            path: '/courses/' + course.id}, [])
-        })),
-    ]),
-    h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
-      h('h2', 'The Course Kindergarten'),
-      'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
-      h('a', {style: {justifySelf: 'end'}, href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},'Check out the kindergarten ➭')
-    ]),
+  return h(MediumWidth, [
+    h(Box, {gap:48}, [
+      h(Box, [
+        h(Welcome),
+        h(Box, {style:{textAlign: 'right'}}, [
+          h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
+          h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')
+        ])
+      ]),
+      h(Box, {gap: 16}, [
+        h('h2', "The Courses List"),
+        !courses ? null : h(CourseGrid,
+                            courses.courses
+                            .map(course => {
+                              return h(CourseCard, {
+                                key: course.id,
+                                description: course.description,
+                                start_date: new Date(course.course_instances[0].start_date),
+                                name: course.id,
+                                path: '/courses/' + course.id}, [])
+                            })),
+      ]),
+      h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
+        h('h2', 'The Course Kindergarten'),
+        'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
+        h('a', {style: {justifySelf: 'end'}, href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},'Check out the kindergarten ➭')
+      ]),
+    ])
   ])
 }
 

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import {colors} from  './Tokens'
 
-export const Primary = styled('button')`
+export const Primary = styled('button')<{disabled?: boolean}>`
 font-family: monospace;
 font-size: 14px;
 height: fit-content;
@@ -15,6 +15,12 @@ border: none;
 &:hover {
 cursor: pointer;
 }
+
+${props => {
+if(props.disabled) return `
+background-color: ${colors.grey80};
+color: ${colors.grey55};
+`}}
 `
 
 export const Secondary = styled(Primary)`

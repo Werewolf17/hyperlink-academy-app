@@ -5,13 +5,11 @@ import Link from 'next/link'
 import Head from 'next/head'
 import h from 'react-hyperscript'
 import { Fragment } from 'react'
-import { useRouter } from 'next/router'
 
-import {Spacing} from './Tokens'
+import {Spacing, colors} from './Tokens'
 
 const Layout:React.SFC = (props)=>{
   const {data: user}= useUserData()
-  let router = useRouter()
 
   return h(Fragment, [
     h(GlobalStyles),
@@ -21,7 +19,7 @@ const Layout:React.SFC = (props)=>{
     })),
     h(Body, {}, [
     h(Header, [
-      router.pathname === '/' ? h('div') : h(Title,{}, h(Link, {href: user ? '/dashboard' : '/'}, h("a", 'h.'))),
+      h(Title,{}, h(Link, {href: user ? '/dashboard' : '/'}, h("a", 'h.'))),
       h(Login),
     ]),
       props.children as React.ReactElement]),
@@ -37,9 +35,9 @@ grid-template-columns: auto auto;
 height: 32px;
 padding-top: 32px;
 padding-bottom: 64px;
-
-@media(max-width: 640px) {
-padding: 24px ;
+@media(max-width: 1016px) {
+  padding-bottom: 32px ;
+  padding-top: 16px ;
 }
 `
 
@@ -49,18 +47,15 @@ font-size: 24px;
 `
 
 const Body = styled('div')`
-max-width: 640px;
+max-width: 968px;
+padding-bottom: 32px;
 margin: auto;
 
-@media(max-width: 640px) {
+@media(max-width: 1016px) {
 padding: 24px;
 }
 `
 
-export const Narrow = styled('div')`
-max-width: 400px;
-margin: auto;
-`
 
 const GlobalStyles = createGlobalStyle`
 html {
@@ -68,6 +63,7 @@ html {
   line-height: 1.375;
   font-size: 16px;
   font-family: 'Lato', sans-serif;
+  color: ${colors.textPrimary};
 }
 
 a:visited {
@@ -104,5 +100,14 @@ display: grid;
 grid-auto-rows: min-content;
 margin-top: ${props => props.mt || 0}px;
 grid-gap: ${props => props.gap || 16}px;
-p
+`
+
+export const MediumWidth = styled('div')`
+max-width: 640px;
+margin: auto;
+`
+
+export const Narrow = styled('div')`
+max-width: 400px;
+margin: auto;
 `
