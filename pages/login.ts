@@ -46,6 +46,7 @@ const Login = () => {
       else router.push('/dashboard')
     }
     else {
+      setLoading(false)
       setError('wrong')
     }
   }
@@ -58,7 +59,7 @@ const Login = () => {
     ]),
   }
 
-  return h(Narrow, {}, [
+  return h(Narrow, [
     h(Form, {onSubmit}, [
       h(TitleImg,{src:'/img/dragon.png'}),
       h('h1', 'Welcome Back!'),
