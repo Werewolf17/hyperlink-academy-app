@@ -27,7 +27,6 @@ export const Login = () => {
         let res = await fetch('/api/logout')
         if(res.status === 200) {
           mutate(false)
-          router.push('/')
         }
       }}, 'logout')
     ])
