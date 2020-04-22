@@ -39,7 +39,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let username = await getUsername(metadata.userId)
     let groupId = await getGroupId(metadata.instanceId)
 
-    if(!username || !groupId) return res.status(400).send('ERROR: Cannot find user or group id')
+    if(!username || !groupId) return res.status(400).send('ERROR: Cannot find user or group id, with metadata: ' + JSON.stringify(metadata))
 
     await prisma.people_in_instances.create({data: {
       people: {connect: {id: metadata.userId}},
