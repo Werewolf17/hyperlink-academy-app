@@ -44,12 +44,8 @@ const checkUser = async (email:string):Promise<boolean> => {
 
 export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   switch(req.query.action) {
-      case 'request': {
-        requestResetPassword(req, res)
-      }
-      case 'reset': {
-        resetPassword(req, res)
-      }
+      case 'request': return requestResetPassword(req, res)
+      case 'reset': return resetPassword(req, res)
   }
 }
 
