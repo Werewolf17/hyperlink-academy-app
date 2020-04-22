@@ -21,7 +21,8 @@ const Login = () => {
   let router = useRouter()
   let {data, mutate} = useUserData()
 
-  let {redirect, reset} = router.query
+  let redirect = router.query.redirect as string | null
+  let {reset} = router.query
   if(data) router.push(redirect as string || '/')
 
   useEffect(()=>setError(null), [email, password])
@@ -38,10 +39,10 @@ const Login = () => {
     })
     if(res.status === 200) {
       let data = await res.json() as Result
-      await mutate(data)
       if(redirect) {
-        if(redirect[0] === '/') router.push(redirect as string)
-        else window.location.assign(redirect as string)
+        if(redirect[0] !== '/' || redirect.startsWith('/sso')) return window.location.assign(redirect)
+        await mutate(data)
+        router.push(redirect as string)
       }
       else router.push('/dashboard')
     }
