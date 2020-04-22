@@ -8,12 +8,12 @@ import {colors} from '../Tokens'
 type Props = {
   name:string,
   description: string
-  path: string
+  id: string,
   start_date?: Date
   instance?: boolean
 }
 export default (props:Props) => {
-  return h(Link, {href: props.path, passHref: true}, h(Card, {
+  return h(Link, {href: '/courses/[id]', as: '/courses/' + props.id, passHref: true}, h(Card, {
   }, h(Box, {gap: 16}, [
     h('h3', props.name),
     h('p', props.description),

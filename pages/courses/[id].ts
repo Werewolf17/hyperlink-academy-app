@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { Box, MediumWidth } from '../../components/Layout'
 import { PrismaClient, coursesGetPayload } from '@prisma/client'
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import { Category } from '../../src/discourse'
 
 import Enroll from '../../components/Course/Enroll'
@@ -71,26 +71,8 @@ position: sticky;
 top: 32px;
 `
 
-
-export const getStaticPaths = async () => {
-  let prisma = new PrismaClient({
-    forceTransactions: true
-  })
-  let courses = await prisma.courses.findMany({
-    select: {
-      id: true
-    }
-  })
-  return {
-    paths: courses.map(course => {
-      return {params: {id: course.id}}
-    }),
-    fallback: false
-  }
-}
-
 export type CourseData = coursesGetPayload<{include: {course_instances: true}}> & {content: string}
-export const getStaticProps:GetStaticProps= async (ctx) => {
+export const getServerSideProps:GetServerSideProps= async (ctx) => {
   let id = (ctx.params?.id || '' )as string
   let prisma = new PrismaClient({
     forceTransactions: true
@@ -101,6 +83,7 @@ export const getStaticProps:GetStaticProps= async (ctx) => {
   })
   await prisma.disconnect()
   let content = await getCourseContent(id)
+  ctx.res.setHeader('cache-control', 's-maxage=600, stale-while-revalidate')
   return {props: {...data, content} as CourseData, }
 }
 

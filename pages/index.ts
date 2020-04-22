@@ -36,10 +36,11 @@ const Landing:NextPage = () => {
                             .map(course => {
                               return h(CourseCard, {
                                 key: course.id,
+                                id: course.id,
                                 description: course.description,
                                 start_date: new Date(course.course_instances[0].start_date),
                                 name: course.id,
-                                path: '/courses/' + course.id}, [])
+                              }, [])
                             })),
       ]),
       h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
