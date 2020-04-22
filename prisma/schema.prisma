@@ -27,7 +27,9 @@ model course_instances {
 model courses {
   cost             Float
   description      String
+  duration         String
   id               String             @id
+  name             String
   course_instances course_instances[]
 }
 

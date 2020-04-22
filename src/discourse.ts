@@ -7,6 +7,15 @@ let headers = {
       "Api-Username": process.env.DISCOURSE_API_USERNAME || '',
     }
 
+export type Category = {
+  topic_list: {
+    topics: Array<{
+      id: string
+      pinned: boolean
+    }>
+  }
+}
+
 export const getUsername = async (userId:string):Promise<string | undefined> => {
   let result = await fetch('https://forum.hyperlink.academy/u/by-external/' + userId + '.json', {
     method: "GET",

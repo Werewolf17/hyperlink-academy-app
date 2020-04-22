@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS people (
 
 CREATE TABLE IF NOT EXISTS courses (
     id            text NOT NULL UNIQUE PRIMARY KEY,
+    name          text NOT NULL,
+    duration      text NOT NULL,
     description   text NOT NULL,
     cost          real NOT NULL
 );
