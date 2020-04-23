@@ -5,6 +5,7 @@ import { Box, MediumWidth } from '../../components/Layout'
 import { PrismaClient, coursesGetPayload } from '@prisma/client'
 import { GetServerSideProps } from 'next'
 import { Category } from '../../src/discourse'
+import Markdown from 'react-markdown'
 
 import Enroll from '../../components/Course/Enroll'
 
@@ -21,11 +22,7 @@ export default (props:CourseData) => {
         ])
       ]),
       h(Content, [
-        h('div', [
-          props.content
-        ]),
-        h('hr'),
-        h('h2', 'Curriclum')
+        h(Markdown,{source: props.content}),
       ]),
     ])
   ])
@@ -45,9 +42,19 @@ grid-column: 1;
 grid-row: 1;
 grid-column: 1;
 
-display: grid;
-grid-auto-rows: min-content;
-grid-gap: 48px;
+h1 {
+margin-bottom: 8px;
+margin-top: 16px;
+}
+
+p {
+margin-bottom: 16px;
+}
+
+li {
+margin-bottom: 8px;
+margin-top: 8px;
+}
 
 @media(max-width: 1016px) {
   grid-row: 2;
