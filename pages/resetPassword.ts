@@ -6,14 +6,15 @@ import Link from 'next/link'
 import {Narrow} from '../components/Layout'
 import {Primary} from '../components/Button'
 import { Form, Input, Error, Label, Info} from '../components/Form'
-import {ResetMsg, Response} from './api/resetPassword/[action]'
+import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
+import { callApi } from '../src/apiHelpers'
 
 export default ()=>{
   let [inputs, setInputs] = useState({password:'', confirmPassword: ''})
   let [status, setStatus] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
   let router = useRouter()
-  let {key} = router.query
+  let key = router.query.key as string
 
   useEffect(()=>{
     if(status === 'success') {
@@ -28,13 +29,9 @@ export default ()=>{
   const onSubmit = async (e:React.FormEvent)=> {
     e.preventDefault()
     setStatus('loading')
-    let msg:ResetMsg = {key: key as string, password: inputs.password}
-    let res = await fetch('/api/resetPassword/reset', {
-      method: "POST",
-      body: JSON.stringify(msg)
-    })
-    let result:Response = await res.json()
-    if(result.success) setStatus('success')
+    let res = await callApi<ResetMsg, ResetResult>('/api/resetPassword/reset',
+                                                   {key, password: inputs.password})
+    if(res.status ===200) setStatus('success')
     else setStatus('error')
   }
 

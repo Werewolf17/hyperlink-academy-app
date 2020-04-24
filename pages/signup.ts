@@ -7,9 +7,10 @@ import { Narrow, Box} from '../components/Layout'
 import {Form, Label, Input, Error, Submit, Info} from '../components/Form'
 import {Primary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
-import {VerifyEmailMsg, SignupMsg, VerifyEmailResult} from './api/signup/[action]'
+import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/user'
+import { callApi } from '../src/apiHelpers'
 
 const Signup = () => {
   let [formState, setFormState] = useState({
@@ -32,17 +33,12 @@ const Signup = () => {
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    let msg: SignupMsg = {email:formState.email, password: formState.password, display_name:  formState.display_name}
-    let res = await (await fetch('/api/signup/request', {
-      method: "POST",
-      body: JSON.stringify(msg)
-    })).json()
-
-    if(!res.success) {
-      setError('user exists')
-    }
+    let res = await callApi<SignupMsg, SignupResponse>('/api/signup/request', {
+      email:formState.email, password: formState.password, display_name:  formState.display_name
+    })
+    if(res.status == 200) {router.push('/signup?verifyEmail')}
     else {
-      router.push('/signup?verifyEmail')
+      setError('user exists')
     }
     setLoading(false)
   }
@@ -116,26 +112,23 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   const onSubmit = async (e: React.FormEvent)=>{
     e.preventDefault()
 
-    let msg:VerifyEmailMsg = {key}
     setResult('loading')
-    let res = await fetch('/api/signup/verify', {method: "POST", body: JSON.stringify(msg)})
-    let result:VerifyEmailResult = await res.json()
-    if(result.success) {
+    let res = await callApi<VerifyEmailMsg, VerifyEmailResponse>('/api/signup/verify', {key})
+    if(res.status === 200) {
       setResult('success')
     }
     else setResult('invalid')
   }
 
   useEffect(()=>{
-    if(router.query.verifyEmail) {
-      let msg:VerifyEmailMsg = {key: router.query.verifyEmail as string}
-      fetch('/api/signup/verify', {method: "POST", body: JSON.stringify(msg)}).then(async res=>{
-        let result:VerifyEmailResult = await res.json()
-        if(result.success) {
-          setResult('success')
-        }
-        else setResult('invalid')
-      })
+    if(router.query.verifyEmail && typeof router.query.verifyEmail === 'string') {
+      callApi<VerifyEmailMsg, VerifyEmailResponse>('/api/signup/verify', {key: router.query.verifyEmail})
+        .then(res => {
+          if(res.status === 200) {
+            setResult('success')
+          }
+          else setResult('invalid')
+        })
     }
   }, [])
 

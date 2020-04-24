@@ -4,13 +4,14 @@ import {useStripe} from '@stripe/react-stripe-js'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import {Msg, Response} from '../../pages/api/courses/enroll'
+import {EnrollMsg, EnrollResponse} from '../../pages/api/courses/enroll'
 import { Primary} from '../Button'
 import { Box} from '../Layout'
 import {colors} from '../Tokens'
 import Loader from '../Loader'
 import {CourseData} from '../../pages/courses/[id]'
 import {useUserData, useUserInstances} from '../../src/user'
+import { callApi } from '../../src/apiHelpers'
 
 type Props = {
   instances: CourseData['course_instances']
@@ -32,15 +33,10 @@ export default (props: Props) => {
     if(!user) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
     if(!stripe || selection === null) return
     setLoading(true)
-    let msg:Msg = {instanceID: props.instances[selection].id}
-    let res = await fetch('/api/courses/enroll', {
-      method: "POST",
-      body: JSON.stringify(msg)
-    })
+    let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {instanceID: props.instances[selection].id})
     if(res.status === 200) {
-      let {sessionId}= await res.json() as Response
       await stripe.redirectToCheckout({
-        sessionId
+        sessionId: res.result.sessionId
       })
     }
     setLoading(false)

@@ -1,10 +1,10 @@
-import { NextApiRequest, NextApiResponse} from 'next'
 import {PrismaClient} from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid';
 
 import hmac from '../../../src/hmac'
-import {setToken} from '../../../src/token'
+import {setTokenHeader} from '../../../src/token'
+import {multiRouteHandler, ResultType, Request} from '../../../src/apiHelpers'
 import {syncSSO} from '../../../src/discourse'
 import sendVerificationEmail from '../../../emails/verifyEmail'
 
@@ -18,46 +18,27 @@ export type SignupMsg = {
   password: string
 }
 
-type SignupResponse = {
-  success: true
-} | {
-  success: false,
-  error: 'user exists'
-} | {
-  success: false,
-  error: 'invalid message'
-}
-
 export type VerifyEmailMsg = {
   key: string
 }
 
-export type VerifyEmailResult = {
- success: true
-} | {
-  success: false
-  error: 'invalid message' | 'invalid key' | 'old key' | 'user exists'
-}
+export type SignupResponse = ResultType<typeof Signup>
+export type VerifyEmailResponse = ResultType<typeof VerifyEmail>
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  switch(req.query.action) {
-      case 'request': return Signup(req, res)
-      case 'verify': return VerifyEmail(req, res)
-  }
-}
+export default multiRouteHandler('action', {
+  request: Signup,
+  verify: VerifyEmail
+})
 
-const Signup = async (req: NextApiRequest, res: NextApiResponse<SignupResponse>) => {
-  let msg: Partial<SignupMsg> = JSON.parse(req.body)
+async function Signup(req: Request) {
+  let msg: Partial<SignupMsg> = req.body
   if(!msg.email || !msg.password || !msg.display_name) {
-    res.json({success: false, error: 'invalid message'})
-    return res.status(403).end()
+    return {status: 400, result: 'Error: invalid message, missing email, password, or display_name'} as const
   }
 
   if(!(await checkUser(msg.email))) {
-    res.json({success: false, error: 'user exists'})
-    res.end()
     await prisma.disconnect()
-    return
+    return {status:401, result: "Error: A user exists with that email"} as const
   }
 
   let salt = await bcrypt.genSalt()
@@ -69,36 +50,38 @@ const Signup = async (req: NextApiRequest, res: NextApiResponse<SignupResponse>)
   let activation_url = `${req.headers.origin}/signup?verifyEmail=${key}`
 
   await sendVerificationEmail(msg.email, {activation_code: key, name:msg.display_name, activation_url})
-  res.json({success: true})
-  return res.end()
+  return {status: 200, result: ''} as const
 }
 
-const VerifyEmail = async (req: NextApiRequest, res: NextApiResponse<VerifyEmailResult>) => {
-  let msg: Partial<VerifyEmailMsg> = JSON.parse(req.body)
-  if(!msg.key) return res.json({success:false, error: 'invalid message'})
+async function VerifyEmail (req: Request) {
+  let msg: Partial<VerifyEmailMsg> = req.body
+  if(!msg.key) return {status: 400, result: 'Error: invalid message, missing property key'} as const
 
   let keyHash = hmac(msg.key)
   let token = await getActivationKey(keyHash)
-  if(!token) return res.json({success: false, error: 'invalid key'})
+  if(!token) return {status: 403, result: 'Error: invalid activation_key'}
 
   let date = new Date(token.created_time)
 
   if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
     await prisma.disconnect()
-    return res.json({success:false, error:'old key'})
+    return {status: 403, result: "Error: activation_key is out of date"}
   }
 
   let id = await createUser(token.email, token.password_hash, token.display_name)
   await prisma.disconnect()
-  if(!id) return res.json({success:false, error:'user exists'})
+  if(!id) return {status: 403, result: "Error: Couldn't create user. May already exist"}
 
   await syncSSO({
     external_id: id,
     email: token.email
   })
 
-  setToken(res, {email:token.email, id, display_name:token.display_name})
-  return res.json({success:true})
+  return {
+    status: 200,
+    result: '',
+    headers: setTokenHeader({email:token.email, id, display_name:token.display_name})
+  } as const
 }
 
 const createActivationKey = async (email: string, hash: string, display_name: string) => {

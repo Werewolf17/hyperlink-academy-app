@@ -1,57 +1,51 @@
-import { NextApiRequest, NextApiResponse} from 'next'
-import { PrismaClient, coursesGetPayload, course_instances} from '@prisma/client'
-import {getToken, Token} from '../../../src/token'
+import { PrismaClient} from '@prisma/client'
+import { multiRouteHandler, ResultType, Request} from '../../../src/apiHelpers'
+import { getToken } from '../../../src/token'
 
-type CourseWithInstances = coursesGetPayload<{include: {course_instances: {select:{start_date: true}}}}>
 
-export type CourseResult = {
-  courses: CourseWithInstances[]
-}
-export type InstanceResult = {
-  course_instances: course_instances[]
-}
-export type WhoAmIResult = Token | false
-
-export type Result = CourseResult |
-  InstanceResult |
-  WhoAmIResult |
-  string
+export type CourseResult = ResultType<typeof getCourses>
+export type InstanceResult = ResultType<typeof getUserInstances>
+export type WhoAmIResult = ResultType<typeof whoami>
 
 let prisma = new PrismaClient({
   forceTransactions: true
 })
 
-export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
-  switch(req.query.item) {
-    case 'courses': {
-      let courses = await prisma.courses.findMany({
-        include: {
-          course_instances: {
-            select: {
-              start_date: true
-            },
-            orderBy: {
-              start_date: "asc"
-            },
-            first: 1
-          }
-        }
-      })
-      return res.json({courses})
-    }
+export default multiRouteHandler('item', {
+  'courses': getCourses,
+  'user_instances': getUserInstances,
+  'whoami': whoami
+})
 
-    case 'user_instances': {
-      let token = getToken(req)
-      if(!token) return res.status(403).send('Error: no user logged in')
-      let course_instances = await prisma.course_instances.findMany({where:{
-        people_in_instances: {some: {person_id: token.id}}
-      }})
-      await prisma.disconnect()
-      return res.json({course_instances})
-    }
-      case 'whoami': {
-        return res.json(getToken(req) || false)
+async function getCourses() {
+  let args = {
+    include: {
+      course_instances: {
+        select: {
+          start_date: true as const
+        },
+        orderBy: {
+          start_date: "asc" as const
+        },
+        first: 1
       }
-    default: return res.status(403).send('Error: invalid msg')
+    }
   }
+  let courses= await prisma.courses.findMany<typeof args>(args)
+  return {status: 200, result: {courses}} as const
+}
+
+async function getUserInstances(req:Request) {
+  let token = getToken(req)
+  if(!token) return {status: 403 as const, result: "Error: no user logged in"}
+  let course_instances = await prisma.course_instances.findMany({where:{
+    people_in_instances: {some: {person_id: token.id}}
+  }})
+  await prisma.disconnect()
+  return {status: 200, result: {course_instances}} as const
+}
+
+async function whoami(req:Request) {
+  let token = getToken(req)
+  return {status: 200, result: token || false } as const
 }

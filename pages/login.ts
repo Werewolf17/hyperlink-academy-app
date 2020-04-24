@@ -6,8 +6,9 @@ import Link from 'next/link'
 import {Narrow, Box} from '../components/Layout'
 import { Form, Input, Error, Label, Submit, Info} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
-import {Msg, Result} from './api/login'
-import {RequestMsg} from './api/resetPassword/[action]'
+import {callApi} from '../src/apiHelpers'
+import {Result, Msg} from './api/login'
+import {RequestMsg, RequestResult} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import {useUserData} from '../src/user'
 import TitleImg from '../components/TitleImg'
@@ -32,13 +33,9 @@ const Login = () => {
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    let msg:Msg = {email, password}
-    let res = await fetch('/api/login', {
-      method: "POST",
-      body: JSON.stringify(msg)
-    })
+    let res = await callApi<Msg, Result>('/api/login', {email, password})
     if(res.status === 200) {
-      let data = await res.json() as Result
+      let data = res.result
       if(redirect) {
         if(redirect[0] !== '/' || redirect.startsWith('/sso')) return window.location.assign(redirect)
         await mutate(data)
@@ -103,12 +100,7 @@ const ResetPassword:React.SFC = () => {
         h(Form, {onSubmit: async e =>{
           e.preventDefault()
           setStatus('loading')
-          let msg:RequestMsg= {email}
-
-          let res = await fetch('/api/resetPassword/request', {
-            method: "POST",
-            body: JSON.stringify(msg)
-          })
+          let res = await callApi<RequestMsg, RequestResult>('/api/resetPassword', {email})
 
           if(res.status === 200) setStatus('success')
           else setStatus('error')

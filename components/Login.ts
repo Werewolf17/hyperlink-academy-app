@@ -13,7 +13,7 @@ export const Login = () => {
 
   if(data === undefined) return null
 
-  let redirect = router.pathname === '/' ? '' : '?redirect=' + encodeURIComponent(router.pathname)
+  let redirect = router.pathname === '/' ? '' : '?redirect=' + encodeURIComponent(router.asPath)
   if(!data) return h(Container, {}, [
     h(Link, {href: '/signup'}, h(Primary,  'Sign up')),
     h(Link, {href: '/login' + redirect}, h(Secondary, "Log in")),

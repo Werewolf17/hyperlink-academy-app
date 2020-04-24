@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse} from 'next'
-import {setToken, Token} from '../../src/token'
+import {APIHandler, ResultType, Request} from '../../src/apiHelpers'
+import {setTokenHeader} from '../../src/token'
 import bcrypt from 'bcryptjs'
 
 import { PrismaClient, people} from '@prisma/client'
@@ -12,24 +12,35 @@ export type Msg = {
   password: string
 }
 
-export type Result = Token
-export default async (req: NextApiRequest, res: NextApiResponse<Result>) => {
-  let msg: Partial<Msg> = JSON.parse(req.body)
+export type Result = ResultType<typeof handler>
+
+const handler = async (req: Request) => {
+  let msg = req.body as Partial<Msg>
   if(!msg.email || !msg.password) {
-    res.status(402)
-    return res.end()
+    return {
+      status: 400 as const,
+      result: "Invalid request, email or password missing" as const
+    }
   }
+
   let person = await validateLogin(msg.email, msg.password)
   if(person) {
     let token = {email:msg.email, id:person.id, display_name:person.display_name}
-    setToken(res, token)
-    res.status(200).json(token)
+    return {
+      status: 200 as const,
+      headers: setTokenHeader(token),
+      result: token
+    }
   }
   else {
-    res.status(401)
-    return res.end()
+    return {
+      status: 401 as const,
+      result: 'Wrong username or password' as const
+    }
   }
 }
+
+export default APIHandler(handler)
 
 async function validateLogin(email: string, password: string):Promise<false | people> {
   try {

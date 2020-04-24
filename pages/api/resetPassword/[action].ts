@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse} from 'next'
+import {multiRouteHandler, ResultType, Request} from '../../../src/apiHelpers'
 import {PrismaClient} from '@prisma/client'
 import hmac from '../../../src/hmac'
 import { v4 as uuidv4 } from 'uuid';
@@ -18,15 +18,72 @@ export type ResetMsg = {
   password: string
 }
 
-export type Response = {
-  success: boolean
+export type RequestResult = ResultType<typeof requestResetPassword>
+export type ResetResult = ResultType<typeof resetPassword>
+
+export default multiRouteHandler('action', {
+  request: requestResetPassword,
+  reset: resetPassword
+})
+
+async function requestResetPassword (req:Request) {
+  let msg = req.body as Partial<RequestMsg>
+  if(!msg.email) {
+    return {status: 403, result: "Error: invalid request, missing email"} as const
+  }
+
+  if(!(await checkUser(msg.email))) {
+    return {status: 200, result: ""} as const
+  }
+
+  else {
+    let key = await createResetKey(msg.email)
+    await prisma.disconnect()
+
+    let url = `${req.headers.origin}/resetPassword?&key=${key}`
+
+    await sendResetEmail(msg.email, url)
+    return {status: 200, result: ""} as const
+  }
 }
 
-export type ResetKey = {
-  email: string
-  time: string,
-  hash: string
+async function resetPassword (req:Request) {
+  let msg = req.body as Partial<ResetMsg>
+  if(!msg.key || !msg.password) {
+    return {
+      status: 400,
+      result: "Error: invalid message, missing key or new password"
+    } as const
+  }
+
+  let hash = hmac(msg.key)
+  let resetKey = await getResetKey(hash)
+  if(!resetKey) {
+    await prisma.disconnect()
+    return {
+      status: 403,
+      result: "Error: invalid reset key"
+    } as const
+  }
+
+  let date = new Date(resetKey.created_time)
+
+  if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
+    return {
+      status: 403,
+      result: "Error: password reset key out of date"
+    } as const
+  }
+
+  await updatePassword(resetKey.email, msg.password, hash)
+  await prisma.disconnect()
+  return {status: 200, result:''}
 }
+
+async function getResetKey(hash: string) {
+  return prisma.password_reset_keys.findOne({where:{key_hash:hash}})
+}
+
 
 const createResetKey = async (email: string) => {
   let key = uuidv4()
@@ -42,71 +99,6 @@ const checkUser = async (email:string):Promise<boolean> => {
   return (await prisma.people.findMany({where: {email}})).length > 0
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
-  switch(req.query.action) {
-      case 'request': return requestResetPassword(req, res)
-      case 'reset': return resetPassword(req, res)
-  }
-}
-
-const requestResetPassword = async (req:NextApiRequest, res: NextApiResponse) => {
-  let msg: Partial<RequestMsg> = JSON.parse(req.body)
-  if(!msg.email) {
-    return res.status(403).end()
-  }
-
-  if(!(await checkUser(msg.email))) {
-    res.json({success:true})
-  }
-
-  else {
-    let key = await createResetKey(msg.email)
-
-    let url = `${req.headers.origin}/resetPassword?&key=${key}`
-
-    await sendResetEmail(msg.email, url)
-    res.json({success: true})
-  }
-
-  await prisma.disconnect()
-  res.end()
-}
-
-async function getResetKey(hash: string) {
-  return prisma.password_reset_keys.findOne({where:{key_hash:hash}})
-}
-
-const resetPassword = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
-  let msg: Partial<ResetMsg> = JSON.parse(req.body)
-  if(!msg.key || !msg.password) {
-    res.json({success: false})
-    return res.end()
-  }
-
-  let hash = hmac(msg.key)
-  let resetKey = await getResetKey(hash)
-  if(!resetKey) {
-    await prisma.disconnect()
-    return res.json({success:false})
-  }
-
-  let date = new Date(resetKey.created_time)
-
-  if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
-    return res.json({success:false})
-  }
-
-  try {
-    await updatePassword(resetKey.email, msg.password, hash)
-    await prisma.disconnect()
-    return res.json({success:true})
-  }
-  catch (e){
-    await prisma.disconnect()
-    console.log(e)
-    return res.json({success:false})
-  }
-}
 
 export async function updatePassword(email: string, newPassword: string, key_hash: string) {
   let password_hash = await bcrypt.hash(newPassword, await bcrypt.genSalt())

@@ -1,25 +1,27 @@
-import { NextApiRequest, NextApiResponse} from 'next'
+import {APIHandler, ResultType, Request} from '../../../src/apiHelpers'
 import {PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
 import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 
-export type Msg = {
+export type EnrollMsg = {
   instanceID:string
 }
 
-export type Response = {sessionId: string}
+export type EnrollResponse= ResultType<typeof handler>
 
 let prisma = new PrismaClient({
   forceTransactions: true
 })
 
-export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
-  let msg: Partial<Msg> = JSON.parse(req.body)
-  if(!msg.instanceID) return res.status(403).end()
+export default APIHandler(handler)
+
+async function handler (req: Request) {
+  let msg = req.body as Partial<EnrollMsg>
+  if(!msg.instanceID) return {status: 400, result: "Error: invalid request, missing instanceID"} as const
 
   let user = getToken(req)
-  if(!user) return res.status(403).end()
+  if(!user) return {status: 403, result: "Error: no user logged in"} as const
 
   let instance = await prisma.course_instances.findOne({
     where: {id: msg.instanceID},
@@ -32,7 +34,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
     }
   })
   await prisma.disconnect()
-  if(!instance || !instance.courses.cost) return res.status(403).end()
+  if(!instance || !instance.courses.cost) return {status: 400, result: "Error: no instance with id " + msg.instanceID + " found"}  as const
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -51,5 +53,8 @@ export default async (req: NextApiRequest, res: NextApiResponse<Response>) => {
     }
   });
 
-  return res.json({sessionId: session.id})
+  return {
+    status: 200,
+    result: {sessionId: session.id}
+  } as const
 }

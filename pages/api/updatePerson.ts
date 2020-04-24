@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse} from 'next'
-import {setToken, getToken} from '../../src/token'
+import {APIHandler, ResultType, Request} from '../../src/apiHelpers'
+import {setTokenHeader, getToken} from '../../src/token'
 import {PrismaClient} from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
@@ -15,32 +15,43 @@ export type Msg = {
   },
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  let msg: Partial<Msg> = JSON.parse(req.body)
+export type Result = ResultType<typeof handler>
 
+const handler = async (req: Request) => {
+  let body = req.body as Partial<Msg>
   let user = getToken(req)
   if(!user) {
-    return res.status(402).end()
+    return {
+      status: 400 as const,
+      result: "Error: No user signed in" as const
+    }
   }
 
-  if(msg.password) {
-    if(await validateLogin(user.email, msg.password.old)) {
-      await updatePassword(user.email, msg.password.new)
+  let setHeaders
+
+  if(body?.password) {
+    if(await validateLogin(user.email, body.password.old)) {
+      await updatePassword(user.email, body.password.new)
     }
     else {
-      res.status(401).send("ERROR: Incorrect password")
+      return {status: 401 as const, result: "Error: Incorrect password" as const}
     }
   }
 
-  if(msg.display_name) {
-    let newData = await updatePerson(user.id, msg.display_name)
-    setToken(res, {...user, display_name:newData.display_name})
+  if(body?.display_name) {
+    let newData = await updatePerson(user.id, body.display_name)
+    setHeaders = setTokenHeader({...user, display_name:newData.display_name})
   }
 
-
-  await prisma.disconnect()
-  res.end()
+  return {
+    status: 200,
+    result: '',
+    headers: setHeaders
+  } as const
 }
+
+
+export default APIHandler(handler)
 
 async function updatePerson(id:string, display_name:string) {
   return await prisma.people.update({

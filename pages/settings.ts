@@ -6,9 +6,10 @@ import { Narrow, Box} from '../components/Layout'
 import { Input, Error, Info, Label} from '../components/Form'
 import { Primary, Secondary} from '../components/Button'
 
-import {Msg as UpdatePersonMsg} from './api/updatePerson'
+import {Msg, Result} from './api/updatePerson'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/user'
+import { callApi } from '../src/apiHelpers'
 import { useRouter } from 'next/router'
 
 export default () => {
@@ -43,13 +44,9 @@ const ChangeName = (props:{display_name: string}) => {
       e.preventDefault()
       setLoading(true)
 
-      let msg:UpdatePersonMsg = {display_name: name}
-      await fetch('/api/updatePerson', {
-        method: "POST",
-        body: JSON.stringify(msg)
-      })
-      setLoading(false)
-      setEditing(false)
+    await callApi<Msg, Result>('/api/updatePerson', {display_name: name})
+    setLoading(false)
+    setEditing(false)
   }
 
   return h('form', {
@@ -102,11 +99,8 @@ const ChangePassword = () => {
   let onSubmit = async (e:React.FormEvent) =>{
     e.preventDefault()
     setResult('loading')
-    let msg:UpdatePersonMsg= {password: {old: oldPassword, new:newPassword}}
-    let res = await fetch('/api/updatePerson', {
-      method: "POST",
-      body: JSON.stringify(msg)
-    })
+
+    let res = await callApi<Msg, Result>('/api/updatePerson', {password: {old: oldPassword, new:newPassword}})
     if(res.status === 200) {
       setResult('success')
       setEditing(false)
