@@ -1,31 +1,33 @@
 import h from 'react-hyperscript'
 import styled from 'styled-components'
+import Markdown from 'react-markdown'
 
 import { Box, MediumWidth } from '../../components/Layout'
 import { PrismaClient, coursesGetPayload } from '@prisma/client'
 import { GetServerSideProps } from 'next'
 import { Category } from '../../src/discourse'
-import Markdown from 'react-markdown'
 
 import Enroll from '../../components/Course/Enroll'
+import Instances from '../../components/Course/Instances'
 
 export default (props:CourseData) => {
-  return h(Box, {gap: 48}, [
-    h(Box, {gap: 8}, [
-      h('h1', props.name),
-      h('a',{href:'https://forum.hyperlink.academy/c/courses/the-meta-course'},  'Check out the course forum')
-    ]),
-    h(Layout, [
+    return h(Layout, [
       h(Side, [
         h(Info, [
+          h(Instances, {instances: props.course_instances}),
           h(Enroll, {instances: props.course_instances, cost: props.cost, duration: props.duration})
         ])
       ]),
       h(Content, [
-        h(Markdown,{source: props.content}),
-      ]),
+        h(Box, {gap: 8}, [
+          h('h1', props.name),
+          h('a',{href:'https://forum.hyperlink.academy/c/courses/the-meta-course'},  'Check out the course forum')
+        ]),
+        h(Text, [
+          h(Markdown,{source: props.content}),
+        ]),
+      ])
     ])
-  ])
 }
 
 const Side = styled('div')`
@@ -34,6 +36,7 @@ grid-row: 1;
 @media(max-width: 1016px) {
   grid-column: 1;
 }
+
 `
 
 const Content  = styled(MediumWidth)`
@@ -42,6 +45,17 @@ grid-column: 1;
 grid-row: 1;
 grid-column: 1;
 
+display: grid;
+grid-gap: 48px;
+grid-auto-rows: min-content;
+
+
+@media(max-width: 1016px) {
+  grid-row: 2;
+}
+`
+
+const Text = styled('div')`
 h1 {
 margin-bottom: 8px;
 margin-top: 16px;
@@ -54,10 +68,6 @@ margin-bottom: 16px;
 li {
 margin-bottom: 8px;
 margin-top: 8px;
-}
-
-@media(max-width: 1016px) {
-  grid-row: 2;
 }
 `
 
@@ -76,6 +86,10 @@ const Info = styled('div')`
 width: 240px;
 position: sticky;
 top: 32px;
+
+display: grid;
+grid-gap: 48px;
+grid-auto-rows: min-content;
 `
 
 export type CourseData = coursesGetPayload<{include: {course_instances: true}}> & {content: string}

@@ -26,7 +26,7 @@ export default (props: Props) => {
   let [selection, setSelection] = useState<null | number>(null)
 
   let {data:user} = useUserData()
-  let {data: instances} = useUserInstances()
+  let {data: userInstances} = useUserInstances()
 
 
   const callEnroll = async ()=>{
@@ -44,11 +44,6 @@ export default (props: Props) => {
 
   if(user === undefined) return null
 
-  let userInNextInstance = instances && instances.course_instances.find(instance => instance.id === props.instances[0].id)
-  if(user && userInNextInstance) return h('a', {
-    href: 'https://forum.hyperlink.academy/g/' + props.instances[0].id
-  }, h(Primary, 'Your instance group'))
-
   return h(Box, {gap: 16}, [
     h('div', [
       h(Cost, '$' + props.cost),
@@ -59,7 +54,9 @@ export default (props: Props) => {
       h('h4', "Enroll in a run"),
       h('small', "Select a time that works for you")
     ]),
-    h(Box, {gap: 8}, props.instances.map((instance, index)=>{
+    h(Box, {gap: 8}, props.instances
+      .filter(instance => !userInstances?.course_instances.find(x=> x.id === instance.id))
+      .map((instance, index)=>{
       return h(Item, {
         style: {display: 'grid', gridTemplateColumns: "auto auto"},
         onClick: ()=> setSelection(index === selection ? null : index)

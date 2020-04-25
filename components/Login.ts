@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {Primary, Secondary} from './Button'
 import {colors} from './Tokens'
-import { useUserData } from '../src/user'
+import { useUserData, useUserInstances } from '../src/user'
 
 export const Login = () => {
   let router = useRouter()
-  let {data, mutate} = useUserData()
+  let {data, mutate: mutateUser} = useUserData()
+  let {mutate: mutateInstances} = useUserInstances()
 
   if(data === undefined) return null
 
@@ -26,7 +27,8 @@ export const Login = () => {
         e.preventDefault()
         let res = await fetch('/api/logout')
         if(res.status === 200) {
-          mutate(false)
+          mutateUser(false)
+          mutateInstances({course_instances: []})
         }
       }}, 'logout')
     ])

@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { Box} from '../Layout'
 import {colors} from '../Tokens'
+import Card  from '../Card'
 
 type Props = {
   name:string,
@@ -17,7 +18,7 @@ export default (props:Props) => {
   return h(Link, {
     href: props.href ? props.href : '/courses/[id]',
     as: props.href ? props.href : '/courses/' + props.id,
-    passHref: true}, h(Card, {
+    passHref: true}, h(CourseCard, {
   }, h(Box, {gap: 16}, [
     h('h3', props.name),
     h('p', props.description),
@@ -30,23 +31,9 @@ color: ${colors.textSecondary}
 font-size: 12px;
 `
 
-let Card = styled('a')`
+let CourseCard = styled(Card)`
 width: 300px;
-box-sizing: border-box;
-border: 1px solid;
-border-color: ${colors.grey15};
 padding: 24px;
-text-decoration: none;
-color: black;
-
-&:visited {
-color: inherit;
-}
-
-&:hover, &:active, &:focus {
-cursor: pointer;
-box-shadow: 4px 4px ${colors.grey15};
-}
 `
 
 export const CourseGrid = styled('div')`

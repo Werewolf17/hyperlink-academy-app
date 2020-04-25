@@ -93,6 +93,10 @@ hr {
   color: black;
   border: 1px solid;
 }
+
+small {
+color: ${colors.textSecondary};
+}
 `
 
 export const Box = styled('div')<{gap?: Spacing, mt?: Spacing}>`
