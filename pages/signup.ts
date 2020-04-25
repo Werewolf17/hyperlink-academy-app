@@ -56,7 +56,7 @@ const Signup = () => {
 
   return h(Narrow, {}, [
     h(Form, {onSubmit}, [
-      h(TitleImg, {src: '/img/start_journey_crop.png', style:{width:'130px'}}),
+      h(TitleImg, {height: 233, width: 130, src: '/img/start_journey_crop.png'}),
       h('h1', 'Start a journey'),
       error ? h(Error, {}, Errors[error]) : null,
       h(Label, [
@@ -152,7 +152,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
 
   return h(Narrow, [
     h(Box, {gap: 32}, [
-      h(TitleImg, {src: '/img/plane.gif'}),
+      h(TitleImg, {height: 100, width: 100, src: '/img/plane.gif'}),
       h('h1', 'Verify your email'),
       props.email ? h(Box, {gap: 8}, [
         `Sweet! We sent an email with a verification code to`,

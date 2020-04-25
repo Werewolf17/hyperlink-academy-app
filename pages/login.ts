@@ -59,7 +59,7 @@ const Login = () => {
 
   return h(Narrow, [
     h(Form, {onSubmit}, [
-      h(TitleImg,{src:'/img/dragon.png'}),
+      h(TitleImg,{height: 163, width:299, src:'/img/dragon.png'}),
       h('h1', 'Welcome Back!'),
       error ? h(Error, {}, Errors[error]) : null,
       h(Label, [

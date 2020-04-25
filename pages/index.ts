@@ -55,7 +55,7 @@ const Landing:NextPage = () => {
 const Welcome = ()=>{
   return h(Box, {gap:32, style:{paddingBottom: '48px'}}, [
     h(ImageContainer, [
-      h(TitleImg, {src:'/img/landing.png', style: {border: 'none'}}),
+      h(TitleImg, {height: 218, width: 640, src:'/img/landing.png', style: {border: 'none'}}),
     ]),
     h(Title, 'hyperlink.academy'),
     h(Intro),
