@@ -26,11 +26,16 @@ export default (props: Props) => {
   let {data: userInstances} = useUserInstances()
   let {data: courseData} = useCourseData(props.id)
 
+
+  if(user === undefined || courseData === undefined) return null
+  let validInstances = courseData?.course_instances
+      .filter(instance => !userInstances?.course_instances.find(x=> x.id === instance.id))
+
   const callEnroll = async ()=>{
     if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
-    if(!stripe || !courseData ||selection === null) return
+    if(!stripe || !validInstances||selection === null) return
     setLoading(true)
-    let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {instanceID: courseData.course_instances[selection].id})
+    let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {instanceID: validInstances[selection].id})
     if(res.status === 200) {
       await stripe.redirectToCheckout({
         sessionId: res.result.sessionId
@@ -39,7 +44,6 @@ export default (props: Props) => {
     setLoading(false)
   }
 
-  if(user === undefined || courseData === undefined) return null
 
   return h(Box, {gap: 16}, [
     h('div', [
@@ -51,8 +55,7 @@ export default (props: Props) => {
       h('h4', "Enroll in a run"),
       h('small', "Select a time that works for you")
     ]),
-    h(Box, {gap: 8}, courseData.course_instances
-      .filter(instance => !userInstances?.course_instances.find(x=> x.id === instance.id))
+    h(Box, {gap: 8}, validInstances
       .map((instance, index)=>{
       return h(Item, {
         onClick: ()=> setSelection(index === selection ? null : index)
