@@ -28,7 +28,10 @@ export const APIHandler = (handler: Handler) => {
 
 export const multiRouteHandler = (query:string, handlers:{[key:string]: Handler}) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    let result = await handlers[req.query[query] as string](req)
+    let route = ((typeof req.query[query] === 'string')
+                 ? req.query[query]
+                 : req.query[query][0]) as string
+    let result = await handlers[route](req)
     if(result.headers) {
       for(let header of Object.keys(result.headers)) {
         res.setHeader(header, result.headers[header])

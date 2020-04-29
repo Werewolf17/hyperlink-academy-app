@@ -1,10 +1,17 @@
 import useSWR from 'swr'
 import {callApi} from './apiHelpers'
-import {CourseResult, InstanceResult, WhoAmIResult} from '../pages/api/get/[item]'
+import { CourseResult, InstanceResult, WhoAmIResult, CourseDataResult} from '../pages/api/get/[...item]'
 export const useUserData = ()=>{
   return useSWR('/api/get/whoami', async (api) => {
     let res = await callApi<null, WhoAmIResult>(api)
     return res.result
+  })
+}
+
+export const useCourseData = (id: string) => {
+  return useSWR('/api/get/course/' + id, async api => {
+    let res = await callApi<null, CourseDataResult>(api)
+    if(res.status === 200) return res.result
   })
 }
 

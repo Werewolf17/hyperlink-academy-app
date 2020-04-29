@@ -1,17 +1,18 @@
 import h from 'react-hyperscript'
-import {CourseData} from '../../pages/courses/[id]'
-import {useUserInstances} from '../../src/user'
+import { useUserInstances, useCourseData} from '../../src/user'
 import { Box } from '../Layout'
 import Card from '../Card'
 import styled from 'styled-components'
 
 type Props = {
-  instances: CourseData['course_instances']
+  id: string
 }
 
 export default (props: Props) => {
   let {data: userInstances} = useUserInstances()
-  let instances = props.instances
+  let {data: courseData} = useCourseData(props.id)
+  if(!courseData) return null
+  let instances = courseData.course_instances
     .filter(instance => {
       return userInstances?.course_instances.find(x => x.id === instance.id)
     })

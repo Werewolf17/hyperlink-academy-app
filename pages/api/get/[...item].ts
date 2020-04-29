@@ -4,6 +4,7 @@ import { getToken } from '../../../src/token'
 
 
 export type CourseResult = ResultType<typeof getCourses>
+export type CourseDataResult = ResultType<typeof getCourseData>
 export type InstanceResult = ResultType<typeof getUserInstances>
 export type WhoAmIResult = ResultType<typeof whoami>
 
@@ -13,9 +14,37 @@ let prisma = new PrismaClient({
 
 export default multiRouteHandler('item', {
   'courses': getCourses,
+  'course': getCourseData,
   'user_instances': getUserInstances,
   'whoami': whoami
 })
+
+async function getCourseData(req: Request) {
+  let id = req.query.item[1]
+  if(!id) return {status: 400, result: 'ERROR: no course id provided'} as const
+  let data = await prisma.courses.findOne({
+    where: {id },
+    include: {
+      course_maintainers: {
+        include: {
+          people: {select: {display_name: true}}
+        }
+      },
+      course_instances: {
+        include: {
+          people: {
+            select: {
+              display_name: true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  if(!data) return {status: 403, result: `ERROR: no course with id ${id} found`} as const
+  return {status:200, result: data} as const
+}
 
 async function getCourses() {
   let args = {

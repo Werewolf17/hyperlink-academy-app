@@ -9,14 +9,11 @@ import { Primary} from '../Button'
 import { Box} from '../Layout'
 import {colors} from '../Tokens'
 import Loader from '../Loader'
-import {CourseData} from '../../pages/courses/[id]'
-import {useUserData, useUserInstances} from '../../src/user'
+import { useUserData, useUserInstances, useCourseData} from '../../src/user'
 import { callApi } from '../../src/apiHelpers'
 
 type Props = {
-  instances: CourseData['course_instances']
-  cost: number,
-  duration: string,
+  id: string,
 }
 
 export default (props: Props) => {
@@ -27,13 +24,13 @@ export default (props: Props) => {
 
   let {data:user} = useUserData()
   let {data: userInstances} = useUserInstances()
-
+  let {data: courseData} = useCourseData(props.id)
 
   const callEnroll = async ()=>{
-    if(!user) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
-    if(!stripe || selection === null) return
+    if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
+    if(!stripe || !courseData ||selection === null) return
     setLoading(true)
-    let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {instanceID: props.instances[selection].id})
+    let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {instanceID: courseData.course_instances[selection].id})
     if(res.status === 200) {
       await stripe.redirectToCheckout({
         sessionId: res.result.sessionId
@@ -42,23 +39,22 @@ export default (props: Props) => {
     setLoading(false)
   }
 
-  if(user === undefined) return null
+  if(user === undefined || courseData === undefined) return null
 
   return h(Box, {gap: 16}, [
     h('div', [
-      h(Cost, '$' + props.cost),
-      h('b', props.duration)
+      h(Cost, '$' + courseData.cost),
+      h('b', courseData.duration)
     ]),
     h(Divider),
     h('div', [
       h('h4', "Enroll in a run"),
       h('small', "Select a time that works for you")
     ]),
-    h(Box, {gap: 8}, props.instances
+    h(Box, {gap: 8}, courseData.course_instances
       .filter(instance => !userInstances?.course_instances.find(x=> x.id === instance.id))
       .map((instance, index)=>{
       return h(Item, {
-        style: {display: 'grid', gridTemplateColumns: "auto auto"},
         onClick: ()=> setSelection(index === selection ? null : index)
       }, [
         h(Radio, {
@@ -67,7 +63,10 @@ export default (props: Props) => {
           type: 'radio',
           checked: selection === index
         }),
-        h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
+        h('div', [
+          h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
+          h('p', 'facillitated by ' + instance.people?.display_name)
+        ])
       ])
     })),
     h(Primary, {
@@ -85,6 +84,7 @@ let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefine
 let Item = styled('div')`
 display: grid;
 grid-template-columns: auto auto;
+align-items: center;
 &:hover {
 cursor: pointer;
 input {
@@ -107,7 +107,6 @@ outline: none;
 
 &:checked {
 border: 2px solid;
-box-shadow:0px 0px 0px 2px white inset;
 background-color: black;
 }
 `
