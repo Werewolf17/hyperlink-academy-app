@@ -16,6 +16,49 @@ export type Category = {
   }
 }
 
+export const createInstanceGroup = async (name: string, admin: string) => {
+  let username = await getUsername(admin)
+  console.log(username)
+  if(!username) return false
+  let result = await fetch('https://forum.hyperlink.academy/admin/groups', {
+    method: 'POST',
+    headers: {
+      ...headers,
+      "Content-Type": 'application/json; charset=utf-8'
+    },
+    body: JSON.stringify({
+      group: {
+        name,
+        visibility_level: 2,
+        owner_usernames: username
+      }
+    })
+  })
+  if(result.status !== 200) {
+    console.log(await result.text())
+    return false
+  }
+  await createCategory(name, name)
+}
+
+export const createCategory = async (groupId: string, name: string) => {
+  let permissions = {
+    [groupId]: 1
+  }
+  console.log(permissions)
+  let result = await fetch('https://forum.hyperlink.academy/categories.json', {
+    method: 'POST',
+    headers: {
+      ...headers,
+      "Content-Type": 'application/json; charset=utf-8'
+    },
+    body: JSON.stringify({name, color: '0088CC', text_color: 'FFFFFF', permissions})
+  })
+  if(result.status === 200) return true
+  console.log(await result.text())
+  return false
+}
+
 export const getUsername = async (userId:string):Promise<string | undefined> => {
   let result = await fetch('https://forum.hyperlink.academy/u/by-external/' + userId + '.json', {
     method: "GET",
