@@ -100,7 +100,7 @@ const ResetPassword:React.SFC = () => {
         h(Form, {onSubmit: async e =>{
           e.preventDefault()
           setStatus('loading')
-          let res = await callApi<RequestMsg, RequestResult>('/api/resetPassword', {email})
+          let res = await callApi<RequestMsg, RequestResult>('/api/resetPassword/request', {email})
 
           if(res.status === 200) setStatus('success')
           else setStatus('error')
