@@ -82,7 +82,7 @@ export default (props: Props) => {
   ])
 }
 
-let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'})
+let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
 
 let Item = styled('div')`
 display: grid;

@@ -22,7 +22,7 @@ export default (props:Props) => {
   }, h(Box, {gap: 16}, [
     h('h3', props.name),
     h('p', props.description),
-    !props.start_date ? null : h(DateContainer, (props.instance ? 'starts ' : 'Next instance starts ') + props.start_date.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}))
+    !props.start_date ? null : h(DateContainer, (props.instance ? 'starts ' : 'Next instance starts ') + props.start_date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}))
   ])))
 }
 
