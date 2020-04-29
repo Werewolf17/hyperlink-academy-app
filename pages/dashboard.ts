@@ -33,11 +33,11 @@ const Dashboard:NextPage = () => {
         h(CourseGrid, {}, instances.course_instances.map(instance => {
           return h(CourseCard, {
             description: '',
-            id: instance.course,
-            href: 'https://forum.hyperlink.academy/g/' + instance.id,
+            id: instance.id,
+            href: 'https://forum.hyperlink.academy/c/' + instance.id,
             start_date: new Date(instance.start_date),
             instance: true,
-            name: instance.course,
+            name: instance.id,
           })
         }))
       ]),
