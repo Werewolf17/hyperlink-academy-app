@@ -29,7 +29,7 @@ export default (props:Props) => {
           h('h1', courseData?.name),
           isMaintainer ? h(Link, {href:'/courses/[id]/settings', as: `/courses/${props.id}/settings`}, h('a', 'settings')) : null,
         ]),
-        h('a',{href:'https://forum.hyperlink.academy/c/courses/the-meta-course'},  'Check out the course forum'),
+        h('a',{href:`https://forum.hyperlink.academy/c/courses/${courseData?.id}`},  'Check out the course forum'),
       ]),
       h(Text, [
         h(Markdown,{source: props.content}),
