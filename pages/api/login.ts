@@ -2,7 +2,7 @@ import {APIHandler, ResultType, Request} from '../../src/apiHelpers'
 import {setTokenHeader} from '../../src/token'
 import bcrypt from 'bcryptjs'
 
-import { PrismaClient, people} from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient({
   forceTransactions: true
 })
@@ -25,7 +25,7 @@ const handler = async (req: Request) => {
 
   let person = await validateLogin(msg.email, msg.password)
   if(person) {
-    let token = {email:msg.email, id:person.id, display_name:person.display_name}
+    let token = {email:msg.email, id:person.id, display_name:person.display_name, admin: person.admins.length > 0}
     return {
       status: 200 as const,
       headers: setTokenHeader(token),
@@ -42,14 +42,15 @@ const handler = async (req: Request) => {
 
 export default APIHandler(handler)
 
-async function validateLogin(email: string, password: string):Promise<false | people> {
+async function validateLogin(email: string, password: string){
   try {
-    let person = await prisma.people.findOne({where:{email}})
+    let person = await prisma.people.findOne({where:{email}, include: {admins: true}})
     await prisma.disconnect()
     if(!person) return false
     if(!await bcrypt.compare(password, person.password_hash)) return false
     return person
   } catch (e) {
+    console.log(e)
     return false
   }
 }

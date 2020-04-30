@@ -5,6 +5,7 @@ export type Token = {
   email: string,
   id: string,
   display_name: string,
+  admin?: boolean
 }
 
 export function setToken(res:ServerResponse, token:Token) {

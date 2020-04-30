@@ -35,6 +35,10 @@ CREATE TABLE IF NOT EXISTS course_maintainers (
     PRIMARY KEY (person_id, instance_id)
 )
 
+CREATE TABLE IF NOT EXISTS admins (
+    person text references people(id) UNIQUE NOT NULL PRIMARY KEY
+)
+
 
 CREATE TABLE IF NOT EXISTS course_instances (
     id            text NOT NULL UNIQUE PRIMARY KEY,

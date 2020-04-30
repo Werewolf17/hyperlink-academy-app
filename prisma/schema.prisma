@@ -15,6 +15,11 @@ model activation_keys {
   password_hash String
 }
 
+model admins {
+  person String @id
+  people people @relation(fields: [person], references: [id])
+}
+
 model course_instances {
   course              String
   end_date            String
@@ -56,6 +61,7 @@ model people {
   email               String                @unique
   id                  String                @id
   password_hash       String                @unique
+  admins              admins[]
   course_instances    course_instances[]
   course_maintainers  course_maintainers[]
   people_in_instances people_in_instances[]
