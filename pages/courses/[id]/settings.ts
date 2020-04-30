@@ -7,7 +7,7 @@ import { useUserData, useCourseData } from '../../../src/user'
 import { callApi } from '../../../src/apiHelpers'
 import { Form, Input, Label} from '../../../components/Form'
 import {Primary} from '../../../components/Button'
-import {CreateInstanceMsg, CreateInstanceResponse} from '../../api/courses/createInstance'
+import {CreateInstanceMsg, CreateInstanceResponse} from '../../api/courses/[action]'
 
 const CourseSettings =  () => {
   let router = useRouter()

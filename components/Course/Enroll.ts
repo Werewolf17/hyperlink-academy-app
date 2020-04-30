@@ -4,7 +4,7 @@ import {useStripe} from '@stripe/react-stripe-js'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import {EnrollMsg, EnrollResponse} from '../../pages/api/courses/enroll'
+import {EnrollMsg, EnrollResponse} from '../../pages/api/courses/[action]'
 import { Primary} from '../Button'
 import { Box} from '../Layout'
 import {colors} from '../Tokens'
