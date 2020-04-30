@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import Stripe from 'stripe'
 import {PrismaClient} from '@prisma/client'
-import { getUsername, getGroupId, addMember} from '../../../src/discourse'
+import { getUsername, getGroupId, addMember} from '../../src/discourse'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 const prisma = new PrismaClient({
