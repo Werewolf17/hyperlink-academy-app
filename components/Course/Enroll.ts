@@ -66,7 +66,7 @@ export default (props: Props) => {
           type: 'radio',
           checked: selection === index
         }),
-        h('div', [
+        h('div', {style:{justifySelf: 'left'}}, [
           h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
           h('p', 'facillitated by ' + instance.people?.display_name)
         ])
