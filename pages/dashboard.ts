@@ -55,6 +55,7 @@ const Dashboard:NextPage = () => {
               name: course.name,
             }, [])
           })),
+        user.admin ? h(Link, {href: '/courses/create'}, h('a', 'create a new course!')) : null
       ]),
       h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24,maxWidth: '640px' }}, [
         h('h2', 'The Course Kindergarten'),

@@ -38,21 +38,17 @@ export const createInstanceGroup = async (name: string, admin: string) => {
     console.log(await result.text())
     return false
   }
-  await createCategory(name, name)
+  await createCategory(name, {permissions: {[name]:1}})
 }
 
-export const createCategory = async (groupId: string, name: string) => {
-  let permissions = {
-    [groupId]: 1
-  }
-  console.log(permissions)
+export const createCategory = async (name: string, options: {permissions?: {[key:string]:number}, parent_category_id?: string} ) => {
   let result = await fetch('https://forum.hyperlink.academy/categories.json', {
     method: 'POST',
     headers: {
       ...headers,
       "Content-Type": 'application/json; charset=utf-8'
     },
-    body: JSON.stringify({name, color: '0088CC', text_color: 'FFFFFF', permissions})
+    body: JSON.stringify({name, color: '0088CC', text_color: 'FFFFFF', ...options})
   })
   if(result.status === 200) return true
   console.log(await result.text())

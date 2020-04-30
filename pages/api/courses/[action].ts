@@ -1,7 +1,7 @@
 import { ResultType, Request, multiRouteHandler} from '../../../src/apiHelpers'
 import { PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
-import {createInstanceGroup} from '../../../src/discourse'
+import {createInstanceGroup, createCategory} from '../../../src/discourse'
 import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient({
@@ -14,17 +14,25 @@ export type CreateInstanceMsg = {
   end: string,
   facillitator: string,
 }
-
 export type CreateInstanceResponse = ResultType<typeof createInstance>
-export type EnrollMsg = {
-  instanceID:string
-}
 
+export type EnrollMsg = { instanceID:string}
 export type EnrollResponse= ResultType<typeof enroll>
+
+export type CreateCourseMsg = {
+  courseId: string
+  description: string
+  name: string
+  cost: number
+  duration: string
+  maintainers: string[]
+}
+export type CreateCourseResponse = ResultType<typeof createCourse>
 
 export default multiRouteHandler('action', {
   createInstance,
-  enroll
+  enroll,
+  createCourse
 })
 
 async function createInstance(req: Request) {
@@ -127,4 +135,34 @@ async function enroll (req: Request) {
     status: 200,
     result: {sessionId: session.id}
   } as const
+}
+
+async function createCourse(req: Request) {
+  let msg = req.body as Partial<CreateCourseMsg>
+  if(!msg.courseId || !msg.cost ||!msg.name
+     || !msg.duration || !msg.description || !msg.maintainers) return {status: 400, result: "ERROR: missing parameters"} as const
+  let user = getToken(req)
+  if(!user) return {status: 403, result: "ERROR: no user logged in"} as const
+
+  let isAdmin = prisma.admins.findOne({where: {person: user.id}})
+  if(!isAdmin) return {status: 403, result: "ERROR: user is not an admin"} as const
+
+  await prisma.courses.create({
+    data: {
+      id: msg.courseId,
+      name: msg.name,
+      description: msg.description,
+      duration: msg.duration,
+      cost: msg.cost,
+      course_maintainers: {
+        create: msg.maintainers.map(email => {
+          return {people: {
+            connect: {email}
+          }}
+        })
+      }
+    },
+  })
+  await createCategory(msg.courseId, {parent_category_id: "15"})
+  return {status:200, result: "Course created"}
 }
