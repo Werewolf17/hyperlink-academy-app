@@ -51,7 +51,7 @@ const Dashboard:NextPage = () => {
               key: course.id,
               id: course.id,
               description: course.description,
-              start_date: new Date(course.course_instances[0].start_date),
+              start_date: new Date(course.course_instances[0]?.start_date),
               name: course.name,
             }, [])
           })),
