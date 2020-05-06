@@ -29,7 +29,7 @@ export default (props:Props) => {
           h('h1', courseData?.name),
           isMaintainer ? h(Link, {href:'/courses/[id]/settings', as: `/courses/${props.id}/settings`}, h('a', 'settings')) : null,
         ]),
-        h('a',{href:`https://forum.hyperlink.academy/c/courses/${courseData?.id}`},  'Check out the course forum'),
+        h('a',{href:`https://forum.hyperlink.academy/c/${courseData?.id}`},  'Check out the course forum'),
       ]),
       h(Text, [
         h(Markdown,{source: props.content}),
@@ -50,7 +50,6 @@ grid-row: 1;
 @media(max-width: 1016px) {
 grid-column: 1;
 }
-
 `
 
 const Content  = styled(MediumWidth)`
@@ -114,7 +113,7 @@ export const getServerSideProps:GetServerSideProps<{content: string, id: string}
 }
 
 const getCourseContent = async (id:string) => {
-  let res = await fetch('https://forum.hyperlink.academy/c/courses/' + id + '.json')
+  let res = await fetch(`https://forum.hyperlink.academy/c/${id}.json`)
   let category = await res.json() as Category
   let topicID = category.topic_list.topics.find(topic => topic.pinned === true)?.id
   let topicRequest = await fetch('https://forum.hyperlink.academy/raw/' + topicID)

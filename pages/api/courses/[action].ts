@@ -53,13 +53,15 @@ async function createInstance(req: Request) {
     return {status: 403, result: "ERROR: user is not maintainer of course"} as const
   }
 
-  let course= await prisma.courses.findOne({
+  let course = await prisma.courses.findOne({
     where: {id: msg.courseId},
-    include:{
+    select: {
+      id: true,
+      category_id: true,
       course_instances: {
         select: {id: true}
       }
-    }
+    },
   })
   await prisma.disconnect()
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
@@ -84,7 +86,7 @@ async function createInstance(req: Request) {
       }
     })
 
-    await createInstanceGroup(id, msg.facillitator)
+    await createInstanceGroup(id, msg.facillitator, course.category_id)
   }
   catch(e) {
     console.log(e)
@@ -147,8 +149,12 @@ async function createCourse(req: Request) {
   let isAdmin = prisma.admins.findOne({where: {person: user.id}})
   if(!isAdmin) return {status: 403, result: "ERROR: user is not an admin"} as const
 
+  let category_id = await createCategory(msg.courseId)
+  if(!category_id) return {status: 500, result: "ERROR: couldn't create course category"}
+
   await prisma.courses.create({
     data: {
+      category_id,
       id: msg.courseId,
       name: msg.name,
       description: msg.description,
@@ -163,6 +169,5 @@ async function createCourse(req: Request) {
       }
     },
   })
-  await createCategory(msg.courseId, {parent_category_id: "15"})
   return {status:200, result: "Course created"}
 }

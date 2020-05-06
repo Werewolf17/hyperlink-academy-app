@@ -41,6 +41,7 @@ model course_maintainers {
 }
 
 model courses {
+  category_id        Int
   cost               Float
   description        String
   duration           String
