@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { callApi } from '../../src/apiHelpers'
 import { CreateCourseMsg, CreateCourseResponse } from '../api/courses/[action]'
 
-export default ()=> {
+const CreateCourse = ()=> {
   let {data: user} = useUserData()
   let router = useRouter()
   let [formData, setFormData] = useState({
@@ -88,3 +88,5 @@ export default ()=> {
 
   ])
 }
+
+export default CreateCourse

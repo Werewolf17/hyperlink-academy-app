@@ -7,7 +7,7 @@ import { GetServerSideProps } from 'next'
 import { makeSSOPayload } from '../src/discourse'
 
 type Props = {error:boolean}
-export default ({error}:Props) => {
+const SSO = ({error}:Props) => {
   let router = useRouter()
   let {sso, sig} = router.query
 
@@ -17,6 +17,8 @@ export default ({error}:Props) => {
 
   return h('h1', 'Logging you onto discourse...')
 }
+
+export default SSO
 
 export const getServerSideProps:GetServerSideProps = async ({req,res, query}) => {
   let token = getToken(req)

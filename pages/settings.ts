@@ -12,7 +12,7 @@ import { useUserData } from '../src/user'
 import { callApi } from '../src/apiHelpers'
 import { useRouter } from 'next/router'
 
-export default () => {
+const Settings = () => {
   let {data: user} = useUserData()
   let router = useRouter()
   useEffect(()=> {if(user === false) router.push('/')})
@@ -164,6 +164,7 @@ const ChangePassword = () => {
   ] )
 }
 
+export default Settings
 
 const PropertyHeader = styled('div')`
 display: grid;

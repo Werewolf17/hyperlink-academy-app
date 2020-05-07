@@ -12,7 +12,7 @@ import Instances from '../../../components/Course/Instances'
 import { useUserData, useCourseData } from '../../../src/user'
 
 type Props =  {content: string, id: string}
-export default (props:Props) => {
+const CoursePage = (props:Props) => {
   let {data: user} = useUserData()
   let {data: courseData} = useCourseData(props.id)
   let isMaintainer = (courseData?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
@@ -37,6 +37,8 @@ export default (props:Props) => {
     ])
   ])
 }
+
+export default CoursePage
 
 const Title = styled('div')`
 display: grid;

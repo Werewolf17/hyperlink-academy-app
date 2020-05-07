@@ -10,7 +10,7 @@ import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import { callApi } from '../src/apiHelpers'
 
-export default ()=>{
+const ResetPassword = ()=>{
   let [inputs, setInputs] = useState({password:'', confirmPassword: ''})
   let [status, setStatus] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
   let router = useRouter()
@@ -68,3 +68,5 @@ export default ()=>{
   }
 
 }
+
+export default ResetPassword
