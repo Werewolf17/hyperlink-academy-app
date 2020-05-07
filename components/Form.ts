@@ -13,8 +13,6 @@ display: grid;
 grid-gap: 8px;
 `
 
-export const Textarea = styled('textarea')``
-
 export let Input = styled('input')`
 padding: 12px 16px;
 border: 1px solid;
@@ -31,10 +29,4 @@ padding: 16px;
 export const Info = styled('div')`
 background-color: ${colors.grey95};
 padding: 16px;
-`
-
-export const Submit = styled('div')`
-display: grid;
-justify-items: end;
-grid-gap: 8px;
 `

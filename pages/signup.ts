@@ -4,7 +4,7 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 
 import { Narrow, Box} from '../components/Layout'
-import {Form, Label, Input, Error, Submit, Info} from '../components/Form'
+import {Form, Label, Input, Error, Info} from '../components/Form'
 import {Primary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
@@ -97,9 +97,7 @@ const Signup = () => {
                   }
                  })
       ]),
-      h(Submit, [
-        h(Primary, {type: 'submit'}, loading ? h(Loader) : 'Submit')
-      ])
+      h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, loading ? h(Loader) : 'Submit')
     ])
   ])
 }

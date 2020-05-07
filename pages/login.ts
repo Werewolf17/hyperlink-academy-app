@@ -4,7 +4,7 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 
 import {Narrow, Box} from '../components/Layout'
-import { Form, Input, Error, Label, Submit, Info} from '../components/Form'
+import { Form, Input, Error, Label, Info} from '../components/Form'
 import {Primary, LinkButton} from '../components/Button'
 import {callApi} from '../src/apiHelpers'
 import {Result, Msg} from './api/login'
@@ -81,9 +81,7 @@ const Login = () => {
         }),
         h(Link, {href: '/login?reset'}, h(LinkButton, 'Reset Password'))
       ]),
-      h(Submit, [
-        h(Primary, {type: 'submit'}, loading ? h(Loader) : 'Log In'),
-      ])
+      h(Primary, {type: 'submit', style: {justifySelf:'end'}}, loading ? h(Loader) : 'Log In'),
     ]),
   ])
 }
