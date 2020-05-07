@@ -13,7 +13,7 @@ export default class MyDocument extends Document {
     return (
       <html lang="en">
         <Head>
-        <link rel="icon" href="data:;base64,iVBORw0KGgo="/>
+        <link rel="icon" href="/img/favicon.png"/>
         <link rel="canonical" href="https://hyperlink.academy/"/>
         {this.props.styleTags}
 
