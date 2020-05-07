@@ -149,7 +149,7 @@ async function createCourse(req: Request) {
   let isAdmin = prisma.admins.findOne({where: {person: user.id}})
   if(!isAdmin) return {status: 403, result: "ERROR: user is not an admin"} as const
 
-  let category_id = await createCategory(msg.courseId)
+  let category_id = await createCategory(msg.name, {id: msg.courseId})
   if(!category_id) return {status: 500, result: "ERROR: couldn't create course category"}
 
   await prisma.courses.create({

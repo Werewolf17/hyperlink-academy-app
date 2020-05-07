@@ -41,7 +41,7 @@ export const createInstanceGroup = async (name: string, admin: string, courseID:
   await createCategory(name, {permissions: {[name]:1}, parent_category_id: courseID})
 }
 
-export const createCategory = async (name: string, options?: {permissions?: {[key:string]:number}, parent_category_id?: number}):Promise<number | false> => {
+export const createCategory = async (name: string, options?: {id?: string,permissions?: {[key:string]:number}, parent_category_id?: number}):Promise<number | false> => {
   let result = await fetch('https://forum.hyperlink.academy/categories.json', {
     method: 'POST',
     headers: {
