@@ -13,82 +13,74 @@ import { useUserData } from '../src/data'
 import { callApi } from '../src/apiHelpers'
 
 const Signup = () => {
-  let [formState, setFormState] = useState({
+  let [formData, setFormData] = useState({
     email:'',
     password:'',
     confPassword:'',
     display_name: ''
   })
-  let [error, setError] = useState<'user exists' | null>(null)
-  let [loading, setLoading] = useState(false)
+
+  let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
   let {data:user} = useUserData()
   let router = useRouter()
 
-  useEffect(()=>{
-    setError(null)
-  }, [formState.email])
-
+  useEffect(()=>setFormState('normal'), [formData.email])
   useEffect(()=>{if(user) router.push('/dashboard')}, [user])
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    setFormState('loading')
     let res = await callApi<SignupMsg, SignupResponse>('/api/signup/request', {
-      email:formState.email, password: formState.password, display_name:  formState.display_name
+      email:formData.email, password: formData.password, display_name:  formData.display_name
     })
     if(res.status == 200) {router.push('/signup?verifyEmail')}
     else {
-      setError('user exists')
+      setFormState('error')
     }
-    setLoading(false)
-  }
-
-  const Errors: {[key in Exclude<typeof error, null>]: React.ReactElement} = {
-    'user exists': h('div', [
-      "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
-      '.'
-    ])
   }
 
   if(router.query.verifyEmail !== undefined) {
-    return h(VerifyEmail, {email: formState.email, resendEmail: onSubmit})
+    return h(VerifyEmail, {email: formData.email, resendEmail: onSubmit})
   }
 
   return h(Narrow, {}, [
     h(Form, {onSubmit}, [
       h(TitleImg, {height: 233, width: 130, src: '/img/start_journey_crop.png'}),
       h('h1', 'Start a journey'),
-      error ? h(Error, {}, Errors[error]) : null,
+      formState === 'error' ? h(Error, {}, h('div', [
+        "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
+        '.'
+      ])) : null,
       h(Label, [
         "Your Name",
         h(Input, {type: 'text',
                   required: true,
-                  value: formState.display_name,
-                  onChange: (e)=> setFormState({...formState, display_name:e.currentTarget.value})})
+                  value: formData.display_name,
+                  onChange: (e)=> setFormData({...formData, display_name:e.currentTarget.value})})
       ]),
       h(Label, [
         "Your Email",
         h(Input, {type: 'email',
                   required: true,
-                  value: formState.email,
-                  onChange: (e)=> setFormState({...formState, email:e.currentTarget.value})})
+                  value: formData.email,
+                  onChange: (e)=> setFormData({...formData, email:e.currentTarget.value})})
       ]),
       h(Label, [
         "A Password",
         h(Input, {type: 'password',
                   required: true,
                   minLength: 8,
-                  value: formState.password,
-                  onChange: (e)=> setFormState({...formState, password:e.currentTarget.value})})
+                  value: formData.password,
+                  onChange: (e)=> setFormData({...formData, password:e.currentTarget.value})})
       ]),
       h(Label, [
         "Confirm Password",
         h(Input, {type: 'password',
                   required: true,
-                  value: formState.confPassword,
+                  value: formData.confPassword,
                   onChange: (e)=> {
-                    setFormState({...formState, confPassword:e.currentTarget.value})
-                    if(e.currentTarget.value !== formState.password) {
+                    setFormData({...formData, confPassword:e.currentTarget.value})
+                    if(e.currentTarget.value !== formData.password) {
                       e.currentTarget.setCustomValidity('passwords do not match')
                     }
                     else {
@@ -97,7 +89,7 @@ const Signup = () => {
                   }
                  })
       ]),
-      h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, loading ? h(Loader) : 'Submit')
+      h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
     ])
   ])
 }

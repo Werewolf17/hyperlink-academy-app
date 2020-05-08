@@ -41,8 +41,8 @@ const ChangeName = (props:{display_name: string}) => {
   let [loading, setLoading] = useState(false)
 
   let onSubmit = async (e:React.FormEvent)=>{
-      e.preventDefault()
-      setLoading(true)
+    e.preventDefault()
+    setLoading(true)
 
     await callApi<Msg, Result>('/api/updatePerson', {display_name: name})
     setLoading(false)
@@ -90,17 +90,15 @@ const ChangeName = (props:{display_name: string}) => {
 }
 
 const ChangePassword = () => {
-  const [editing, setEditing] = useState(false)
-  const [oldPassword, setOldPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confPassword, setConfPassword] = useState('')
+  const [formData, setFormData] = useState({old: '', new: '', confirm: ''})
   const [result, setResult] = useState<null | 'success' | 'failure' |'loading'>(null)
+  const [editing, setEditing] = useState(false)
 
   let onSubmit = async (e:React.FormEvent) =>{
     e.preventDefault()
     setResult('loading')
 
-    let res = await callApi<Msg, Result>('/api/updatePerson', {password: {old: oldPassword, new:newPassword}})
+    let res = await callApi<Msg, Result>('/api/updatePerson', {password: {...formData}})
     if(res.status === 200) {
       setResult('success')
       setEditing(false)
@@ -131,29 +129,34 @@ const ChangePassword = () => {
       result === 'failure' ? h(Error, 'Your current password is incorrect') : null,
       h(Label, [
         'Current Password',
-        h(Input, {type: 'password',
-                  value: oldPassword,
-                  onChange: e =>setOldPassword(e.currentTarget.value)}),
+        h(Input, {
+          type: 'password',
+          value: formData.old,
+          onChange: e =>setFormData({...formData, old:e.currentTarget.value})
+        }),
       ]),
       h(Label, [
         'New Password',
-        h(Input, {type: 'password',
-                  value: newPassword,
-                  onChange: e=> setNewPassword(e.currentTarget.value)}),
+        h(Input, {
+          type: 'password',
+          value: formData.new,
+          onChange: e=> setFormData({...formData, new: e.currentTarget.value})
+        }),
       ]),
       h(Label, [
         'Confirm New Password',
-        h(Input, {type: 'password',
-                  value: confPassword ,
-                  onChange: e=> {
-                    setConfPassword(e.currentTarget.value)
-                    if(e.currentTarget.value !== newPassword) {
-                      e.currentTarget.setCustomValidity('Passwords do not match')
-                    }
-                    else {
-                      e.currentTarget.setCustomValidity('')
-                    }
-                  }}),
+        h(Input, {
+          type: 'password',
+          value: formData.confirm,
+          onChange: e=> {
+            setFormData({...formData, confirm: e.currentTarget.value})
+            if(e.currentTarget.value !== formData.new) {
+              e.currentTarget.setCustomValidity('Passwords do not match')
+            }
+            else {
+              e.currentTarget.setCustomValidity('')
+            }
+          }}),
       ]),
       h('div', {style:{justifySelf:'end'}}, [
         h(Secondary, {type: 'submit'}, result === 'loading' ? h(Loader) : 'submit'),

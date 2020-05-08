@@ -16,7 +16,7 @@ type Props = {
   id: string,
 }
 
-export default (props: Props) => {
+const Enroll = (props: Props) => {
   const stripe = useStripe();
   let router = useRouter()
   let [loading, setLoading] = useState(false)
@@ -26,24 +26,23 @@ export default (props: Props) => {
   let {data: userInstances} = useUserInstances()
   let {data: courseData} = useCourseData(props.id)
 
-
   if(user === undefined || courseData === undefined) return null
   let validInstances = courseData?.course_instances
       .filter(instance => !userInstances?.course_instances.find(x=> x.id === instance.id))
 
-  const callEnroll = async ()=>{
+  const onSubmit = async (e: React.FormEvent)=>{
+    e.preventDefault()
+
     if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
     if(!stripe || !validInstances||selection === null) return
+
     setLoading(true)
-    let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {instanceID: validInstances[selection].id})
-    if(res.status === 200) {
-      await stripe.redirectToCheckout({
-        sessionId: res.result.sessionId
-      })
-    }
+    let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {
+      instanceID: validInstances[selection].id
+    })
+    if(res.status === 200) await stripe.redirectToCheckout({sessionId: res.result.sessionId})
     setLoading(false)
   }
-
 
   return h(Box, {gap: 16}, [
     h('div', [
@@ -55,32 +54,33 @@ export default (props: Props) => {
       h('h4', "Enroll in a run"),
       h('small', "Select a time that works for you")
     ]),
-    h(Box, {gap: 8}, validInstances
-      .map((instance, index)=>{
-      return h(Item, {
-        onClick: ()=> setSelection(index === selection ? null : index)
-      }, [
-        h(Radio, {
-          id: instance.id,
-          readOnly: true,
-          type: 'radio',
-          checked: selection === index
-        }),
-        h('div', {style:{justifySelf: 'left'}}, [
-          h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
-          h('p', 'facillitated by ' + instance.people?.display_name)
-        ])
-      ])
-    })),
-    h(Primary, {
-      disabled: selection === null,
-      style: {
-        width: '100%'
-      },
-      onClick: callEnroll
-    }, loading ? h(Loader) : 'Enroll'),
+    h(Box, {as: "form", onSubmit}, [
+      h(Box, {gap: 8}, validInstances
+        .map((instance, index)=>{
+          return h(Item, {
+            onClick: ()=> setSelection(index === selection ? null : index)
+          }, [
+            h(Radio, {
+              id: instance.id,
+              readOnly: true,
+              type: 'radio',
+              checked: selection === index
+            }),
+            h('div', {style:{justifySelf: 'left'}}, [
+              h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
+              h('p', 'facillitated by ' + instance.people?.display_name)
+            ])
+          ])
+        })),
+      h(Primary, {
+        disabled: selection === null,
+        style: {width: '100%'},
+      }, loading ? h(Loader) : 'Enroll'),
+    ])
   ])
 }
+
+export default Enroll
 
 let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
 

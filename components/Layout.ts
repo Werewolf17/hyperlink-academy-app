@@ -98,7 +98,7 @@ color: ${colors.textSecondary};
 }
 `
 
-export const Box = styled('div')<{gap?: Spacing, mt?: Spacing}>`
+export const Box = styled('div')<{gap?: Spacing, mt?: Spacing, as?: string}>`
 display: grid;
 grid-auto-rows: min-content;
 margin-top: ${props => props.mt || 0}px;

@@ -11,13 +11,13 @@ import Loader from '../components/Loader'
 import { callApi } from '../src/apiHelpers'
 
 const ResetPassword = ()=>{
-  let [inputs, setInputs] = useState({password:'', confirmPassword: ''})
-  let [status, setStatus] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
+  let [formData, setFormData] = useState({password:'', confirmPassword: ''})
+  let [formState, setFormState] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
   let router = useRouter()
   let key = router.query.key as string
 
   useEffect(()=>{
-    if(status === 'success') {
+    if(formState === 'success') {
       setTimeout(()=> {
         router.push('/login')
       }, 5000)
@@ -28,14 +28,14 @@ const ResetPassword = ()=>{
 
   const onSubmit = async (e:React.FormEvent)=> {
     e.preventDefault()
-    setStatus('loading')
+    setFormState('loading')
     let res = await callApi<ResetMsg, ResetResult>('/api/resetPassword/reset',
-                                                   {key, password: inputs.password})
-    if(res.status ===200) setStatus('success')
-    else setStatus('error')
+                                                   {key, password: formData.password})
+    if(res.status ===200) setFormState('success')
+    else setFormState('error')
   }
 
-  switch(status) {
+  switch(formState) {
     case 'normal':
     case 'loading':
       return h(Narrow, [
@@ -45,19 +45,19 @@ const ResetPassword = ()=>{
             "A New Password",
             h(Input, {
               type: 'password',
-              value: inputs.password,
-              onChange: e => setInputs({...inputs, password:e.target.value})
+              value: formData.password,
+              onChange: e => setFormData({...formData, password:e.target.value})
             }),
           ]),
           h(Label, [
             "Confirm Password",
             h(Input, {
               type: 'password',
-              value: inputs.confirmPassword,
-              onChange: e => setInputs({...inputs, confirmPassword:e.target.value})
+              value: formData.confirmPassword,
+              onChange: e => setFormData({...formData, confirmPassword:e.target.value})
             })
           ]),
-          h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'submit')
+          h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'submit')
         ])
       ])
     case 'success': return h(Info, [
@@ -66,7 +66,6 @@ const ResetPassword = ()=>{
     ])
     case 'error': return h(Error, 'something went wrong, please try again')
   }
-
 }
 
 export default ResetPassword
