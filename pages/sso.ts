@@ -28,18 +28,13 @@ export const getServerSideProps:GetServerSideProps = async ({req,res, query}) =>
     return {props:{}}
   }
   let {sso, sig} = query
+  if(typeof sso !== 'string') return {props: {error: true}}
 
   const hmac1 = crypto.createHmac('sha256', process.env.DISCOURSE_SECRET || '');
   hmac1.update(Buffer.from(sso))
 
   let verifySig = hmac1.digest('hex')
-  if(verifySig !== sig) {
-    return  {
-      props: {
-        error: true
-      }
-    }
-  }
+  if(verifySig !== sig) return  {props: {error: true}}
 
   let {nonce} = querystring.parse(Buffer.from(sso as string, 'base64').toString())
 
