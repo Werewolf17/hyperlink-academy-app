@@ -8,7 +8,7 @@ import { Primary, Secondary} from '../components/Button'
 
 import {Msg, Result} from './api/updatePerson'
 import Loader from '../components/Loader'
-import { useUserData } from '../src/user'
+import { useUserData } from '../src/data'
 import { callApi } from '../src/apiHelpers'
 import { useRouter } from 'next/router'
 

@@ -9,7 +9,7 @@ import { Primary} from '../Button'
 import { Box} from '../Layout'
 import {colors} from '../Tokens'
 import Loader from '../Loader'
-import { useUserData, useUserInstances, useCourseData} from '../../src/user'
+import { useUserData, useUserInstances, useCourseData} from '../../src/data'
 import { callApi } from '../../src/apiHelpers'
 
 type Props = {

@@ -1,6 +1,6 @@
 import styled, {createGlobalStyle} from 'styled-components'
 import {Login} from './Login'
-import {useUserData} from '../src/user'
+import {useUserData} from '../src/data'
 import Link from 'next/link'
 import Head from 'next/head'
 import h from 'react-hyperscript'
@@ -10,7 +10,6 @@ import {Spacing, colors} from './Tokens'
 
 const Layout:React.SFC = (props)=>{
   const {data: user}= useUserData()
-
   return h(Fragment, [
     h(GlobalStyles),
     h(Head, {children: []}, h('link', {

@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import { useUserData } from '../../src/user'
+import { useUserData } from '../../src/data'
 import { useRouter } from 'next/router'
 import {Form, Input, Label} from '../../components/Form'
 import { Primary } from '../../components/Button'

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import {useEffect, useState} from 'react'
 
-import { useUserData, useCourseData } from '../../../src/user'
+import { useUserData, useCourseData } from '../../../src/data'
 import { callApi } from '../../../src/apiHelpers'
 import { Form, Input, Label} from '../../../components/Form'
 import {Primary} from '../../../components/Button'

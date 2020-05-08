@@ -9,7 +9,7 @@ import {Primary} from '../components/Button'
 import TitleImg from '../components/TitleImg'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
 import Loader from '../components/Loader'
-import { useUserData } from '../src/user'
+import { useUserData } from '../src/data'
 import { callApi } from '../src/apiHelpers'
 
 const Signup = () => {

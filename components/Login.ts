@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {Primary, Secondary} from './Button'
 import {colors} from './Tokens'
-import { useUserData, useUserInstances } from '../src/user'
+import { useUserData, useUserInstances } from '../src/data'
 
 export const Login = () => {
   let router = useRouter()

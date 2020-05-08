@@ -9,7 +9,7 @@ import { Category } from '../../../src/discourse'
 import { Box, MediumWidth } from '../../../components/Layout'
 import Enroll from '../../../components/Course/Enroll'
 import Instances from '../../../components/Course/Instances'
-import { useUserData, useCourseData } from '../../../src/user'
+import { useUserData, useCourseData } from '../../../src/data'
 
 type Props =  {content: string, id: string}
 const CoursePage = (props:Props) => {

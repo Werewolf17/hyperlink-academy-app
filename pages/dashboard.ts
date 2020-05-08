@@ -5,7 +5,7 @@ import Link from 'next/link'
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { MediumWidth, Box} from '../components/Layout'
-import { useUserInstances, useUserData, useCourses } from '../src/user'
+import { useUserInstances, useUserData, useCourses } from '../src/data'
 import { useRouter } from 'next/router'
 
 const Dashboard:NextPage = () => {
