@@ -1,4 +1,5 @@
-import styled, {createGlobalStyle} from 'styled-components'
+import styled from '@emotion/styled'
+import {css, Global} from '@emotion/core'
 import {Login} from './Login'
 import {useUserData} from '../src/data'
 import Link from 'next/link'
@@ -11,7 +12,7 @@ import {Spacing, colors} from './Tokens'
 const Layout:React.SFC = (props)=>{
   const {data: user}= useUserData()
   return h(Fragment, [
-    h(GlobalStyles),
+    h(Global, {styles: GlobalStyles}),
     h(Head, {children: []}, h('link', {
       href:"https://fonts.googleapis.com/css?family=Lato|Roboto+Mono&display=swap",
       rel:"stylesheet"
@@ -56,7 +57,7 @@ padding: 24px;
 `
 
 
-const GlobalStyles = createGlobalStyle`
+const GlobalStyles = css`
 html {
   overflow-y: scroll;
   line-height: 1.375;

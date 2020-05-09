@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 let TitleImg = styled('img')<{height: number, width: number}>`
 image-rendering: pixelated;
 image-rendering: -moz-crisp-edges;

@@ -6,7 +6,7 @@ primarily written in Typescript.
 Important libraries we use are: 
 
 - [prisma](https://prisma.io/) for database access
-- [styled-components](https://styled-components.com/) for writing CSS in JavaScript
+- [emotion](https://emotion.sh/) for writing CSS in JavaScript
 
 ## Structure
 

@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import fetch from 'isomorphic-unfetch'
 import Link from 'next/link'
 import { useRouter } from 'next/router'

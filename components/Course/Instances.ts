@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { useUserInstances, useCourseData} from '../../src/data'
 import { Box } from '../Layout'
 import Card from '../Card'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 type Props = {
   id: string

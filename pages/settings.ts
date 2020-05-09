@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { useState, useEffect, Fragment} from 'react'
 
 import { Narrow, Box} from '../components/Layout'

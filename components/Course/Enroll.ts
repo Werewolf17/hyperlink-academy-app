@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import {useStripe} from '@stripe/react-stripe-js'
 import { useRouter } from 'next/router'
 import { useState } from 'react'

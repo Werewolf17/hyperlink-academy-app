@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import {colors} from  './Tokens'
 
 export const Primary = styled('button')<{disabled?: boolean}>`
