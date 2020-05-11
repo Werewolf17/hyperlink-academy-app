@@ -74,6 +74,7 @@ async function VerifyEmail (req: Request) {
 
   await syncSSO({
     external_id: id,
+    name: token.display_name,
     email: token.email
   })
 

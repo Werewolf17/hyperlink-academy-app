@@ -1,5 +1,6 @@
 import {APIHandler, ResultType, Request} from '../../src/apiHelpers'
 import {setTokenHeader, getToken} from '../../src/token'
+import {syncSSO} from '../../src/discourse'
 import {PrismaClient} from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
@@ -28,7 +29,6 @@ const handler = async (req: Request) => {
   }
 
   let setHeaders
-
   if(body?.password) {
     if(await validateLogin(user.email, body.password.old)) {
       await updatePassword(user.email, body.password.new)
@@ -41,7 +41,9 @@ const handler = async (req: Request) => {
   if(body?.display_name) {
     let newData = await updatePerson(user.id, body.display_name)
     setHeaders = setTokenHeader({...user, display_name:newData.display_name})
+    await syncSSO({external_id: user.id, email: user.email, name: body.display_name})
   }
+
 
   return {
     status: 200,
