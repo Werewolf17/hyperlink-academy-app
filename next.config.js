@@ -3,7 +3,4 @@ const withMDX = require('@next/mdx')({
 })
 module.exports = withMDX({
   pageExtensions: ['js', 'jsx', 'ts', 'md', 'mdx'],
-  experimental: {
-    reactRefresh: true
-  }
 })
