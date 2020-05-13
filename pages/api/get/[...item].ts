@@ -5,7 +5,8 @@ import { getToken } from '../../../src/token'
 
 export type CourseResult = ResultType<typeof getCourses>
 export type CourseDataResult = ResultType<typeof getCourseData>
-export type InstanceResult = ResultType<typeof getUserInstances>
+export type InstanceResult = ResultType<typeof getInstanceData>
+export type UserInstancesResult = ResultType<typeof getUserInstances>
 export type WhoAmIResult = ResultType<typeof whoami>
 
 let prisma = new PrismaClient({
@@ -16,7 +17,9 @@ export default multiRouteHandler('item', {
   'courses': getCourses,
   'course': getCourseData,
   'user_instances': getUserInstances,
-  'whoami': whoami
+  'whoami': whoami,
+  'instance': getInstanceData,
+  'profile': getProfileData
 })
 
 async function getCourseData(req: Request) {
@@ -46,6 +49,49 @@ async function getCourseData(req: Request) {
   return {status:200, result: data} as const
 }
 
+async function getInstanceData(req: Request) {
+  let id = req.query.item[1]
+  if(!id) return {status: 400, result: 'ERROR: no instance id provided'} as const
+
+  let data = await prisma.course_instances.findOne({
+    where: {id},
+    select: {
+      start_date: true,
+      end_date: true,
+      people: {
+        select: {display_name: true}
+      },
+      courses: {
+        select: {name: true, id: true, cost: true, duration: true}
+      },
+      people_in_instances: {
+        include: {
+          people: {
+            select: {
+              display_name: true
+            }
+          }
+        }
+      }
+    },
+  })
+  if(!data) return {status: 404, result: `Error: no instance with id ${id} found`} as const
+  return {status: 200, result: data} as const
+}
+
+async function getProfileData(req:Request) {
+  let id = req.query.item[1]
+  if(!id) return {status: 400, result: 'ERROR: no user id provided'} as const
+  let data = await prisma.people.findOne({
+    where: {id},
+    select: {
+      display_name: true
+    }
+  })
+  if(!data) return {status: 404, result: `Error: no user with id ${id} found`} as const
+  return {status: 200, result: data} as const
+}
+
 async function getCourses() {
   let args = {
     include: {
@@ -63,6 +109,7 @@ async function getCourses() {
   let courses= await prisma.courses.findMany<typeof args>(args)
   return {status: 200, result: {courses}} as const
 }
+
 
 async function getUserInstances(req:Request) {
   let token = getToken(req)

@@ -1,35 +1,50 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Markdown from 'react-markdown'
+import {PrismaClient} from '@prisma/client'
 
-import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 
 import { Category } from '../../../src/discourse'
 import { Box, MediumWidth } from '../../../components/Layout'
-import Enroll from '../../../components/Course/Enroll'
-import Instances from '../../../components/Course/Instances'
-import { useUserData, useCourseData } from '../../../src/data'
+import { useUserData, useUserInstances } from '../../../src/data'
 
-type Props =  {content: string, id: string}
+type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
+type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
 const CoursePage = (props:Props) => {
   let {data: user} = useUserData()
-  let {data: courseData} = useCourseData(props.id)
-  let isMaintainer = (courseData?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
+  let {data: userInstances} = useUserInstances()
+
+  let isMaintainer = (props.course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   return h(Layout, [
     h(Side, [
       h(Info, [
-        h(Instances, {id: props.id}),
-        h(Enroll, {id: props.id})
+        h('div', [
+          h('h4', "Your Instances"),
+          h('ul', userInstances?.course_instances
+            .filter(instance => instance.course === props.id)
+            .map(instance=> h('li', [
+              h(Link, {href: "/courses/[id]/[instanceID]", as: `/courses/${props.id}/${instance.id}`}, h('a', instance.id))
+            ])))
+        ]),
+        h('div', [
+          h('h4', 'Upcoming Instances'),
+          h('ul', props.course?.course_instances
+            .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
+            .map(instance => h('li', [
+              h(Link, {href: "/courses/[id]/[instanceID]", as:`/courses/${props.id}/${instance.id}`},
+                h('a', instance.id))
+            ])))
+        ])
       ])
     ]),
     h(Content, [
       h(Box, {gap: 8}, [
         h(Title, [
-          h('h1', courseData?.name),
+          h('h1', props.course?.name),
           isMaintainer ? h(Link, {href:'/courses/[id]/settings', as: `/courses/${props.id}/settings`}, h('a', 'settings')) : null,
         ]),
-        h('a',{href:`https://forum.hyperlink.academy/c/${courseData?.id}`},  'Check out the course forum'),
+        h('a',{href:`https://forum.hyperlink.academy/c/${props.course?.id}`},  'Check out the course forum'),
       ]),
       h(Text, [
         h(Markdown,{source: props.content}),
@@ -107,17 +122,45 @@ grid-gap: 48px;
 grid-auto-rows: min-content;
 `
 
-export const getServerSideProps:GetServerSideProps<{content: string, id: string}>= async (ctx) => {
+export const getStaticProps = async (ctx:any) => {
   let id = (ctx.params?.id || '' )as string
-  ctx.res.setHeader('cache-control', 's-maxage=600, stale-while-revalidate')
   let content = await getCourseContent(id)
-  return {props: {content, id}} as const
+
+  let prisma = new PrismaClient({
+    forceTransactions: true
+  })
+
+  let data = await prisma.courses.findOne({
+    where: {id },
+    include: {
+      course_maintainers: {
+        include: {
+          people: {select: {display_name: true}}
+        }
+      },
+      course_instances: {
+        include: {
+          people: {
+            select: {
+              display_name: true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  return {props: {content, id, course: data}, unstable_revalidate: 1} as const
+}
+
+export const getStaticPaths = () => {
+  return {paths:[], fallback: true}
 }
 
 const getCourseContent = async (id:string) => {
   let res = await fetch(`https://forum.hyperlink.academy/c/${id}.json`)
   let category = await res.json() as Category
-  let topicID = category.topic_list.topics.find(topic => topic.pinned === true)?.id
+  let topicID = category.topic_list.topics.find((topic) => topic.pinned === true)?.id
   let topicRequest = await fetch('https://forum.hyperlink.academy/raw/' + topicID)
   return await topicRequest.text()
 }

@@ -9,8 +9,9 @@ import { Primary} from '../Button'
 import { Box} from '../Layout'
 import {colors} from '../Tokens'
 import Loader from '../Loader'
-import { useUserData, useUserInstances, useCourseData} from '../../src/data'
+import { useUserData, useInstanceData} from '../../src/data'
 import { callApi } from '../../src/apiHelpers'
+import { Error } from '../Form'
 
 type Props = {
   id: string,
@@ -20,25 +21,22 @@ const Enroll = (props: Props) => {
   const stripe = useStripe();
   let router = useRouter()
   let [loading, setLoading] = useState(false)
-  let [selection, setSelection] = useState<null | number>(null)
 
   let {data:user} = useUserData()
-  let {data: userInstances} = useUserInstances()
-  let {data: courseData} = useCourseData(props.id)
+  let {data: instance} = useInstanceData(props.id)
 
-  if(user === undefined || courseData === undefined) return null
-  let validInstances = courseData?.course_instances
-      .filter(instance => !userInstances?.course_instances.find(x=> x.id === instance.id))
+  if(user === undefined || instance === undefined) return null
+  if(instance === false) return h('div', h(Error, 'No instance found'))
 
   const onSubmit = async (e: React.FormEvent)=>{
     e.preventDefault()
 
     if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
-    if(!stripe || !validInstances||selection === null) return
+    if(!stripe) return
 
     setLoading(true)
     let res = await callApi<EnrollMsg, EnrollResponse>('/api/courses/enroll', {
-      instanceID: validInstances[selection].id
+      instanceID: props.id
     })
     if(res.status === 200) await stripe.redirectToCheckout({sessionId: res.result.sessionId})
     setLoading(false)
@@ -46,34 +44,14 @@ const Enroll = (props: Props) => {
 
   return h(Box, {gap: 16}, [
     h('div', [
-      h(Cost, '$' + courseData.cost),
-      h('b', courseData.duration)
+      h(Cost, '$' + instance.courses.cost),
+      h('b', instance.courses.duration)
     ]),
     h(Divider),
-    h('div', [
-      h('h4', "Enroll in a run"),
-      h('small', "Select a time that works for you")
-    ]),
     h(Box, {as: "form", onSubmit}, [
-      h(Box, {gap: 8}, validInstances
-        .map((instance, index)=>{
-          return h(Item, {
-            onClick: ()=> setSelection(index === selection ? null : index)
-          }, [
-            h(Radio, {
-              id: instance.id,
-              readOnly: true,
-              type: 'radio',
-              checked: selection === index
-            }),
-            h('div', {style:{justifySelf: 'left'}}, [
-              h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
-              h('p', 'facillitated by ' + instance.people?.display_name)
-            ])
-          ])
-        })),
+      h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
+      h('p', 'facillitated by ' + instance.people?.display_name),
       h(Primary, {
-        disabled: selection === null,
         style: {width: '100%'},
       }, loading ? h(Loader) : 'Enroll'),
     ])
@@ -83,36 +61,6 @@ const Enroll = (props: Props) => {
 export default Enroll
 
 let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
-
-let Item = styled('div')`
-display: grid;
-grid-template-columns: auto auto;
-align-items: center;
-&:hover {
-cursor: pointer;
-input {
-  border: 2px solid;
-}
-}
-`
-
-let Radio = styled('input')`
-appearance: none;
-border-radius: 50%;
-border: 1px solid;
-width: 16px;
-height: 16px;
-box-shadow:0px 0px 0px 2px white inset;
-
-&:active {
-outline: none;
-}
-
-&:checked {
-border: 2px solid;
-background-color: black;
-}
-`
 
 let Label = styled('h4')`
 display: inline;
