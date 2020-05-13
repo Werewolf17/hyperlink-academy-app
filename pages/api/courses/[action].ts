@@ -108,7 +108,8 @@ async function enroll (req: Request) {
     include: {
       courses: {
         select: {
-          cost: true
+          cost: true,
+          name: true
         }
       }
     }
@@ -119,7 +120,7 @@ async function enroll (req: Request) {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [{
-      name: instance.course,
+      name: instance.courses.name,
       amount: instance.courses.cost * 100,
       currency: 'usd',
       quantity: 1,
