@@ -27,7 +27,7 @@ export default (props:Props) => {
 }
 
 let DateContainer = styled('p')`
-color: ${colors.textSecondary}
+color: ${colors.textSecondary};
 font-size: 12px;
 `
 
