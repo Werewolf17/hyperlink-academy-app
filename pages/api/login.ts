@@ -25,7 +25,13 @@ const handler = async (req: Request) => {
 
   let person = await validateLogin(msg.email, msg.password)
   if(person) {
-    let token = {email:msg.email, id:person.id, display_name:person.display_name, admin: person.admins.length > 0}
+    let token = {
+      username: person.username,
+      email:msg.email,
+      id:person.id,
+      display_name:person.display_name,
+      admin: person.admins.length > 0
+    }
     return {
       status: 200 as const,
       headers: setTokenHeader(token),
@@ -44,7 +50,9 @@ export default APIHandler(handler)
 
 async function validateLogin(email: string, password: string){
   try {
-    let person = await prisma.people.findOne({where:{email}, include: {admins: true}})
+    let person = await prisma.people.findOne({
+      where:{email}, include: {admins: true}
+    })
     await prisma.disconnect()
     if(!person) return false
     if(!await bcrypt.compare(password, person.password_hash)) return false

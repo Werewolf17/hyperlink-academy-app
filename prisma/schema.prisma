@@ -9,10 +9,10 @@ datasource db {
 
 model activation_keys {
   created_time  String
-  display_name  String
   email         String
   key_hash      String @id
   password_hash String
+  username      String
 }
 
 model admins {
@@ -58,10 +58,13 @@ model password_reset_keys {
 }
 
 model people {
-  display_name        String
+  bio                 String?
+  display_name        String?
   email               String                @unique
   id                  String                @id
+  link                String?
   password_hash       String                @unique
+  username            String                @unique
   admins              admins[]
   course_instances    course_instances[]
   course_maintainers  course_maintainers[]

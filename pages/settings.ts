@@ -22,7 +22,7 @@ const Settings = () => {
     h(Box, {gap: 48}, [
       h('h2', 'Your Settings'),
       h(Box, {gap: 24}, [
-        h(ChangeName, {display_name: user.display_name}),
+        h(ChangeName, {display_name: user.display_name || ''}),
         h('hr'),
         h('div', [
           h('h3', 'Your Email'),

@@ -25,7 +25,7 @@ const Dashboard = (props:Props) => {
   return h(MediumWidth, {}, [
     h(Box, {gap:48}, [
       h(Box, [
-        h('h1', `Hello ${user.display_name ? user.display_name : ''}!`),
+        h('h1', `Hello ${user.display_name || user.username}!`),
         h(Box, [
           h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
           h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')

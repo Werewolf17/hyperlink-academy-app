@@ -38,7 +38,7 @@ const handler = async (req: Request) => {
     }
   }
 
-  if(body?.display_name) {
+  if(body.display_name !== undefined) {
     let newData = await updatePerson(user.id, body.display_name)
     setHeaders = setTokenHeader({...user, display_name:newData.display_name})
     await syncSSO({external_id: user.id, email: user.email, name: body.display_name})

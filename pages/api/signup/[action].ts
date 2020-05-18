@@ -14,7 +14,7 @@ const prisma = new PrismaClient({
 
 export type SignupMsg = {
   email: string
-  display_name: string
+  username: string
   password: string
 }
 
@@ -32,7 +32,7 @@ export default multiRouteHandler('action', {
 
 async function Signup(req: Request) {
   let msg: Partial<SignupMsg> = req.body
-  if(!msg.email || !msg.password || !msg.display_name) {
+  if(!msg.email || !msg.password || !msg.username) {
     return {status: 400, result: 'Error: invalid message, missing email, password, or display_name'} as const
   }
 
@@ -42,14 +42,14 @@ async function Signup(req: Request) {
   }
 
   let salt = await bcrypt.genSalt()
-  let hash = await bcrypt.hash(msg.password, salt)
+  let password_hash = await bcrypt.hash(msg.password, salt)
 
-  let key = await createActivationKey(msg.email, hash, msg.display_name)
+  let key = await createActivationKey({email: msg.email, username:msg.username, password_hash})
   await prisma.disconnect()
 
   let activation_url = `${req.headers.origin}/signup?verifyEmail=${key}`
 
-  await sendVerificationEmail(msg.email, {activation_code: key, name:msg.display_name, activation_url})
+  await sendVerificationEmail(msg.email, {activation_code: key, name:msg.username, activation_url})
   return {status: 200, result: ''} as const
 }
 
@@ -68,30 +68,33 @@ async function VerifyEmail (req: Request) {
     return {status: 403, result: "Error: activation_key is out of date"}
   }
 
-  let id = await createUser(token.email, token.password_hash, token.display_name)
+  let id = await createUser({
+    username: token.username,
+    email: token.email,
+    password_hash: token.password_hash
+  })
+
   await prisma.disconnect()
   if(!id) return {status: 403, result: "Error: Couldn't create user. May already exist"}
 
   await syncSSO({
     external_id: id,
-    name: token.display_name,
+    username: token.username,
     email: token.email
   })
 
   return {
     status: 200,
     result: '',
-    headers: setTokenHeader({email:token.email, id, display_name:token.display_name})
+    headers: setTokenHeader({id, email:token.email,username:token.username})
   } as const
 }
 
-const createActivationKey = async (email: string, hash: string, display_name: string) => {
+const createActivationKey = async (person:{email: string, password_hash: string, username: string}) => {
   let key = uuidv4()
   await prisma.activation_keys.create({
     data: {
-      password_hash: hash,
-      email,
-      display_name,
+      ...person,
       created_time: new Date(Date.now()).toISOString(),
       key_hash: hmac(key)
     }
@@ -104,19 +107,24 @@ const checkUser = async (email:string):Promise<boolean> => {
 }
 
 
-const createUser = async (email:string, password_hash:string, display_name: string) => {
+const createUser = async (input:{email:string, password_hash:string, username: string}) => {
   let data = {
-    email, password_hash, display_name, id: uuidv4()
+    ...input,
+    id: uuidv4()
   }
   try {
     await prisma.people.create({data})
-    await prisma.activation_keys.deleteMany({where:{email}})
+    await prisma.activation_keys.deleteMany({where:{email:input.email}})
   } catch(e) {
+    console.log(e)
     return false
   }
   return data.id
 }
 
 const getActivationKey = async (hash: string)=> {
-  return prisma.activation_keys.findOne({where: {key_hash: hash}})
+  return prisma.activation_keys.findOne({
+    where: {key_hash: hash},
+    select: {username: true, email: true, password_hash: true, created_time: true}
+  })
 }

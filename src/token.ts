@@ -4,7 +4,8 @@ import cookie from 'cookie'
 export type Token = {
   email: string,
   id: string,
-  display_name: string,
+  username: string,
+  display_name?: string | null,
   admin?: boolean
 }
 

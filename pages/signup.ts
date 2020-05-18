@@ -15,9 +15,9 @@ import { callApi } from '../src/apiHelpers'
 const Signup = () => {
   let [formData, setFormData] = useState({
     email:'',
+    username: '',
     password:'',
     confPassword:'',
-    display_name: ''
   })
 
   let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
@@ -30,9 +30,7 @@ const Signup = () => {
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
     setFormState('loading')
-    let res = await callApi<SignupMsg, SignupResponse>('/api/signup/request', {
-      email:formData.email, password: formData.password, display_name:  formData.display_name
-    })
+    let res = await callApi<SignupMsg, SignupResponse>('/api/signup/request', formData)
     if(res.status == 200) {router.push('/signup?verifyEmail')}
     else {
       setFormState('error')
@@ -52,11 +50,11 @@ const Signup = () => {
         '.'
       ])) : null,
       h(Label, [
-        "Your Name",
+        "Your username",
         h(Input, {type: 'text',
                   required: true,
-                  value: formData.display_name,
-                  onChange: (e)=> setFormData({...formData, display_name:e.currentTarget.value})})
+                  value: formData.username,
+                  onChange: (e)=> setFormData({...formData, username:e.currentTarget.value})})
       ]),
       h(Label, [
         "Your Email",
