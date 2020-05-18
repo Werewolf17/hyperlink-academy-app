@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import { useState, useEffect, Fragment} from 'react'
 
 import { Narrow, Box} from '../components/Layout'
-import { Input, Error, Info, Label} from '../components/Form'
+import { Input, Textarea, Error, Info, Label} from '../components/Form'
 import { Primary, Secondary} from '../components/Button'
 
 import {Msg, Result} from './api/updatePerson'
@@ -22,12 +22,16 @@ const Settings = () => {
     h(Box, {gap: 48}, [
       h('h2', 'Your Settings'),
       h(Box, {gap: 24}, [
-        h(ChangeName, {display_name: user.display_name || ''}),
-        h('hr'),
         h('div', [
           h('h3', 'Your Email'),
           user.email
         ]),
+        h('hr'),
+        h(ChangeName, {display_name: user.display_name || ''}),
+        h('hr'),
+        h(ChangeBio, {bio: user.bio || ''}),
+        h('hr'),
+        h(ChangeLink, {link: user.link || ''}),
         h('hr'),
         h(ChangePassword)
       ]),
@@ -44,7 +48,7 @@ const ChangeName = (props:{display_name: string}) => {
     e.preventDefault()
     setLoading(true)
 
-    await callApi<Msg, Result>('/api/updatePerson', {display_name: name})
+    await callApi<Msg, Result>('/api/updatePerson', {profile:{display_name: name}})
     setLoading(false)
     setEditing(false)
   }
@@ -86,6 +90,114 @@ const ChangeName = (props:{display_name: string}) => {
         loading ? null : h(Primary, {onClick: ()=>{setName(props.display_name); setEditing(false)}}, 'cancel')
       ])
     ]) : name
+  ])
+}
+
+const ChangeLink = (props:{link: string}) => {
+  let [editing, setEditing] = useState(false)
+  let [link, setLink] = useState(props.link)
+  let [loading, setLoading] = useState(false)
+
+  let onSubmit = async (e:React.FormEvent)=>{
+    e.preventDefault()
+    setLoading(true)
+
+    await callApi<Msg, Result>('/api/updatePerson', {profile:{link}})
+    setLoading(false)
+    setEditing(false)
+  }
+
+  return h('form', {
+    style: {
+      display: 'grid',
+      gridTemplateRows: 'auto auto',
+      gridGap: 16
+    },
+    onSubmit
+  }, [
+    h(PropertyHeader , [
+      h('h3', 'A Link'),
+      editing ? null : h('div', {
+        style:{
+          justifySelf:'end',
+        }
+      }, [
+        h(Primary, {
+          onClick: (e)=> {
+            e.preventDefault()
+            if(editing) {
+              setLink(props.link)
+            }
+            setEditing(!editing)
+          }
+        }, 'edit' ),
+      ])
+    ]),
+    editing ? h(Fragment, [
+      h(Input, {
+        value: link,
+        type: 'url',
+        onChange: e => setLink(e.currentTarget.value)
+      }),
+      h('div', {style:{justifySelf:'end'}}, [
+        h(Secondary, {type: 'submit'}, loading ? h(Loader) : 'submit'),
+        ' ',
+        loading ? null : h(Primary, {onClick: ()=>{setLink(props.link); setEditing(false)}}, 'cancel')
+      ])
+    ]) : h('a', {href: link}, link)
+  ])
+}
+
+const ChangeBio = (props:{bio: string}) => {
+  let [editing, setEditing] = useState(false)
+  let [bio, setBio] = useState(props.bio)
+  let [loading, setLoading] = useState(false)
+
+  let onSubmit = async (e:React.FormEvent)=>{
+    e.preventDefault()
+    setLoading(true)
+
+    await callApi<Msg, Result>('/api/updatePerson', {profile:{bio}})
+    setLoading(false)
+    setEditing(false)
+  }
+
+  return h('form', {
+    style: {
+      display: 'grid',
+      gridTemplateRows: 'auto auto',
+      gridGap: 16
+    },
+    onSubmit
+  }, [
+    h(PropertyHeader , [
+      h('h3', 'Your Bio'),
+      editing ? null : h('div', {
+        style:{
+          justifySelf:'end',
+        }
+      }, [
+        h(Primary, {
+          onClick: (e)=> {
+            e.preventDefault()
+            setBio(props.bio)
+            setEditing(!editing)
+          }
+        }, 'edit' ),
+      ])
+    ]),
+    editing ? h(Fragment, [
+      h(Textarea, {
+        value: bio,
+        maxLength: 200,
+        onChange: e => setBio(e.currentTarget.value)
+      }),
+      h('div', {style:{justifySelf:'end'}}, [
+        h(Secondary, {type: 'submit'}, loading ? h(Loader) : 'submit'),
+        ' ',
+        loading ? null : h(Primary, {onClick: ()=>{setBio(props.bio); setEditing(false)}}, 'cancel')
+      ])
+    ]) :bio
   ])
 }
 

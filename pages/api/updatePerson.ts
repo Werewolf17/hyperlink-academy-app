@@ -1,7 +1,7 @@
 import {APIHandler, ResultType, Request} from '../../src/apiHelpers'
 import {setTokenHeader, getToken} from '../../src/token'
 import {syncSSO} from '../../src/discourse'
-import {PrismaClient} from '@prisma/client'
+import { PrismaClient, people} from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient({
@@ -9,7 +9,11 @@ const prisma = new PrismaClient({
 })
 
 export type Msg = {
-  display_name?: string,
+  profile?: {
+    display_name?: string,
+    link?: string,
+    bio?: string,
+  },
   password?: {
     new: string,
     old: string
@@ -29,7 +33,7 @@ const handler = async (req: Request) => {
   }
 
   let setHeaders
-  if(body?.password) {
+  if(body.password) {
     if(await validateLogin(user.email, body.password.old)) {
       await updatePassword(user.email, body.password.new)
     }
@@ -38,10 +42,16 @@ const handler = async (req: Request) => {
     }
   }
 
-  if(body.display_name !== undefined) {
-    let newData = await updatePerson(user.id, body.display_name)
-    setHeaders = setTokenHeader({...user, display_name:newData.display_name})
-    await syncSSO({external_id: user.id, email: user.email, name: body.display_name})
+  if(body.profile) {
+    let data = {display_name: body.profile.display_name, link: body.profile.link, bio: body.profile.bio}
+    let newData = await updatePerson(user.id, data)
+    setHeaders = setTokenHeader({...user, ...data})
+    await syncSSO({
+      external_id: user.id,
+      email: user.email,
+      name: newData.display_name || '',
+      website: newData.link || ''
+    })
   }
 
 
@@ -55,10 +65,10 @@ const handler = async (req: Request) => {
 
 export default APIHandler(handler)
 
-async function updatePerson(id:string, display_name:string) {
+async function updatePerson(id:string, data: Partial<people>) {
   return await prisma.people.update({
     where:{id},
-    data:{display_name}
+    data
   })
 }
 

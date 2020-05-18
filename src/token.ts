@@ -6,6 +6,8 @@ export type Token = {
   id: string,
   username: string,
   display_name?: string | null,
+  link?: string | null
+  bio?: string | null
   admin?: boolean
 }
 

@@ -20,6 +20,8 @@ border-color: ${colors.grey55};
 font-size: inherit;
 `
 
+export const Textarea = styled('textarea')``
+
 export const Error = styled('div')`
 background-color: ${colors.backgroundRed};
 color: ${colors.accentRed};
