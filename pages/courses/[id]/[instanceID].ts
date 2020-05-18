@@ -19,7 +19,11 @@ const InstancePage = () => {
       h('h3', 'Learners'),
       h('ul', instance?.people_in_instances
         .map((person)=>{
-          return h('li', [h(Link, {href: '/people/[id]', as: `/people/${person.person_id}`}, h('a', person.people.display_name))])
+          return h('li', [
+            h(Link, {
+              href: '/people/[id]',
+                     as: `/people/${person.people.username}`
+            }, h('a', person.people.display_name || person.people.username))])
         }))
     ])
   ])

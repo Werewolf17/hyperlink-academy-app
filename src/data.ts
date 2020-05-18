@@ -1,6 +1,6 @@
 import useSWR from 'swr'
-import {callApi, Successful} from './apiHelpers'
-import { CourseResult, InstanceResult, UserInstancesResult, WhoAmIResult, CourseDataResult} from '../pages/api/get/[...item]'
+import {callApi, Success} from './apiHelpers'
+import { CourseResult, InstanceResult, UserInstancesResult, WhoAmIResult, CourseDataResult, ProfileResult} from '../pages/api/get/[...item]'
 export const useUserData = ()=>{
   return useSWR('/api/get/whoami', async (api) => {
     let res = await callApi<null, WhoAmIResult>(api)
@@ -8,7 +8,15 @@ export const useUserData = ()=>{
   })
 }
 
-export const useCourseData = (id: string, initialData?:Successful<CourseDataResult>) => {
+export const useProfileData = (username:string, initialData?:Success<ProfileResult>)=>{
+  return useSWR('/api/get/profile/'+username, async api =>{
+    let res = await callApi<null, ProfileResult>(api)
+    if(res.status===200) return res.result
+    else return false
+  }, {initialData})
+}
+
+export const useCourseData = (id: string, initialData?:Success<CourseDataResult>) => {
   return useSWR('/api/get/course/' + id, async api => {
     let res = await callApi<null, CourseDataResult>(api)
     if(res.status === 200) return res.result
@@ -30,7 +38,7 @@ export const useUserInstances = () => {
   })
 }
 
-export const useCourses = (initialData?:Successful<CourseResult>) => {
+export const useCourses = (initialData?:Success<CourseResult>) => {
   return useSWR('/api/get/courses', async (api) => {
     let res = await callApi<null, CourseResult>(api)
     return res.result

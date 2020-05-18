@@ -8,6 +8,7 @@ export type CourseDataResult = ResultType<typeof getCourseData>
 export type InstanceResult = ResultType<typeof getInstanceData>
 export type UserInstancesResult = ResultType<typeof getUserInstances>
 export type WhoAmIResult = ResultType<typeof whoami>
+export type ProfileResult = ResultType<typeof getProfileData>
 
 let prisma = new PrismaClient({
   forceTransactions: true
@@ -59,7 +60,7 @@ async function getInstanceData(req: Request) {
       start_date: true,
       end_date: true,
       people: {
-        select: {display_name: true}
+        select: {display_name: true, username: true}
       },
       courses: {
         select: {name: true, id: true, cost: true, duration: true}
@@ -68,7 +69,8 @@ async function getInstanceData(req: Request) {
         include: {
           people: {
             select: {
-              display_name: true
+              display_name: true,
+              username: true,
             }
           }
         }
@@ -80,20 +82,22 @@ async function getInstanceData(req: Request) {
 }
 
 async function getProfileData(req:Request) {
-  let id = req.query.item[1]
-  if(!id) return {status: 400, result: 'ERROR: no user id provided'} as const
+  let username = req.query.item[1]
+  if(!username) return {status: 400, result: 'ERROR: no user id provided'} as const
   let data = await prisma.people.findOne({
-    where: {id},
+    where: {username},
     select: {
-      display_name: true
+      display_name: true,
+      bio: true,
+      link: true,
     }
   })
-  if(!data) return {status: 404, result: `Error: no user with id ${id} found`} as const
+  if(!data) return {status: 404, result: `Error: no user with id ${username} found`} as const
   return {status: 200, result: data} as const
 }
 
 async function getCourses() {
-  let args = {
+  let courses= await prisma.courses.findMany({
     include: {
       course_instances: {
         select: {
@@ -105,8 +109,7 @@ async function getCourses() {
         first: 1
       }
     }
-  }
-  let courses= await prisma.courses.findMany<typeof args>(args)
+  })
   return {status: 200, result: {courses}} as const
 }
 

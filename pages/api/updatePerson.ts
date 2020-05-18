@@ -45,7 +45,7 @@ const handler = async (req: Request) => {
   if(body.profile) {
     let data = {display_name: body.profile.display_name, link: body.profile.link, bio: body.profile.bio}
     let newData = await updatePerson(user.id, data)
-    setHeaders = setTokenHeader({...user, ...data})
+    setHeaders = setTokenHeader({...user, display_name:newData.display_name, link: newData.link, bio: newData.bio})
     await syncSSO({
       external_id: user.id,
       email: user.email,
