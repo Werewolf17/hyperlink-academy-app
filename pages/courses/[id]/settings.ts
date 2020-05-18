@@ -13,7 +13,7 @@ import Loader from '../../../components/Loader'
 const CourseSettings =  () => {
   let router = useRouter()
   let {data:user} = useUserData()
-  let {data:courseData} = useCourseData(router.query.id as string)
+  let {data:courseData, mutate} = useCourseData(router.query.id as string)
 
   let [newInstance, setNewInstance] = useState({start: '', end: '', facillitator: ''})
   let [formState, setFormState] = useState<'normal' | 'error' |'success' | 'loading'>('normal')
@@ -32,7 +32,13 @@ const CourseSettings =  () => {
     if(!courseData) return
     setFormState('loading')
     let res = await callApi<CreateInstanceMsg, CreateInstanceResponse>('/api/courses/createInstance', {courseId: courseData.id, ...newInstance})
-    if(res.status === 200) setFormState('success')
+    if(res.status === 200) {
+      mutate({
+        ...courseData,
+        course_instances: [...courseData.course_instances, res.result]
+      })
+      setFormState('success')
+    }
     else setFormState('error')
   }
 

@@ -68,7 +68,10 @@ async function createInstance(req: Request) {
 
   let id = course.id + '-' + course.course_instances.length
   try {
-    await prisma.course_instances.create({
+    let instance = await prisma.course_instances.create({
+      include: {
+        people: {select: {display_name: true}}
+      },
       data: {
         id,
         end_date: msg.end,
@@ -87,13 +90,13 @@ async function createInstance(req: Request) {
     })
 
     await createInstanceGroup(id, msg.facillitator, course.category_id)
+    return {status: 200, result: instance} as const
   }
   catch(e) {
     console.log(e)
     return {status: 401, result: e} as const
   }
 
-  return {status: 200, result: 'created course' } as const
 }
 
 async function enroll (req: Request) {

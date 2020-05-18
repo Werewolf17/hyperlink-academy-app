@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import {callApi} from './apiHelpers'
+import {callApi, Successful} from './apiHelpers'
 import { CourseResult, InstanceResult, UserInstancesResult, WhoAmIResult, CourseDataResult} from '../pages/api/get/[...item]'
 export const useUserData = ()=>{
   return useSWR('/api/get/whoami', async (api) => {
@@ -8,11 +8,11 @@ export const useUserData = ()=>{
   })
 }
 
-export const useCourseData = (id: string) => {
+export const useCourseData = (id: string, initialData?:Successful<CourseDataResult>) => {
   return useSWR('/api/get/course/' + id, async api => {
     let res = await callApi<null, CourseDataResult>(api)
     if(res.status === 200) return res.result
-  })
+  }, {initialData})
 }
 
 export const useInstanceData = (id: string) => {
@@ -30,9 +30,9 @@ export const useUserInstances = () => {
   })
 }
 
-export const useCourses = () => {
+export const useCourses = (initialData?:Successful<CourseResult>) => {
   return useSWR('/api/get/courses', async (api) => {
     let res = await callApi<null, CourseResult>(api)
     return res.result
-  })
+  }, {initialData})
 }

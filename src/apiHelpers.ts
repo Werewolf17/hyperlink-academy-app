@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse} from 'next'
 
 export type ResultType<T extends (...args:any)=> any> = PromiseReturn<ReturnType<T>>
 export type Request = NextApiRequest
+export type Successful<T extends Result> = Extract<T, {status: 200}>['result']
 
 type Handler = (req:Request) => Promise<Result>
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T

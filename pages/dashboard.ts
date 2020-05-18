@@ -1,6 +1,6 @@
 import h from 'react-hyperscript'
-import { NextPage } from 'next'
 import Link from 'next/link'
+import { PrismaClient} from '@prisma/client'
 
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
@@ -8,9 +8,12 @@ import { MediumWidth, Box} from '../components/Layout'
 import { useUserInstances, useUserData, useCourses } from '../src/data'
 import { useRouter } from 'next/router'
 
-const Dashboard:NextPage = () => {
+type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
+type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
+
+const Dashboard = (props:Props) => {
   let {data: user} = useUserData()
-  let {data: courses} = useCourses()
+  let {data: courses} = useCourses(props)
   let {data: instances} = useUserInstances()
   let router = useRouter()
 
@@ -34,7 +37,7 @@ const Dashboard:NextPage = () => {
           return h(CourseCard, {
             description: '',
             id: instance.id,
-            href: 'https://forum.hyperlink.academy/c/' + instance.id,
+            href: `/courses/${instance.course}/${instance.id}`,
             start_date: new Date(instance.start_date),
             instance: true,
             name: instance.id,
@@ -65,5 +68,27 @@ const Dashboard:NextPage = () => {
     ])
   ])
 }
+
+export const getStaticProps = async () => {
+  let prisma = new PrismaClient({
+    forceTransactions: true
+  })
+
+  let courses= await prisma.courses.findMany({
+    include: {
+      course_instances: {
+        select: {
+          start_date: true as const
+        },
+        orderBy: {
+          start_date: "asc" as const
+        },
+        first: 1
+      }
+    }
+  })
+  return {props: {courses}, unstable_revalidate: 1} as const
+}
+
 
 export default Dashboard

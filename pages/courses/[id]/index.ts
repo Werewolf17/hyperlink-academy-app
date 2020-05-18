@@ -7,15 +7,16 @@ import Link from 'next/link'
 
 import { Category } from '../../../src/discourse'
 import { Box, MediumWidth } from '../../../components/Layout'
-import { useUserData, useUserInstances } from '../../../src/data'
+import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
 const CoursePage = (props:Props) => {
   let {data: user} = useUserData()
+  let {data: course} = useCourseData(props.id, props.course || undefined)
   let {data: userInstances} = useUserInstances()
 
-  let isMaintainer = (props.course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
+  let isMaintainer = (course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   return h(Layout, [
     h(Side, [
       h(Info, [
@@ -29,7 +30,7 @@ const CoursePage = (props:Props) => {
         ]),
         h('div', [
           h('h4', 'Upcoming Instances'),
-          h('ul', props.course?.course_instances
+          h('ul', course?.course_instances
             .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
             .map(instance => h('li', [
               h(Link, {href: "/courses/[id]/[instanceID]", as:`/courses/${props.id}/${instance.id}`},
@@ -41,10 +42,10 @@ const CoursePage = (props:Props) => {
     h(Content, [
       h(Box, {gap: 8}, [
         h(Title, [
-          h('h1', props.course?.name),
+          h('h1', course?.name),
           isMaintainer ? h(Link, {href:'/courses/[id]/settings', as: `/courses/${props.id}/settings`}, h('a', 'settings')) : null,
         ]),
-        h('a',{href:`https://forum.hyperlink.academy/c/${props.course?.id}`},  'Check out the course forum'),
+        h('a',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum'),
       ]),
       h(Text, [
         h(Markdown,{source: props.content}),
