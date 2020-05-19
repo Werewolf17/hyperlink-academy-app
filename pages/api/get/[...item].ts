@@ -81,10 +81,8 @@ async function getInstanceData(req: Request) {
   return {status: 200, result: data} as const
 }
 
-async function getProfileData(req:Request) {
-  let username = req.query.item[1]
-  if(!username) return {status: 400, result: 'ERROR: no user id provided'} as const
-  let data = await prisma.people.findOne({
+export const profileDataQuery = (username: string)=>{
+  return prisma.people.findOne({
     where: {username},
     select: {
       display_name: true,
@@ -92,6 +90,12 @@ async function getProfileData(req:Request) {
       link: true,
     }
   })
+}
+
+async function getProfileData(req:Request) {
+  let username = req.query.item[1]
+  if(!username) return {status: 400, result: 'ERROR: no user id provided'} as const
+  let data = await profileDataQuery(username)
   if(!data) return {status: 404, result: `Error: no user with id ${username} found`} as const
   return {status: 200, result: data} as const
 }
