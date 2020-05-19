@@ -1,12 +1,12 @@
 import h from 'react-hyperscript'
 import Link from 'next/link'
-import { PrismaClient} from '@prisma/client'
 
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { MediumWidth, Box} from '../components/Layout'
 import { useUserInstances, useUserData, useCourses } from '../src/data'
 import { useRouter } from 'next/router'
+import { coursesQuery } from './api/get/[...item]'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -70,23 +70,7 @@ const Dashboard = (props:Props) => {
 }
 
 export const getStaticProps = async () => {
-  let prisma = new PrismaClient({
-    forceTransactions: true
-  })
-
-  let courses= await prisma.courses.findMany({
-    include: {
-      course_instances: {
-        select: {
-          start_date: true as const
-        },
-        orderBy: {
-          start_date: "asc" as const
-        },
-        first: 1
-      }
-    }
-  })
+  let courses = await coursesQuery()
   return {props: {courses}, unstable_revalidate: 1} as const
 }
 

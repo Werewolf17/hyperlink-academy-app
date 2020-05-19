@@ -1,13 +1,13 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Markdown from 'react-markdown'
-import {PrismaClient} from '@prisma/client'
 
 import Link from 'next/link'
 
 import { Category } from '../../../src/discourse'
 import { Box, MediumWidth } from '../../../components/Layout'
 import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
+import { courseDataQuery } from '../../api/get/[...item]'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -125,31 +125,9 @@ grid-auto-rows: min-content;
 
 export const getStaticProps = async (ctx:any) => {
   let id = (ctx.params?.id || '' )as string
+
   let content = await getCourseContent(id)
-
-  let prisma = new PrismaClient({
-    forceTransactions: true
-  })
-
-  let data = await prisma.courses.findOne({
-    where: {id },
-    include: {
-      course_maintainers: {
-        include: {
-          people: {select: {display_name: true}}
-        }
-      },
-      course_instances: {
-        include: {
-          people: {
-            select: {
-              display_name: true
-            }
-          }
-        }
-      }
-    }
-  })
+  let data = await courseDataQuery(id)
 
   return {props: {content, id, course: data}, unstable_revalidate: 1} as const
 }

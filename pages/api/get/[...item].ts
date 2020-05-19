@@ -23,28 +23,30 @@ export default multiRouteHandler('item', {
   'profile': getProfileData
 })
 
-async function getCourseData(req: Request) {
-  let id = req.query.item[1]
-  if(!id) return {status: 400, result: 'ERROR: no course id provided'} as const
-  let data = await prisma.courses.findOne({
-    where: {id },
-    include: {
-      course_maintainers: {
-        include: {
-          people: {select: {display_name: true}}
-        }
-      },
-      course_instances: {
-        include: {
-          people: {
-            select: {
-              display_name: true
-            }
+export const courseDataQuery = (id:string) => prisma.courses.findOne({
+  where: {id },
+  include: {
+    course_maintainers: {
+      include: {
+        people: {select: {display_name: true}}
+      }
+    },
+    course_instances: {
+      include: {
+        people: {
+          select: {
+            display_name: true
           }
         }
       }
     }
-  })
+  }
+})
+
+async function getCourseData(req: Request) {
+  let id = req.query.item[1]
+  if(!id) return {status: 400, result: 'ERROR: no course id provided'} as const
+  let data = await courseDataQuery(id)
 
   if(!data) return {status: 403, result: `ERROR: no course with id ${id} found`} as const
   return {status:200, result: data} as const
@@ -100,20 +102,18 @@ async function getProfileData(req:Request) {
   return {status: 200, result: data} as const
 }
 
-async function getCourses() {
-  let courses= await prisma.courses.findMany({
+export const coursesQuery = () => prisma.courses.findMany({
     include: {
       course_instances: {
-        select: {
-          start_date: true as const
-        },
-        orderBy: {
-          start_date: "asc" as const
-        },
+        select: {start_date: true},
+        orderBy: {start_date: "asc"},
         first: 1
       }
     }
-  })
+})
+
+async function getCourses() {
+  let courses = await coursesQuery()
   return {status: 200, result: {courses}} as const
 }
 
