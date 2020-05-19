@@ -16,7 +16,7 @@
     "@emotion/styled": "^10.0.27",
     "@mdx-js/loader": "^1.6.1",
     "@next/mdx": "^9.3.6",
-    "@prisma/client": "2.0.0-beta.1",
+    "@prisma/client": "^2.0.0-beta.5",
     "@stripe/react-stripe-js": "^1.1.2",
     "@stripe/stripe-js": "^1.5.0",
     "bcryptjs": "^2.4.3",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@now/node": "^1.6.0",
-    "@prisma/cli": "2.0.0-beta.1",
+    "@prisma/cli": "^2.0.0-beta.5",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie": "^0.3.3",
     "@types/react-hyperscript": "^3.0.4",
