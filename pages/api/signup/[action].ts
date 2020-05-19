@@ -35,6 +35,7 @@ async function Signup(req: Request) {
   if(!msg.email || !msg.password || !msg.username) {
     return {status: 400, result: 'Error: invalid message, missing email, password, or display_name'} as const
   }
+  if(msg.username.length < 3 || msg.username.length > 20) return {status: 400, result: "Error: username must be between 3 and 20 characters"}
 
   if(!(await checkUser(msg.email))) {
     await prisma.disconnect()

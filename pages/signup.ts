@@ -53,6 +53,8 @@ const Signup = () => {
         "Your username",
         h(Input, {type: 'text',
                   required: true,
+                  minLength: 3,
+                  maxLength: 20,
                   value: formData.username,
                   onChange: (e)=> setFormData({...formData, username:e.currentTarget.value})})
       ]),
