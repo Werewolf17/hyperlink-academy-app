@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-unfetch'
 import crypto from 'crypto'
 import querystring from 'querystring'
 
