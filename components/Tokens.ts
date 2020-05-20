@@ -1,7 +1,9 @@
 export const colors = {
   grey95: "#F2F2F2",
+  grey90: "#E5E5E5",
   grey80: "#CCCCCC",
   grey55: "#8C8C8C",
+  grey35: "#595959",
   grey15: "#272727",
   textSecondary: '#595959',
   textPrimary: '#272727',

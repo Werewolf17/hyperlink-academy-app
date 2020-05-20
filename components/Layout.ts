@@ -14,7 +14,7 @@ const Layout:React.SFC = (props)=>{
   return h(Fragment, [
     h(Global, {styles: GlobalStyles}),
     h(Head, {children: []}, h('link', {
-      href:"https://fonts.googleapis.com/css?family=Lato|Roboto+Mono&display=swap",
+      href:"https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,400;0,700;0,900;1,400;1,700;1,900&family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap",
       rel:"stylesheet"
     })),
     h(Body, {}, [
@@ -79,12 +79,23 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
+h1 {
+font-size:2.8rem;
+font-weight: bold;
+}
+
 h2 {
-  font-size: 1.75rem;
+  font-size: 2rem;
+font-weight: bold;
 }
 
 h3 {
-font-size: 1.25rem;
+font-size: 1.375rem;
+font-weight: 900;
+}
+
+h4 {
+font-weight: 900;
 }
 
 p { margin: 0; }
@@ -114,4 +125,10 @@ margin: auto;
 export const Narrow = styled('div')`
 max-width: 400px;
 margin: auto;
+`
+
+export const Seperator = styled('hr')`
+border: 1px dashed;
+border-bottom: none;
+color: ${colors.borderColor}
 `
