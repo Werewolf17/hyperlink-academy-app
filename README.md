@@ -19,9 +19,11 @@ We also have couple other top level directories:
 - `/components` has react components that are used across pages
 - `/src` contains functions that are used across pages and api endpoints
 - `/emails` contains functions that use the [Postmark](https://postmarkapp.com/)
-  to send emails. Right now they reference templates stored by Postmark, but the
-  plan is for them to store templates directly so they can be version
-  controlled.
+  to send emails. 
+  - `/emails/templtaes` contains templates that are synced with postmark. Each
+    template has an HTML and text version as well as some metadata for postmark.
+    To view changes to this tempaltes you can use the
+    [`postmark-cli`](https://github.com/wildbit/postmark-cli)
 - `/writing` contains `.mdx` files for copy that will be rendered on the site,
   like the introduction text.
 - `/prisma` contains the generated prisma schema and an SQL file,

@@ -1,0 +1,7 @@
+image: library/node:current
+emails:
+  script:
+    - npm i postmark-cli -g
+    - postmark templates push ./emails/templates -f
+  only:
+    - v2
