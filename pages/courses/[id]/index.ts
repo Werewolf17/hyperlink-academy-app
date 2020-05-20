@@ -5,9 +5,11 @@ import Markdown from 'react-markdown'
 import Link from 'next/link'
 
 import { Category } from '../../../src/discourse'
-import { Box, MediumWidth } from '../../../components/Layout'
+import { Box, MediumWidth, Seperator } from '../../../components/Layout'
 import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
+import { useState } from 'react'
+import { colors } from '../../../components/Tokens'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -16,20 +18,19 @@ const CoursePage = (props:Props) => {
   let {data: course} = useCourseData(props.id, props.course || undefined)
   let {data: userInstances} = useUserInstances()
 
-  let isMaintainer = (course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
+  let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   return h(Layout, [
     h(Side, [
       h(Info, [
-        h('div', [
-          h('h4', "Your Instances"),
-          h('ul', userInstances?.course_instances
-            .filter(instance => instance.course === props.id)
-            .map(instance=> h('li', [
-              h(Link, {href: "/courses/[id]/[instanceID]", as: `/courses/${props.id}/${instance.id}`}, h('a', instance.id))
-            ])))
+        h(Cost, '$'+course?.cost),
+        h(Box, {gap: 8, style: {color: colors.textSecondary}}, [
+          h('b', course?.duration),
         ]),
+        h(Seperator),
         h('div', [
-          h('h4', 'Upcoming Instances'),
+          h('h3', 'Enroll in an Instance'),
+          h('div', {style: {color: colors.textSecondary, fontSize: '0.8rem', fontWeight: 'bold'}},
+            'Click on an instance below for details'),
           h('ul', course?.course_instances
             .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
             .map(instance => h('li', [
@@ -40,21 +41,130 @@ const CoursePage = (props:Props) => {
       ])
     ]),
     h(Content, [
-      h(Box, {gap: 8}, [
-        h(Title, [
-          h('h1', course?.name),
-          isMaintainer ? h(Link, {href:'/courses/[id]/settings', as: `/courses/${props.id}/settings`}, h('a', 'settings')) : null,
+      h(Box, {gap: 32}, [
+        h(Box, {gap: 16}, [
+          h(Title, [
+            h('h1', course?.name),
+          ]),
+          h('span', {style:{color: 'blue'}}, [h('a',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum '), '➭'])
         ]),
-        h('a',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum'),
+        course?.description || ''
       ]),
-      h(Text, [
-        h(Markdown,{source: props.content}),
-      ]),
+      h(Details, {isMaintainer, content: props.content, instances: course?.course_instances})
     ])
   ])
 }
 
 export default CoursePage
+
+type DetailsProps = {
+  content: string
+  isMaintainer: boolean
+  instances: Exclude<Props['course'], null>['course_instances'] | undefined
+}
+const Details = (props:DetailsProps) => {
+  let [nav, setNav] = useState<'curriculum' | 'instances' | 'settings'>('curriculum')
+
+  let views = {
+    curriculum:  h(Text, {}, h(Markdown, {source: props.content})),
+    instances: h(Instances, {instances: props.instances}),
+    settings: h(Settings)
+  }
+
+
+  return h(Box, {gap: 32}, [
+    h(Nav, [
+      h(Tab, {active: nav === 'curriculum', onClick: ()=> setNav('curriculum')}, "Curriculum"),
+      h(Tab, {active: nav === 'instances', onClick: ()=> setNav('instances')}, "Instances"),
+      !props.isMaintainer ? null : h(Tab, {active: nav === 'settings', onClick: ()=> setNav('settings')}, "Settings"),
+    ]),
+    views[nav]
+  ])
+}
+
+const Instances = (props: Pick<DetailsProps, 'instances'>) => {
+  let {data: userInstances} = useUserInstances()
+  let {data: user} = useUserData()
+
+  return h(Box, {gap:32}, [
+    h('h2', "Instances"),
+    h(Box, {gap: 32},
+      props.instances?.flatMap(instance=>{
+        let inInstance = userInstances?.course_instances.find(x=> x.id===instance.id)
+        let isFacillitator = user && instance.facillitator === user.id
+        return [
+          h(Box, {gap: 16}, [
+            h('div', [
+              inInstance ? h(Pill, 'enrolled') : null,
+              ' ',
+              isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,
+            ]),
+            h('h3', {}, h(Link, {
+              href:'/courses/[id]/[instanceID]',
+              as:  `/courses/${instance.course}/${instance.id}`
+            }, h('a', instance.id))),
+            h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
+              h('strong', `${prettyDate(instance.start_date)} - ${prettyDate(instance.end_date)}`),
+              h('div', `Facillitated by ${instance.people.display_name}`)
+            ])
+          ]),
+          h(Seperator)
+        ]
+      }))])
+}
+
+const Settings = () => {
+  return h('div', [
+    h('div', [
+      `To add a new maintainer or remove an instance please email `,
+      h('a',{href:'mailto:contact@hyperlink.academy'}, 'contact@hyperlink.academy')
+    ]),
+    h(Seperator),
+    h('div', [
+      h('h2', 'Add a new Instance')
+    ])
+  ])
+}
+
+let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
+
+const Cost = styled('div')`
+font-size: 64px;
+font-weight: bold;
+`
+
+const Pill = styled('span')<{borderOnly?: boolean}>`
+width: fit-content;
+padding: 2px 8px;
+font-size: 0.75rem;
+border-radius: 4px;
+color: ${colors.textSecondary};
+${props=> props.borderOnly
+? `border: 1px solid ${colors.grey35};
+border-radius: 2px;
+`
+: `background-color: ${colors.grey90};`
+}
+`
+
+const Nav = styled('div')`
+display: grid;
+grid-gap: 32px;
+grid-template-columns: repeat(3, min-content);
+border-bottom: 3px solid;
+`
+
+const Tab = styled('h4')<{active:boolean}>`
+padding-bottom: 4px;
+margin-bottom: 2px;
+
+&:hover {
+cursor: pointer;
+}
+
+${props => props.active ? 'color: blue' : ''};
+${props => props.active ? 'border-bottom: 4px solid' : ''};
+`.withComponent('a')
 
 const Title = styled('div')`
 display: grid;
@@ -77,7 +187,7 @@ grid-row: 1;
 grid-column: 1;
 
 display: grid;
-grid-gap: 48px;
+grid-gap: 64px;
 grid-auto-rows: min-content;
 
 
@@ -104,11 +214,11 @@ margin-top: 8px;
 
 const Layout = styled('div')`
 display: grid;
-grid-template-columns: auto auto;
+grid-template-columns: auto max-content;
 grid-gap: 16px;
 
 @media(max-width: 1016px) {
-grid-tempalte-columns: auto;
+grid-template-columns: auto;
 grid-template-rows: auto auto;
 }
 `
@@ -119,7 +229,7 @@ position: sticky;
 top: 32px;
 
 display: grid;
-grid-gap: 48px;
+grid-gap: 16px;
 grid-auto-rows: min-content;
 `
 

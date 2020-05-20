@@ -16,8 +16,9 @@
     "strict": true,
     "target": "es2015",
     "lib": [
-      "es2017",
-      "DOM"
+        "es2019",
+        "es2017",
+        "DOM"
     ],
     "types": [
       "node"
