@@ -1,9 +1,9 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
-import { useState, useEffect, Fragment} from 'react'
+import { useState, useEffect } from 'react'
 
 import { Narrow, Box} from '../components/Layout'
-import { Input, Textarea, Error, Info, Label} from '../components/Form'
+import { Input, Textarea, Info, Label} from '../components/Form'
 import { Primary, Secondary} from '../components/Button'
 
 import {Msg, Result} from './api/updatePerson'
@@ -11,279 +11,98 @@ import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
 import { callApi } from '../src/apiHelpers'
 import { useRouter } from 'next/router'
+import { colors } from '../components/Tokens'
 
 const Settings = () => {
-  let {data: user} = useUserData()
   let router = useRouter()
+  let {data: user, mutate} = useUserData()
+  let [formData, setFormData] = useState({
+    bio: '',
+    display_name: '',
+    link: ''
+  })
+  let [formState, setFormState] = useState<'normal' |'loading' | 'success'>('normal')
+
+  useEffect(()=> {
+    if(user) setFormData({bio:user.bio || '', display_name:user.display_name || '', link: user.link || ''})
+  }, [user])
   useEffect(()=> {if(user === false) router.push('/')})
 
+
   if(!user) return null
-  return h(Narrow, [
-    h(Box, {gap: 48}, [
-      h('h2', 'Your Settings'),
-      h(Box, {gap: 24}, [
-        h('div', [
-          h('h3', 'Your Email'),
-          user.email
-        ]),
-        h('hr'),
-        h(ChangeName, {display_name: user.display_name || ''}),
-        h('hr'),
-        h(ChangeBio, {bio: user.bio || ''}),
-        h('hr'),
-        h(ChangeLink, {link: user.link || ''}),
-        h('hr'),
-        h(ChangePassword)
-      ]),
-    ])
-  ])
-}
 
-const ChangeName = (props:{display_name: string}) => {
-  let [editing, setEditing] = useState(false)
-  let [name, setName] = useState(props.display_name)
-  let [loading, setLoading] = useState(false)
+  const changed =
+    formData.bio !== user.bio ||
+    formData.display_name !== user.display_name ||
+    formData.link !== user.link
 
-  let onSubmit = async (e:React.FormEvent)=>{
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-
-    await callApi<Msg, Result>('/api/updatePerson', {profile:{display_name: name}})
-    setLoading(false)
-    setEditing(false)
-  }
-
-  return h('form', {
-    style: {
-      display: 'grid',
-      gridTemplateRows: 'auto auto',
-      gridGap: 16
-    },
-    onSubmit
-  }, [
-    h(PropertyHeader , [
-      h('h3', 'Your Name'),
-      editing ? null : h('div', {
-        style:{
-          justifySelf:'end',
-        }
-      }, [
-        h(Primary, {
-          onClick: (e)=> {
-            e.preventDefault()
-            if(editing) {
-              setName(props.display_name)
-            }
-            setEditing(!editing)
-          }
-        }, 'edit' ),
-      ])
-    ]),
-    editing ? h(Fragment, [
-      h(Input, {
-        value: name,
-        onChange: e => setName(e.currentTarget.value)
-      }),
-      h('div', {style:{justifySelf:'end'}}, [
-        h(Secondary, {type: 'submit'}, loading ? h(Loader) : 'submit'),
-        ' ',
-        loading ? null : h(Primary, {onClick: ()=>{setName(props.display_name); setEditing(false)}}, 'cancel')
-      ])
-    ]) : name
-  ])
-}
-
-const ChangeLink = (props:{link: string}) => {
-  let [editing, setEditing] = useState(false)
-  let [link, setLink] = useState(props.link)
-  let [loading, setLoading] = useState(false)
-
-  let onSubmit = async (e:React.FormEvent)=>{
-    e.preventDefault()
-    setLoading(true)
-
-    await callApi<Msg, Result>('/api/updatePerson', {profile:{link}})
-    setLoading(false)
-    setEditing(false)
-  }
-
-  return h('form', {
-    style: {
-      display: 'grid',
-      gridTemplateRows: 'auto auto',
-      gridGap: 16
-    },
-    onSubmit
-  }, [
-    h(PropertyHeader , [
-      h('h3', 'A Link'),
-      editing ? null : h('div', {
-        style:{
-          justifySelf:'end',
-        }
-      }, [
-        h(Primary, {
-          onClick: (e)=> {
-            e.preventDefault()
-            if(editing) {
-              setLink(props.link)
-            }
-            setEditing(!editing)
-          }
-        }, 'edit' ),
-      ])
-    ]),
-    editing ? h(Fragment, [
-      h(Input, {
-        value: link,
-        type: 'url',
-        onChange: e => setLink(e.currentTarget.value)
-      }),
-      h('div', {style:{justifySelf:'end'}}, [
-        h(Secondary, {type: 'submit'}, loading ? h(Loader) : 'submit'),
-        ' ',
-        loading ? null : h(Primary, {onClick: ()=>{setLink(props.link); setEditing(false)}}, 'cancel')
-      ])
-    ]) : h('a', {href: link}, link)
-  ])
-}
-
-const ChangeBio = (props:{bio: string}) => {
-  let [editing, setEditing] = useState(false)
-  let [bio, setBio] = useState(props.bio)
-  let [loading, setLoading] = useState(false)
-
-  let onSubmit = async (e:React.FormEvent)=>{
-    e.preventDefault()
-    setLoading(true)
-
-    await callApi<Msg, Result>('/api/updatePerson', {profile:{bio}})
-    setLoading(false)
-    setEditing(false)
-  }
-
-  return h('form', {
-    style: {
-      display: 'grid',
-      gridTemplateRows: 'auto auto',
-      gridGap: 16
-    },
-    onSubmit
-  }, [
-    h(PropertyHeader , [
-      h('h3', 'Your Bio'),
-      editing ? null : h('div', {
-        style:{
-          justifySelf:'end',
-        }
-      }, [
-        h(Primary, {
-          onClick: (e)=> {
-            e.preventDefault()
-            setBio(props.bio)
-            setEditing(!editing)
-          }
-        }, 'edit' ),
-      ])
-    ]),
-    editing ? h(Fragment, [
-      h(Textarea, {
-        value: bio,
-        maxLength: 200,
-        onChange: e => setBio(e.currentTarget.value)
-      }),
-      h('div', {style:{justifySelf:'end'}}, [
-        h(Secondary, {type: 'submit'}, loading ? h(Loader) : 'submit'),
-        ' ',
-        loading ? null : h(Primary, {onClick: ()=>{setBio(props.bio); setEditing(false)}}, 'cancel')
-      ])
-    ]) :bio
-  ])
-}
-
-const ChangePassword = () => {
-  const [formData, setFormData] = useState({old: '', new: '', confirm: ''})
-  const [result, setResult] = useState<null | 'success' | 'failure' |'loading'>(null)
-  const [editing, setEditing] = useState(false)
-
-  let onSubmit = async (e:React.FormEvent) =>{
-    e.preventDefault()
-    setResult('loading')
-
-    let res = await callApi<Msg, Result>('/api/updatePerson', {password: {...formData}})
+    if(!changed) return
+    setFormState('loading')
+    let res = await callApi<Msg, Result>('/api/updatePerson', {profile:formData})
     if(res.status === 200) {
-      setResult('success')
-      setEditing(false)
+      if(user) mutate({...user, ...formData})
+      setFormState('success')
     }
-    else setResult('failure')
   }
 
-  return h('form', {
-    style: {
-      display: 'grid',
-      gridGap: 16,
-    },
-    onSubmit
-  }, [
-    h(PropertyHeader,[
-      h('h3', 'Your Password'),
-      h('div', {style:{justifySelf:'end'}}, [
-        editing ? null :  h(Primary, {
-          onClick: (e)=> {
-            e.preventDefault()
-            setEditing(!editing)
-          }
-        }, 'change' ),
+  return h(Narrow, [
+    h('form', {onSubmit}, [
+      h(Box, {gap: 64}, [
+        h(Box, {gap: 32}, [
+          h('h2', 'Your Settings'),
+          h(Box, {gap:8}, [h('b', 'Username'),h(Info, user.username)]),
+          h(Box, {gap:8}, [h('b', 'Email'),h(Info, user.email)]),
+          h(Label, [
+            'Nickname',
+            h(Description, ''),
+            h(Input,{
+              value: formData.display_name,
+              onChange: e=>{
+                e.preventDefault()
+                setFormData({...formData, display_name: e.currentTarget.value})
+              }
+            })
+          ]),
+          h(Label, [
+            'A Link',
+            h(Description, "Add a link to where you're hanging on the internet (your website, twitter, etc)"),
+            h(Input, {
+              value: formData.link,
+              onChange: e=>setFormData({...formData, link: e.currentTarget.value})
+            })
+          ]),
+          h(Label, [
+            'Bio',
+            h(Textarea, {
+              value: formData.bio,
+              onChange: e=>setFormData({...formData, bio: e.currentTarget.value})
+            })
+          ]),
+        ]),
+        h(SubmitButtons, [
+          h(Secondary, {disabled: !changed, red: changed,onClick: ()=>{
+            if(user)setFormData({bio: user.bio ||'', display_name: user.display_name||'', link: user.link || ''})
+          }}, "Discard Changes"),
+          h(Primary, {type: 'submit', disabled: !changed},
+            formState === 'loading' ? h(Loader) : 'Save Changes')
+        ])
       ])
     ]),
-    result === 'success' ? h(Info, 'Your password has been changed!') : null,
-    !editing ? null : h(Fragment,[
-      result === 'failure' ? h(Error, 'Your current password is incorrect') : null,
-      h(Label, [
-        'Current Password',
-        h(Input, {
-          type: 'password',
-          value: formData.old,
-          onChange: e =>setFormData({...formData, old:e.currentTarget.value})
-        }),
-      ]),
-      h(Label, [
-        'New Password',
-        h(Input, {
-          type: 'password',
-          value: formData.new,
-          onChange: e=> setFormData({...formData, new: e.currentTarget.value})
-        }),
-      ]),
-      h(Label, [
-        'Confirm New Password',
-        h(Input, {
-          type: 'password',
-          value: formData.confirm,
-          onChange: e=> {
-            setFormData({...formData, confirm: e.currentTarget.value})
-            if(e.currentTarget.value !== formData.new) {
-              e.currentTarget.setCustomValidity('Passwords do not match')
-            }
-            else {
-              e.currentTarget.setCustomValidity('')
-            }
-          }}),
-      ]),
-      h('div', {style:{justifySelf:'end'}}, [
-        h(Secondary, {type: 'submit'}, result === 'loading' ? h(Loader) : 'submit'),
-        ' ',
-        result === 'loading' ? null : h(Primary, {onClick: e=>{e.preventDefault(); setEditing(false)}}, 'cancel')
-      ])
-    ])
-  ] )
+  ])
 }
 
 export default Settings
 
-const PropertyHeader = styled('div')`
+const Description = styled('p')`
+font-size: 0.75rem;
+color: ${colors.textSecondary};
+`
+
+const SubmitButtons = styled('div')`
+justify-self: right;
 display: grid;
-height: 32px;
-align-items: center;
 grid-template-columns: auto auto;
+grid-gap: 16px;
 `

@@ -20,7 +20,11 @@ border-color: ${colors.grey55};
 font-size: inherit;
 `
 
-export const Textarea = styled('textarea')``
+export const Textarea = styled('textarea')`
+padding: 12px 16px;
+height: 128px;
+font-family: Lato;
+`
 
 export const Error = styled('div')`
 background-color: ${colors.backgroundRed};
