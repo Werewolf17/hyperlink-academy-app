@@ -6,10 +6,17 @@ import Link from 'next/link'
 
 import { Category } from '../../../src/discourse'
 import { Box, MediumWidth, Seperator } from '../../../components/Layout'
+
+import {Input, Label, Error, Info, Select} from '../../../components/Form'
+import {Primary} from '../../../components/Button'
 import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { colors } from '../../../components/Tokens'
+import { useRouter } from 'next/router'
+import {CreateInstanceMsg, CreateInstanceResponse} from '../../api/courses/[action]'
+import { callApi } from '../../../src/apiHelpers'
+import Loader from '../../../components/Loader'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -21,7 +28,7 @@ const CoursePage = (props:Props) => {
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   return h(Layout, [
     h(Side, [
-      h(Info, [
+      h(CourseInfo, [
         h(Cost, '$'+course?.cost),
         h(Box, {gap: 8, style: {color: colors.textSecondary}}, [
           h('b', course?.duration),
@@ -114,14 +121,64 @@ const Instances = (props: Pick<DetailsProps, 'instances'>) => {
 }
 
 const Settings = () => {
-  return h('div', [
-    h('div', [
-      `To add a new maintainer or remove an instance please email `,
-      h('a',{href:'mailto:contact@hyperlink.academy'}, 'contact@hyperlink.academy')
+  return h(Box, {gap: 64}, [
+    h(Box, {style: {width:400}}, [
+      h('div', [
+        `To add a new maintainer or remove an instance please email `,
+        h('a',{href:'mailto:contact@hyperlink.academy'}, 'contact@hyperlink.academy'),
+      ]),
+      h(Seperator),
     ]),
-    h(Seperator),
-    h('div', [
-      h('h2', 'Add a new Instance')
+    h(AddInstance),
+  ])
+}
+
+const AddInstance = ()=>{
+  let [newInstance, setNewInstance] = useState({start: '', end: '', facillitator: ''})
+  let [formState, setFormState] = useState<'normal' | 'error' |'success' | 'loading'>('normal')
+  let router = useRouter()
+  let {data:courseData, mutate} = useCourseData(router.query.id as string)
+  useEffect(()=>setFormState('normal'), [newInstance])
+
+  const onSubmit = async (e:React.FormEvent) => {
+    e.preventDefault()
+    if(!courseData) return
+    setFormState('loading')
+    let res = await callApi<CreateInstanceMsg, CreateInstanceResponse>('/api/courses/createInstance', {courseId: courseData.id, ...newInstance})
+    if(res.status === 200) {
+      mutate({
+        ...courseData,
+        course_instances: [...courseData.course_instances, res.result]
+      })
+      setFormState('success')
+    }
+    else setFormState('error')
+  }
+
+  return h('form', {onSubmit}, [
+    h(Box, {gap: 32, style: {width: 400}}, [
+      h('h2', 'Add a new Instance'),
+      formState === 'error' ? h(Error, 'An error occured') : null,
+      formState === 'success' ? h(Info, 'Instance created!') : null,
+      h(Label, [
+        h(Select, {
+          required: true,
+          onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewInstance({...newInstance, facillitator: e.currentTarget.value})
+        }, courseData?.course_maintainers.map(maintainer => {
+          return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
+        })),
+      ]),
+      h(Label, [
+        'Start Date',
+        h(Input, {
+          type: 'date',
+          required: true,
+          value: newInstance.start,
+          onChange: e => setNewInstance({...newInstance, start: e.currentTarget.value})
+        })
+      ]),
+      h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'Add a new Instance'),
+      h(Seperator),
     ])
   ])
 }
@@ -223,7 +280,7 @@ grid-template-rows: auto auto;
 }
 `
 
-const Info = styled('div')`
+const CourseInfo = styled('div')`
 width: 240px;
 position: sticky;
 top: 32px;
