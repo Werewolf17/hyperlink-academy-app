@@ -66,6 +66,13 @@ html {
   color: ${colors.textPrimary};
 }
 
+a.notBlue {
+  color: inherit;
+  a: visited {
+    color: inherit;
+  }
+}
+
 a:visited {
   color: blue;
 }
@@ -131,4 +138,15 @@ export const Seperator = styled('hr')`
 border: 1px dashed;
 border-bottom: none;
 color: ${colors.borderColor}
+`
+
+export const TwoColumn = styled('div')`
+display: grid;
+grid-template-columns: 640px 240px;
+grid-gap: 64px;
+
+@media(max-width: 1016px) {
+grid-template-columns: auto;
+grid-template-rows: auto auto;
+}
 `
