@@ -47,6 +47,7 @@ model courses {
   duration           String
   id                 String               @id
   name               String
+  prerequisites      String
   course_instances   course_instances[]
   course_maintainers course_maintainers[]
 }

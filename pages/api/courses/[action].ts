@@ -25,6 +25,7 @@ export type CreateCourseMsg = {
   name: string
   cost: number
   duration: string
+  prerequisites: string
   maintainers: string[]
 }
 export type CreateCourseResponse = ResultType<typeof createCourse>
@@ -146,7 +147,7 @@ async function enroll (req: Request) {
 async function createCourse(req: Request) {
   let msg = req.body as Partial<CreateCourseMsg>
   if(!msg.courseId || !msg.cost ||!msg.name
-     || !msg.duration || !msg.description || !msg.maintainers) return {status: 400, result: "ERROR: missing parameters"} as const
+     || !msg.duration || !msg.description || !msg.maintainers || !msg.prerequisites) return {status: 400, result: "ERROR: missing parameters"} as const
   let user = getToken(req)
   if(!user) return {status: 403, result: "ERROR: no user logged in"} as const
 
@@ -163,6 +164,7 @@ async function createCourse(req: Request) {
       name: msg.name,
       description: msg.description,
       duration: msg.duration,
+      prerequisites: msg.prerequisites,
       cost: msg.cost,
       course_maintainers: {
         create: msg.maintainers.map(email => {

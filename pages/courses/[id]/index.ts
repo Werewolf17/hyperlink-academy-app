@@ -32,6 +32,8 @@ const CoursePage = (props:Props) => {
         h(Cost, '$'+course?.cost),
         h(Box, {gap: 8, style: {color: colors.textSecondary}}, [
           h('b', course?.duration),
+          h('b', 'Prerequisites'),
+          h('p', course?.prerequisites)
         ]),
         h(Seperator),
         h('div', [

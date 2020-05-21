@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS courses (
     duration      text NOT NULL,
     description   text NOT NULL,
     cost          real NOT NULL
+    prerequisites text NOT NULL,
 );
 
 CREATE TABLE IF NOT EXISTS course_maintainers (

@@ -1,7 +1,7 @@
 import h from 'react-hyperscript'
 import { useUserData } from '../../src/data'
 import { useRouter } from 'next/router'
-import {Form, Input, Label, Error, Info} from '../../components/Form'
+import { Form, Input, Label, Error, Info, Textarea} from '../../components/Form'
 import { Primary } from '../../components/Button'
 import { useState, useEffect } from 'react'
 import { callApi } from '../../src/apiHelpers'
@@ -15,6 +15,7 @@ const CreateCourse = ()=> {
     courseId: '',
     name: '',
     description: '',
+    prerequisites: '',
     duration: "",
     cost: 5,
     maintainers: [] as string[]
@@ -74,6 +75,13 @@ const CreateCourse = ()=> {
           type: 'text',
           value: formData.duration,
           onChange: e=> setFormData({...formData, duration: e.currentTarget.value})
+        })
+      ]),
+      h(Label, [
+        'duration',
+        h(Textarea, {
+          value: formData.duration,
+          onChange: e=> setFormData({...formData, prerequisites: e.currentTarget.value})
         })
       ]),
       h(Label, [
