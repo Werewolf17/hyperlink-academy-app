@@ -11,7 +11,6 @@ let prisma = new PrismaClient({
 export type CreateInstanceMsg = {
   courseId: string,
   start: string,
-  end: string,
   facillitator: string,
 }
 export type CreateInstanceResponse = ResultType<typeof createInstance>
@@ -48,7 +47,7 @@ export default multiRouteHandler('action', {
 async function createInstance(req: Request) {
   let msg = req.body as Partial<CreateInstanceMsg>
   if(!msg.courseId || !msg.start ||
-     !msg.end || !msg.facillitator) return {status: 400, result: "Error: invalid request, missing parameters"} as const
+     !msg.facillitator) return {status: 400, result: "Error: invalid request, missing parameters"} as const
 
   let user = getToken(req)
   if(!user) return {status: 403, result: "Error: no user logged in"} as const
@@ -84,7 +83,6 @@ async function createInstance(req: Request) {
       },
       data: {
         id,
-        end_date: msg.end,
         start_date: msg.start,
         courses: {
           connect: {

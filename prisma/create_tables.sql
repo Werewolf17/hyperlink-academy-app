@@ -38,18 +38,17 @@ CREATE TABLE IF NOT EXISTS course_maintainers (
     course        text REFERENCES courses(id) NOT NULL,
     maintainer    text REFERENCES people(id) NOT NULL
     PRIMARY KEY (person_id, instance_id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS admins (
     person text references people(id) UNIQUE NOT NULL PRIMARY KEY
-)
+);
 
 
 CREATE TABLE IF NOT EXISTS course_instances (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     start_date    text NOT NULL,
-    end_date      text NOT NULL,
-    facillitator  text REFERENCES people(id) NOT NULL
+    facillitator  text REFERENCES people(id) NOT NULL,
     course        text REFERENCES courses(id) NOT NULL
 );
 
@@ -57,4 +56,4 @@ CREATE TABLE IF NOT EXISTS people_in_instances (
     person_id     text REFERENCES people(id) NOT NULL,
     instance_id   text REFERENCES course_instances(id) NOT NULL,
     PRIMARY KEY (person_id, instance_id)
-)
+);

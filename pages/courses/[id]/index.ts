@@ -113,7 +113,7 @@ const Instances = (props: Pick<DetailsProps, 'instances'>) => {
               as:  `/courses/${instance.course}/${instance.id}`
             }, h('a', instance.id))),
             h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
-              h('strong', `${prettyDate(instance.start_date)} - ${prettyDate(instance.end_date)}`),
+              h('strong', `Starts ${prettyDate(instance.start_date)}`),
               h('div', `Facillitated by ${instance.people.display_name}`)
             ])
           ]),
@@ -137,7 +137,7 @@ const Settings = () => {
 }
 
 const AddInstance = ()=> {
-  let [newInstance, setNewInstance] = useState({start: '', end: '', facillitator: ''})
+  let [newInstance, setNewInstance] = useState({start: '', facillitator: ''})
   let [formState, setFormState] = useState<'normal' | 'error' |'success' | 'loading'>('normal')
   let router = useRouter()
   let {data:courseData, mutate} = useCourseData(router.query.id as string)

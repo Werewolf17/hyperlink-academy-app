@@ -25,7 +25,7 @@ export default (props: Props) => {
     h(Box, {}, instances.map(instance => {
       return h(InstanceCard, {href: 'https://forum.hyperlink.academy/c/' + instance.id}, [
         h('h3', instance.id),
-        h('h4', prettyDate(instance.start_date) + ' - ' + prettyDate(instance.end_date))
+        h('h4', prettyDate(instance.start_date))
       ])
     })
     )

@@ -49,7 +49,7 @@ const Enroll = (props: Props) => {
     ]),
     h(Divider),
     h(Box, {as: "form", onSubmit}, [
-      h(Label, [prettyDate(instance.start_date), ' - ', prettyDate(instance.end_date)]),
+      h(Label, [prettyDate(instance.start_date)]),
       h('p', 'facillitated by ' + instance.people?.display_name),
       h(Primary, {
         style: {width: '100%'},

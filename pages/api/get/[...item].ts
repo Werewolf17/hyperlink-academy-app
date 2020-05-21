@@ -60,7 +60,6 @@ async function getInstanceData(req: Request) {
     where: {id},
     select: {
       start_date: true,
-      end_date: true,
       people: {
         select: {display_name: true, username: true}
       },

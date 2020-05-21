@@ -22,7 +22,6 @@ model admins {
 
 model course_instances {
   course              String
-  end_date            String
   facillitator        String
   id                  String                @id
   start_date          String
