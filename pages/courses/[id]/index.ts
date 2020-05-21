@@ -7,14 +7,14 @@ import Link from 'next/link'
 import { Category } from '../../../src/discourse'
 import { Box, MediumWidth, Seperator } from '../../../components/Layout'
 
-import {Input, Label, Error, Info, Select} from '../../../components/Form'
-import {Primary} from '../../../components/Button'
+import { Input, Label, Error, Info, Select, Textarea} from '../../../components/Form'
+import { Primary, Secondary} from '../../../components/Button'
 import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
 import { useState, useEffect } from 'react'
 import { colors } from '../../../components/Tokens'
 import { useRouter } from 'next/router'
-import {CreateInstanceMsg, CreateInstanceResponse} from '../../api/courses/[action]'
+import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
 import { callApi } from '../../../src/apiHelpers'
 import Loader from '../../../components/Loader'
 
@@ -132,10 +132,11 @@ const Settings = () => {
       h(Seperator),
     ]),
     h(AddInstance),
+    h(EditDetails),
   ])
 }
 
-const AddInstance = ()=>{
+const AddInstance = ()=> {
   let [newInstance, setNewInstance] = useState({start: '', end: '', facillitator: ''})
   let [formState, setFormState] = useState<'normal' | 'error' |'success' | 'loading'>('normal')
   let router = useRouter()
@@ -185,7 +186,93 @@ const AddInstance = ()=>{
   ])
 }
 
+const EditDetails = ()=> {
+  let [formData, setFormData] = useState({
+    duration: '',
+    prerequisites: '',
+    description: ''
+  })
+  let [formState, setFormState] = useState<'normal' |'loading' | 'success' | 'error'>('normal')
+  let router = useRouter()
+  let courseId = router.query.id as string
+  let {data:course, mutate} = useCourseData(courseId)
+
+  useEffect(()=>{
+    if(course) setFormData({
+      duration: course.duration,
+      prerequisites: course.prerequisites,
+      description: course.description
+    })
+  }, [course])
+
+  let changed = course && (course.duration !== formData.duration
+                           || course.prerequisites !== formData.prerequisites
+                           || course.description !== formData.description)
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormState('loading')
+    let res = await callApi<UpdateCourseMsg, UpdateCourseResponse>('/api/courses/updateCourse', {...formData, id:courseId})
+    if(res.status === 200) {
+      setFormState('success')
+      console.log(res.result)
+      if(course) mutate({...course, ...res.result})
+    }
+    else {
+      setFormState('error')
+    }
+  }
+
+  return h('form', {onSubmit}, [
+    h(Box, {gap:32, style:{width: 400}}, [
+      h('h3', 'Edit Course Details'),
+      h(Box, {gap:8}, [h('b', 'Course Name'),h(Info, course?.name)]),
+      h(Box, {gap:8}, [h('b', 'Course Cost'),h(Info, course?.cost ? `$${course.cost}` : null)]),
+      h(Label, [
+        'Description',
+        h(Textarea, {
+          value: formData.description,
+          onChange: e => setFormData({...formData, description: e.currentTarget.value})
+        })
+      ]),
+      h(Label, [
+        'Prerequisites',
+        h(Textarea, {
+          value: formData.prerequisites,
+          onChange: e => setFormData({...formData, prerequisites: e.currentTarget.value})
+        })
+      ]),
+      h(Label, [
+        'Duration',
+        h(Input, {
+          value: formData.duration,
+          onChange: e => setFormData({...formData, duration: e.currentTarget.value})
+        })
+      ]),
+      h(SubmitButtons, [
+        h(Secondary, {disabled: !changed, red: changed,onClick: (e)=>{
+          e.preventDefault()
+          if(course)setFormData({
+            prerequisites: course.prerequisites,
+            duration: course.prerequisites,
+            description: course.description
+          })
+        }}, "Discard Changes"),
+        h(Primary, {type: 'submit', disabled: !changed},
+          formState === 'loading' ? h(Loader) : 'Save Changes')
+      ])
+    ])
+  ])
+}
+
 let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
+
+const SubmitButtons = styled('div')`
+justify-self: right;
+display: grid;
+grid-template-columns: auto auto;
+grid-gap: 16px;
+`
 
 const Cost = styled('div')`
 font-size: 64px;

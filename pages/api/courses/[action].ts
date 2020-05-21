@@ -30,10 +30,19 @@ export type CreateCourseMsg = {
 }
 export type CreateCourseResponse = ResultType<typeof createCourse>
 
+export type UpdateCourseMsg = {
+  id: string
+  prerequisites?: string
+  duration?: string
+  description: string
+}
+export type UpdateCourseResponse = ResultType<typeof updateCourse>
+
 export default multiRouteHandler('action', {
   createInstance,
   enroll,
-  createCourse
+  createCourse,
+  updateCourse
 })
 
 async function createInstance(req: Request) {
@@ -176,4 +185,35 @@ async function createCourse(req: Request) {
     },
   })
   return {status:200, result: "Course created"}
+}
+
+async function updateCourse(req: Request) {
+  let msg = req.body as Partial<UpdateCourseMsg>
+  if(!msg.id) return {status: 400, result: "ERROR: No course id provided"} as const
+  let user = getToken(req)
+  if(!user) return {status: 403, result: "ERROR: No user logged in"} as const
+  let isMaintainer = await prisma.people.findOne({
+    where:{id: user.id},
+    select: {
+      course_maintainers: {where: {course: msg.id}}
+    }
+  })
+
+  console.log(isMaintainer)
+
+  if(!isMaintainer || isMaintainer.course_maintainers.length === 0) return {
+    status: 403,
+    result: `ERROR: user is not maintainer of course ${msg.id}`
+  } as const
+
+  let newData = await prisma.courses.update({
+    where: {id: msg.id},
+    data: {
+      duration: msg.duration,
+      prerequisites: msg.prerequisites,
+      description: msg.description
+    }
+  })
+
+  return {status: 200, result: {prerequisites: newData.prerequisites, duration: newData.duration}} as const
 }
