@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Narrow, Box} from '../components/Layout'
 import {Form, Label, Input, Error, Info} from '../components/Form'
 import {Primary} from '../components/Button'
-import TitleImg from '../components/TitleImg'
+import {TitleImg, AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
@@ -142,13 +142,14 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
 
   return h(Narrow, [
     h(Box, {gap: 32}, [
-      h(TitleImg, {height: 100, width: 100, src: '/img/plane.gif'}),
+      h(AccentImg, {src: '/img/plane.gif'}),
       h('h1', 'Verify your email'),
       props.email ? h(Box, {gap: 8}, [
         `Sweet! We sent an email with a verification code to`,
         h(Info, props.email),
       ]) : null,
-      `Copy the code there and submit it here:`,
+      h(Box, {gap: 8}, [
+        `Copy the code there and submit it here:`,
       result === 'invalid' ? h(Error, {}, [
         'Your email link is invalid or out of date, please try ',
         h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
@@ -160,9 +161,10 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
             value: key,
             onChange: e=>setKey(e.currentTarget.value)
           })
+        ])
         ]),
-        h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, result  === 'loading' ? h(Loader) : "Confirm your email")
       ]),
+        h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, result  === 'loading' ? h(Loader) : "Confirm your email")
     ]),
   ])
 }
