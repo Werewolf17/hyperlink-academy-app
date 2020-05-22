@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import {colors} from  './Tokens'
 
 export const Primary = styled('button')<{disabled?: boolean}>`
-font-family: monospace;
+font-family: Roboto Mono;
 font-size: 14px;
 height: fit-content;
 width: fit-content;
@@ -11,7 +11,8 @@ color: white;
 padding: 8px 16px;
 border-radius: 2px;
 border: none;
-
+text-decoration:none;
+&:visited {color: white;}
 &:hover {
 cursor: pointer;
 }

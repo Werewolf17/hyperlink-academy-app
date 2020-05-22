@@ -62,7 +62,7 @@ const Instances = (props:{course: string}) => {
         let isFacillitator = user && instance.facillitator === user.id
         return [
           h(Box, {gap: 16}, [
-            h('div', [
+            !inInstance && !isFacillitator ? null : h('div', [
               inInstance ? h(Pill, 'enrolled') : null,
               ' ',
               isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,

@@ -66,8 +66,10 @@ const Settings = () => {
             })
           ]),
           h(Label, [
-            'A Link',
-            h(Description, "Add a link to where you're hanging on the internet (your website, twitter, etc)"),
+            h(Box, {gap:4}, [
+              'A Link',
+              h(Description, "Add a link to where you're hanging on the internet (your website, twitter, etc)"),
+            ]),
             h(Input, {
               value: formData.link,
               onChange: e=>setFormData({...formData, link: e.currentTarget.value})
@@ -97,6 +99,7 @@ export default Settings
 
 const Description = styled('p')`
 font-size: 0.75rem;
+font-weight: normal;
 color: ${colors.textSecondary};
 `
 
