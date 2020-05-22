@@ -52,19 +52,16 @@ async function getCourseData(req: Request) {
   return {status:200, result: data} as const
 }
 
-async function getInstanceData(req: Request) {
-  let id = req.query.item[1]
-  if(!id) return {status: 400, result: 'ERROR: no instance id provided'} as const
-
-  let data = await prisma.course_instances.findOne({
+export const instanceDataQuery = (id: string)=>prisma.course_instances.findOne({
     where: {id},
     select: {
       start_date: true,
+      id: true,
       people: {
         select: {display_name: true, username: true}
       },
       courses: {
-        select: {name: true, id: true, cost: true, duration: true}
+        select: {name: true, id: true, cost: true, duration: true, description: true}
       },
       people_in_instances: {
         include: {
@@ -77,7 +74,13 @@ async function getInstanceData(req: Request) {
         }
       }
     },
-  })
+})
+
+async function getInstanceData(req: Request) {
+  let id = req.query.item[1]
+  if(!id) return {status: 400, result: 'ERROR: no instance id provided'} as const
+
+  let data = await instanceDataQuery(id)
   if(!data) return {status: 404, result: `Error: no instance with id ${id} found`} as const
   return {status: 200, result: data} as const
 }

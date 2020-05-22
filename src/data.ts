@@ -23,12 +23,12 @@ export const useCourseData = (id: string, initialData?:Success<CourseDataResult>
   }, {initialData})
 }
 
-export const useInstanceData = (id: string) => {
+export const useInstanceData = (id: string, initialData?:Success<InstanceResult>) => {
   return useSWR('/api/get/instance/' + id, async api => {
     let res = await callApi<null, InstanceResult>(api)
     if(res.status === 200) return res.result
     else return false
-  })
+  }, {initialData})
 }
 
 export const useUserInstances = () => {
