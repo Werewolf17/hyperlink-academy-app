@@ -79,7 +79,7 @@ async function createInstance(req: Request) {
   try {
     let instance = await prisma.course_instances.create({
       include: {
-        people: {select: {display_name: true}}
+        people: {select: {display_name: true, username: true}}
       },
       data: {
         id,

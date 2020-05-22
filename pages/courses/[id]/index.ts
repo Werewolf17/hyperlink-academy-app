@@ -131,7 +131,7 @@ const AddInstance = ()=> {
     if(res.status === 200) {
       mutate({
         ...courseData,
-        course_instances: [...courseData.course_instances, res.result]
+        course_instances: [...courseData.course_instances, {...res.result, people_in_instances:[]}]
       })
       setFormState('success')
     }
