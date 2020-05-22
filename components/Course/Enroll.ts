@@ -27,8 +27,6 @@ const Enroll = (props: Props) => {
   let {data:course} = useCourseData(props.courseId)
   let {data: userInstances} = useUserInstances()
 
-  if(user === undefined || course=== undefined) return null
-
   const onSubmit = async (e: React.FormEvent)=>{
     e.preventDefault()
 
