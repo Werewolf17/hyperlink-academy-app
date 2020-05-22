@@ -9,6 +9,7 @@ import { colors } from '../../../components/Tokens'
 import { Tabs } from '../../../components/Tabs'
 import { Pill } from '../../../components/Pill'
 import { instanceDataQuery } from '../../api/get/[...item]'
+import { Primary } from '../../../components/Button'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -18,18 +19,22 @@ const InstancePage = (props:Props) => {
   let {data: instance} = useInstanceData(props.id, props.instance || undefined)
   if(instance === false) return null
 
-  let userInInstance = instance?.people_in_instances.find(p => p.person_id === (user ? user.id : undefined))
+  let inInstance = instance?.people_in_instances.find(p => p.person_id === (user ? user.id : undefined))
+  let isFacilitrator  = user && instance?.people.username === user.username
 
   return h(TwoColumn, [
     h(Box, {gap: 64}, [
-      h(Box, {gap: 16}, [
-        h('div', {style:{color:'blue'}}, ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a', 'back to course'))]),
-        h('h1', instance?.courses.name),
-        h(Details, [
-          h('b', instance?.id), h('span', '|'),
-          `Starts ${prettyDate(instance?.start_date || '')}`, h('span', '|'),
-          `Facillitated by ${instance?.people.display_name}`
+      h(Box, {gap: 32}, [
+        h(Box, {gap: 16}, [
+          h('div', {style:{color:'blue'}}, ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a', 'back to course'))]),
+          h('h1', instance?.courses.name),
+          h(Details, [
+            h('b', instance?.id), h('span', '|'),
+            `Starts ${prettyDate(instance?.start_date || '')}`, h('span', '|'),
+            `Facillitated by ${instance?.people.display_name}`
+          ]),
         ]),
+        inInstance || isFacilitrator ? h(Primary.withComponent('a'), {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}, 'Go to the forum') : null
       ]),
       h(Tabs, {
         tabs: {
@@ -63,7 +68,7 @@ const InstancePage = (props:Props) => {
         }
       })
     ]),
-    userInInstance ? null : h(Enroll, {instanceId: router.query.instanceID as string, courseId: router.query.id as string}),
+    inInstance ? null : h(Enroll, {instanceId: router.query.instanceID as string, courseId: router.query.id as string}),
   ])
 }
 
