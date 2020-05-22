@@ -5,6 +5,7 @@ import { Error } from '../../components/Form'
 import Loader from '../../components/Loader'
 import { Box } from '../../components/Layout'
 import {profileDataQuery} from '../api/get/[...item]'
+import { colors } from '../../components/Tokens'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -15,9 +16,12 @@ const Profile= (props: Props)=>{
   if(person === undefined) return h(Loader)
   if(person === false) return h(Error, 'No user found :(')
 
-  return h(Box, {gap: 16}, [
-    h('h1', person.display_name || username),
-    !person.link ? null : h('a', {href: person.link}, person.link),
+  return h(Box, {gap: 32}, [
+    h(Box, {gap: 8}, [
+      h('h1', person.display_name || username),
+      h('b', {style: {color: colors.textSecondary}}, `@${username}`),
+      !person.link ? null : h('a', {href: person.link}, h('b', person.link)),
+    ]),
     !person.bio ? null : h('div', person.bio)
   ])
 }
