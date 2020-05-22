@@ -49,10 +49,7 @@ const CoursePage = (props:Props) => {
             h(Box, {gap:32}, [
               h('h3', "Your Instances"),
               h(Box, {gap: 16}, [
-                ...userInstances.map(instance => h(InstanceCard, {
-                  start_date: instance.start_date,
-                  facillitator: instance.people.display_name || instance.people.username
-                }))
+                ...userInstances.map(instance => h(InstanceCard, instance))
               ])
             ])
           ])

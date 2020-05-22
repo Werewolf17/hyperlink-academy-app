@@ -3,7 +3,6 @@ import styled from '@emotion/styled'
 import {useStripe} from '@stripe/react-stripe-js'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import Link from 'next/link'
 
 import {EnrollMsg, EnrollResponse} from '../../pages/api/courses/[action]'
 import { Primary} from '../Button'
@@ -68,12 +67,7 @@ const Enroll = (props: Props) => {
         ]),
         ...course?.course_instances
           .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
-          .map(instance => h(Link, {href: "/courses/[id]/[instanceID]", as:`/courses/${props.courseId}/${instance.id}`},
-                             h(InstanceCard, {
-                               start_date: instance.start_date,
-                               facillitator: instance.people.display_name || instance.people.username
-                             }))
-              ) || []
+          .map(instance => h(InstanceCard, instance)) || []
       ])
   ])
 }
