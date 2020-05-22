@@ -12,6 +12,7 @@ import {colors} from '../Tokens'
 import Loader from '../Loader'
 import { useUserData, useCourseData, useUserInstances} from '../../src/data'
 import { callApi } from '../../src/apiHelpers'
+import Card from '../Card'
 
 type Props = {
   instanceId?: string,
@@ -59,17 +60,22 @@ const Enroll = (props: Props) => {
           style: {width: '100%'},
         }, loading ? h(Loader) : 'Enroll'),
       ])
-    : h('div', [
+      : h(Box, {gap: 16}, [
+        h('div', [
           h('h3', 'Enroll in an Instance'),
           h('div', {style: {color: colors.textSecondary, fontSize: '0.8rem', fontWeight: 'bold'}},
             'Click on an instance below for details'),
-          h('ul', course?.course_instances
-            .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
-            .map(instance => h('li', [
-              h(Link, {href: "/courses/[id]/[instanceID]", as:`/courses/${props.courseId}/${instance.id}`},
-                h('a', instance.id))
-            ])))
-        ])
+        ]),
+        ...course?.course_instances
+          .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
+          .map(instance => h(Link, {href: "/courses/[id]/[instanceID]", as:`/courses/${props.courseId}/${instance.id}`},
+                             h(InstanceCard, [
+                               h('h4', `Starts ${prettyDate(instance.start_date)}`),
+                               h('p', {style:{color: colors.textSecondary}},
+                                 `Facillitated by ${instance.people.display_name || instance.people.username}`)
+                             ]))
+              ) || []
+      ])
   ])
 }
 
@@ -89,4 +95,8 @@ display: inline;
 const Cost = styled('div')`
 font-size: 56px;
 font-weight: bold;
+`
+
+const InstanceCard = styled(Card)`
+padding: 16px
 `

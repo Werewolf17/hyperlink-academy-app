@@ -35,7 +35,8 @@ export const courseDataQuery = (id:string) => prisma.courses.findOne({
       include: {
         people: {
           select: {
-            display_name: true
+            display_name: true,
+            username: true
           }
         }
       }
