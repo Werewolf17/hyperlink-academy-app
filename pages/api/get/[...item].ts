@@ -38,6 +38,15 @@ export const courseDataQuery = (id:string) => prisma.courses.findOne({
             display_name: true,
             username: true
           }
+        },
+        people_in_instances: {
+          select: {
+            people: {
+              select: {
+                id: true
+              }
+            }
+          }
         }
       }
     }

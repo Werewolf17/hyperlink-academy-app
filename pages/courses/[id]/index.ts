@@ -19,12 +19,21 @@ import { courseDataQuery } from '../../api/get/[...item]'
 import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
 import { callApi } from '../../../src/apiHelpers'
 import Enroll from '../../../components/Course/Enroll'
+import { InstanceCard } from '../../../components/Card'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
 const CoursePage = (props:Props) => {
   let {data: user} = useUserData()
   let {data: course} = useCourseData(props.id, props.course || undefined)
+
+  let userInstances = course?.course_instances.filter(i => {
+    if(!user) return false
+    return i.facillitator === user.id
+      || i.people_in_instances
+      .find(p => p.people.id === (user ? user.id : undefined))
+  })
+  if(userInstances?.length === 0) userInstances = undefined
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   return h(TwoColumn, [
@@ -34,7 +43,19 @@ const CoursePage = (props:Props) => {
           h('h1', course?.name),
           h('span', {style:{color: 'blue'}}, [h('a',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum '), '➭'])
         ]),
-        course?.description || ''
+        course?.description || '',
+        !userInstances ? null :
+          h(Info, {style: {padding:'32px 32px', paddingBottom: '16px'}}, [
+            h(Box, {gap:32}, [
+              h('h3', "Your Instances"),
+              h(Box, {gap: 16}, [
+                ...userInstances.map(instance => h(InstanceCard, {
+                  start_date: instance.start_date,
+                  facillitator: instance.people.display_name || instance.people.username
+                }))
+              ])
+            ])
+          ])
       ]),
 
       h(Tabs, {tabs: {
