@@ -1,6 +1,5 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
-import { NextPage } from 'next'
 import Link from 'next/link'
 
 import Intro from '../writing/Intro.mdx'
@@ -11,9 +10,14 @@ import { useCourses, useUserData } from '../src/data'
 import { useRouter } from 'next/router'
 import TitleImg from '../components/TitleImg'
 import { useEffect } from 'react'
+import { coursesQuery } from './api/get/[...item]'
 
-const Landing:NextPage = () => {
-  let {data: courses} = useCourses()
+
+type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
+type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
+
+const Landing = (props:Props) => {
+  let {data: courses} = useCourses(props)
   let {data: user} = useUserData()
   let router = useRouter()
   useEffect(()=>{
@@ -60,6 +64,11 @@ const Welcome = ()=>{
     h(Title, 'hyperlink.academy'),
     h(Intro),
   ])
+}
+
+export const getStaticProps = async () => {
+  let courses = await coursesQuery()
+  return {props: {courses}, unstable_revalidate: 1} as const
 }
 
 const ImageContainer = styled('div')`
