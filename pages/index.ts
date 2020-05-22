@@ -8,7 +8,7 @@ import {colors} from '../components/Tokens'
 import { MediumWidth, Box } from '../components/Layout'
 import { useCourses, useUserData } from '../src/data'
 import { useRouter } from 'next/router'
-import TitleImg from '../components/TitleImg'
+import {TitleImg} from '../components/Images'
 import { useEffect } from 'react'
 import { coursesQuery } from './api/get/[...item]'
 

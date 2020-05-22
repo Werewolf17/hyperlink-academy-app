@@ -11,7 +11,7 @@ import { Result, Msg } from './api/login'
 import { RequestMsg, RequestResult } from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
-import TitleImg from '../components/TitleImg'
+import {TitleImg} from '../components/Images'
 
 const Login = () => {
   let router = useRouter()
