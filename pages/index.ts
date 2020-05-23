@@ -29,8 +29,14 @@ const Landing = (props:Props) => {
       h(Box, [
         h(Welcome),
         h(Box, {style:{textAlign: 'right'}}, [
-          h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
-          h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')
+          h('span', {style:{color: 'blue'}}, [
+            h(Link,{href: '/manual'}, h('a.mono', 'Read the manual' )), 
+            h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+          ]),
+          h('span', {style:{color: 'blue'}}, [
+            h('a.mono', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'), 
+            h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭') 
+          ]),
         ])
       ]),
       h(Box, {gap: 16}, [
@@ -50,7 +56,7 @@ const Landing = (props:Props) => {
       h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
         h('h2', 'The Course Kindergarten'),
         'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
-        h('a', {style: {justifySelf: 'end'}, href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},'Check out the kindergarten ➭')
+        h('span', {style:{color: 'blue', justifySelf: 'end'}}, [h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'), '\u00A0 ➭'])
       ]),
     ])
   ])
