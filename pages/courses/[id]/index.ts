@@ -41,7 +41,7 @@ const CoursePage = (props:Props) => {
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
           h('h1', course?.name),
-          h('span', {style:{color: 'blue'}}, [h('a',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum '), '➭'])
+          h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum'), ' ➭'])
         ]),
         course?.description || '',
         !userInstances ? null :
@@ -271,17 +271,66 @@ grid-row: 2;
 
 const Text = styled('div')`
 h1 {
-margin-bottom: 8px;
-margin-top: 16px;
+  margin-top: 64px;
+  margin-bottom: 8px;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+h2 {
+  margin-top: 32px;
+  margin-bottom: 8px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 900;
+  font-size: 1.375rem;
+
+}
+
+h3 {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+
+}
+
+h4 {
+  margin-top: 16px;
+  margin-bottom: 4px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 900;
+  font-size: .8rem;
+  color: ${colors.textSecondary};
+  text-transform: uppercase;
+}
+
+h5 {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: .8rem;
+  color: ${colors.textSecondary};
+}
+
+h6 {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  font-size: .8rem;
+  color: ${colors.textSecondary};
 }
 
 p {
-margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 li {
-margin-bottom: 8px;
-margin-top: 8px;
+  margin-bottom: 8px;
+  margin-top: 8px;
 }
 `
 export const getStaticProps = async (ctx:any) => {

@@ -68,13 +68,36 @@ html {
 
 a.notBlue {
   color: inherit;
-  a: visited {
-    color: inherit;
-  }
 }
+
+
+a.notBlue:visited {
+  color: inherit;
+}
+
+a.notBlue:hover {
+  color: #00008B;
+}
+
+a.mono {
+  font-family: 'Roboto Mono', mono;
+}
+
+a.notBlue:visited {
+  color: inherit;
+}
+
+a.notBlue:hover {
+  color: #00008B;
+}
+
 
 a:visited {
   color: blue;
+}
+
+a:hover {
+  color: #00008B;
 }
 
 h1, h2 {

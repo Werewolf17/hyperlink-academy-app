@@ -27,8 +27,14 @@ const Dashboard = (props:Props) => {
       h(Box, [
         h('h1', `Hello ${user.display_name || user.username}!`),
         h(Box, [
-          h(Link, {href: '/manual'}, h('a', 'Read the manual ➭' )),
-          h('a', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum')
+          h('span', {style:{color: 'blue'}}, [
+            h(Link,{href: '/manual'}, h('a.mono', 'Read the manual')), 
+            h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+          ]),
+          h('span', {style:{color: 'blue'}}, [
+            h('a.mono', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'), 
+            h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭') 
+          ]),
         ])
       ]),
       !instances ? null : h(Box, [
@@ -47,6 +53,10 @@ const Dashboard = (props:Props) => {
       h('hr'),
       !courses ? null : h(Box, {gap: 16}, [
         h('h2', "The Courses List"),
+        user.admin ? h('span', {style:{color: 'blue'}}, [
+          h(Link,{href: '/courses/create'},  h('a.mono', 'Publish a New Course')), 
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ]) : null,
         h(CourseGrid,
           courses.courses
           .map(course => {
@@ -58,12 +68,14 @@ const Dashboard = (props:Props) => {
               name: course.name,
             }, [])
           })),
-        user.admin ? h(Link, {href: '/courses/create'}, h('a', 'create a new course!')) : null
       ]),
       h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24,maxWidth: '640px' }}, [
         h('h2', 'The Course Kindergarten'),
         'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
-        h('a', {style: {justifySelf: 'end'}, href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},'Check out the kindergarten ➭')
+        h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
+          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'), 
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ])
       ]),
     ])
   ])
