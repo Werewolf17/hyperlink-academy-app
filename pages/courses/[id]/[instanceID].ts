@@ -72,7 +72,7 @@ const InstancePage = (props:Props) => {
                 })])
             ] )
           ]),
-          "Curriculumn": h('div', [
+          "Curriculum": h('div', [
 
           ])
         }
