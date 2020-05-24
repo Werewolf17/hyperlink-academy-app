@@ -140,9 +140,14 @@ color: ${colors.textSecondary};
 }
 `
 
-export const Box = styled('div')<{gap?: Spacing, mt?: Spacing, as?: string}>`
+export const Box = styled('div')<{gap?: Spacing, mt?: Spacing, as?: string, h?:true}>`
 display: grid;
-grid-auto-rows: min-content;
+${props => !props.h
+? 'grid-auto-rows: min-content'
+: `
+grid-auto-columns: max-content;
+grid-auto-flow: column;
+`};
 margin-top: ${props => props.mt || 0}px;
 grid-gap: ${props => props.gap || 16}px;
 `

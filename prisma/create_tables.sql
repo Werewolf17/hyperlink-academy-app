@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS activation_keys
     created_time  text NOT NULL,
     password_hash text NOT NULL,
     email         text NOT NULL,
-    username      text NOT NULL,
+    username      text NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS password_reset_keys
@@ -30,13 +30,13 @@ CREATE TABLE IF NOT EXISTS courses (
     category_id   integer NULL,
     duration      text NOT NULL,
     description   text NOT NULL,
-    cost          real NOT NULL
-    prerequisites text NOT NULL,
+    cost          real NOT NULL,
+    prerequisites text NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS course_maintainers (
     course        text REFERENCES courses(id) NOT NULL,
-    maintainer    text REFERENCES people(id) NOT NULL
+    maintainer    text REFERENCES people(id) NOT NULL,
     PRIMARY KEY (person_id, instance_id)
 );
 
@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS course_instances (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     start_date    text NOT NULL,
     facillitator  text REFERENCES people(id) NOT NULL,
-    course        text REFERENCES courses(id) NOT NULL
+    course        text REFERENCES courses(id) NOT NULL,
+    completed     text
 );
 
 CREATE TABLE IF NOT EXISTS people_in_instances (

@@ -3,7 +3,7 @@ import {colors} from  './Tokens'
 
 export const Primary = styled('button')<{disabled?: boolean}>`
 font-family: Roboto Mono;
-font-size: 14px;
+font-size: inherit;
 height: fit-content;
 width: fit-content;
 background-color: ${colors.grey15};
@@ -24,9 +24,8 @@ color: ${colors.grey55};
 `}}
 `
 
-export const Secondary = styled(Primary)<{disabled?:boolean, red?: boolean}>`
+export const Secondary = styled(Primary)<{disabled?:boolean}>`
 border: 2px solid;
-padding: 6px 16px;
 box-sizing: border-box;
 border-color: ${colors.grey15};
 color: black;
@@ -37,12 +36,11 @@ if(props.disabled) return `
 border-color: ${colors.grey80};
 color: ${colors.grey55};
 `}}
+`
 
-${props => {
-if(props.red) return `
+export const Destructive = styled(Secondary)`
 color: ${colors.accentRed};
 border-color: ${colors.accentRed};
-`}}
 `
 
 export const LinkButton = styled('a')`

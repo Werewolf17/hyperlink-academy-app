@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 import { Narrow, Box} from '../components/Layout'
 import { Input, Textarea, Info, Label} from '../components/Form'
-import { Primary, Secondary} from '../components/Button'
+import { Primary, Destructive} from '../components/Button'
 
 import {Msg, Result} from './api/updatePerson'
 import Loader from '../components/Loader'
@@ -84,7 +84,7 @@ const Settings = () => {
           ]),
         ]),
         h(SubmitButtons, [
-          h(Secondary, {disabled: !changed, red: changed,onClick: ()=>{
+          h(Destructive, {disabled: !changed, onClick: ()=>{
             if(user)setFormData({bio: user.bio ||'', display_name: user.display_name||'', link: user.link || ''})
           }}, "Discard Changes"),
           h(Primary, {type: 'submit', disabled: !changed},

@@ -13,7 +13,7 @@ import { Input, Label, Error, Info, Select, Textarea} from '../../../components/
 import {Pill} from '../../../components/Pill'
 
 import { Category } from '../../../src/discourse'
-import { Primary, Secondary} from '../../../components/Button'
+import { Primary, Destructive} from '../../../components/Button'
 import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
 import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
@@ -45,12 +45,10 @@ const CoursePage = (props:Props) => {
         ]),
         course?.description || '',
         !userInstances ? null :
-          h(Info, {style: {padding:'32px 32px', paddingBottom: '16px'}}, [
-            h(Box, {gap:32}, [
+          h(Info, {style: {padding:'32px'}}, [
+            h(Box, {gap:16}, [
               h('h3', "Your Instances"),
-              h(Box, {gap: 16}, [
-                ...userInstances.map(instance => h(InstanceCard, instance))
-              ])
+              ...userInstances.map(instance => h(InstanceCard, instance))
             ])
           ])
       ]),
@@ -227,7 +225,7 @@ const EditDetails = ()=> {
         })
       ]),
       h(SubmitButtons, [
-        h(Secondary, {disabled: !changed, red: changed,onClick: (e)=>{
+        h(Destructive, {disabled: !changed, onClick: (e)=>{
           e.preventDefault()
           if(course)setFormData({
             prerequisites: course.prerequisites,

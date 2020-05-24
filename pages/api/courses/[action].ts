@@ -37,12 +37,32 @@ export type UpdateCourseMsg = {
 }
 export type UpdateCourseResponse = ResultType<typeof updateCourse>
 
+export type CompleteInstanceMsg = {
+  instanceId: string
+}
+export type CompleteInstanceResponse = ResultType<typeof completeInstance>
+
 export default multiRouteHandler('action', {
   createInstance,
   enroll,
   createCourse,
-  updateCourse
+  updateCourse,
+  completeInstance
 })
+
+async function completeInstance(req:Request) {
+  let msg = req.body as Partial<CompleteInstanceMsg>
+  if(!msg.instanceId) return {status: 400, result: "Error: invalid request, missing parameters"} as const
+  let completed = (new Date()).toISOString()
+  let newData = await prisma.course_instances.update({
+    where: {id:msg.instanceId},
+    data: {
+      completed
+    }
+  })
+  if(!newData) return {status: 404, result: `No instance with id ${msg.instanceId} found`} as const
+  return {status:200, result: {completed}} as const
+}
 
 async function createInstance(req: Request) {
   let msg = req.body as Partial<CreateInstanceMsg>
@@ -72,7 +92,6 @@ async function createInstance(req: Request) {
       }
     },
   })
-  await prisma.disconnect()
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
 
   let id = course.id + '-' + course.course_instances.length

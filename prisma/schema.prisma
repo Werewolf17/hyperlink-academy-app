@@ -21,6 +21,7 @@ model admins {
 }
 
 model course_instances {
+  completed           String?
   course              String
   facillitator        String
   id                  String                @id

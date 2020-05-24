@@ -67,6 +67,7 @@ export const instanceDataQuery = (id: string)=>prisma.course_instances.findOne({
     select: {
       start_date: true,
       id: true,
+      completed: true,
       people: {
         select: {display_name: true, username: true}
       },

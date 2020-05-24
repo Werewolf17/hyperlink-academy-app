@@ -58,7 +58,7 @@ const Dashboard = (props:Props) => {
           h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
         ]) : null,
         h(CourseGrid,
-          courses.courses
+          courses?.courses
           .map(course => {
             return h(CourseCard, {
               key: course.id,
