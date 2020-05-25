@@ -7,7 +7,7 @@ import Head from 'next/head'
 import h from 'react-hyperscript'
 import { Fragment } from 'react'
 
-import {Spacing, colors} from './Tokens'
+import { Spacing, colors, Widths} from './Tokens'
 
 const Layout:React.SFC = (props)=>{
   const {data: user}= useUserData()
@@ -48,6 +48,7 @@ font-size: 24px;
 
 const Body = styled('div')`
 max-width: 968px;
+width: 100%;
 padding-bottom: 32px;
 margin: auto;
 
@@ -58,6 +59,8 @@ padding: 24px;
 
 
 const GlobalStyles = css`
+.textSecondary { color: ${colors.textSecondary} };
+
 html {
   overflow-y: scroll;
   line-height: 1.375;
@@ -140,16 +143,30 @@ color: ${colors.textSecondary};
 }
 `
 
-export const Box = styled('div')<{gap?: Spacing, mt?: Spacing, as?: string, h?:true}>`
+export const Box = styled('div')<{
+  gap?: Spacing,
+  padding?: Spacing,
+  mt?: Spacing,
+  as?: string,
+  h?:true,
+  ma?: true,
+  height?: number,
+  width?:Widths
+}>`
 display: grid;
+${props=> props.width ? 'max-width:' + props.width + 'px;' : ''}
+padding: ${props=> props.padding? props.padding : '0'}px;
+
 ${props => !props.h
 ? 'grid-auto-rows: min-content'
 : `
 grid-auto-columns: max-content;
 grid-auto-flow: column;
 `};
+
 margin-top: ${props => props.mt || 0}px;
 grid-gap: ${props => props.gap || 16}px;
+${props=> props.ma ? 'margin: auto;':''}
 `
 
 export const MediumWidth = styled('div')`

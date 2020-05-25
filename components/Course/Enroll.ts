@@ -11,7 +11,7 @@ import {colors} from '../Tokens'
 import Loader from '../Loader'
 import { useUserData, useCourseData, useUserInstances} from '../../src/data'
 import { callApi } from '../../src/apiHelpers'
-import { InstanceCard } from '../Card'
+import { SmallInstanceCard } from '../Card'
 
 type Props = {
   instanceId?: string,
@@ -69,7 +69,7 @@ const Enroll = (props: Props) => {
         ]),
         ...course?.course_instances
           .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
-          .map(instance => h(InstanceCard, instance)) || []
+          .map(instance => h(SmallInstanceCard, instance)) || []
       ])
   ])
 }

@@ -5,9 +5,9 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import Intro from '../writing/Intro.mdx'
-import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
+import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
-import { MediumWidth, Box } from '../components/Layout'
+import { Box } from '../components/Layout'
 import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
@@ -24,51 +24,51 @@ const Landing = (props:Props) => {
     if(user) router.push('/dashboard')
   }, [user])
 
-  return h(MediumWidth, [
-    h(Box, {gap:48}, [
-      h(Box, [
-        h(Welcome),
-        h(Box, {style:{textAlign: 'right'}}, [
-          h('span', {style:{color: 'blue'}}, [
-            h(Link,{href: '/manual'}, h('a.mono', 'Read the manual' )), 
-            h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
-          ]),
-          h('span', {style:{color: 'blue'}}, [
-            h('a.mono', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'), 
-            h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭') 
-          ]),
-        ])
-      ]),
-      h(Box, {gap: 16}, [
-        h('h2', "The Courses List"),
-        !courses ? null : h(CourseGrid,
-                            courses.courses
-                            .map(course => {
-                              return h(CourseCard, {
-                                key: course.id,
-                                id: course.id,
-                                description: course.description,
-                                start_date: new Date(course.course_instances[0]?.start_date),
-                                name: course.id,
-                              }, [])
-                            })),
-      ]),
-      h(Box, {gap: 16, style:{backgroundColor: colors.grey95, padding: 24}}, [
-        h('h2', 'The Course Kindergarten'),
-        'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
-        h('span', {style:{color: 'blue', justifySelf: 'end'}}, [h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'), '\u00A0 ➭'])
-      ]),
+  return h(Box, {gap:48}, [
+    h(Welcome),
+    h('hr'),
+    h(Box, {gap: 16}, [
+      h('h2', "The Courses List"),
+      !courses ? null : h(FlexGrid, {min: 400, mobileMin: 200},
+                          courses.courses
+                          .map(course => {
+                            return h(CourseCard, {
+                              key: course.id,
+                              id: course.id,
+                              description: course.description,
+                              start_date: new Date(course.course_instances[0]?.start_date),
+                              name: course.name,
+                            }, [])
+                          })),
+    ]),
+    h(Box, {width: 640, ma: true, gap: 16, padding: 16, style:{backgroundColor: colors.grey95}}, [
+      h('h2', 'The Course Kindergarten'),
+      h('p', `The course kindergarten is where we grow new courses. Check out some in
+development, or propose your own!`),
+      h('span', {style:{color: 'blue', justifySelf: 'end'}}, [h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'), '\u00A0 ➭'])
     ])
   ])
 }
 
 const Welcome = ()=>{
-  return h(Box, {gap:32, style:{paddingBottom: '48px'}}, [
+  return h(Box, {gap:32}, [
     h(ImageContainer, [
       h(TitleImg, {height: 218, width: 640, src:'/img/landing.png', style: {border: 'none'}}),
     ]),
-    h(Title, 'hyperlink.academy'),
-    h(Intro),
+    h(Box, {ma: true, width: 640}, [
+      h(Title, 'hyperlink.academy'),
+      h(Intro),
+      h(Box, {style:{textAlign: 'right'}}, [
+        h('span', {style:{color: 'blue'}}, [
+          h(Link,{href: '/manual'}, h('a.mono', 'Read the manual' )),
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ]),
+        h('span', {style:{color: 'blue'}}, [
+          h('a.mono', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ]),
+      ])
+    ]),
   ])
 }
 

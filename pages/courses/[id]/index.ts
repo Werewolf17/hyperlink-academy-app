@@ -12,7 +12,7 @@ import Loader from '../../../components/Loader'
 import { Input, Label, Error, Info, Select, Textarea} from '../../../components/Form'
 import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
-import { InstanceCard } from '../../../components/Card'
+import { SmallInstanceCard } from '../../../components/Card'
 
 import { Category } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
@@ -48,7 +48,7 @@ const CoursePage = (props:Props) => {
           h(Info, {style: {padding:'32px'}}, [
             h(Box, {gap:16}, [
               h('h3', "Your Instances"),
-              ...userInstances.map(instance => h(InstanceCard, instance))
+              ...userInstances.map(instance => h(SmallInstanceCard, instance))
             ])
           ])
       ]),

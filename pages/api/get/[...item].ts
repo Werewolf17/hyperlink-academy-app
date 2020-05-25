@@ -134,9 +134,21 @@ async function getCourses() {
 async function getUserInstances(req:Request) {
   let token = getToken(req)
   if(!token) return {status: 403 as const, result: "Error: no user logged in"}
-  let course_instances = await prisma.course_instances.findMany({where:{
-    people_in_instances: {some: {person_id: token.id}}
-  }})
+  let course_instances = await prisma.course_instances.findMany({
+    where:{
+      people_in_instances: {some: {person_id: token.id}}
+    },
+    include:{
+      courses: {select: {name: true}},
+      people: {
+        select: {
+          display_name: true,
+          username: true,
+        }
+
+      }
+    },
+  })
   await prisma.disconnect()
   return {status: 200, result: {course_instances}} as const
 }
