@@ -57,7 +57,7 @@ const ResetPassword = ()=>{
               onChange: e => setFormData({...formData, confirmPassword:e.target.value})
             })
           ]),
-          h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'submit')
+          h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
         ])
       ])
     case 'success': return h(Info, [

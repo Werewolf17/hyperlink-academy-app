@@ -19,6 +19,7 @@ padding: 12px 16px;
 border: 1px solid;
 border-color: ${colors.grey55};
 font-size: inherit;
+font-family: inherit;
 `
 
 export const Textarea = styled('textarea')`
@@ -60,6 +61,7 @@ const SelectEl = styled('select')`
 width: 100%;
 border: 1px solid;
 border-color: ${colors.grey55};
+font-size: inherit;
 
 background-color: inherit;
 padding: 12px 16px;

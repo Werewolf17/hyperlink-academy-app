@@ -41,6 +41,12 @@ color: ${colors.grey55};
 export const Destructive = styled(Secondary)`
 color: ${colors.accentRed};
 border-color: ${colors.accentRed};
+
+${props => {
+if(props.disabled) return `
+border-color: ${colors.grey80};
+color: ${colors.grey55};
+`}}
 `
 
 export const LinkButton = styled('a')`

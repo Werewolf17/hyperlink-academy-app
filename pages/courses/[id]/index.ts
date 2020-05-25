@@ -78,15 +78,17 @@ const Instances = (props:{course: string}) => {
         let isFacillitator = user && instance.facillitator === user.id
         return [
           h(Box, {gap: 16}, [
-            !inInstance && !isFacillitator ? null : h('div', [
-              inInstance ? h(Pill, 'enrolled') : null,
-              ' ',
-              isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,
+            h(Box, {gap: 8}, [
+              !inInstance && !isFacillitator ? null : h('div', [
+                inInstance ? h(Pill, 'enrolled') : null,
+                ' ',
+                isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,
+              ]),
+              h('h3', {}, h(Link, {
+                href:'/courses/[id]/[instanceID]',
+                as:  `/courses/${instance.course}/${instance.id}`
+              }, h('a', instance.id))),
             ]),
-            h('h3', {}, h(Link, {
-              href:'/courses/[id]/[instanceID]',
-              as:  `/courses/${instance.course}/${instance.id}`
-            }, h('a', instance.id))),
             h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
               h('strong', `Starts ${prettyDate(instance.start_date)}`),
               h('div', `Facillitated by ${instance.people.display_name}`)
@@ -229,7 +231,7 @@ const EditDetails = ()=> {
           e.preventDefault()
           if(course)setFormData({
             prerequisites: course.prerequisites,
-            duration: course.prerequisites,
+            duration: course.duration,
             description: course.description
           })
         }}, "Discard Changes"),
