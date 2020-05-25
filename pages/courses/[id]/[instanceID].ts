@@ -32,18 +32,18 @@ const InstancePage = (props:Props) => {
 
   return h(TwoColumn, [
     !instance ? null : h(WelcomeModal, {display:router.query.welcome !== undefined, instance}),
-    h(Box, {gap: 64, style: {marginTop: "-38px"}}, [
+    h(Box, {gap: 64}, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
           h('div', {style:{color:colors.textSecondary}}, ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', 'back to the course'))]),
           h('h1', instance?.courses.name),
-          h(Details, [
-            h('b', instance?.id), h('span', '|'),
-            `Starts ${prettyDate(instance?.start_date || '')}`, h('span', '|'),
+          h('span', [
+            h('b', instance?.id), h('span', ' | '),
+            `Starts ${prettyDate(instance?.start_date || '')}`, h('span', ' | '),
             `Facillitated by ${instance?.people.display_name}`
           ]),
         ]),
-        h(Box, {h: true}, [
+        h(Box, [
           inInstance || isFacilitator
             ? h('a', {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}
                 , h(Primary, 'Go to the forum')) : null,
@@ -93,13 +93,6 @@ let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefine
 let LearnerEntry = styled('div')`
 display: grid;
 grid-template-columns: max-content min-content;
-grid-gap: 16px;
-`
-
-let Details = styled('span')`
-color: ${colors.textSecondary};
-display: grid;
-grid-template-columns: repeat(5, max-content);
 grid-gap: 16px;
 `
 

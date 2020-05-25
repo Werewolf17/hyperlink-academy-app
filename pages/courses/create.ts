@@ -64,9 +64,8 @@ const CreateCourse = ()=> {
       ]),
       h(Label, [
         'description',
-        h(Input, {
+        h(Textarea, {
           required: true,
-          type: 'text',
           value: formData.description,
           onChange: e=> setFormData({...formData, description: e.currentTarget.value})
         })
@@ -80,9 +79,9 @@ const CreateCourse = ()=> {
         })
       ]),
       h(Label, [
-        'duration',
+        'prerequisites',
         h(Textarea, {
-          value: formData.duration,
+          value: formData.prerequisites,
           onChange: e=> setFormData({...formData, prerequisites: e.currentTarget.value})
         })
       ]),
