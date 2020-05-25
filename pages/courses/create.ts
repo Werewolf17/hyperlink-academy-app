@@ -1,12 +1,14 @@
 import h from 'react-hyperscript'
-import { useUserData } from '../../src/data'
 import { useRouter } from 'next/router'
+import { useState, useEffect } from 'react'
+
 import { Form, Input, Label, Error, Info, Textarea} from '../../components/Form'
 import { Primary } from '../../components/Button'
-import { useState, useEffect } from 'react'
+import Loader from '../../components/Loader'
+
 import { callApi } from '../../src/apiHelpers'
 import { CreateCourseMsg, CreateCourseResponse } from '../api/courses/[action]'
-import Loader from '../../components/Loader'
+import { useUserData } from '../../src/data'
 
 const CreateCourse = ()=> {
   let {data: user} = useUserData()

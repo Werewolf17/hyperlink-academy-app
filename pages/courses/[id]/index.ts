@@ -11,6 +11,8 @@ import { colors } from '../../../components/Tokens'
 import Loader from '../../../components/Loader'
 import { Input, Label, Error, Info, Select, Textarea} from '../../../components/Form'
 import {Pill} from '../../../components/Pill'
+import Enroll from '../../../components/Course/Enroll'
+import { InstanceCard } from '../../../components/Card'
 
 import { Category } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
@@ -18,8 +20,6 @@ import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
 import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
 import { callApi } from '../../../src/apiHelpers'
-import Enroll from '../../../components/Course/Enroll'
-import { InstanceCard } from '../../../components/Card'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']

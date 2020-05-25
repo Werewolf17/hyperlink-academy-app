@@ -1,11 +1,11 @@
 import h from 'react-hyperscript'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { MediumWidth, Box} from '../components/Layout'
 import { useUserInstances, useUserData, useCourses } from '../src/data'
-import { useRouter } from 'next/router'
 import { coursesQuery } from './api/get/[...item]'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T

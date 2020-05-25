@@ -1,17 +1,17 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 import { Narrow, Box} from '../components/Layout'
 import { Input, Textarea, Info, Label} from '../components/Form'
 import { Primary, Destructive} from '../components/Button'
+import Loader from '../components/Loader'
+import { colors } from '../components/Tokens'
 
 import {Msg, Result} from './api/updatePerson'
-import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
 import { callApi } from '../src/apiHelpers'
-import { useRouter } from 'next/router'
-import { colors } from '../components/Tokens'
 
 const Settings = () => {
   let router = useRouter()

@@ -1,20 +1,22 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/router'
-import { useInstanceData, useUserData } from '../../../src/data'
 import Link from 'next/link'
+import { useState } from 'react'
+
 import Enroll from '../../../components/Course/Enroll'
 import { TwoColumn, Box, Seperator} from '../../../components/Layout'
 import { colors } from '../../../components/Tokens'
 import { Tabs } from '../../../components/Tabs'
 import { Pill } from '../../../components/Pill'
-import { instanceDataQuery } from '../../api/get/[...item]'
 import { Primary, Destructive } from '../../../components/Button'
-import { callApi } from '../../../src/apiHelpers'
-import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses/[action]'
-import { useState } from 'react'
 import Loader from '../../../components/Loader'
 import { Info } from '../../../components/Form'
+
+import { callApi } from '../../../src/apiHelpers'
+import { instanceDataQuery } from '../../api/get/[...item]'
+import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses/[action]'
+import { useInstanceData, useUserData } from '../../../src/data'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']

@@ -1,15 +1,15 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {CourseGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { MediumWidth, Box } from '../components/Layout'
-import { useCourses, useUserData } from '../src/data'
-import { useRouter } from 'next/router'
 import {TitleImg} from '../components/Images'
-import { useEffect } from 'react'
+import { useCourses, useUserData } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 
 

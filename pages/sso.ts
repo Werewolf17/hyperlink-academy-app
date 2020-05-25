@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import {useRouter} from 'next/router'
 import {getToken} from '../src/token'
 import { GetServerSideProps } from 'next'
+
 import { makeSSOPayload } from '../src/discourse'
 
 type Props = {error:boolean}

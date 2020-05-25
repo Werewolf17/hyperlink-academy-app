@@ -1,10 +1,12 @@
 import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
-import { useProfileData } from '../../src/data'
+
 import { Error } from '../../components/Form'
 import Loader from '../../components/Loader'
 import { Box } from '../../components/Layout'
 import {profileDataQuery} from '../api/get/[...item]'
+
+import { useProfileData } from '../../src/data'
 import { colors } from '../../components/Tokens'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
