@@ -12,6 +12,7 @@ import { Pill } from '../../../components/Pill'
 import { Primary, Destructive } from '../../../components/Button'
 import Loader from '../../../components/Loader'
 import { Info } from '../../../components/Form'
+import { Modal } from '../../../components/Modal'
 
 import { callApi } from '../../../src/apiHelpers'
 import { instanceDataQuery } from '../../api/get/[...item]'
@@ -30,6 +31,7 @@ const InstancePage = (props:Props) => {
   let isFacilitator  = user && instance?.people.username === user.username
 
   return h(TwoColumn, [
+    !instance ? null : h(WelcomeModal, {display:router.query.welcome !== undefined, instance}),
     h(Box, {gap: 64, style: {marginTop: "-38px"}}, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
@@ -42,7 +44,9 @@ const InstancePage = (props:Props) => {
           ]),
         ]),
         h(Box, {h: true}, [
-          inInstance || isFacilitator ? h(Primary.withComponent('a'), {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}, 'Go to the forum') : null,
+          inInstance || isFacilitator
+            ? h('a', {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}
+                , h(Primary, 'Go to the forum')) : null,
           instance && !instance.completed && isFacilitator ? h(MarkInstanceComplete, {id:props.id}) : null
         ]),
         instance && instance.completed && (inInstance || isFacilitator)
@@ -112,6 +116,26 @@ const MarkInstanceComplete = (props:{id: string})=>{
     if(res.status === 200) mutate({...instance, completed: res.result.completed})
     setLoading(false)
   }}, loading ? h(Loader) : 'Mark as complete')
+}
+
+const WelcomeModal = (props: {display:boolean, instance:{start_date: string, id: string, courses: {id: string}}})=>{
+  return h(Modal, {display:props.display}, [
+    h(Box, {gap: 32}, [
+      h('h2', "You're enrollled!"),
+      h(Info, {}, h('b', `This instance starts on ${prettyDate(props.instance.start_date)}`)),
+      h('p',
+        `For now, you can head to the instance form to introduce yourself see what you
+you'll be doing on your first day`),
+      h('a', {
+        style: {margin: 'auto'},
+        href: `https://forum.hyperlink.academy/c/${props.instance.courses.id}/${props.instance.id}`
+      }, h(Primary, "Get started")),
+      h(Link, {
+        href:'/courses/[id]/[instanceID]',
+        as: `/courses/${props.instance.courses.id}/${props.instance.id}`
+      }, 'Back to the instance page')
+    ])
+  ])
 }
 
 const CompleteBanner = (props:{completed:string | null, id: string, courses:{id: string}})=>{

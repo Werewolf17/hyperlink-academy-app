@@ -155,8 +155,8 @@ async function enroll (req: Request) {
       currency: 'usd',
       quantity: 1,
     }],
-    cancel_url: `${req.headers.origin}/courses/${instance.course}`,
-    success_url: `${req.headers.origin}/courses/${instance.course}?success`,
+    cancel_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}`,
+    success_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}?welcome`,
     customer_email: user.email,
     metadata: {
       instanceId: instance.id,
