@@ -6,7 +6,7 @@ import { useState } from 'react'
 
 import Enroll from '../../../components/Course/Enroll'
 import { TwoColumn, Box, Seperator} from '../../../components/Layout'
-import { colors } from '../../../components/Tokens'
+import { colors, Mobile } from '../../../components/Tokens'
 import { Tabs } from '../../../components/Tabs'
 import { Pill } from '../../../components/Pill'
 import { Primary, Destructive } from '../../../components/Button'
@@ -30,61 +30,63 @@ const InstancePage = (props:Props) => {
   let inInstance = instance?.people_in_instances.find(p => p.person_id === (user ? user.id : undefined))
   let isFacilitator  = user && instance?.people.username === user.username
 
-  return h(TwoColumn, [
-    !instance ? null : h(WelcomeModal, {display:router.query.welcome !== undefined, instance}),
-    h(Box, {gap: 64}, [
-      h(Box, {gap: 32}, [
-        h(Box, {gap: 16}, [
-          h('div', {style:{color:colors.textSecondary}}, ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', 'back to the course'))]),
-          h('h1', instance?.courses.name),
-          h('span', [
-            h('b', instance?.id), h('span', ' | '),
-            `Starts ${prettyDate(instance?.start_date || '')}`, h('span', ' | '),
-            `Facillitated by ${instance?.people.display_name}`
+  return h('div', {}, [
+    instance && instance.completed && (inInstance || isFacilitator)
+      ? h(CompleteBanner, instance) : null,
+    h(TwoColumn, [
+      !instance ? null : h(WelcomeModal, {display:router.query.welcome !== undefined, instance}),
+      h(Box, {gap: 64}, [
+        h(Box, {gap: 32}, [
+          h(Box, {gap: 16}, [
+            h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', 'back to the course'))]),
+            h('h1', instance?.courses.name),
+            h('span', [
+              h('b', instance?.id), h('span', ' | '),
+              `Starts ${prettyDate(instance?.start_date || '')}`, h('span', ' | '),
+              `Facillitated by ${instance?.people.display_name}`
+            ]),
+          ]),
+          h(Box, [
+            inInstance || isFacilitator
+              ? h('a', {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}
+                  , h(Primary, 'Go to the forum')) : null,
+            instance && !instance.completed && isFacilitator ? h(MarkInstanceComplete, {id:props.id}) : null
           ]),
         ]),
-        h(Box, [
-          inInstance || isFacilitator
-            ? h('a', {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}
-                , h(Primary, 'Go to the forum')) : null,
-          instance && !instance.completed && isFacilitator ? h(MarkInstanceComplete, {id:props.id}) : null
-        ]),
-        instance && instance.completed && (inInstance || isFacilitator)
-          ? h(CompleteBanner, instance) : null,
-      ]),
-      h(Tabs, {
-        tabs: {
-          "Instance Details": h(Box, {gap: 64}, [
-            h(Box, {gap: 32},[
-              h(Box, {gap: 8}, [
-                h('h3', 'Participants'),
-              ]),
-              h(Box, {gap:16}, !instance ? [] : [
-                h(LearnerEntry, [
-                  h(Link, {
-                    href: '/people/[id]',
-                    as: `/people/${instance.people.username}`
-                  }, h('a', {className: 'notBlue'}, instance.people.display_name || instance.people.username)),
-                  h(Pill, {borderOnly: true}, 'facilitator')
+        h(Tabs, {
+          tabs: {
+            "Instance Details": h(Box, {gap: 64}, [
+              h(Box, {gap: 32},[
+                h(Box, {gap: 8}, [
+                  h('h3', 'Participants'),
                 ]),
-                h(Seperator),
-                ...instance.people_in_instances
-                .map((person)=>{
-                  return h(LearnerEntry, [
+                h(Box, {gap:16}, !instance ? [] : [
+                  h(LearnerEntry, [
                     h(Link, {
                       href: '/people/[id]',
-                      as: `/people/${person.people.username}`
-                    }, h('a', {className: 'notBlue'},person.people.display_name || person.people.username))])
-                })])
-            ] )
-          ]),
-          "Curriculum": h('div', [
+                      as: `/people/${instance.people.username}`
+                    }, h('a', {className: 'notBlue'}, instance.people.display_name || instance.people.username)),
+                    h(Pill, {borderOnly: true}, 'facilitator')
+                  ]),
+                  h(Seperator),
+                  ...instance.people_in_instances
+                    .map((person)=>{
+                      return h(LearnerEntry, [
+                        h(Link, {
+                          href: '/people/[id]',
+                          as: `/people/${person.people.username}`
+                        }, h('a', {className: 'notBlue'},person.people.display_name || person.people.username))])
+                    })])
+              ] )
+            ]),
+            "Curriculum": h('div', [
 
-          ])
-        }
-      })
-    ]),
-    inInstance ? null : h(Enroll, {instanceId: router.query.instanceID as string, courseId: router.query.id as string}),
+            ])
+          }
+        })
+      ]),
+      inInstance ? null : h(Enroll, {instanceId: router.query.instanceID as string, courseId: router.query.id as string}),
+    ])
   ])
 }
 
@@ -132,11 +134,36 @@ you'll be doing on your first day`),
 }
 
 const CompleteBanner = (props:{completed:string | null, id: string, courses:{id: string}})=>{
-  return h(Info, {style:{padding: '32px', marginBottom: '16px'}}, h(Box, {gap: 16}, [
-    h('h3', `You completed this course on ${prettyDate(props.completed || '')}!`),
-    h('p', [`This instance's `, h('a', {href: `https://forum.hyperlink.academy/c/${props.courses.id}/${props.id}`}, 'private forum'), ` will always be open! Feel free to come back whenever`])
-  ]))
+  return h(Banner, {}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
+    h(Box, {gap: 8, className: "textSecondary"}, [
+      h('h4', `You completed this course on ${prettyDate(props.completed || '')}!`),
+      h('p', [`This instance's `, h('a', {href: `https://forum.hyperlink.academy/c/${props.courses.id}/${props.id}`}, 'private forum'), ` will always be open! Feel free to come back whenever`])
+    ])
+  ])))
 }
+
+const BannerInner = styled('div')`
+display: grid;
+grid-template-columns: 640px 240px;
+grid-gap: 64px;
+@media(max-width: 1016px) {
+grid-template-columns: auto;
+grid-template-rows: auto ;
+}
+`
+
+const Banner = styled('div')`
+background-color: ${colors.grey95};
+position: relative;
+width: calc(100vw);
+position: relative;
+left: calc(50% - 50vw);
+margin-bottom: 16px;
+margin-top: -48px;
+${Mobile}{
+margin-top: 0px
+}
+`
 
 export const getStaticProps = async (ctx:any)=>{
   let id = (ctx.params?.instanceID || '' )as string
