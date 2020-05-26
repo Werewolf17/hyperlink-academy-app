@@ -41,12 +41,16 @@ const Landing = (props:Props) => {
                             }, [])
                           })),
     ]),
-    h(Box, {width: 640, ma: true, gap: 16, padding: 16, style:{backgroundColor: colors.grey95}}, [
-      h('h2', 'The Course Kindergarten'),
-      h('p', `The course kindergarten is where we grow new courses. Check out some in
-development, or propose your own!`),
-      h('span', {style:{color: 'blue', justifySelf: 'end'}}, [h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'), '\u00A0 ➭'])
-    ])
+    h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
+      h(Box, {width: 640, ma: true}, [
+        h('h2', 'The Course Kindergarten'),
+        'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
+        h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
+          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'),
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ])
+      ])
+    ]),
   ])
 }
 
