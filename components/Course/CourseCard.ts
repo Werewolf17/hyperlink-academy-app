@@ -3,7 +3,7 @@ import h from 'react-hyperscript'
 import Link from 'next/link'
 
 import { Box} from '../Layout'
-import {colors} from '../Tokens'
+import { colors, Mobile} from '../Tokens'
 import Card  from '../Card'
 
 type Props = {
@@ -64,7 +64,7 @@ width: 100%;
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(${props=>props.min}px, 1fr));
 
-@media(max-width: 420px) {
+${Mobile} {
 grid-template-columns: repeat(auto-fill, minmax(${props=>props.mobileMin}px, 1fr));
 }
 grid-gap: 32px;

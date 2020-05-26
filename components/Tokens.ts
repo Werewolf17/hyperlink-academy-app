@@ -15,3 +15,5 @@ export const colors = {
 
 export type Spacing = 0 | 4 | 8 | 16 | 24 | 32 | 48 | 64 | 256
 export type Widths = 400 | 640 | 1024
+
+export const Mobile = '@media(max-width:420px)'

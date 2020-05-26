@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
-import {colors} from '../components/Tokens'
+import { colors, Mobile} from '../components/Tokens'
 import { Box } from '../components/Layout'
 import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
@@ -29,7 +29,7 @@ const Landing = (props:Props) => {
     h('hr'),
     h(Box, {gap: 16}, [
       h('h2', "The Courses List"),
-      !courses ? null : h(FlexGrid, {min: 400, mobileMin: 200},
+      !courses ? null : h(FlexGrid, {min: 328, mobileMin: 200},
                           courses.courses
                           .map(course => {
                             return h(CourseCard, {
@@ -80,13 +80,12 @@ export const getStaticProps = async () => {
 const ImageContainer = styled('div')`
 overflow: hidden;
 border: 2px solid;
-@media(max-width: 600px) {
-overflow: scroll;
-}
+${Mobile}{overflow: scroll};
 `
 
 const Title = styled('h1')`
 font-family: serif;
+font-size: 2.7rem;
 text-decoration: underline;
 font-weight: bold;
 color: blue;

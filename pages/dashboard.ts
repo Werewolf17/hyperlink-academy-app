@@ -51,7 +51,7 @@ const Dashboard = (props:Props) => {
         h(Link,{href: '/courses/create'},  h('a.mono', 'Publish a New Course')),
         h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
       ]) : null,
-      h(FlexGrid, {min: 400, mobileMin: 200},
+      h(FlexGrid, {min: 328, mobileMin: 200},
         courses?.courses
         .map(course => {
           return h(CourseCard, {

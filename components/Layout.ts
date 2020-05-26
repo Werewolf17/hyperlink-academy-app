@@ -7,7 +7,7 @@ import Head from 'next/head'
 import h from 'react-hyperscript'
 import { Fragment } from 'react'
 
-import { Spacing, colors, Widths} from './Tokens'
+import { Spacing, colors, Widths, Mobile} from './Tokens'
 
 const Layout:React.SFC = (props)=>{
   const {data: user}= useUserData()
@@ -35,7 +35,7 @@ grid-template-columns: auto auto;
 height: 32px;
 padding-top: 32px;
 padding-bottom: 64px;
-@media(max-width: 1016px) {
+${Mobile} {
   padding-bottom: 32px ;
   padding-top: 16px ;
 }
@@ -49,10 +49,11 @@ font-size: 24px;
 const Body = styled('div')`
 max-width: 968px;
 width: 100%;
-padding-bottom: 32px;
+padding: 32px;
 margin: auto;
+box-sizing: border-box;
 
-@media(max-width: 1016px) {
+${Mobile}{
 padding: 24px;
 }
 `
