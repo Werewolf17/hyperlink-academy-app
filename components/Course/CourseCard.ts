@@ -24,7 +24,7 @@ export default (props:Props) => {
       h(Image, {src: `/img/courses/${props.id}.png`}),
     ]),
     h(Box, {padding: 16, gap:32}, [
-      h(Box, {gap: 16, style: {maxHeight: 152}}, [
+      h(Box, {gap: 16, style: {minHeight: 152}}, [
         h('h3', props.name),
         h('p', props.description),
       ]),
