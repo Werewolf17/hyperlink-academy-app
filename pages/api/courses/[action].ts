@@ -95,6 +95,10 @@ async function createInstance(req: Request) {
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
 
   let id = course.id + '-' + course.course_instances.length
+  if(!(await createInstanceGroup(id, msg.facillitator, course.category_id))){
+    return {status: 500, result: "ERROR: unable to create instance group"} as const
+  }
+
   try {
     let instance = await prisma.course_instances.create({
       include: {
@@ -116,12 +120,11 @@ async function createInstance(req: Request) {
       }
     })
 
-    await createInstanceGroup(id, msg.facillitator, course.category_id)
     return {status: 200, result: instance} as const
   }
   catch(e) {
     console.log(e)
-    return {status: 401, result: e} as const
+    return {status: 501, result: e} as const
   }
 
 }

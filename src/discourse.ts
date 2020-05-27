@@ -38,6 +38,7 @@ export const createInstanceGroup = async (name: string, admin: string, courseID:
     return false
   }
   await createCategory(name, {permissions: {[name]:1}, parent_category_id: courseID})
+  return true
 }
 
 export const createCategory = async (name: string, options?: {id?: string,permissions?: {[key:string]:number}, parent_category_id?: number}):Promise<number | false> => {
