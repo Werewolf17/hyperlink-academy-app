@@ -168,9 +168,12 @@ const AddInstance = ()=> {
         h(Select, {
           required: true,
           onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewInstance({...newInstance, facillitator: e.currentTarget.value})
-        }, courseData?.course_maintainers.map(maintainer => {
-          return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
-        })),
+        }, [
+          h('option', {value: ''}, "Select a facillitator"),
+          ...(courseData?.course_maintainers.map(maintainer => {
+            return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
+          })||[])
+        ]),
       ]),
       h(Label, [
         'Start Date',
@@ -181,7 +184,10 @@ const AddInstance = ()=> {
           onChange: e => setNewInstance({...newInstance, start: e.currentTarget.value})
         })
       ]),
-      h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'Add a new Instance'),
+      h(Primary, {
+        type: 'submit',
+        disabled: !newInstance.start || !newInstance.facillitator
+      }, formState === 'loading' ? h(Loader) : 'Add a new Instance'),
       h(Seperator),
     ])
   ])
