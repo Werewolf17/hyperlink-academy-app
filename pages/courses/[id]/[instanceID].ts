@@ -18,6 +18,7 @@ import { callApi } from '../../../src/apiHelpers'
 import { instanceDataQuery } from '../../api/get/[...item]'
 import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses/[action]'
 import { useInstanceData, useUserData } from '../../../src/data'
+import { instancePrettyDate } from '../../../components/Card'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -42,7 +43,7 @@ const InstancePage = (props:Props) => {
             h('h1', instance?.courses.name),
             h('span', [
               h('b', instance?.id), h('span', ' | '),
-              `Starts ${prettyDate(instance?.start_date || '')}`, h('span', ' | '),
+              instancePrettyDate(instance?.start_date || '', instance?.completed), h('span', ' | '),
               `Facillitated by ${instance?.people.display_name}`
             ]),
           ]),

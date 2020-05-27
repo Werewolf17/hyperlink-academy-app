@@ -19,6 +19,7 @@ import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
 import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
 import { callApi } from '../../../src/apiHelpers'
+import { instancePrettyDate } from '../../../components/Card'
 
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
 type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
@@ -116,7 +117,7 @@ const Instance = (props: {instance: Instances[0]}) => {
       }, h('a', {style: {textDecoration: 'none'}}, `#${id} ${props.instance.courses.name}`))),
     ]),
     h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
-      h('strong', `Starts ${prettyDate(props.instance.start_date)}`),
+      h('strong', instancePrettyDate(props.instance.start_date, props.instance.completed)),
       h('div', `Facillitated by ${props.instance.people.display_name}`)
     ])
   ])
@@ -264,8 +265,6 @@ const EditDetails = ()=> {
     ])
   ])
 }
-
-let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
 
 const SubmitButtons = styled('div')`
 justify-self: right;

@@ -55,22 +55,6 @@ export const BigInstanceCard = (props: Instance & {courses: {name: string}}) =>{
   let now = new Date()
   let status: "Completed" | "Upcoming" | "Ongoing" = "Upcoming"
   if(now > new Date(props.start_date)) status = "Ongoing"
-  if(props.completed) status = "Completed"
-
-  let statusText = ''
-  switch(status) {
-    case "Completed": {
-      statusText = `${prettyDate(props.start_date)} - ${prettyDate(props.completed || '')}`
-      break
-    }
-    case "Upcoming": {
-      statusText = `Starts ${prettyDate(props.start_date)}`
-      break
-    }
-    case "Ongoing": {
-      statusText = `Started ${prettyDate(props.start_date)}`
-    }
-  }
 
   return h(Link, {
     href: "/courses/[id]/[instanceID]",
@@ -89,12 +73,32 @@ export const BigInstanceCard = (props: Instance & {courses: {name: string}}) =>{
         ]),
         h('div', [
           h('b', status),
-          h('p.textSecondary', statusText),
+          h('p.textSecondary', instancePrettyDate(props.start_date, props.completed)),
           h('p.textSecondary', `Facillitated by ${props.people.display_name || props.people.username}`)
         ] )
       ])
     ])
   ])
+}
+
+export const instancePrettyDate = (start_date: string, completed?: string | null)=>{
+  let status: "Completed" | "Upcoming" | "Ongoing" = "Upcoming"
+
+  if(new Date() > new Date(start_date)) status = "Ongoing"
+  if(completed) status = "Completed"
+  switch(status) {
+    case "Completed": {
+      statusText = `${prettyDate(props.start_date)} - ${prettyDate(props.completed || '')}`
+      break
+    }
+    case "Upcoming": {
+      statusText = `Starts ${prettyDate(props.start_date)}`
+      break
+    }
+    case "Ongoing": {
+      statusText = `Started ${prettyDate(props.start_date)}`
+    }
+  }
 }
 
 let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})

@@ -68,7 +68,9 @@ const Enroll = (props: Props) => {
             'Click on an instance below for details'),
         ]),
         ...course?.course_instances
-          .filter(i => !userInstances?.course_instances.find(x => x.id === i.id))
+          .filter(i => !userInstances?.course_instances.find(x => x.id === i.id) &&
+                  !i.completed && (new Date() < new Date(i.start_date)))
+          .sort((a, b)=>new Date(a.start_date) < new Date(b.start_date)? -1 : 1)
           .map(instance => h(SmallInstanceCard, instance)) || []
       ])
   ])
