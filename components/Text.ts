@@ -1,6 +1,9 @@
 import styled from '@emotion/styled'
+import h from 'react-hyperscript'
+import Markdown from 'react-markdown'
 import {colors} from './Tokens'
 
+export default (props:{source:string}) => h(Text, {}, h(Markdown, props))
 export const Text = styled('div')`
 h1 {
   margin-top: 64px;

@@ -1,6 +1,5 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
-import Markdown from 'react-markdown'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -12,7 +11,7 @@ import Loader from '../../../components/Loader'
 import { Input, Label, Error, Info, Select, Textarea} from '../../../components/Form'
 import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
-import {Text} from '../../../components/Text'
+import Text from '../../../components/Text'
 
 import { Category } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
@@ -46,7 +45,7 @@ const CoursePage = (props:Props) => {
       course?.description || '',
     ]),
     h(Tabs, {tabs: {
-      Curriculum:  h(Text, {}, h(Markdown, {source: props.content})),
+      Curriculum:  h(Text, {source: props.content}),
       Instances: h(Instances, {course: props.id}),
       Settings: isMaintainer ? h(Settings) : null
     }}),
