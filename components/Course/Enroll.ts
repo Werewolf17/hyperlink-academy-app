@@ -43,7 +43,17 @@ const Enroll = (props: Props) => {
   }
   let instance = course?.course_instances.find(i=> i.id===props.instanceId)
 
-  return h(Container, {gap: 16}, [
+
+
+
+
+
+
+//Laying out the Enroll Panel
+  return h(EnrollGrid, [
+
+    //Enroll Details (cost, length, prereqs)
+    h(Box, {gap:16}, [
       h(Cost, '$' + course?.cost),
     h(Box, {gap: 8, style:{color: colors.textSecondary}}, [
       h('b', course?.duration),
@@ -52,27 +62,34 @@ const Enroll = (props: Props) => {
          h('p', course?.prerequisites)
       ])
     ]),
+    ]),
+
+    //Dotted Separator
     h(Seperator),
-    instance ?
-      h(Box, {as: "form", onSubmit}, [
-        h(Label, [prettyDate(instance.start_date)]),
-        h('p', 'facillitated by ' + instance.people?.display_name),
-        h(Primary, {
-          style: {width: '100%'},
-        }, loading ? h(Loader) : 'Enroll'),
-      ])
-      : h(Box, {gap: 16}, [
-        h('div', [
-          h('h3', 'Enroll in an Instance'),
-          h('div', {style: {color: colors.textSecondary, fontSize: '0.8rem', fontWeight: 'bold'}},
-            'Click on an instance below for details'),
-        ]),
-        ...course?.course_instances
-          .filter(i => !userInstances?.course_instances.find(x => x.id === i.id) &&
-                  !i.completed && (new Date() < new Date(i.start_date)))
-          .sort((a, b)=>new Date(a.start_date) < new Date(b.start_date)? -1 : 1)
-          .map(instance => h(SmallInstanceCard, instance)) || []
-      ])
+
+    //Upcoming instance list 
+    h(Box, {gap:16}, [
+      instance ?
+        h(Box, {as: "form", onSubmit}, [
+          h(Label, [prettyDate(instance.start_date)]),
+          h('p', 'facillitated by ' + instance.people?.display_name),
+          h(Primary, {
+            style: {width: '100%'},
+          }, loading ? h(Loader) : 'Enroll'),
+        ])
+        : h(Box, {gap: 16}, [
+          h('div', [
+            h('h3', 'Enroll in an Instance'),
+            h('div', {style: {color: colors.textSecondary, fontSize: '0.8rem', fontWeight: 'bold'}},
+              'Click on an instance below for details'),
+          ]),
+          ...course?.course_instances
+            .filter(i => !userInstances?.course_instances.find(x => x.id === i.id) &&
+                    !i.completed && (new Date() < new Date(i.start_date)))
+            .sort((a, b)=>new Date(a.start_date) < new Date(b.start_date)? -1 : 1)
+            .map(instance => h(SmallInstanceCard, instance)) || []
+        ])
+    ])
   ])
 }
 
@@ -80,10 +97,6 @@ export default Enroll
 
 let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
 
-let Container = styled(Box)`
-position: sticky;
-top: 32px;
-`
 
 let Label = styled('h4')`
 display: inline;
@@ -92,4 +105,22 @@ display: inline;
 const Cost = styled('div')`
 font-size: 56px;
 font-weight: bold;
+`
+
+export const EnrollGrid = styled('div')`
+display: grid;
+grid-template-columns: 1fr;
+grid-gap: 16px;
+
+  @media(max-width: 768px) {
+    grid-template-columns: 1fr 0px 2fr;
+    grid-gap: 16px;
+  }
+
+  /* 424px is an artibrarty number not found anywhere else that ensures 
+  that the instance cards inside the enroll panel doesn't get too skinny */
+  @media(max-width: 424px) {
+    grid-template-columns: 1fr;
+    grid-gap: 16px;
+  }
 `

@@ -68,6 +68,8 @@ ${props=> props.ma ? 'margin: auto;':''}
 export const Seperator = styled('hr')`
 border: 1px dashed;
 border-bottom: none;
+border-right: none;
+margin :0;
 color: ${colors.borderColor}
 `
 
