@@ -83,10 +83,10 @@ color: ${colors.borderColor}
 
 export const TwoColumn = styled('div')`
 display: grid;
-grid-template-columns: 640px 240px;
+grid-template-columns: 2fr 1fr;
 grid-gap: 64px;
 
-@media(max-width: 1016px) {
+@media(max-width: 768px) {
 grid-template-columns: auto;
 grid-template-rows: auto auto;
 }

@@ -282,7 +282,7 @@ grid-gap: 16px;
 const Side = styled('div')`
 grid-column: 2;
 grid-row: 1;
-@media(max-width: 1016px) {
+@media(max-width: 768px) {
 grid-column: 1;
 }
 `
@@ -292,7 +292,7 @@ display: grid;
 grid-gap: 64px;
 grid-auto-rows: min-content;
 
-@media(max-width: 1016px) {
+@media(max-width: 768px) {
 grid-row: 2;
 }
 `
