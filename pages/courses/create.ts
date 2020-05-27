@@ -44,7 +44,7 @@ const CreateCourse = ()=> {
     h('h1', 'Create a new course'),
     formState === 'error' ? h(Error, 'An error occured') : null,
     formState === 'success' ? h(Info, 'Course created!') : null,
-    h(Box.withComponent('form'), {onSubmit},[
+    h('form', {onSubmit}, h(Box, [
       h(Label, [
         'id',
         h(Input, {
@@ -107,7 +107,7 @@ const CreateCourse = ()=> {
         })
       ]),
       h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'submit')
-    ])
+    ]))
 
   ])
 }

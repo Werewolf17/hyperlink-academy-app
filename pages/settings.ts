@@ -47,7 +47,7 @@ const Settings = () => {
     }
   }
 
-  return h(Box.withComponent('form'), {onSubmit, width: 400, gap: 64}, [
+  return h('form', {onSubmit}, h(Box, {width: 400, gap: 64}, [
     h(Box, {gap: 32}, [
       h('h2', 'Your Settings'),
       h(Box, {gap:8}, [h('b', 'Username'),h(Info, user.username)]),
@@ -88,7 +88,7 @@ const Settings = () => {
       h(Primary, {type: 'submit', disabled: !changed},
         formState === 'loading' ? h(Loader) : 'Save Changes')
     ])
-  ])
+  ]))
 }
 
 export default Settings

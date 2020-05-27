@@ -38,7 +38,7 @@ const ResetPassword = ()=>{
   switch(formState) {
     case 'normal':
     case 'loading':
-      return h(Box.withComponent('form'), {width:400, ma: true, onSubmit}, [
+      return h('form', {onSubmit}, h(Box, {width:400, ma: true }, [
         h('h1', 'Reset your password'),
         h(Label, [
           "A New Password",
@@ -57,7 +57,7 @@ const ResetPassword = ()=>{
           })
         ]),
         h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
-      ])
+      ]))
     case 'success': return h(Info, [
       'Awesome, we reset your password, go ahead and ',
       h(Link, {href:'/login'}, h('a', 'login'))

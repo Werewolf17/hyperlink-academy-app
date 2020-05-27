@@ -46,7 +46,7 @@ const Login = () => {
     }
   }
 
-  return h(Box.withComponent('form'), {width: 400, ma: true, onSubmit}, [
+  return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
     h(TitleImg, { height: 163, width: 299, src: '/img/dragon.png' }),
     h('h1', 'Welcome Back!'),
     formState === 'error' ? h(Error, {}, h('div', [
@@ -74,7 +74,7 @@ const Login = () => {
       h(Link, { href: '/login?reset' }, h(LinkButton, 'Reset Password'))
     ]),
     h(Primary, { type: 'submit', style: { justifySelf: 'end' } }, formState === 'loading' ? h(Loader) : 'Log In'),
-  ])
+  ]))
 }
 
 
@@ -93,7 +93,7 @@ const ResetPassword: React.SFC = () => {
   switch (status) {
     case 'normal':
     case 'loading':
-      return h(Box.withComponent('form'), {width: 400, ma:true, onSubmit}, [
+      return h('form',{onSubmit}, h(Box, {width: 400, ma:true}, [
         h('h1', 'Reset your password'),
         h(Label, [
           'Your Account Email',
@@ -107,7 +107,7 @@ const ResetPassword: React.SFC = () => {
         h('div', { style: { display: 'grid', justifyItems: 'end', gridGap: '8px' } }, [
           h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : 'reset password')
         ])
-      ])
+      ]))
     case 'success': return h(Box, { gap: 16, width: 400, ma: true }, [
       'We sent an email with a password reset link to',
       h(Info, email),

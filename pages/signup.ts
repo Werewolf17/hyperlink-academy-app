@@ -41,55 +41,55 @@ const Signup = () => {
     return h(VerifyEmail, {email: formData.email, resendEmail: onSubmit})
   }
 
-  return h(Box.withComponent('form'), {width: 400, ma: true, onSubmit}, [
-      h(TitleImg, {height: 233, width: 130, src: '/img/start_journey_crop.png'}),
-      h('h1', 'Start a journey'),
-      formState === 'error' ? h(Error, {}, h('div', [
-        "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
-        '.'
-      ])) : null,
-      h(Label, [
-        "Your username",
-        h(Input, {type: 'text',
-                  required: true,
-                  minLength: 3,
-                  maxLength: 20,
-                  value: formData.username,
-                  onChange: (e)=> setFormData({...formData, username:e.currentTarget.value})})
-      ]),
-      h(Label, [
-        "Your Email",
-        h(Input, {type: 'email',
-                  required: true,
-                  value: formData.email,
-                  onChange: (e)=> setFormData({...formData, email:e.currentTarget.value})})
-      ]),
-      h(Label, [
-        "A Password",
-        h(Input, {type: 'password',
-                  required: true,
-                  minLength: 8,
-                  value: formData.password,
-                  onChange: (e)=> setFormData({...formData, password:e.currentTarget.value})})
-      ]),
-      h(Label, [
-        "Confirm Password",
-        h(Input, {type: 'password',
-                  required: true,
-                  value: formData.confPassword,
-                  onChange: (e)=> {
-                    setFormData({...formData, confPassword:e.currentTarget.value})
-                    if(e.currentTarget.value !== formData.password) {
-                      e.currentTarget.setCustomValidity('passwords do not match')
-                    }
-                    else {
-                      e.currentTarget.setCustomValidity('')
-                    }
+  return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
+    h(TitleImg, {height: 233, width: 130, src: '/img/start_journey_crop.png'}),
+    h('h1', 'Start a journey'),
+    formState === 'error' ? h(Error, {}, h('div', [
+      "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
+      '.'
+    ])) : null,
+    h(Label, [
+      "Your username",
+      h(Input, {type: 'text',
+                required: true,
+                minLength: 3,
+                maxLength: 20,
+                value: formData.username,
+                onChange: (e)=> setFormData({...formData, username:e.currentTarget.value})})
+    ]),
+    h(Label, [
+      "Your Email",
+      h(Input, {type: 'email',
+                required: true,
+                value: formData.email,
+                onChange: (e)=> setFormData({...formData, email:e.currentTarget.value})})
+    ]),
+    h(Label, [
+      "A Password",
+      h(Input, {type: 'password',
+                required: true,
+                minLength: 8,
+                value: formData.password,
+                onChange: (e)=> setFormData({...formData, password:e.currentTarget.value})})
+    ]),
+    h(Label, [
+      "Confirm Password",
+      h(Input, {type: 'password',
+                required: true,
+                value: formData.confPassword,
+                onChange: (e)=> {
+                  setFormData({...formData, confPassword:e.currentTarget.value})
+                  if(e.currentTarget.value !== formData.password) {
+                    e.currentTarget.setCustomValidity('passwords do not match')
                   }
-                 })
-      ]),
-      h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
-    ])
+                  else {
+                    e.currentTarget.setCustomValidity('')
+                  }
+                }
+               })
+    ]),
+    h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
+  ]))
 }
 
 const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
