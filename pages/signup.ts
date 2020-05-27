@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
-import { Narrow, Box} from '../components/Layout'
-import {Form, Label, Input, Error, Info} from '../components/Form'
+import { Box} from '../components/Layout'
+import { Label, Input, Error, Info} from '../components/Form'
 import {Primary} from '../components/Button'
 import {TitleImg, AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
@@ -41,8 +41,7 @@ const Signup = () => {
     return h(VerifyEmail, {email: formData.email, resendEmail: onSubmit})
   }
 
-  return h(Narrow, {}, [
-    h(Form, {onSubmit}, [
+  return h(Box.withComponent('form'), {width: 400, ma: true, onSubmit}, [
       h(TitleImg, {height: 233, width: 130, src: '/img/start_journey_crop.png'}),
       h('h1', 'Start a journey'),
       formState === 'error' ? h(Error, {}, h('div', [
@@ -91,7 +90,6 @@ const Signup = () => {
       ]),
       h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
     ])
-  ])
 }
 
 const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
@@ -132,29 +130,26 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   if(router.query.verifyEmail && result === null) return null
 
 
-  if(result === 'success') return h(Narrow, [
-    h(Box, {gap: 16}, [
+  if(result === 'success') return h(Box, {width: 400, ma:true, gap: 16}, [
       h('h1', "You're verified!"),
       h(Info, "Click the button below if you're not redirected in a couple seconds"),
       h(Primary, {onClick: ()=> router.push('/dashboard')}, 'Back to hyperlink')
-    ])
   ])
 
-  return h(Narrow, [
-    h(Box, {gap: 32}, [
-      h(AccentImg, {src: '/img/plane.gif'}),
-      h('h1', 'Verify your email'),
-      props.email ? h(Box, {gap: 8}, [
-        `Sweet! We sent an email with a verification code to`,
-        h(Info, props.email),
-      ]) : null,
-      h(Box, {gap: 8}, [
-        `Copy the code there and submit it here:`,
+  return h(Box, {width: 400, ma: true, gap: 32}, [
+    h(AccentImg, {src: '/img/plane.gif'}),
+    h('h1', 'Verify your email'),
+    props.email ? h(Box, {gap: 8}, [
+      `Sweet! We sent an email with a verification code to`,
+      h(Info, props.email),
+    ]) : null,
+    h(Box, {gap: 8}, [
+      `Copy the code there and submit it here:`,
       result === 'invalid' ? h(Error, {}, [
         'Your email link is invalid or out of date, please try ',
         h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
       ]) : null,
-      h(Form, {onSubmit, style: {width: '100%'}}, [
+      h('form', {onSubmit, style: {width: '100%'}}, [
         h(Label, [
           h(Input, {
             type: 'text',
@@ -162,10 +157,9 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
             onChange: e=>setKey(e.currentTarget.value)
           })
         ])
-        ]),
       ]),
-        h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, result  === 'loading' ? h(Loader) : "Confirm your email")
     ]),
+    h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, result  === 'loading' ? h(Loader) : "Confirm your email")
   ])
 }
 

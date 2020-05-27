@@ -2,13 +2,14 @@ import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 
-import { Form, Input, Label, Error, Info, Textarea} from '../../components/Form'
+import {  Input, Label, Error, Info, Textarea} from '../../components/Form'
 import { Primary } from '../../components/Button'
 import Loader from '../../components/Loader'
 
 import { callApi } from '../../src/apiHelpers'
 import { CreateCourseMsg, CreateCourseResponse } from '../api/courses/[action]'
 import { useUserData } from '../../src/data'
+import { Box } from '../../components/Layout'
 
 const CreateCourse = ()=> {
   let {data: user} = useUserData()
@@ -43,7 +44,7 @@ const CreateCourse = ()=> {
     h('h1', 'Create a new course'),
     formState === 'error' ? h(Error, 'An error occured') : null,
     formState === 'success' ? h(Info, 'Course created!') : null,
-    h(Form, {onSubmit},[
+    h(Box.withComponent('form'), {onSubmit},[
       h(Label, [
         'id',
         h(Input, {

@@ -2,12 +2,6 @@ import styled from '@emotion/styled'
 import h from 'react-hyperscript'
 import {colors} from './Tokens'
 
-export let Form = styled('form')`
-margin: 0px auto;
-display: grid;
-grid-gap: 32px;
-`
-
 export let Label = styled('label')`
 font-weight: bold;
 display: grid;

@@ -65,16 +65,6 @@ grid-gap: ${props => props.gap || 16}px;
 ${props=> props.ma ? 'margin: auto;':''}
 `
 
-export const MediumWidth = styled('div')`
-max-width: 640px;
-margin: auto;
-`
-
-export const Narrow = styled('div')`
-max-width: 400px;
-margin: auto;
-`
-
 export const Seperator = styled('hr')`
 border: 1px dashed;
 border-bottom: none;

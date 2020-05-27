@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
-import {Narrow} from '../components/Layout'
+import { Box} from '../components/Layout'
 import {Primary} from '../components/Button'
-import { Form, Input, Error, Label, Info} from '../components/Form'
+import { Input, Error, Label, Info} from '../components/Form'
 import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import { callApi } from '../src/apiHelpers'
@@ -38,27 +38,25 @@ const ResetPassword = ()=>{
   switch(formState) {
     case 'normal':
     case 'loading':
-      return h(Narrow, [
-        h(Form, {onSubmit}, [
-          h('h1', 'Reset your password'),
-          h(Label, [
-            "A New Password",
-            h(Input, {
-              type: 'password',
-              value: formData.password,
-              onChange: e => setFormData({...formData, password:e.target.value})
-            }),
-          ]),
-          h(Label, [
-            "Confirm Password",
-            h(Input, {
-              type: 'password',
-              value: formData.confirmPassword,
-              onChange: e => setFormData({...formData, confirmPassword:e.target.value})
-            })
-          ]),
-          h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
-        ])
+      return h(Box.withComponent('form'), {width:400, ma: true, onSubmit}, [
+        h('h1', 'Reset your password'),
+        h(Label, [
+          "A New Password",
+          h(Input, {
+            type: 'password',
+            value: formData.password,
+            onChange: e => setFormData({...formData, password:e.target.value})
+          }),
+        ]),
+        h(Label, [
+          "Confirm Password",
+          h(Input, {
+            type: 'password',
+            value: formData.confirmPassword,
+            onChange: e => setFormData({...formData, confirmPassword:e.target.value})
+          })
+        ]),
+        h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
       ])
     case 'success': return h(Info, [
       'Awesome, we reset your password, go ahead and ',
