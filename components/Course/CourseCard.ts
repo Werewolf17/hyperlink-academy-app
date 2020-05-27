@@ -45,6 +45,9 @@ height: auto;
 overflow: hidden;
 object-fit: none;
 border-right: 2px solid;
+${Mobile} {
+display: none;
+}
 `
 
 let DateContainer = styled('p')`
@@ -57,6 +60,10 @@ padding: 0px;
 display: grid;
 border: 2px solid;
 grid-template-columns: 120px auto;
+max-height: 280px;
+${Mobile} {
+grid-template-columns: auto;
+}
 `
 
 export const FlexGrid= styled('div')<{min: number, mobileMin: number}>`
