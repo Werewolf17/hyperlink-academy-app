@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Box, Seperator, TwoColumn } from '../../../components/Layout'
+import { Box, Seperator, TwoColumn, Sidebar } from '../../../components/Layout'
 import {Tabs} from '../../../components/Tabs'
 import { colors } from '../../../components/Tokens'
 import Loader from '../../../components/Loader'
@@ -37,22 +37,20 @@ const CoursePage = (props:Props) => {
   if(userInstances?.length === 0) userInstances = undefined
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
-  return h(TwoColumn, [
-    h(Content, [
-      h(Box, {gap: 32}, [
-        h(Box, {gap: 16}, [
-          h('h1', course?.name),
-          h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum'), ' ➭'])
-        ]),
-        course?.description || '',
+  return h(TwoColumn, {}, [
+    h(Box, {gap: 32}, [
+      h(Box, {gap: 16}, [
+        h('h1', course?.name),
+        h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum'), ' ➭'])
       ]),
-      h(Tabs, {tabs: {
-        Curriculum:  h(Text, {}, h(Markdown, {source: props.content})),
-        Instances: h(Instances, {course: props.id}),
-        Settings: isMaintainer ? h(Settings) : null
-      }})
+      course?.description || '',
     ]),
-    h(Side, [h(Enroll, {courseId: props.id})]),
+    h(Tabs, {tabs: {
+      Curriculum:  h(Text, {}, h(Markdown, {source: props.content})),
+      Instances: h(Instances, {course: props.id}),
+      Settings: isMaintainer ? h(Settings) : null
+    }}),
+    h(Sidebar, [h(Enroll, {courseId: props.id})]),
   ])
 }
 
@@ -278,24 +276,6 @@ justify-self: right;
 display: grid;
 grid-template-columns: auto auto;
 grid-gap: 16px;
-`
-
-const Side = styled('div')`
-grid-column: 2;
-grid-row: 1;
-@media(max-width: 768px) {
-grid-column: 1;
-}
-`
-
-const Content  = styled('div')`
-display: grid;
-grid-gap: 64px;
-grid-auto-rows: min-content;
-
-@media(max-width: 768px) {
-grid-row: 2;
-}
 `
 
 export const getStaticProps = async (ctx:any) => {

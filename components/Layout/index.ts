@@ -80,6 +80,14 @@ grid-gap: 64px;
 
 @media(max-width: 768px) {
 grid-template-columns: auto;
-grid-template-rows: auto auto;
+}
+`
+
+export const Sidebar = styled('div')`
+grid-column: 2;
+grid-row: 1 / 3;
+@media(max-width: 768px) {
+grid-row: 2;
+grid-column: 1;
 }
 `

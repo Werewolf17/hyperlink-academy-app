@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import Enroll from '../../../components/Course/Enroll'
-import { TwoColumn, Box, Seperator} from '../../../components/Layout'
+import { TwoColumn, Box, Seperator, Sidebar} from '../../../components/Layout'
 import { colors, Mobile } from '../../../components/Tokens'
 import { Tabs } from '../../../components/Tabs'
 import { Pill } from '../../../components/Pill'
@@ -54,7 +54,8 @@ const InstancePage = (props:Props) => {
             instance && !instance.completed && isFacilitator ? h(MarkInstanceComplete, {id:props.id}) : null
           ]),
         ]),
-        h(Tabs, {
+      ]),
+      h('div', {style: {gridColumn: 1}}, h(Tabs, {
           tabs: {
             "Instance Details": h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
@@ -84,9 +85,12 @@ const InstancePage = (props:Props) => {
 
             ])
           }
-        })
-      ]),
-      inInstance ? null : h(Enroll, {instanceId: router.query.instanceID as string, courseId: router.query.id as string}),
+        })),
+      inInstance
+        ? null
+        : h(Sidebar, {} ,
+            h(Enroll, {instanceId: router.query.instanceID as string, courseId: router.query.id as string}),
+           )
     ])
   ])
 }
