@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Link from 'next/link'
 
-import { colors, Mobile} from '../Tokens'
+import { colors } from '../Tokens'
 import { Body, Box, Seperator} from './index'
 
 export default ()=>{
