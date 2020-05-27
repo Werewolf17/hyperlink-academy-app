@@ -12,7 +12,6 @@ import Loader from '../../../components/Loader'
 import { Input, Label, Error, Info, Select, Textarea} from '../../../components/Form'
 import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
-import { SmallInstanceCard } from '../../../components/Card'
 
 import { Category } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
@@ -44,15 +43,7 @@ const CoursePage = (props:Props) => {
           h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum'), ' ➭'])
         ]),
         course?.description || '',
-        !userInstances ? null :
-          h(Info, {style: {padding:'32px'}}, [
-            h(Box, {gap:16}, [
-              h('h3', "Your Instances"),
-              ...userInstances.map(instance => h(SmallInstanceCard, instance))
-            ])
-          ])
       ]),
-
       h(Tabs, {tabs: {
         Curriculum:  h(Text, {}, h(Markdown, {source: props.content})),
         Instances: h(Instances, {course: props.id}),
@@ -70,33 +61,65 @@ const Instances = (props:{course: string}) => {
   let {data: course} = useCourseData(props.course)
   let {data: user} = useUserData()
 
+  if(!course) return null
+  let {userInvolved, upcoming, completed} = course.course_instances.reduce((acc, instance)=> {
+    if(user) {
+      if(instance.facillitator === user.id ||
+         userInstances?.course_instances.find(i => i.id === instance.id)
+        ) acc.userInvolved.push(h(Instance, {instance}))
+      return acc
+    }
+    if(instance.completed) acc.completed.push(h(Instance, {instance}))
+    else acc.upcoming.push(h(Instance, {instance}))
+    return acc
+  }, {
+    userInvolved:[] as React.ReactElement[],
+    upcoming:[] as React.ReactElement[],
+    completed:[] as  React.ReactElement[]
+  })
+
   return h(Box, {gap:32}, [
     h('h2', "Instances"),
-    h(Box, {gap: 32},
-      course?.course_instances?.flatMap(instance=>{
-        let inInstance = userInstances?.course_instances.find(x=> x.id===instance.id)
-        let isFacillitator = user && instance.facillitator === user.id
-        return [
-          h(Box, {gap: 16}, [
-            h(Box, {gap: 8}, [
-              !inInstance && !isFacillitator ? null : h('div', [
-                inInstance ? h(Pill, 'enrolled') : null,
-                ' ',
-                isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,
-              ]),
-              h('h3', {}, h(Link, {
-                href:'/courses/[id]/[instanceID]',
-                as:  `/courses/${instance.course}/${instance.id}`
-              }, h('a', instance.id))),
-            ]),
-            h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
-              h('strong', `Starts ${prettyDate(instance.start_date)}`),
-              h('div', `Facillitated by ${instance.people.display_name}`)
-            ])
-          ]),
-          h(Seperator)
-        ]
-      }))])
+    h(Box, {gap: 32},[
+       ...(userInvolved.length === 0 ? [] : [
+         h('h3', 'Your Instances'),
+         ...userInvolved,
+         h(Seperator),
+       ]),
+      h('h3', 'Upcoming Instances'),
+      ...upcoming,
+      h('h3', 'Completed Instances'),
+      ...completed
+    ])])
+}
+
+type Instances =  Exclude<ReturnType<typeof useCourseData>["data"], undefined>['course_instances']
+const Instance = (props: {instance: Instances[0]}) => {
+  let {data: userInstances} = useUserInstances()
+  let {data: user} = useUserData()
+
+  let id= props.instance.id.split('-').slice(-1)[0]
+
+  let inInstance = userInstances?.course_instances.find(x=> x.id===props.instance.id)
+  let isFacillitator = user && props.instance.facillitator === user.id
+
+  return h(Box, {gap: 16}, [
+    h(Box, {gap: 8}, [
+      !inInstance && !isFacillitator ? null : h('div', [
+        inInstance ? h(Pill, 'enrolled') : null,
+        ' ',
+        isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,
+      ]),
+      h('h3', {}, h(Link, {
+        href:'/courses/[id]/[instanceID]',
+        as:  `/courses/${props.instance.course}/${props.instance.id}`
+      }, h('a', {style: {textDecoration: 'none'}}, `#${id} ${props.instance.courses.name}`))),
+    ]),
+    h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
+      h('strong', `Starts ${prettyDate(props.instance.start_date)}`),
+      h('div', `Facillitated by ${props.instance.people.display_name}`)
+    ])
+  ])
 }
 
 const Settings = () => {
@@ -128,7 +151,7 @@ const AddInstance = ()=> {
     if(res.status === 200) {
       mutate({
         ...courseData,
-        course_instances: [...courseData.course_instances, {...res.result, people_in_instances:[]}]
+        course_instances: [...courseData.course_instances, {...res.result, people_in_instances:[], courses: {name: courseData.name}}]
       })
       setFormState('success')
     }
