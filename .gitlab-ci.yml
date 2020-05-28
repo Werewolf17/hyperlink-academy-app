@@ -1,7 +1,18 @@
 image: library/node:current
+
+stages:
+  - init
+
 emails:
+  stage: init
   script:
     - npm i postmark-cli -g
     - postmark templates push ./emails/templates -f
   only:
-    - v2
+    - master
+
+typechecking:
+  stage: init
+  script:
+    - npm i
+    - npm run typecheck
