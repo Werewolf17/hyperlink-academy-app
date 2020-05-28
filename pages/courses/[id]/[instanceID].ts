@@ -14,7 +14,7 @@ import { Primary, Destructive, Secondary} from '../../../components/Button'
 import Loader from '../../../components/Loader'
 import { Info } from '../../../components/Form'
 import { Modal } from '../../../components/Modal'
-import {Text} from '../../../components/Text'
+import Text from '../../../components/Text'
 
 import { getTaggedPostContent } from '../../../src/discourse'
 import { callApi } from '../../../src/apiHelpers'
@@ -63,8 +63,8 @@ const InstancePage = (props:Props) => {
           tabs: {
             "Instance Details": h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
-                h(Box, [
-                  h(Text, props.notes)
+                !props.notes ? null : h(Box, [
+                  h(Text, {source: props.notes})
                 ]),
                 h(Box, {gap: 8}, [
                   h('h3', 'Participants'),
@@ -88,7 +88,7 @@ const InstancePage = (props:Props) => {
                     })])
               ] )
             ]),
-            "Curriculum": h(Text, props.curriculum)
+            "Curriculum": h(Text, {source:props.curriculum})
           }
         })),
       inInstance || isFacilitator ? null
