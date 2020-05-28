@@ -43,6 +43,7 @@ const ImageContainer = styled('div')`
 width: 120px;
 height: auto;
 overflow: hidden;
+max-height: 272px;
 object-fit: none;
 border-right: 2px solid;
 ${Mobile} {
