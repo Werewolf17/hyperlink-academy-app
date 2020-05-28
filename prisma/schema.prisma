@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URI")
+}
+
+model activation_keys {
+  created_time  String
+  email         String
+  key_hash      String @id
+  password_hash String
+  username      String
+}
+
+model admins {
+  person String @id
+  people people @relation(fields: [person], references: [id])
+}
+
+model course_instances {
+  completed           String?
+  course              String
+  facillitator        String
+  id                  String                @id
+  start_date          String
+  courses             courses               @relation(fields: [course], references: [id])
+  people              people                @relation(fields: [facillitator], references: [id])
+  people_in_instances people_in_instances[]
+}
+
+model course_invites {
+  course  String
+  email   String
+  courses courses @relation(fields: [course], references: [id])
+
+  @@id([course, email])
+}
+
+model course_maintainers {
+  course     String
+  maintainer String
+  courses    courses @relation(fields: [course], references: [id])
+  people     people  @relation(fields: [maintainer], references: [id])
+
+  @@id([course, maintainer])
+}
+
+model courses {
+  category_id        Int
+  cost               Float
+  description        String
+  duration           String
+  id                 String               @id
+  invite_only        Boolean              @default(false)
+  name               String
+  prerequisites      String
+  course_instances   course_instances[]
+  course_invites     course_invites[]
+  course_maintainers course_maintainers[]
+}
+
+model password_reset_keys {
+  created_time String
+  email        String
+  key_hash     String @id
+}
+
+model people {
+  bio                 String?
+  display_name        String?
+  email               String                @unique
+  id                  String                @id
+  link                String?
+  password_hash       String                @unique
+  username            String                @unique
+  admins              admins[]
+  course_instances    course_instances[]
+  course_maintainers  course_maintainers[]
+  people_in_instances people_in_instances[]
+}
+
+model people_in_instances {
+  instance_id      String
+  person_id        String
+  course_instances course_instances @relation(fields: [instance_id], references: [id])
+  people           people           @relation(fields: [person_id], references: [id])
+
+  @@id([person_id, instance_id])
+}

@@ -1,86 +1,99 @@
 import h from 'react-hyperscript'
-import airtable, {Table} from 'airtable'
-import {NextPage} from 'next'
-import Intro from './intro.mdx'
+import styled from '@emotion/styled'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
-import {Section} from '../components/Section'
+import Intro from '../writing/Intro.mdx'
+import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
+import { colors, Mobile} from '../components/Tokens'
+import { Box } from '../components/Layout'
+import {TitleImg} from '../components/Images'
+import { useCourses, useUserData } from '../src/data'
+import { coursesQuery } from './api/get/[...item]'
 
-type Course = {
-  name: string,
-  description: string,
-  webpage: string
-  start: string,
-  end: string
-}
 
-type Learner = {
-  name: string,
-  webpage: string
-}
+type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
+type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
 
-const Landing:NextPage<{courses:Course[],learners:Learner[],children?: any}> = (props) => {
-  return h('div', [
-    h(Intro),
-    h(Section, {legend: 'Learners'}, h('ul', props.learners.map(learner => {
-      return h('li', {}, h('a', {href: learner.webpage}, learner.name))
-    }))),
-    h(Section, {legend: 'Courses'}, h('ul', props.courses.sort((a, b) => {
-      let aDate = new Date(a.start)
-      let bDate = new Date(b.start)
-      if(aDate>bDate) return 1
-      else return -1
-    }).map(course => {
-      let start = new Date(course.start)
-      let end = course.end ? new Date(course.end) : undefined
-      let dateOptions = {month: 'short', year: '2-digit', day: '2-digit', timeZone: 'UTC'}
-      return h('li', {}, [
-        h('h4', {}, [
-          h('a', {href: course.webpage}, course.name),
-          ' @ ',
-          h('span', [
-            start.toLocaleDateString('en-US', dateOptions),
-            ' - ',
-            end ? end.toLocaleDateString('en-US', dateOptions) : "ongoing"
-          ]),
-        ]),
-        h('div', course.description),
+const Landing = (props:Props) => {
+  let {data: courses} = useCourses(props)
+  let {data: user} = useUserData()
+  let router = useRouter()
+  useEffect(()=>{
+    if(user) router.push('/dashboard')
+  }, [user])
+
+  return h(Box, {gap:48}, [
+    h(Welcome),
+    h('hr'),
+    h(Box, {gap: 16}, [
+      h('h2', "The Courses List"),
+      !courses ? null : h(FlexGrid, {min: 328, mobileMin: 200},
+                          courses.courses
+                          .map(course => {
+                            return h(CourseCard, {
+                              key: course.id,
+                              id: course.id,
+                              description: course.description,
+                              start_date: new Date(course.course_instances[0]?.start_date),
+                              name: course.name,
+                            }, [])
+                          })),
+    ]),
+    h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
+      h(Box, {width: 640, ma: true}, [
+        h('h2', 'The Course Kindergarten'),
+        'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
+        h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
+          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'),
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ])
       ])
-    })))
+    ]),
   ])
 }
 
-Landing.getInitialProps = async ({res}) =>{
-  console.log('FETCHING')
-  let courses: Course[] = []
-  let learners: Learner[] = []
-
-  if(typeof window !== "undefined") return {courses, learners}
-  if(!res) return {courses, learners}
-
-  let base = new airtable({apiKey: process.env.AIRTABLE_API_KEY}).base('appI77uDPls9eA4xr');
-
-  try {
-
-    let learnerRows = await (base('Learners') as Table<Learner>).select({
-      fields: ["name", "webpage"],
-      filterByFormula: '{approved}'
-    }).firstPage()
-
-    let coursesRows = await (base('Courses') as Table<Course>).select({
-      fields: ["name", "webpage", "description", "start", "end"],
-      filterByFormula: '{approved}'
-    }).firstPage()
-
-    courses = coursesRows.map(row => row.fields)
-    learners =  learnerRows.map(row=> row.fields)
-  }
-  catch(e) {
-    console.log(JSON.stringify(e))
-  }
-
-  res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-  return {courses, learners}
+const Welcome = ()=>{
+  return h(Box, {gap:32}, [
+    h(ImageContainer, [
+      h(TitleImg, {width: 1024, src:'/img/landing.png', style: {border: 'none'}}),
+    ]),
+    h(Box, {ma: true, width: 640}, [
+      h(Title, 'hyperlink.academy'),
+      h(Intro),
+      h(Box, {style:{textAlign: 'right'}}, [
+        h('span', {style:{color: 'blue'}}, [
+          h(Link,{href: '/manual'}, h('a.mono', 'Read the manual' )),
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ]),
+        h('span', {style:{color: 'blue'}}, [
+          h('a.mono', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
+          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        ]),
+      ])
+    ]),
+  ])
 }
 
-export default Landing
+export const getStaticProps = async () => {
+  let courses = await coursesQuery()
+  return {props: {courses}, unstable_revalidate: 1} as const
+}
 
+const ImageContainer = styled('div')`
+overflow: hidden;
+border: 2px solid;
+height: 218px;
+${Mobile}{overflow-x: scroll};
+`
+
+const Title = styled('h1')`
+font-family: serif;
+font-size: 2.7rem;
+text-decoration: underline;
+font-weight: bold;
+color: blue;
+`
+
+export default Landing
