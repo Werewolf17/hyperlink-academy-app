@@ -8,9 +8,7 @@ import {multiRouteHandler, ResultType, Request} from '../../../src/apiHelpers'
 import {syncSSO} from '../../../src/discourse'
 import sendVerificationEmail from '../../../emails/verifyEmail'
 
-const prisma = new PrismaClient({
-  forceTransactions: true
-})
+const prisma = new PrismaClient()
 
 export type SignupMsg = {
   email: string

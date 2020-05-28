@@ -4,9 +4,7 @@ import {getToken} from '../../../src/token'
 import { createInstanceGroup, createCategory, createTopic} from '../../../src/discourse'
 import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
-let prisma = new PrismaClient({
-  forceTransactions: true
-})
+let prisma = new PrismaClient()
 
 export type CreateInstanceMsg = {
   courseId: string,

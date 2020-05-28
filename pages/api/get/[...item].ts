@@ -10,9 +10,7 @@ export type UserInstancesResult = ResultType<typeof getUserInstances>
 export type WhoAmIResult = ResultType<typeof whoami>
 export type ProfileResult = ResultType<typeof getProfileData>
 
-let prisma = new PrismaClient({
-  forceTransactions: true
-})
+let prisma = new PrismaClient()
 
 export default multiRouteHandler('item', {
   'courses': getCourses,
