@@ -16,21 +16,36 @@ const Layout:React.SFC = (props)=>{
       href:"https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,400;0,700;0,900;1,400;1,700;1,900&family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap",
       rel:"stylesheet"
     })),
-    h(Body, {}, [
-      h(Header, []),
-      props.children as React.ReactElement,
-    ]),
-    h(Footer)
-  ])
+    h(PageWrapper, [
+      h(Body, {}, [
+        h(Header, []),
+        props.children as React.ReactElement,
+      ]),
+      h(Footer)
+    ])
+])
 }
 
 export default Layout
+
+// export const PageWrapper = styled ('div')`
+// min-height: 100%;
+// display: grid;
+// grid-template-rows: auto 1fr auto
+
+
+export const PageWrapper = styled('div')`
+min-height: 100vh;
+display: grid;
+grid-template-rows: 1fr auto;
+
+`
 
 export const Body = styled('div')`
 max-width: 968px;
 width: 100%;
 padding: 32px;
-margin: auto;
+margin: 0 auto;
 box-sizing: border-box;
 
 ${Mobile}{
