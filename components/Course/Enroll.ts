@@ -43,46 +43,48 @@ const Enroll = (props: Props) => {
   let instance = props.course?.course_instances.find(i=> i.id===props.instanceId)
 
   //Laying out the Enroll Panel
-  return h(EnrollGrid, [
+  return h(StickyWrapper, [
+    h(EnrollGrid, [
 
-    //Enroll Details (cost, length, prereqs)
-    h(Box, {gap:16}, [
-      h(Cost, '$' + props.course?.cost),
-    h(Box, {gap: 8, style:{color: colors.textSecondary}}, [
-      h('b', props.course?.duration),
-      h(Box, {gap: 4}, [
-         h('b', 'Prerequisites'),
-         h('p', props.course?.prerequisites)
+      //Enroll Details (cost, length, prereqs)
+      h(Box, {gap:16}, [
+        h(Cost, '$' + props.course?.cost),
+      h(Box, {gap: 8, style:{color: colors.textSecondary}}, [
+        h('b', props.course?.duration),
+        h(Box, {gap: 4}, [
+          h('b', 'Prerequisites'),
+          h('p', props.course?.prerequisites)
+        ])
+      ]),
+      ]),
+
+      //Dotted Separator
+      h(Seperator),
+
+      //Upcoming instance list 
+      h(Box, {gap:16}, [
+        instance ?
+          h(Box, {as: "form", onSubmit}, [
+            h(Label, [prettyDate(instance.start_date)]),
+            h('p', 'facillitated by ' + instance.people?.display_name),
+            h(Primary, {
+              disabled: !!props.course?.invite_only && props.course?.course_invites.length === 0,
+              style: {width: '100%'},
+            }, loading ? h(Loader) : 'Enroll'),
+          ])
+          : h(Box, {gap: 16}, [
+            h('div', [
+              h('h3', 'Enroll in an Instance'),
+              h('div', {style: {color: colors.textSecondary, fontSize: '0.8rem', fontWeight: 'bold'}},
+                'Click on an instance below for details'),
+            ]),
+            ...props.course?.course_instances
+              .filter(i => !userInstances?.course_instances.find(x => x.id === i.id) &&
+                      !i.completed && (new Date() < new Date(i.start_date)))
+              .sort((a, b)=>new Date(a.start_date) < new Date(b.start_date)? -1 : 1)
+              .map(instance => h(SmallInstanceCard, instance)) || []
+          ])
       ])
-    ]),
-    ]),
-
-    //Dotted Separator
-    h(Seperator),
-
-    //Upcoming instance list 
-    h(Box, {gap:16}, [
-      instance ?
-        h(Box, {as: "form", onSubmit}, [
-          h(Label, [prettyDate(instance.start_date)]),
-          h('p', 'facillitated by ' + instance.people?.display_name),
-          h(Primary, {
-            disabled: !!props.course?.invite_only && props.course?.course_invites.length === 0,
-            style: {width: '100%'},
-          }, loading ? h(Loader) : 'Enroll'),
-        ])
-        : h(Box, {gap: 16}, [
-          h('div', [
-            h('h3', 'Enroll in an Instance'),
-            h('div', {style: {color: colors.textSecondary, fontSize: '0.8rem', fontWeight: 'bold'}},
-              'Click on an instance below for details'),
-          ]),
-          ...props.course?.course_instances
-            .filter(i => !userInstances?.course_instances.find(x => x.id === i.id) &&
-                    !i.completed && (new Date() < new Date(i.start_date)))
-            .sort((a, b)=>new Date(a.start_date) < new Date(b.start_date)? -1 : 1)
-            .map(instance => h(SmallInstanceCard, instance)) || []
-        ])
     ])
   ])
 }
@@ -99,6 +101,12 @@ display: inline;
 const Cost = styled('div')`
 font-size: 56px;
 font-weight: bold;
+`
+
+// Add a wrapper around Enroll Panel so apply the sticky feature on screens above 768px
+export const StickyWrapper = styled('div')`
+position: sticky;
+top: 32px;
 `
 
 export const EnrollGrid = styled('div')`
