@@ -54,10 +54,9 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
               `Facillitated by ${instance?.people.display_name}`
             ]),
           ]),
-          h(Box, [
-            inInstance || isFacilitator
-              ? h('a', {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}
-                  , h(Primary, 'Go to the forum')) : null,
+          !inInstance || !isFacilitator ? null : h(Box, [
+            h('a', {href: `https://forum.hyperlink.academy/c/${instance?.courses.id}/${instance?.id}`}
+              , h(Primary, 'Go to the forum')),
             instance && !instance.completed && isFacilitator && isStarted ? h(MarkInstanceComplete, {id:props.id}) : null
           ]),
         ]),
@@ -67,12 +66,11 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
             "Instance Details": h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
                 !props.notes ? null : h(Box, [
+                  h('h3', "Notes"),
                   h(Text, {source: props.notes})
                 ]),
-                h(Box, {gap: 8}, [
-                  h('h3', 'Participants'),
-                ]),
                 h(Box, {gap:16}, !instance ? [] : [
+                  h('h3', 'Participants'),
                   h(LearnerEntry, [
                     h(Link, {
                       href: '/people/[id]',
