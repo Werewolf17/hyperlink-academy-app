@@ -42,7 +42,7 @@ grid-template-rows: 1fr auto;
 `
 
 export const Body = styled('div')`
-max-width: 968px;
+max-width: 1024px;
 width: 100%;
 padding: 32px;
 margin: 0 auto;

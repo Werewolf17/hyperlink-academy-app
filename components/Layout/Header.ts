@@ -76,7 +76,6 @@ display: grid;
 font-family: serif;
 grid-template-columns: auto auto;
 height: 32px;
-padding-top: 32px;
 padding-bottom: 64px;
 ${Mobile} {
   padding-bottom: 32px ;
