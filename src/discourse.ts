@@ -11,6 +11,7 @@ export type Category = {
     topics: Array<{
       id: string
       pinned: boolean
+      tags: string[]
     }>
   }
 }
@@ -88,6 +89,22 @@ export const addMember = async (groupId:string, username: string) => {
         })
       })
   return result.status  === 200
+}
+
+export const getTaggedPostContent = async (c: string, tag: string) => {
+  let res = await fetch(`https://forum.hyperlink.academy/c/${c}.json`, {
+    method: 'GET',
+    headers: {
+      ...headers,
+      "Content-Type": 'application/json; charset=utf-8',
+    },
+  })
+
+  let category = await res.json() as Category
+  let topicID = category.topic_list.topics.find((topic) => topic.tags.includes(tag))?.id
+  if(!topicID) return ''
+  let topicRequest = await fetch('https://forum.hyperlink.academy/raw/' + topicID, {headers})
+  return await topicRequest.text()
 }
 
 export const makeSSOPayload = (params: {[key:string]: string}) => {

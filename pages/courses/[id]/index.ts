@@ -13,7 +13,7 @@ import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
 import Text from '../../../components/Text'
 
-import { Category } from '../../../src/discourse'
+import { getTaggedPostContent } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
 import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
@@ -280,20 +280,12 @@ grid-gap: 16px;
 export const getStaticProps = async (ctx:any) => {
   let id = (ctx.params?.id || '' )as string
 
-  let content = await getCourseContent(id)
   let data = await courseDataQuery(id)
+  let content = await getTaggedPostContent(id, 'curriculum')
 
   return {props: {content, id, course: data}, unstable_revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
   return {paths:[], fallback: true}
-}
-
-const getCourseContent = async (id:string) => {
-  let res = await fetch(`https://forum.hyperlink.academy/c/${id}.json`)
-  let category = await res.json() as Category
-  let topicID = category.topic_list.topics.find((topic) => topic.pinned === true)?.id
-  let topicRequest = await fetch('https://forum.hyperlink.academy/raw/' + topicID)
-  return await topicRequest.text()
 }

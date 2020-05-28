@@ -13,7 +13,9 @@ import { Primary, Destructive } from '../../../components/Button'
 import Loader from '../../../components/Loader'
 import { Info } from '../../../components/Form'
 import { Modal } from '../../../components/Modal'
+import {Text} from '../../../components/Text'
 
+import { getTaggedPostContent } from '../../../src/discourse'
 import { callApi } from '../../../src/apiHelpers'
 import { instanceDataQuery } from '../../api/get/[...item]'
 import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses/[action]'
@@ -59,6 +61,9 @@ const InstancePage = (props:Props) => {
           tabs: {
             "Instance Details": h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
+                h(Box, [
+                  h(Text, props.notes)
+                ]),
                 h(Box, {gap: 8}, [
                   h('h3', 'Participants'),
                 ]),
@@ -81,9 +86,7 @@ const InstancePage = (props:Props) => {
                     })])
               ] )
             ]),
-            "Curriculum": h('div', [
-
-            ])
+            "Curriculum": h(Text, props.curriculum)
           }
         })),
       inInstance
@@ -173,7 +176,9 @@ margin-top: 0px
 export const getStaticProps = async (ctx:any)=>{
   let id = (ctx.params?.instanceID || '' )as string
   let data = await instanceDataQuery(id)
-  return {props: {id, instance: data}, unstable_revalidate: 1} as const
+  let notes= await getTaggedPostContent(ctx.params.id + '/' + ctx.params?.instanceID, 'note')
+  let curriculum = await getTaggedPostContent(ctx.params.id, 'curriculum')
+  return {props: {id, instance: data, notes, curriculum}, unstable_revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
