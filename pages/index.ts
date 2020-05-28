@@ -2,6 +2,7 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { InferGetStaticPropsType } from 'next'
 import { useEffect } from 'react'
 
 import Intro from '../writing/Intro.mdx'
@@ -12,10 +13,7 @@ import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 
-
-type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
-type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
-
+type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Landing = (props:Props) => {
   let {data: courses} = useCourses(props)
   let {data: user} = useUserData()

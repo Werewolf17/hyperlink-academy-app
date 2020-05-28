@@ -1,6 +1,7 @@
 import h from 'react-hyperscript'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { InferGetStaticPropsType } from 'next'
 
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
@@ -9,9 +10,7 @@ import { useUserInstances, useUserData, useCourses } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import { BigInstanceCard } from '../components/Card'
 
-type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
-type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
-
+type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Dashboard = (props:Props) => {
   let {data: user} = useUserData()
   let {data: courses} = useCourses(props)
