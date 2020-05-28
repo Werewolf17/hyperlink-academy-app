@@ -57,7 +57,7 @@ const Landing = (props:Props) => {
 const Welcome = ()=>{
   return h(Box, {gap:32}, [
     h(ImageContainer, [
-      h(TitleImg, {height: 218, width: 640, src:'/img/landing.png', style: {border: 'none'}}),
+      h(TitleImg, {height: 'auto', width: 1024, src:'/img/landing.png', style: {border: 'none'}}),
     ]),
     h(Box, {ma: true, width: 640}, [
       h(Title, 'hyperlink.academy'),
@@ -84,6 +84,7 @@ export const getStaticProps = async () => {
 const ImageContainer = styled('div')`
 overflow: hidden;
 border: 2px solid;
+height: 218px;
 ${Mobile}{overflow: scroll};
 `
 
