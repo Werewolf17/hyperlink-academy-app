@@ -16,6 +16,7 @@ export const useProfileData = (username:string, initialData?:Success<ProfileResu
   }, {initialData})
 }
 
+export type Course = Success<CourseDataResult>
 export const useCourseData = (id: string, initialData?:Success<CourseDataResult>) => {
   return useSWR('/api/get/course/' + id, async api => {
     let res = await callApi<null, CourseDataResult>(api)
