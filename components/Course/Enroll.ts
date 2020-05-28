@@ -9,13 +9,13 @@ import { Primary} from '../Button'
 import { Box, Seperator} from '../Layout'
 import {colors} from '../Tokens'
 import Loader from '../Loader'
-import { useUserData, useCourseData, useUserInstances} from '../../src/data'
+import { useUserData, useUserInstances, Course} from '../../src/data'
 import { callApi } from '../../src/apiHelpers'
 import { SmallInstanceCard } from '../Card'
 
 type Props = {
   instanceId?: string,
-  courseId: string
+  course?: Course
 }
 
 const Enroll = (props: Props) => {
@@ -24,7 +24,6 @@ const Enroll = (props: Props) => {
   let [loading, setLoading] = useState(false)
 
   let {data:user} = useUserData()
-  let {data:course} = useCourseData(props.courseId)
   let {data: userInstances} = useUserInstances()
 
   const onSubmit = async (e: React.FormEvent)=>{
@@ -41,19 +40,19 @@ const Enroll = (props: Props) => {
     if(res.status === 200) await stripe.redirectToCheckout({sessionId: res.result.sessionId})
     setLoading(false)
   }
-  let instance = course?.course_instances.find(i=> i.id===props.instanceId)
+  let instance = props.course?.course_instances.find(i=> i.id===props.instanceId)
 
   //Laying out the Enroll Panel
   return h(EnrollGrid, [
 
     //Enroll Details (cost, length, prereqs)
     h(Box, {gap:16}, [
-      h(Cost, '$' + course?.cost),
+      h(Cost, '$' + props.course?.cost),
     h(Box, {gap: 8, style:{color: colors.textSecondary}}, [
-      h('b', course?.duration),
+      h('b', props.course?.duration),
       h(Box, {gap: 4}, [
          h('b', 'Prerequisites'),
-         h('p', course?.prerequisites)
+         h('p', props.course?.prerequisites)
       ])
     ]),
     ]),
@@ -68,7 +67,7 @@ const Enroll = (props: Props) => {
           h(Label, [prettyDate(instance.start_date)]),
           h('p', 'facillitated by ' + instance.people?.display_name),
           h(Primary, {
-            disabled: !!course?.invite_only && course?.course_invites.length === 0,
+            disabled: !!props.course?.invite_only && props.course?.course_invites.length === 0,
             style: {width: '100%'},
           }, loading ? h(Loader) : 'Enroll'),
         ])
@@ -78,7 +77,7 @@ const Enroll = (props: Props) => {
             h('div', {style: {color: colors.textSecondary, fontSize: '0.8rem', fontWeight: 'bold'}},
               'Click on an instance below for details'),
           ]),
-          ...course?.course_instances
+          ...props.course?.course_instances
             .filter(i => !userInstances?.course_instances.find(x => x.id === i.id) &&
                     !i.completed && (new Date() < new Date(i.start_date)))
             .sort((a, b)=>new Date(a.start_date) < new Date(b.start_date)? -1 : 1)

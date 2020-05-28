@@ -49,7 +49,7 @@ const CoursePage = (props:Props) => {
       Instances: h(Instances, {course: props.id}),
       Settings: isMaintainer ? h(Settings) : null
     }}),
-    h(Sidebar, [h(Enroll, {courseId: props.id})]),
+    h(Sidebar, [h(Enroll, {course})]),
   ])
 }
 

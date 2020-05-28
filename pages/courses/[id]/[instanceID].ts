@@ -18,9 +18,9 @@ import {Text} from '../../../components/Text'
 
 import { getTaggedPostContent } from '../../../src/discourse'
 import { callApi } from '../../../src/apiHelpers'
-import { instanceDataQuery } from '../../api/get/[...item]'
+import { instanceDataQuery, courseDataQuery } from '../../api/get/[...item]'
 import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses/[action]'
-import { useInstanceData, useUserData } from '../../../src/data'
+import { useInstanceData, useUserData, useCourseData } from '../../../src/data'
 import { instancePrettyDate } from '../../../components/Card'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
@@ -28,6 +28,7 @@ const InstancePage = (props:Props) => {
   let router = useRouter()
   let {data: user} = useUserData()
   let {data: instance} = useInstanceData(props.id, props.instance || undefined)
+  let {data: course} = useCourseData(props.courseId, props.course || undefined)
   if(instance === false) return null
 
   let inInstance = instance?.people_in_instances.find(p => p.person_id === (user ? user.id : undefined))
@@ -92,9 +93,7 @@ const InstancePage = (props:Props) => {
         })),
       inInstance
         ? null
-        : h(Sidebar, {} ,
-            h(Enroll, {instanceId: router.query.instanceID as string, courseId: router.query.id as string}),
-           )
+        : h(Sidebar, {} ,h(Enroll, {instanceId: props.id, course}))
     ])
   ])
 }
@@ -221,11 +220,15 @@ margin-top: 0px
 `
 
 export const getStaticProps = async (ctx:any)=>{
-  let id = (ctx.params?.instanceID || '' )as string
-  let data = await instanceDataQuery(id)
-  let notes= await getTaggedPostContent(ctx.params.id + '/' + ctx.params?.instanceID, 'note')
+  let instanceId = (ctx.params?.instanceID || '' )as string
+  let courseId = (ctx.params?.id || '' )as string
+
+  let instance = await instanceDataQuery(instanceId)
+  let course = await courseDataQuery(courseId)
+
+  let notes= await getTaggedPostContent(courseId + '/' + instanceId, 'note')
   let curriculum = await getTaggedPostContent(ctx.params.id, 'curriculum')
-  return {props: {id, instance: data, notes, curriculum}, unstable_revalidate: 1} as const
+  return {props: {id:instanceId, instance, courseId, course, notes, curriculum}, unstable_revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
