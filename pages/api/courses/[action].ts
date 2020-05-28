@@ -1,7 +1,7 @@
 import { ResultType, Request, multiRouteHandler} from '../../../src/apiHelpers'
 import { PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
-import {createInstanceGroup, createCategory} from '../../../src/discourse'
+import { createInstanceGroup, createCategory, createTopic} from '../../../src/discourse'
 import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient({
@@ -183,12 +183,18 @@ async function createCourse(req: Request) {
   let isAdmin = prisma.admins.findOne({where: {person: user.id}})
   if(!isAdmin) return {status: 403, result: "ERROR: user is not an admin"} as const
 
-  let category_id = await createCategory(msg.name, {id: msg.courseId})
-  if(!category_id) return {status: 500, result: "ERROR: couldn't create course category"}
+  let category = await createCategory(msg.name, {id: msg.courseId})
+  if(!category) return {status: 500, result: "ERROR: couldn't create course category"}
+  await createTopic({
+    category,
+    title: `${msg.name} Curriculum`,
+    tags: ['curriculum'],
+    raw: "Please fill out the course curriculum"
+  })
 
   await prisma.courses.create({
     data: {
-      category_id,
+      category_id: category,
       id: msg.courseId,
       name: msg.name,
       description: msg.description,

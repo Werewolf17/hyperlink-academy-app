@@ -38,8 +38,26 @@ export const createInstanceGroup = async (name: string, admin: string, courseID:
     console.log(await result.text())
     return false
   }
-  await createCategory(name, {permissions: {[name]:1}, parent_category_id: courseID})
+  let category = await createCategory(name, {permissions: {[name]:1}, parent_category_id: courseID})
+  if(category) await createTopic({
+    category,
+    title: name + " Notes",
+    raw: "Fill out these notes for your new instance",
+    tags: ['note']
+  })
   return true
+}
+
+export async function createTopic(input:{title: string, category: number, raw: string, tags?: string[]}) {
+  let result = await fetch('https://forum.hyperlink.academy/posts.json', {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json; charset=utf-8',
+      ...headers
+    },
+    body: JSON.stringify({...input})
+  })
+  console.log(result)
 }
 
 export const createCategory = async (name: string, options?: {id?: string,permissions?: {[key:string]:number}, parent_category_id?: number}):Promise<number | false> => {
