@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Box} from '../components/Layout'
 import { Label, Input, Error, Info} from '../components/Form'
 import {Primary} from '../components/Button'
-import {TitleImg, AccentImg} from '../components/Images'
+import {AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
@@ -42,8 +42,7 @@ const Signup = () => {
   }
 
   return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
-    h(TitleImg, {height: 233, width: 130, src: '/img/start_journey_crop.png'}),
-    h('h1', 'Start a journey'),
+    h('h1', 'Sign Up'),
     formState === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
       '.'

@@ -47,7 +47,6 @@ const Login = () => {
   }
 
   return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
-    h(TitleImg, { height: 163, width: 299, src: '/img/dragon.png' }),
     h('h1', 'Welcome Back!'),
     formState === 'error' ? h(Error, {}, h('div', [
       "That email and password don't match. You can ",
