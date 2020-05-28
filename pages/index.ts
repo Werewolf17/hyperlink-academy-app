@@ -57,7 +57,7 @@ const Landing = (props:Props) => {
 const Welcome = ()=>{
   return h(Box, {gap:32}, [
     h(ImageContainer, [
-      h(TitleImg, {height: 'auto', width: 1024, src:'/img/landing.png', style: {border: 'none'}}),
+      h(TitleImg, {width: 1024, src:'/img/landing.png', style: {border: 'none'}}),
     ]),
     h(Box, {ma: true, width: 640}, [
       h(Title, 'hyperlink.academy'),

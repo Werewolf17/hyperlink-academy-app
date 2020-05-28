@@ -1,10 +1,10 @@
 import styled from '@emotion/styled'
-export let TitleImg = styled('img')<{height: number, width: number}>`
+export let TitleImg = styled('img')<{height?: number, width: number}>`
 image-rendering: pixelated;
 image-rendering: crisp-edges;
 display: block;
 border: 2px solid;
-height: ${props=> props.height}px;
+height: ${props=> props.height ? props.height +'px' : 'auto'};
 width: ${props=> props.width}px;
 `
 
