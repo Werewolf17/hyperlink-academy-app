@@ -21,9 +21,13 @@ import { courseDataQuery } from '../../api/get/[...item]'
 import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
 import { callApi } from '../../../src/apiHelpers'
 import { instancePrettyDate } from '../../../components/Card'
+import ErrorPage from '../../404'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
-const CoursePage = (props:Props) => {
+
+export default (props: Props)=>props.notFound ? h(ErrorPage) : h(CoursePage, props)
+
+const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: user} = useUserData()
   let {data: course} = useCourseData(props.id, props.course || undefined)
 
@@ -52,8 +56,6 @@ const CoursePage = (props:Props) => {
     h(Sidebar, [h(Enroll, {course})]),
   ])
 }
-
-export default CoursePage
 
 const Instances = (props:{course: string}) => {
   let {data: userInstances} = useUserInstances()
@@ -283,9 +285,10 @@ export const getStaticProps = async (ctx:any) => {
   let id = (ctx.params?.id || '' )as string
 
   let data = await courseDataQuery(id)
+  if(!data) return {props:{notFound: true}} as const
   let content = await getTaggedPostContent(id, 'curriculum')
 
-  return {props: {content, id, course: data}, unstable_revalidate: 1} as const
+  return {props: {notFound: false, content, id, course: data}, unstable_revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {

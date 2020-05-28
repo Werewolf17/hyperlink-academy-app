@@ -9,9 +9,13 @@ import {profileDataQuery} from '../api/get/[...item]'
 
 import { useProfileData } from '../../src/data'
 import { colors } from '../../components/Tokens'
+import ErrorPage from '../404'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
-const Profile= (props: Props)=>{
+
+export default (props: Props)=> props.notFound ? h(ErrorPage) : h(Profile, props)
+
+const Profile= (props: Extract<Props, {notFound: false}>)=>{
   let router = useRouter()
   let username = router.query.username as string
   let {data: person} = useProfileData(username, props || undefined)
@@ -30,16 +34,13 @@ const Profile= (props: Props)=>{
 
 export const getStaticProps = async (ctx:any)=>{
   let username = ctx.params?.username as string
-  if(!username) return {
-    props:undefined,
-    unstable_revalidate: 1
-  }
   let data = await profileDataQuery(username)
-  return {props: data, unstable_revalidate:1}
+
+  if(!data) return {props: {notFound: true}} as const
+
+  return {props: {notFound: false, ...data}, unstable_revalidate:1} as const
 }
 
 export const getStaticPaths = async ()=>{
   return {paths:[], fallback: true}
 }
-
-export default Profile

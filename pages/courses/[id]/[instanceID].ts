@@ -23,12 +23,15 @@ import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses
 import { useInstanceData, useUserData, useCourseData } from '../../../src/data'
 import { instancePrettyDate } from '../../../components/Card'
 
+import ErrorPage from '../../404'
+
 type Props = InferGetStaticPropsType<typeof getStaticProps>
-const InstancePage = (props:Props) => {
+export default (props: Props)=>  props.notFound ? h(ErrorPage) : h(InstancePage, props)
+const InstancePage = (props: Extract<Props, {notFound:false}>) => {
   let router = useRouter()
   let {data: user} = useUserData()
-  let {data: instance} = useInstanceData(props.id, props.instance || undefined)
-  let {data: course} = useCourseData(props.courseId, props.course || undefined)
+  let {data: instance} = useInstanceData(props.id, props.instance)
+  let {data: course} = useCourseData(props.courseId, props.course)
   if(instance === false) return null
 
   let inInstance = instance?.people_in_instances.find(p => p.person_id === (user ? user.id : undefined))
@@ -104,8 +107,6 @@ display: grid;
 grid-template-columns: max-content min-content;
 grid-gap: 16px;
 `
-
-export default InstancePage
 
 const MarkInstanceComplete = (props:{id: string})=> {
   let {data: instance, mutate} = useInstanceData(props.id)
@@ -225,9 +226,11 @@ export const getStaticProps = async (ctx:any)=>{
   let instance = await instanceDataQuery(instanceId)
   let course = await courseDataQuery(courseId)
 
+  if(!instance || !course) return {props: {notFound: true}} as const
+
   let notes= await getTaggedPostContent(courseId + '/' + instanceId, 'note')
   let curriculum = await getTaggedPostContent(ctx.params.id, 'curriculum')
-  return {props: {id:instanceId, instance, courseId, course, notes, curriculum}, unstable_revalidate: 1} as const
+  return {props: {notFound: false, id:instanceId, instance, courseId, course, notes, curriculum}, unstable_revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
