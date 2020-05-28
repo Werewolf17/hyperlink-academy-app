@@ -61,15 +61,17 @@ const Instances = (props:{course: string}) => {
   let {data: user} = useUserData()
 
   if(!course) return null
-  let {userInvolved, upcoming, completed} = course.course_instances.reduce((acc, instance)=> {
-    if(user) {
-      if(instance.facillitator === user.id ||
-         userInstances?.course_instances.find(i => i.id === instance.id)
-        ) acc.userInvolved.push(h(Instance, {instance}))
-      return acc
-    }
-    if(instance.completed) acc.completed.push(h(Instance, {instance}))
-    else acc.upcoming.push(h(Instance, {instance}))
+  let {userInvolved, upcoming, completed} = course.course_instances
+    .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
+    .reduce((acc, instance)=> {
+      if(user) {
+        if(instance.facillitator === user.id ||
+           userInstances?.course_instances.find(i => i.id === instance.id)
+          ) acc.userInvolved.push(h(Instance, {instance}))
+        return acc
+      }
+      if(instance.completed) acc.completed.push(h(Instance, {instance}))
+      else acc.upcoming.push(h(Instance, {instance}))
     return acc
   }, {
     userInvolved:[] as React.ReactElement[],
