@@ -4,9 +4,7 @@ import {syncSSO} from '../../src/discourse'
 import { PrismaClient, people} from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient({
-  forceTransactions: true
-})
+const prisma = new PrismaClient()
 
 export type Msg = {
   profile?: {
