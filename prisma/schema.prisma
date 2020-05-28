@@ -31,6 +31,14 @@ model course_instances {
   people_in_instances people_in_instances[]
 }
 
+model course_invites {
+  course  String
+  email   String
+  courses courses @relation(fields: [course], references: [id])
+
+  @@id([course, email])
+}
+
 model course_maintainers {
   course     String
   maintainer String
@@ -46,9 +54,11 @@ model courses {
   description        String
   duration           String
   id                 String               @id
+  invite_only        Boolean              @default(false)
   name               String
   prerequisites      String
   course_instances   course_instances[]
+  course_invites     course_invites[]
   course_maintainers course_maintainers[]
 }
 

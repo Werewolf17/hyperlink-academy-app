@@ -21,7 +21,7 @@ export default multiRouteHandler('item', {
   'profile': getProfileData
 })
 
-export const courseDataQuery = (id:string) => prisma.courses.findOne({
+export const courseDataQuery = (id:string, email?:string) => prisma.courses.findOne({
   where: {id },
   include: {
     course_maintainers: {
@@ -52,14 +52,20 @@ export const courseDataQuery = (id:string) => prisma.courses.findOne({
           }
         }
       }
+    },
+    course_invites: {
+      where: {
+        email
+      }
     }
   }
 })
 
 async function getCourseData(req: Request) {
+  let user = getToken(req)
   let id = req.query.item[1]
   if(!id) return {status: 400, result: 'ERROR: no course id provided'} as const
-  let data = await courseDataQuery(id)
+  let data = await courseDataQuery(id, user?.email)
 
   if(!data) return {status: 403, result: `ERROR: no course with id ${id} found`} as const
   return {status:200, result: data} as const
@@ -85,7 +91,7 @@ export const instanceDataQuery = (id: string)=>prisma.course_instances.findOne({
               username: true,
             }
           }
-        }
+        },
       }
     },
 })
@@ -148,12 +154,20 @@ async function getUserInstances(req:Request) {
           display_name: true,
           username: true,
         }
-
       }
     },
   })
+  let invited_courses = await prisma.courses.findMany({
+    where:{
+      course_invites: {
+        some: {
+          email: token.email
+        }
+      }
+    }
+  })
   await prisma.disconnect()
-  return {status: 200, result: {course_instances}} as const
+  return {status: 200, result: {course_instances, invited_courses}} as const
 }
 
 async function whoami(req:Request) {

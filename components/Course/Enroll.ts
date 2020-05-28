@@ -43,13 +43,7 @@ const Enroll = (props: Props) => {
   }
   let instance = course?.course_instances.find(i=> i.id===props.instanceId)
 
-
-
-
-
-
-
-//Laying out the Enroll Panel
+  //Laying out the Enroll Panel
   return h(EnrollGrid, [
 
     //Enroll Details (cost, length, prereqs)
@@ -74,6 +68,7 @@ const Enroll = (props: Props) => {
           h(Label, [prettyDate(instance.start_date)]),
           h('p', 'facillitated by ' + instance.people?.display_name),
           h(Primary, {
+            disabled: !!course?.invite_only && course?.course_invites.length === 0,
             style: {width: '100%'},
           }, loading ? h(Loader) : 'Enroll'),
         ])

@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS courses (
     name          text NOT NULL,
     category_id   integer NULL,
     duration      text NOT NULL,
+    invite_only   boolean NOT NULL DEFAULT false,
     description   text NOT NULL,
     cost          real NOT NULL,
     prerequisites text NOT NULL
@@ -51,6 +52,12 @@ CREATE TABLE IF NOT EXISTS course_instances (
     facillitator  text REFERENCES people(id) NOT NULL,
     course        text REFERENCES courses(id) NOT NULL,
     completed     text
+);
+
+CREATE TABLE IF NOT EXISTS course_invites (
+    course        text REFERENCES courses(id) NOT NULL,
+    email         text NOT NULL,
+    PRIMARY KEY (course, email)
 );
 
 CREATE TABLE IF NOT EXISTS people_in_instances (
