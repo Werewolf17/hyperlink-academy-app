@@ -55,7 +55,7 @@ export const courseDataQuery = (id:string, email?:string) => prisma.courses.find
     },
     course_invites: {
       where: {
-        email
+        email: email || 'no email'
       }
     }
   }

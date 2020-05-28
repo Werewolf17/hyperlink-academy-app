@@ -91,8 +91,7 @@ const InstancePage = (props:Props) => {
             "Curriculum": h(Text, props.curriculum)
           }
         })),
-      inInstance
-        ? null
+      inInstance || isFacilitator ? null
         : h(Sidebar, {} ,h(Enroll, {instanceId: props.id, course}))
     ])
   ])
