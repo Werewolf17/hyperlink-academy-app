@@ -2,12 +2,15 @@ import styled from '@emotion/styled'
 import h from 'react-hyperscript'
 import { Fragment, useState, useEffect } from 'react'
 
-export const Modal:React.SFC<{display:boolean}> = (props)=>{
+export const Modal:React.SFC<{display:boolean, onExit?: Function}> = (props)=>{
   let [display, setDisplay] =  useState(props.display)
   useEffect(()=>setDisplay(props.display), [props])
   if(!display) return null
   return h(Fragment, [
-    h(ModalBlur, {onClick: ()=>setDisplay(false)}),
+    h(ModalBlur, {onClick: ()=>{
+      setDisplay(false)
+      if(props.onExit) props.onExit()
+    }}),
     h(ModalBox, {}, [props.children as React.ReactElement])
   ])
 }
