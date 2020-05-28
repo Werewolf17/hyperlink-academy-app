@@ -3,6 +3,7 @@ import styled from '@emotion/styled'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useState } from 'react'
+import { InferGetStaticPropsType } from 'next'
 
 import Enroll from '../../../components/Course/Enroll'
 import { TwoColumn, Box, Seperator, Sidebar} from '../../../components/Layout'
@@ -22,8 +23,7 @@ import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses
 import { useInstanceData, useUserData } from '../../../src/data'
 import { instancePrettyDate } from '../../../components/Card'
 
-type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
-type Props = PromiseReturn<ReturnType<typeof getStaticProps>>['props']
+type Props = InferGetStaticPropsType<typeof getStaticProps>
 const InstancePage = (props:Props) => {
   let router = useRouter()
   let {data: user} = useUserData()
