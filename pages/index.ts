@@ -85,7 +85,7 @@ const ImageContainer = styled('div')`
 overflow: hidden;
 border: 2px solid;
 height: 218px;
-${Mobile}{overflow: scroll};
+${Mobile}{overflow-x: scroll};
 `
 
 const Title = styled('h1')`
