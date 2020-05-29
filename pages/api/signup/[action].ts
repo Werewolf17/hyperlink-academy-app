@@ -14,6 +14,7 @@ export type SignupMsg = {
   email: string
   username: string
   password: string
+  newsletter: boolean
 }
 
 export type VerifyEmailMsg = {
@@ -30,8 +31,8 @@ export default multiRouteHandler('action', {
 
 async function Signup(req: Request) {
   let msg: Partial<SignupMsg> = req.body
-  if(!msg.email || !msg.password || !msg.username) {
-    return {status: 400, result: 'Error: invalid message, missing email, password, or display_name'} as const
+  if(!msg.email || !msg.password || !msg.username || msg.newsletter === undefined) {
+    return {status: 400, result: 'Error: invalid message, missing email, password, newsletter, or display_name'} as const
   }
   if(msg.username.length < 3 || msg.username.length > 20) return {status: 400, result: "Error: username must be between 3 and 20 characters"}
   if(/\s/.test(msg.username)) return {status:400, result: "Error: username cannot contain spaces"} as const
@@ -44,7 +45,7 @@ async function Signup(req: Request) {
   let salt = await bcrypt.genSalt()
   let password_hash = await bcrypt.hash(msg.password, salt)
 
-  let key = await createActivationKey({email: msg.email, username:msg.username, password_hash})
+  let key = await createActivationKey({email: msg.email, username:msg.username, password_hash, newsletter:msg.newsletter})
   await prisma.disconnect()
 
   let activation_url = `${req.headers.origin}/signup?verifyEmail=${key}`
@@ -74,6 +75,19 @@ async function VerifyEmail (req: Request) {
     password_hash: token.password_hash
   })
 
+  if(token.newsletter) {
+    fetch('https://api.buttondown.email/v1/subscribers',{
+      method: "POST",
+      headers: {
+        Authorization: `Token ${process.env.BUTTONDOWN_API_KEY}`,
+        "Content-Type": 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        email: token.email
+      })
+    })
+  }
+
   await prisma.disconnect()
   if(!id) return {status: 403, result: "Error: Couldn't create user. May already exist"}
 
@@ -90,7 +104,7 @@ async function VerifyEmail (req: Request) {
   } as const
 }
 
-const createActivationKey = async (person:{email: string, password_hash: string, username: string}) => {
+const createActivationKey = async (person:{email: string, password_hash: string, username: string, newsletter:boolean}) => {
   let key = uuidv4()
   await prisma.activation_keys.create({
     data: {
@@ -125,6 +139,6 @@ const createUser = async (input:{email:string, password_hash:string, username: s
 const getActivationKey = async (hash: string)=> {
   return prisma.activation_keys.findOne({
     where: {key_hash: hash},
-    select: {username: true, email: true, password_hash: true, created_time: true}
+    select: {username: true, email: true, password_hash: true, created_time: true, newsletter: true}
   })
 }

@@ -8,6 +8,54 @@ display: grid;
 grid-gap: 8px;
 `
 
+export let CheckBox = styled('label')`
+font-weight: bold;
+display: grid;
+align-items: center;
+grid-template-columns: 16px auto;
+grid-gap: 16px;
+
+input[type="checkbox"]:focus {
+  border: 1px solid;
+  outline: none;
+}
+
+input[type="checkbox"]:hover {
+  border: 2px solid;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  height: 16px;
+  width: 16px;
+  border: 1px solid;
+  border-radius: 2px
+}
+input[type="checkbox"]::before {
+  position: absolute;
+
+  content: url("data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8'
+  fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4.69231L2.875
+  7L7 1' stroke='black' stroke-width='2' stroke-linecap='round'
+  stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  visibility: hidden; top: -5.5px;
+  left: 2px;
+}
+
+input[type="checkbox"]:checked::before {
+  visibility: visible;
+}
+input[type="checkbox"]:checked {
+  border: 2px solid;
+}
+
+
+`
+
 export let Input = styled('input')`
 padding: 12px 16px;
 border: 1px solid;

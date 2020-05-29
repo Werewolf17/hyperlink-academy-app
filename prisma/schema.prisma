@@ -10,7 +10,8 @@ datasource db {
 model activation_keys {
   created_time  String
   email         String
-  key_hash      String @id
+  key_hash      String  @id
+  newsletter    Boolean @default(false)
   password_hash String
   username      String
 }
