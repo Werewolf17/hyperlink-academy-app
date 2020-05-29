@@ -4,7 +4,7 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 
 import { Box} from '../components/Layout'
-import { Label, Input, Error, Info} from '../components/Form'
+import { Label, Input, Error, Info, CheckBox} from '../components/Form'
 import {Primary} from '../components/Button'
 import {AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
@@ -18,6 +18,7 @@ const Signup = () => {
     username: '',
     password:'',
     confPassword:'',
+    newsletter: false,
   })
 
   let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
@@ -86,6 +87,12 @@ const Signup = () => {
                   }
                 }
                })
+    ]),
+    h(CheckBox, [
+      h(Input, {type: 'checkbox', checked: formData.newsletter, onChange: e=> {
+        setFormData({...formData, newsletter: e.currentTarget.checked})
+      }}),
+      "Do you want to receive our newsletter?"
     ]),
     h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
   ]))
