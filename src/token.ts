@@ -11,17 +11,6 @@ export type Token = {
   admin?: boolean
 }
 
-export function setToken(res:ServerResponse, token:Token) {
-  res.setHeader(
-    'Set-Cookie',
-    cookie.serialize('loginToken', JSON.stringify(token), {
-      path: '/',
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
-      httpOnly: true
-    })
-  );
-}
-
 export function setTokenHeader(token:Token)  {
   return {
     'Set-Cookie':cookie.serialize('loginToken', JSON.stringify(token), {
