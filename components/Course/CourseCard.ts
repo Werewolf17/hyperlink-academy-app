@@ -60,6 +60,7 @@ let CourseCard = styled(Card)`
 padding: 0px;
 display: grid;
 border: 2px solid;
+border-radius: 2px;
 grid-template-columns: 120px auto;
 max-height: 280px;
 ${Mobile} {

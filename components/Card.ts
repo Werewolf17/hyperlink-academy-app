@@ -43,7 +43,7 @@ export const SmallInstanceCard = (props: Instance) => {
     passHref: true,
     as:`/courses/${props.course}/${props.id}`
   }, [
-    h(Card, {style:{border: '1px solid', borderTop: '4px solid'}}, [
+    h(Card, {style:{border: '1px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h('h4', `Starts ${prettyDate(props.start_date)}`),
       h('p', {style:{color: colors.textSecondary}},
         `Facillitated by ${props.people.display_name || props.people.username}`)
@@ -61,7 +61,7 @@ export const BigInstanceCard = (props: Instance & {courses: {name: string}}) =>{
     passHref: true,
     as:`/courses/${props.course}/${props.id}`
   }, [
-    h(Card, {style:{border: '2px solid', borderTop: '4px solid'}}, [
+    h(Card, {style:{border: '2px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 8}, [
           props.enrolled || props.facillitating ? h(Box, {gap: 8, h: true}, [
