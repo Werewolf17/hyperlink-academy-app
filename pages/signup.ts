@@ -11,6 +11,8 @@ import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from '.
 import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
 import { callApi } from '../src/apiHelpers'
+import { useDebouncedEffect} from '../src/hooks'
+import { CheckUsernameResult } from './api/get/[...item]'
 
 const Signup = () => {
   let [formData, setFormData] = useState({
@@ -21,11 +23,18 @@ const Signup = () => {
   })
 
   let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
+  let [usernameValid, setUsernameValid] = useState<null | boolean>(null)
   let {data:user} = useUserData()
   let router = useRouter()
 
   useEffect(()=>setFormState('normal'), [formData.email])
   useEffect(()=>{if(user) router.push('/dashboard')}, [user])
+  useDebouncedEffect(async ()=>{
+    if(!formData.username) return setUsernameValid(null)
+    let res = await callApi<null, CheckUsernameResult>('/api/get/username/'+formData.username)
+    if(res.status===404) setUsernameValid(true)
+    else setUsernameValid(false)
+  }, 500, [formData.username])
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
@@ -54,7 +63,18 @@ const Signup = () => {
                 minLength: 3,
                 maxLength: 20,
                 value: formData.username,
-                onChange: (e)=> setFormData({...formData, username:e.currentTarget.value})})
+                onChange: (e)=> {
+                  setFormData({...formData, username:e.currentTarget.value})
+                  if(/\s/.test(e.currentTarget.value)){
+                    e.currentTarget.setCustomValidity('Your username cannot contain spaces')
+                  }
+                  else {
+                    e.currentTarget.setCustomValidity('')
+                  }
+                }}),
+      usernameValid === null
+        ? ''
+        : usernameValid ? h('span.accentSuccess', 'Great! This username is available') : h('span.accentRed', "Sorry, that username is taken")
     ]),
     h(Label, [
       "Your Email",
@@ -79,7 +99,7 @@ const Signup = () => {
                 onChange: (e)=> {
                   setFormData({...formData, confPassword:e.currentTarget.value})
                   if(e.currentTarget.value !== formData.password) {
-                    e.currentTarget.setCustomValidity('passwords do not match')
+                    e.currentTarget.setCustomValidity('Your passwords do not match')
                   }
                   else {
                     e.currentTarget.setCustomValidity('')

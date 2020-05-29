@@ -9,6 +9,7 @@ export type InstanceResult = ResultType<typeof getInstanceData>
 export type UserInstancesResult = ResultType<typeof getUserInstances>
 export type WhoAmIResult = ResultType<typeof whoami>
 export type ProfileResult = ResultType<typeof getProfileData>
+export type CheckUsernameResult = ResultType<typeof checkUsername>
 
 let prisma = new PrismaClient()
 
@@ -16,6 +17,7 @@ export default multiRouteHandler('item', {
   'courses': getCourses,
   'course': getCourseData,
   'user_instances': getUserInstances,
+  'username': checkUsername,
   'whoami': whoami,
   'instance': getInstanceData,
   'profile': getProfileData
@@ -173,4 +175,12 @@ async function getUserInstances(req:Request) {
 async function whoami(req:Request) {
   let token = getToken(req)
   return {status: 200, result: token || false } as const
+}
+
+async function checkUsername(req:Request){
+  let username = req.query.item[1]
+  let headers = {"Cache-Control": 's-maxage=60000, stale-while-revalidate'}
+  return !!await prisma.people.findOne({where:{username}, select:{username: true}})
+    ? {status: 200, result: '', headers} as const
+    : {status: 404, result: '', headers} as const
 }

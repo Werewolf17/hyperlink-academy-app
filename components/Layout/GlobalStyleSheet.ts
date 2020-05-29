@@ -2,6 +2,8 @@ import {css} from '@emotion/core'
 import {colors} from '../Tokens'
 export const GlobalStyleSheet = css`
 .textSecondary { color: ${colors.textSecondary} };
+.accentSuccess { color: ${colors.accentSuccess} };
+.accentRed { color: ${colors.accentRed} };
 
 html {
   overflow-y: scroll;
