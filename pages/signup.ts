@@ -135,7 +135,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
       h(Primary, {onClick: ()=> router.push('/dashboard')}, 'Back to hyperlink')
   ])
 
-  return h(Box, {width: 400, ma: true, gap: 32}, [
+  return h('form', {onSubmit}, h(Box, {width: 400, ma: true, gap: 32}, [
     h(AccentImg, {src: '/img/plane.gif'}),
     h('h1', 'Verify your email'),
     props.email ? h(Box, {gap: 8}, [
@@ -148,7 +148,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
         'Your email link is invalid or out of date, please try ',
         h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
       ]) : null,
-      h('form', {onSubmit, style: {width: '100%'}}, [
+      h('div', {style: {width: '100%'}}, [
         h(Label, [
           h(Input, {
             type: 'text',
@@ -159,7 +159,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
       ]),
     ]),
     h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, result  === 'loading' ? h(Loader) : "Confirm your email")
-  ])
+  ]))
 }
 
 export default Signup
