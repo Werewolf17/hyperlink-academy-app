@@ -131,7 +131,7 @@ export const coursesQuery = () => prisma.courses.findMany({
       course_instances: {
         select: {start_date: true},
         orderBy: {start_date: "asc"},
-        first: 1
+        take: 1
       }
     }
 })
