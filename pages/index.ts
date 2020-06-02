@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { InferGetStaticPropsType } from 'next'
+import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
 import { useEffect } from 'react'
 
 import Intro from '../writing/Intro.mdx'
@@ -12,8 +12,9 @@ import { Box } from '../components/Layout'
 import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
+import {getToken} from '../src/token'
 
-type Props = InferGetStaticPropsType<typeof getStaticProps>
+type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const Landing = (props:Props) => {
   let {data: courses} = useCourses(props)
   let {data: user} = useUserData()
@@ -74,9 +75,16 @@ const Welcome = ()=>{
   ])
 }
 
-export const getStaticProps = async () => {
-  let courses = await coursesQuery()
-  return {props: {courses}, unstable_revalidate: 1} as const
+export const getServerSideProps = async ({req,res}:GetServerSidePropsContext) => {
+  let token = getToken(req)
+  if(!token) {
+    let courses = await coursesQuery()
+    return {props: {courses}} as const
+  }
+
+  res.writeHead(301, {Location: '/dashboard'})
+  res.end()
+  return {props:{courses:[]}}
 }
 
 const ImageContainer = styled('div')`
