@@ -1,8 +1,5 @@
-{{ product_name }} ({{ product_url }})
+Hyperlink.academy (https://hyperlink.academy)
 
 {{{ @content }}}
 
-© 2020 {{ product_name }}. All rights reserved.
-
-{{ company_name }}
-{{ company_address }}
+© 2020 Learning Futures Inc. All rights reserved.

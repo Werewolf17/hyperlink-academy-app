@@ -1,0 +1,22 @@
+Hi {{name}},
+
+You're enrolled in {{course_name}}, starting {{course_start_date}}!
+
+Thanks for signing up, we're glad to have you and excited for this Hyperlink course to get started.
+
+A couple Very Important Things to Know:
+
+Key course details:
+{{cohort_page_url}}
+
+Your community for the course:
+{{cohort_forum_link}}
+
+Just one thing to do for now — Head here to get started!
+
+{{course_name}} - Get Started!
+{{get_started_topic_url}}
+
+If you have questions, please make a post on the forum (linked above!) or reach out privately by hitting reply on this email.
+
+—The Hyperlink Team
