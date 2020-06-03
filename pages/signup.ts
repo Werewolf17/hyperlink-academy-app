@@ -10,7 +10,7 @@ import {AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
-import { callApi } from '../src/apiHelpers'
+import { callApi, useApi } from '../src/apiHelpers'
 import { useDebouncedEffect} from '../src/hooks'
 import { CheckUsernameResult } from './api/get/[...item]'
 
@@ -23,12 +23,11 @@ const Signup = () => {
     newsletter: false,
   })
 
-  let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
+  let [status, callSignupRequest] = useApi<SignupMsg, SignupResponse>([formData], ()=> router.push('/signup?verifyEmail'))
   let [usernameValid, setUsernameValid] = useState<null | boolean>(null)
   let {data:user} = useUserData()
   let router = useRouter()
 
-  useEffect(()=>setFormState('normal'), [formData.email])
   useEffect(()=>{if(user) router.push('/dashboard')}, [user])
   useDebouncedEffect(async ()=>{
     if(!formData.username) return setUsernameValid(null)
@@ -39,12 +38,7 @@ const Signup = () => {
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    setFormState('loading')
-    let res = await callApi<SignupMsg, SignupResponse>('/api/signup/request', formData)
-    if(res.status == 200) {router.push('/signup?verifyEmail')}
-    else {
-      setFormState('error')
-    }
+    await callSignupRequest('/api/signup/request', formData)
   }
 
   if(router.query.verifyEmail !== undefined) {
@@ -53,7 +47,7 @@ const Signup = () => {
 
   return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
     h('h1', 'Sign Up'),
-    formState === 'error' ? h(Error, {}, h('div', [
+    status === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
       '.'
     ])) : null,
@@ -114,49 +108,36 @@ const Signup = () => {
       }}),
       "Do you want to receive our newsletter?"
     ]),
-    h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
+    h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, status === 'loading' ? h(Loader) : 'Submit')
   ]))
 }
 
 const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   let router = useRouter()
   let [key, setKey] = useState('')
-  let [result, setResult] = useState<null | 'loading'| 'invalid' | 'success'>(null)
+  let [status, callSignupVerify] = useApi<VerifyEmailMsg, VerifyEmailResponse>([key])
 
   const onSubmit = async (e: React.FormEvent)=>{
     e.preventDefault()
-
-    setResult('loading')
-    let res = await callApi<VerifyEmailMsg, VerifyEmailResponse>('/api/signup/verify', {key})
-    if(res.status === 200) {
-      setResult('success')
-    }
-    else setResult('invalid')
+    await callSignupVerify('/api/signup/verify', {key})
   }
 
   useEffect(()=>{
     if(router.query.verifyEmail && typeof router.query.verifyEmail === 'string') {
-      callApi<VerifyEmailMsg, VerifyEmailResponse>('/api/signup/verify', {key: router.query.verifyEmail})
-        .then(res => {
-          if(res.status === 200) {
-            setResult('success')
-          }
-          else setResult('invalid')
-        })
+      callSignupVerify('/api/signup/verify', {key:router.query.verifyEmail})
     }
   }, [])
 
   useEffect(()=>{
-    if(result !== 'success') return
+    if(status !== 'success') return
     setTimeout(()=>{
       router.push('/dashboard')
     }, 3000)
-  }, [result])
+  }, [status])
 
-  if(router.query.verifyEmail && result === null) return null
+  if(router.query.verifyEmail && status === null) return null
 
-
-  if(result === 'success') return h(Box, {width: 400, ma:true, gap: 16}, [
+  if(status === 'success') return h(Box, {width: 400, ma:true, gap: 16}, [
       h('h1', "You're verified!"),
       h(Info, "Click the button below if you're not redirected in a couple seconds"),
       h(Primary, {onClick: ()=> router.push('/dashboard')}, 'Back to hyperlink')
@@ -171,7 +152,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
     ]) : null,
     h(Box, {gap: 8}, [
       `Copy the code there and submit it here:`,
-      result === 'invalid' ? h(Error, {}, [
+      status === 'error' ? h(Error, {}, [
         'Your email link is invalid or out of date, please try ',
         h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
       ]) : null,
@@ -185,7 +166,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
         ])
       ]),
     ]),
-    h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, result  === 'loading' ? h(Loader) : "Confirm your email")
+    h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, status  === 'loading' ? h(Loader) : "Confirm your email")
   ]))
 }
 

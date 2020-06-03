@@ -11,7 +11,7 @@ import { colors } from '../components/Tokens'
 
 import {Msg, Result} from './api/updatePerson'
 import { useUserData } from '../src/data'
-import { callApi } from '../src/apiHelpers'
+import { useApi } from '../src/apiHelpers'
 
 const Settings = () => {
   let router = useRouter()
@@ -21,7 +21,7 @@ const Settings = () => {
     display_name: '',
     link: ''
   })
-  let [formState, setFormState] = useState<'normal' |'loading' | 'success'>('normal')
+  let [status, callUpdatePerson] = useApi<Msg, Result>([])
 
   useEffect(()=> {
     if(user) setFormData({bio:user.bio || '', display_name:user.display_name || '', link: user.link || ''})
@@ -39,11 +39,9 @@ const Settings = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if(!changed) return
-    setFormState('loading')
-    let res = await callApi<Msg, Result>('/api/updatePerson', {profile:formData})
+    let res = await callUpdatePerson('/api/updatePerson', {profile:formData})
     if(res.status === 200) {
       if(user) mutate({...user, ...formData})
-      setFormState('success')
     }
   }
 
@@ -86,7 +84,7 @@ const Settings = () => {
         if(user)setFormData({bio: user.bio ||'', display_name: user.display_name||'', link: user.link || ''})
       }}, "Discard Changes"),
       h(Primary, {type: 'submit', disabled: !changed},
-        formState === 'loading' ? h(Loader) : 'Save Changes')
+        status === 'loading' ? h(Loader) : 'Save Changes')
     ])
   ]))
 }

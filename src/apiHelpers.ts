@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse} from 'next'
+import { useState, useEffect} from 'react'
 
 export type ResultType<T extends (...args:any)=> any> = PromiseReturn<ReturnType<T>>
 export type Request = NextApiRequest
@@ -52,4 +53,21 @@ export async function callApi<Msg extends object | string | null, R extends Omit
         ? await result.json()
         : await result.text()
     } as R
+}
+
+type Status = 'normal' | 'error' | 'loading' | 'success'
+export function useApi<Msg extends object | string | null, R extends Omit<Result, 'headers'>>(deps: any[], successCallback?: (result: Extract<R, {status:200}>['result'])=> any) {
+  let [state, setState] = useState<Status>('normal')
+  useEffect(()=> setState('normal'), deps)
+  let call= async (path: string, msg?: Msg) => {
+    setState('loading')
+    let res = await callApi<Msg, R>(path, msg)
+    if(res.status === 200) {
+      if(successCallback) await successCallback(res.result)
+      setState('success')
+    }
+    else setState('error')
+    return res
+  }
+  return [state, call, setState] as const
 }

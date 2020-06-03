@@ -1,12 +1,12 @@
 import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import {  Input, Label, Error, Info, Textarea} from '../../components/Form'
 import { Primary } from '../../components/Button'
 import Loader from '../../components/Loader'
 
-import { callApi } from '../../src/apiHelpers'
+import { useApi } from '../../src/apiHelpers'
 import { CreateCourseMsg, CreateCourseResponse } from '../api/courses/[action]'
 import { useUserData } from '../../src/data'
 import { Box } from '../../components/Layout'
@@ -24,26 +24,20 @@ const CreateCourse = ()=> {
     maintainers: [] as string[]
   })
 
-  let [formState, setFormState] = useState<'normal' | 'error' |'success' | 'loading'>('normal')
-
-  useEffect(()=>setFormState('normal'), [formData])
+  let [status, callCreateCourse] = useApi<CreateCourseMsg, CreateCourseResponse>([formData])
 
   if(user === false) router.push('/')
   if(user &&  user.admin === false) router.push('/dashboard')
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    setFormState('loading')
-    let res = await callApi<CreateCourseMsg, CreateCourseResponse>('/api/courses/createCourse', {
-      ...formData
-    })
-    if(res.status === 200) setFormState('success')
+    await callCreateCourse('/api/courses/createCourse', {...formData})
   }
 
   return h('div', [
     h('h1', 'Create a new course'),
-    formState === 'error' ? h(Error, 'An error occured') : null,
-    formState === 'success' ? h(Info, 'Course created!') : null,
+    status === 'error' ? h(Error, 'An error occured') : null,
+    status === 'success' ? h(Info, 'Course created!') : null,
     h('form', {onSubmit}, h(Box, [
       h(Label, [
         'id',
@@ -106,7 +100,7 @@ const CreateCourse = ()=> {
           onChange: e=> setFormData({...formData, maintainers: e.currentTarget.value.split(',')})
         })
       ]),
-      h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'submit')
+      h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'submit')
     ]))
 
   ])
