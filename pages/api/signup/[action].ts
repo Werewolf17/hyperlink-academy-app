@@ -6,7 +6,7 @@ import hmac from '../../../src/hmac'
 import {setTokenHeader} from '../../../src/token'
 import {multiRouteHandler, ResultType, Request} from '../../../src/apiHelpers'
 import {syncSSO} from '../../../src/discourse'
-import sendVerificationEmail from '../../../emails/verifyEmail'
+import {sendVerificationEmail} from '../../../emails'
 
 const prisma = new PrismaClient()
 

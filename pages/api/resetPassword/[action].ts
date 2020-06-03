@@ -3,7 +3,7 @@ import {PrismaClient} from '@prisma/client'
 import hmac from '../../../src/hmac'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs'
-import sendResetEmail from '../../../emails/resetPassword'
+import {sendResetPasswordEmail} from '../../../emails'
 
 const prisma = new PrismaClient()
 
@@ -30,7 +30,8 @@ async function requestResetPassword (req:Request) {
     return {status: 403, result: "Error: invalid request, missing email"} as const
   }
 
-  if(!(await checkUser(msg.email))) {
+  let user = await findUser(msg.email)
+  if(!user) {
     return {status: 200, result: ""} as const
   }
 
@@ -40,7 +41,10 @@ async function requestResetPassword (req:Request) {
 
     let url = `${req.headers.origin}/resetPassword?&key=${key}`
 
-    await sendResetEmail(msg.email, url)
+    await sendResetPasswordEmail(msg.email, {
+      action_url: url,
+      name: user.display_name || user.username
+    })
     return {status: 200, result: ""} as const
   }
 }
@@ -93,8 +97,8 @@ const createResetKey = async (email: string) => {
   return key
 }
 
-const checkUser = async (email:string):Promise<boolean> => {
-  return (await prisma.people.findMany({where: {email}})).length > 0
+const findUser = async (email:string) => {
+  return await prisma.people.findOne({where: {email}})
 }
 
 
