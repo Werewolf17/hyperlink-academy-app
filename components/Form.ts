@@ -65,6 +65,8 @@ font-family: inherit;
 `
 
 export const Textarea = styled('textarea')`
+resize: vertical;
+font-size: 1rem;
 padding: 12px 16px;
 height: 128px;
 font-family: Lato;

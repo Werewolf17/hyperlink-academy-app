@@ -24,6 +24,13 @@ import { instancePrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
 import { useDebouncedEffect } from '../../../src/hooks'
 
+const COPY = {
+  courseForum: "Check out the course forum",
+  curriculumTab: "Curriculum",
+  cohortTab: "Past Cohorts",
+  settingsTab: "Settings"
+}
+
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
 export default (props: Props)=>props.notFound ? h(ErrorPage) : h(CoursePage, props)
@@ -45,20 +52,20 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
     h(Box, {gap: 32}, [
       h(Box, {gap: 16}, [
         h('h1', course?.name),
-        h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  'Check out the course forum'), ' ➭'])
+        h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  COPY.courseForum), ' ➭'])
       ]),
       course?.description || '',
     ]),
     h(Tabs, {tabs: {
-      Curriculum:  h(Text, {source: props.content}),
-      Instances: h(Instances, {course: props.id}),
-      Settings: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
+      [COPY.curriculumTab]:  h(Text, {source: props.content}),
+      [COPY.cohortTab]: h(Cohorts, {course: props.id}),
+      [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
     }}),
     h(Sidebar, [h(Enroll, {course})]),
   ])
 }
 
-const Instances = (props:{course: string}) => {
+const Cohorts = (props:{course: string}) => {
   let {data: userInstances} = useUserInstances()
   let {data: course} = useCourseData(props.course)
   let {data: user} = useUserData()

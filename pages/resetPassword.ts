@@ -10,6 +10,17 @@ import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import { useApi } from '../src/apiHelpers'
 
+const COPY = {
+  header: "Reset Password",
+  button: "Reset Password",
+  passwordInput: "New Password",
+  confirmInput: "Confirm Password",
+  error: h(Error, [
+    'Looks like that link is expired or invalid, please try to ', h(Link, {href:"/login?reset"}, h('a', 'reset your password')),
+    ' again'
+  ])
+}
+
 const ResetPassword = ()=>{
   let [formData, setFormData] = useState({password:'', confirmPassword: ''})
   let [status, callResetPassword] = useApi<ResetMsg, ResetResult>([formData])
@@ -24,7 +35,7 @@ const ResetPassword = ()=>{
     }
   })
 
-  if(!key || typeof key !== 'string') return h(Error, ['Broken link, please try to ', h(Link, {href:"/login?reset"}, h('a', 'reset your password again'))])
+  if(!key || typeof key !== 'string') return COPY.error
 
   const onSubmit = async (e:React.FormEvent)=> {
     e.preventDefault()
@@ -35,9 +46,9 @@ const ResetPassword = ()=>{
     case 'normal':
     case 'loading':
       return h('form', {onSubmit}, h(Box, {width:400, ma: true }, [
-        h('h1', 'Reset your password'),
+        h('h1', COPY.header),
         h(Label, [
-          "A New Password",
+          COPY.passwordInput,
           h(Input, {
             type: 'password',
             value: formData.password,
@@ -45,20 +56,20 @@ const ResetPassword = ()=>{
           }),
         ]),
         h(Label, [
-          "Confirm Password",
+          COPY.confirmInput,
           h(Input, {
             type: 'password',
             value: formData.confirmPassword,
             onChange: e => setFormData({...formData, confirmPassword:e.target.value})
           })
         ]),
-        h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'Submit')
+        h(Primary, {type: 'submit', style: {justifySelf:'end'}}, status === 'loading' ? h(Loader) : 'Submit')
       ]))
     case 'success': return h(Info, [
       'Awesome, we reset your password, go ahead and ',
       h(Link, {href:'/login'}, h('a', 'login'))
     ])
-    case 'error': return h(Error, 'something went wrong, please try again')
+    case 'error': return COPY.error
   }
 }
 

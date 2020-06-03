@@ -48,6 +48,7 @@ const handler = async (req: Request) => {
       external_id: user.id,
       email: user.email,
       name: newData.display_name || '',
+      bio: newData.bio || '',
       website: newData.link || ''
     })
   }

@@ -14,6 +14,16 @@ import { useCourses, useUserData } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import {getToken} from '../src/token'
 
+let COPY = {
+  CoursesHeader: "The Courses List",
+  register: "Join the Alpha",
+  signupForNewsletter: "Signup for updates",
+  courseGardenHeader: "Have an idea for a course?",
+  courseGardenDescription: `Hyperlink courses are created by our community. We seed and grow them in the Course
+Garden. Check out some in development, or propose your own!`,
+  courseGardenLink: "Check out the Course Garden"
+}
+
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const Landing = (props:Props) => {
   let {data: courses} = useCourses(props)
@@ -27,7 +37,7 @@ const Landing = (props:Props) => {
     h(Welcome),
     h('hr'),
     h(Box, {gap: 16}, [
-      h('h2', "The Courses List"),
+      h('h2', COPY.CoursesHeader),
       !courses ? null : h(FlexGrid, {min: 328, mobileMin: 200},
                           courses.courses
                           .map(course => {
@@ -42,10 +52,10 @@ const Landing = (props:Props) => {
     ]),
     h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
       h(Box, {width: 640, ma: true}, [
-        h('h2', 'The Course Kindergarten'),
-        'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
+        h('h2', COPY.courseGardenHeader),
+        COPY.courseGardenDescription,
         h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
-          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'),
+          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'}, COPY.courseGardenLink),
           h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
         ])
       ])

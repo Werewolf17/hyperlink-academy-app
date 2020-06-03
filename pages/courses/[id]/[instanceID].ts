@@ -22,11 +22,19 @@ import { instanceDataQuery, courseDataQuery } from '../../api/get/[...item]'
 import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses/[action]'
 import { useInstanceData, useUserData, useCourseData } from '../../../src/data'
 import { instancePrettyDate } from '../../../components/Card'
-
 import ErrorPage from '../../404'
 
+const COPY = {
+  detailsTab: "Details",
+  curriculumTab: "Curriculum",
+  backToCourse: 'back to the course',
+  details: "Details",
+  participants: "Participants"
+}
+
 type Props = InferGetStaticPropsType<typeof getStaticProps>
-export default (props: Props)=>  props.notFound ? h(ErrorPage) : h(InstancePage, props)
+const WrappedInstancePage = (props: Props)=>  props.notFound ? h(ErrorPage) : h(InstancePage, props)
+export default WrappedInstancePage
 const InstancePage = (props: Extract<Props, {notFound:false}>) => {
   let router = useRouter()
   let {data: user} = useUserData()
@@ -40,18 +48,20 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
 
   return h('div', {}, [
     instance && (inInstance || isFacilitator)
-      ? h(Banners, {...instance, enrolled: !!inInstance, facillitating: isFacilitator}) : null,
+      ? h(Banners, {...instance, enrolled: !!inInstance, facilitating: isFacilitator}) : null,
     h(TwoColumn, [
       !instance ? null : h(WelcomeModal, {display:router.query.welcome !== undefined, instance}),
       h(Box, {gap: 64}, [
         h(Box, {gap: 32}, [
           h(Box, {gap: 16}, [
-            h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', 'back to the course'))]),
-            h('h1', instance?.courses.name),
+            h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
+            h(Box, {gap:4}, [
+              h('h1', instance?.courses.name),
+              h('h3.textSecondary', 'Cohort #'+instance?.id.split('-').slice(-1)[0]),
+            ]),
             h('span', [
-              h('b', instance?.id), h('span', ' | '),
               instancePrettyDate(instance?.start_date || '', instance?.completed), h('span', ' | '),
-              `Facillitated by ${instance?.people.display_name}`
+              `Facilitated by ${instance?.people.display_name}`
             ]),
           ]),
           !inInstance || !isFacilitator ? null : h(Box, [
@@ -63,14 +73,14 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
       ]),
       h('div', {style: {gridColumn: 1}}, h(Tabs, {
           tabs: {
-            "Instance Details": h(Box, {gap: 64}, [
+            [COPY.detailsTab]: h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
                 !props.notes ? null : h(Box, [
-                  h('h3', "Notes"),
+                  h('h3', COPY.details),
                   h(Text, {source: props.notes})
                 ]),
                 h(Box, {gap:16}, !instance ? [] : [
-                  h('h3', 'Participants'),
+                  h('h3', COPY.participants),
                   h(LearnerEntry, [
                     h(Link, {
                       href: '/people/[id]',
@@ -89,7 +99,7 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
                     })])
               ] )
             ]),
-            "Curriculum": h(Text, {source:props.curriculum})
+            [COPY.curriculumTab]: h(Text, {source:props.curriculum})
           }
         })),
       inInstance || isFacilitator ? null
@@ -160,7 +170,7 @@ you'll be doing on your first day`),
 
 const Banners = (props:{
   completed:string | null,
-  facillitating?: boolean,
+  facilitating?: boolean,
   enrolled?: boolean,
   start_date: string,
   id: string,
@@ -172,11 +182,26 @@ const Banners = (props:{
   if(props.completed)  return h(Banner, {}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
       h('h4', `You completed this course on ${prettyDate(props.completed || '')}!`),
-      h('p', [`This instance's `, h('a', {href: forum}, 'private forum'), ` will always be open! Feel free to come back whenever`])
+      h('p', [`This cohort's `, h('a', {href: forum}, 'private forum'), ` will always be open! Feel free to come back whenever`])
     ])
   ])))
 
-  if(isStarted > 0 && (props.enrolled || props.facillitating)) {
+  if(isStarted > 0 && (props.enrolled || props.facilitating)) {
+    if(props.facilitating) {
+      return h(Banner, {}, [
+        h(Box, {width: 904, ma: true, padding: 32}, h(BannerInner, [
+          h(Box, {gap: 8, className: "textSecondary"}, [
+            h('h4', `You're facilitating in ${Math.round(isStarted / (1000 * 60 * 60 * 24))} days `),
+            h('p', [
+              `Check out the `,
+              h('a', {href: forum}, 'forum'),
+              ` and meet the learners. You can also read our `, h('a', {href: "/manual"}, 'facilitator guide'), `in the Hyperlink Manual`
+            ])
+          ])
+        ]))
+      ])
+
+    }
     return h(Banner, {}, [
       h(Box, {width: 904, ma: true, padding: 32}, h(BannerInner, [
         h(Box, {gap: 8, className: "textSecondary"}, [
@@ -184,7 +209,7 @@ const Banners = (props:{
           h('p', [
             `Check out the `,
             h('a', {href: forum}, 'forum'),
-            ` while you're waiting. You can introduce yourself and learn more about what you'll be doing when the course starts!`
+            ` while you're waiting. You can introduce yourself and learn more about what you'll be doing when your cohort starts!`
           ])
         ])
       ]))

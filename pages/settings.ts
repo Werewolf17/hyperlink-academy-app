@@ -13,6 +13,18 @@ import {Msg, Result} from './api/updatePerson'
 import { useUserData } from '../src/data'
 import { useApi } from '../src/apiHelpers'
 
+const COPY = {
+  header: "Your Settings",
+  usernameField: "Username",
+  emailField: "Email",
+  displayNameField: "Nickname",
+  displayNameDescription: "This is displayed when you post on the forum or enroll in a course.",
+  linkField: "Link",
+  linkDescription: "Where you're hanging on the internet (your website, Twitter, etc.)",
+  bioField: "Bio"
+
+}
+
 const Settings = () => {
   let router = useRouter()
   let {data: user, mutate} = useUserData()
@@ -45,14 +57,16 @@ const Settings = () => {
     }
   }
 
-  return h('form', {onSubmit}, h(Box, {width: 400, gap: 64}, [
+  return h('form', {onSubmit}, h(Box, {width: 400, gap: 64, ma: true}, [
     h(Box, {gap: 32}, [
-      h('h2', 'Your Settings'),
+      h('h2', COPY.header),
       h(Box, {gap:8}, [h('b', 'Username'),h(Info, user.username)]),
       h(Box, {gap:8}, [h('b', 'Email'),h(Info, user.email)]),
       h(Label, [
-        'Nickname',
-        h(Description, ''),
+        h(Box, {gap:4}, [
+          COPY.displayNameField,
+          h(Description, COPY.displayNameDescription)
+        ]),
         h(Input,{
           value: formData.display_name,
           onChange: e=>{
@@ -63,8 +77,8 @@ const Settings = () => {
       ]),
       h(Label, [
         h(Box, {gap:4}, [
-          'A Link',
-          h(Description, "Add a link to where you're hanging on the internet (your website, twitter, etc)"),
+          COPY.linkField,
+          h(Description, COPY.linkDescription),
         ]),
         h(Input, {
           value: formData.link,
@@ -72,7 +86,7 @@ const Settings = () => {
         })
       ]),
       h(Label, [
-        'Bio',
+        COPY.bioField,
         h(Textarea, {
           value: formData.bio,
           onChange: e=>setFormData({...formData, bio: e.currentTarget.value})

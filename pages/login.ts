@@ -6,11 +6,26 @@ import Link from 'next/link'
 import { Box } from '../components/Layout'
 import { Input, Error, Label, Info } from '../components/Form'
 import { Primary, LinkButton } from '../components/Button'
+import {AccentImg} from '../components/Images'
 import { useApi } from '../src/apiHelpers'
 import { Result, Msg } from './api/login'
 import { RequestMsg, RequestResult } from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
+
+const COPY = {
+  emailInput: "Your Email",
+  passwordInput: "Password",
+  resetPassword: "Reset password",
+  loginHeader: "Welcome Back!",
+  createAccount: "Create a new account",
+  wrongLogin: h('div', [
+    "That email and password don't match. ", h('br'), "You can ",
+    h(Link, { href: '/login?reset' }, h('a', 'reset your password here')),
+    '.'
+  ]),
+  loginButton: "Log In"
+}
 
 const Login = () => {
   let router = useRouter()
@@ -36,14 +51,10 @@ const Login = () => {
   if (typeof reset !== 'undefined') return h(ResetPassword)
 
   return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
-    h('h1', 'Welcome Back!'),
-    status === 'error' ? h(Error, {}, h('div', [
-      "That email and password don't match. You can ",
-      h(Link, { href: '/login?reset' }, h('a', 'reset your password here')),
-      '.'
-    ])) : null,
+    h('h1', COPY.loginHeader),
+    status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
     h(Label, [
-      'Your Email',
+      COPY.emailInput,
       h(Input, {
         type: 'email',
         value: formData.email,
@@ -52,19 +63,28 @@ const Login = () => {
       }),
     ]),
     h(Label, [
-      'Password',
+      COPY.passwordInput,
       h(Input, {
         type: 'password',
         value: formData.password,
         required: true,
         onChange: (e) => setFormData({ ...formData, password: e.currentTarget.value })
       }),
-      h(Link, { href: '/login?reset' }, h(LinkButton, 'Reset Password'))
+      h(Link, { href: '/login?reset' }, h(LinkButton, COPY.resetPassword))
     ]),
-    h(Primary, { type: 'submit', style: { justifySelf: 'end' } }, status === 'loading' ? h(Loader) : 'Log In'),
+    h(Box, {gap: 8, style: {justifySelf: 'end', justifyItems: "end"}}, [
+      h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : COPY.loginButton),
+      h(Link, { href: '/signup' }, h(LinkButton, COPY.createAccount))
+    ])
   ]))
 }
 
+const RESETCOPY = {
+  header: "Reset Password",
+  emailInput: "Your account email",
+  button: "Reset Password",
+  successHeader: "Check your Email"
+}
 
 const ResetPassword: React.SFC = () => {
   let [email, setEmail] = useState('')
@@ -78,21 +98,23 @@ const ResetPassword: React.SFC = () => {
     case 'normal':
     case 'loading':
       return h('form',{onSubmit}, h(Box, {width: 400, ma:true}, [
-        h('h1', 'Reset your password'),
+        h('h1', RESETCOPY.header),
         h(Label, [
-          'Your Account Email',
+          RESETCOPY.emailInput,
           h(Input, {
             type: 'email',
+            required: true,
             value: email,
-            placeholder: 'your account email',
             onChange: e => setEmail(e.currentTarget.value)
           }),
         ]),
         h('div', { style: { display: 'grid', justifyItems: 'end', gridGap: '8px' } }, [
-          h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : 'reset password')
+          h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : RESETCOPY.button)
         ])
       ]))
     case 'success': return h(Box, { gap: 16, width: 400, ma: true }, [
+      h(AccentImg, {src: '/img/plane.gif'}),
+      h('h1', RESETCOPY.successHeader),
       'We sent an email with a password reset link to',
       h(Info, email),
       'It expires in 30 minutes.',
