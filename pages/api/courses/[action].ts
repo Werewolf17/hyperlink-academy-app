@@ -3,6 +3,7 @@ import { PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
 import { createInstanceGroup, createCategory, createTopic} from '../../../src/discourse'
 import Stripe from 'stripe'
+import { sendInviteToCourseEmail } from '../../../emails'
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
 
@@ -253,11 +254,16 @@ async function inviteToCourse(req:Request) {
   if(!msg.email && !msg.username) return {status: 400, result: "ERROR: Must include username or email"} as const
 
   let email = msg.email || ''
+  let name = ''
   if(msg.username) {
-    let person = await prisma.people.findOne({where: {username: msg.username}, select:{email: true}})
+    let person = await prisma.people.findOne({where: {username: msg.username}, select:{email: true, display_name: true}})
     if(!person) return {status: 404, result: `no user with username ${msg.username} found`} as const
     email = person.email
+    name = person.display_name || ''
   }
+
+  let courseData = await prisma.courses.findOne({where: {id: msg.course}, select:{name: true}})
+  if(!courseData) return {status:404, result: `ERROR: no course found with id ${msg.course}`}
 
   await prisma.course_invites.create({data: {
     email,
@@ -267,6 +273,12 @@ async function inviteToCourse(req:Request) {
       }
     }
   }})
+
+  await sendInviteToCourseEmail(email, {
+    course_url: `https://hyperlink.academy/courses/${msg.course}`,
+    course_name: courseData.name,
+    name
+  })
 
   return {status: 200, result: {email}} as const
 }
