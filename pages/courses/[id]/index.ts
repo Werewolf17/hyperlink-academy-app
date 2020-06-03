@@ -13,6 +13,7 @@ import { Input, Label, Error, Info, Select, Textarea} from '../../../components/
 import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
 import Text from '../../../components/Text'
+import {SmallInstanceCard} from '../../../components/Card'
 
 import { getTaggedPostContent } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
@@ -28,26 +29,33 @@ const COPY = {
   courseForum: "Check out the course forum",
   curriculumTab: "Curriculum",
   cohortTab: "Past Cohorts",
-  settingsTab: "Settings"
+  activeCohorts: "You Current Cohorts",
+  settingsTab: "Settings",
+  inviteOnly: "This course is invite only right now. Reach out on the forum if you're interested!",
+  invited: "You're invited!"
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
-export default (props: Props)=>props.notFound ? h(ErrorPage) : h(CoursePage, props)
+const WrappedCoursePage = (props: Props)=>props.notFound ? h(ErrorPage) : h(CoursePage, props)
+export default WrappedCoursePage
 
 const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: user} = useUserData()
   let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
+  let router = useRouter()
 
-  let userInstances = course?.course_instances.filter(i => {
+  let activeCohorts = course?.course_instances.filter(i => {
     if(!user) return false
     return i.facillitator === user.id
       || i.people_in_instances
-      .find(p => p.people.id === (user ? user.id : undefined))
-  })
-  if(userInstances?.length === 0) userInstances = undefined
+      .find(p => p.people.id === (user ? user.id : undefined)) && i.completed === null
+  }) || []
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
+  let invited = !!props.course?.invite_only && user && props.course?.course_invites.length === 0
+
+  //Setting up the layout for the course page
   return h(TwoColumn, {}, [
     h(Box, {gap: 32}, [
       h(Box, {gap: 16}, [
@@ -55,13 +63,33 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
         h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  COPY.courseForum), ' ➭'])
       ]),
       course?.description || '',
+      activeCohorts.length > 0 ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [
+          h('h3', COPY.activeCohorts),
+          ...activeCohorts.map(instance=> h(SmallInstanceCard, {
+            ...instance,
+            facillitating: instance.facillitator === (user ? user?.id : undefined),
+            enrolled: !(instance.facillitator === (user ? user?.id : undefined))
+          }))
+      ]) : null
     ]),
     h(Tabs, {tabs: {
       [COPY.curriculumTab]:  h(Text, {source: props.content}),
       [COPY.cohortTab]: h(Cohorts, {course: props.id}),
       [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
     }}),
-    h(Sidebar, [h(Enroll, {course})]),
+    h(Sidebar, [
+      h(Enroll, {course}, [
+        h(Box, {gap: 8}, [
+          h(Primary, {
+            onClick: ()=> router.push('/courses/[id]/enroll', `/courses/${props.course?.id}/enroll`),
+            disabled: !invited
+          }, 'Enroll in this Course'),
+          h('div.textSecondary', {style:{width:232}}, [
+          course?.invite_only && !invited ? COPY.inviteOnly : null,
+          course?.invite_only && invited ? COPY.invited : null
+          ])
+        ])
+      ])]),
   ])
 }
 
@@ -71,7 +99,7 @@ const Cohorts = (props:{course: string}) => {
   let {data: user} = useUserData()
 
   if(!course) return null
-  let {userInvolved, upcoming, completed} = course.course_instances
+  let {userInvolved, completed} = course.course_instances
     .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
     .reduce((acc, instance)=> {
       if(user) {
@@ -81,27 +109,22 @@ const Cohorts = (props:{course: string}) => {
         return acc
       }
       if(instance.completed) acc.completed.push(h(Instance, {instance}))
-      else acc.upcoming.push(h(Instance, {instance}))
     return acc
   }, {
     userInvolved:[] as React.ReactElement[],
-    upcoming:[] as React.ReactElement[],
+    // upcoming:[] as React.ReactElement[],
     completed:[] as  React.ReactElement[]
   })
 
   return h(Box, {gap:32}, [
-    h('h2', "Instances"),
-    h(Box, {gap: 32},[
        ...(userInvolved.length === 0 ? [] : [
-         h('h3', 'Your Instances'),
+         h('h2', 'Your Cohorts'),
          ...userInvolved,
          h(Seperator),
        ]),
-      h('h3', 'Upcoming Instances'),
-      ...upcoming,
-      h('h3', 'Completed Instances'),
+      h('h2', 'Past Cohorts'),
       ...completed
-    ])])
+    ])
 }
 
 type Instances =  Exclude<ReturnType<typeof useCourseData>["data"], undefined>['course_instances']
@@ -237,6 +260,7 @@ const AddInstance = ()=> {
   ])
 }
 
+// Feature to edit course detail (length, prereqs, one line description)
 const EditDetails = ()=> {
   let [formData, setFormData] = useState({
     duration: '',

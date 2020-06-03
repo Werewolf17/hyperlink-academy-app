@@ -44,9 +44,17 @@ export const SmallInstanceCard = (props: Instance) => {
     as:`/courses/${props.course}/${props.id}`
   }, [
     h(Card, {style:{border: '1px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
-      h('h4', `Starts ${prettyDate(props.start_date)}`),
-      h('p', {style:{color: colors.textSecondary}},
-        `Facillitated by ${props.people.display_name || props.people.username}`)
+      h(Box, {gap: 8}, [
+        props.enrolled || props.facillitating ? h(Box, {gap: 8, h: true}, [
+          props.facillitating ? h(Pill, {borderOnly: true}, 'facilitator') : null,
+          props.enrolled ? h(Pill, 'enrolled') : null
+        ]): null,
+        h('div', [
+          h('h4', `Starts ${prettyDate(props.start_date)}`),
+          h('p', {style:{color: colors.textSecondary}},
+            `Facillitated by ${props.people.display_name || props.people.username}`)
+        ])
+      ])
     ])
   ])
 }
