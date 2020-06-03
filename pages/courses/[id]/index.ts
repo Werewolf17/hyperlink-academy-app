@@ -16,12 +16,13 @@ import Text from '../../../components/Text'
 
 import { getTaggedPostContent } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
-import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
-import { courseDataQuery } from '../../api/get/[...item]'
-import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
-import { useApi } from '../../../src/apiHelpers'
+import { useUserData, useUserInstances, useCourseData, Course } from '../../../src/data'
+import { courseDataQuery, CheckUsernameResult } from '../../api/get/[...item]'
+import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse, InviteToCourseMsg, InviteToCourseResponse} from '../../api/courses/[action]'
+import { callApi, useApi } from '../../../src/apiHelpers'
 import { instancePrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
+import { useDebouncedEffect } from '../../../src/hooks'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -29,7 +30,7 @@ export default (props: Props)=>props.notFound ? h(ErrorPage) : h(CoursePage, pro
 
 const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: user} = useUserData()
-  let {data: course} = useCourseData(props.id, props.course || undefined)
+  let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
 
   let userInstances = course?.course_instances.filter(i => {
     if(!user) return false
@@ -51,7 +52,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
     h(Tabs, {tabs: {
       Curriculum:  h(Text, {source: props.content}),
       Instances: h(Instances, {course: props.id}),
-      Settings: isMaintainer ? h(Settings) : null
+      Settings: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
     }}),
     h(Sidebar, [h(Enroll, {course})]),
   ])
@@ -125,7 +126,7 @@ const Instance = (props: {instance: Instances[0]}) => {
   ])
 }
 
-const Settings = () => {
+const Settings = (props: {inviteOnly?: boolean, mutate: (course:Course)=> any, courseId:string}) => {
   return h(Box, {gap: 64}, [
     h(Box, {style: {width:400}}, [
       h('div', [
@@ -136,7 +137,47 @@ const Settings = () => {
     ]),
     h(AddInstance),
     h(EditDetails),
+    props.inviteOnly ? h(InvitePerson, {id: props.courseId}) : null
   ])
+}
+
+const InvitePerson = (props:{id: string})=> {
+  let [emailOrUsername, setEmailOrUsername] = useState('')
+  let [valid, setValid] = useState<null | boolean>(null)
+  let [formState, callInviteToCourse] = useApi<InviteToCourseMsg, InviteToCourseResponse>([emailOrUsername])
+
+  useDebouncedEffect(async ()=>{
+    if(emailOrUsername.includes('@') || emailOrUsername === '') return setValid(null)
+    let res = await callApi<null, CheckUsernameResult>('/api/get/username/'+emailOrUsername)
+    if(res.status===404) setValid(false)
+    else setValid(true)
+  }, 500, [emailOrUsername])
+  useEffect(()=>setValid(null),[emailOrUsername])
+
+  let onSubmit = async (e: React.FormEvent)=>{
+    e.preventDefault()
+    let x = emailOrUsername.includes('@') ? {email: emailOrUsername} : {username: emailOrUsername}
+    callInviteToCourse(`/api/courses/inviteToCourse`, {course:props.id, ...x})
+  }
+  return h('form', {onSubmit}, h(Box, {gap:32, width: 400}, [
+    h('h2', "Invite someone to this course"),
+    h(Label, [
+      "Username or Email",
+      h(Input, {
+        type: emailOrUsername.includes('@') ? 'email' : 'text',
+        required: true,
+        value: emailOrUsername,
+        onChange: e=> setEmailOrUsername(e.currentTarget.value)
+      }),
+      valid === null ? null :
+        valid ? h('span.accentSuccess', "Great, found @"+emailOrUsername): h('span.accentRed', "We can't find a user with that username")
+    ]),
+    h(Primary, {
+      style: {justifySelf: 'right'},
+      type: 'submit',
+      disabled: (!emailOrUsername.includes('@') && valid !== true)
+    }, formState === 'loading' ? h(Loader) : 'Invite'),
+  ]))
 }
 
 const AddInstance = ()=> {

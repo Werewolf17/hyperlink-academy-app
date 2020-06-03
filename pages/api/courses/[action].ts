@@ -40,12 +40,17 @@ export type CompleteInstanceMsg = {
 }
 export type CompleteInstanceResponse = ResultType<typeof completeInstance>
 
+export type InviteToCourseMsg = {course: string}
+  & ({ email: string, username: undefined} | {username: string, email: undefined})
+export type InviteToCourseResponse = ResultType<typeof inviteToCourse>
+
 export default multiRouteHandler('action', {
   createInstance,
   enroll,
   createCourse,
   updateCourse,
-  completeInstance
+  completeInstance,
+  inviteToCourse
 })
 
 async function completeInstance(req:Request) {
@@ -240,4 +245,28 @@ async function updateCourse(req: Request) {
   })
 
   return {status: 200, result: {prerequisites: newData.prerequisites, duration: newData.duration}} as const
+}
+
+async function inviteToCourse(req:Request) {
+  let msg = req.body as Partial<InviteToCourseMsg>
+  if(!msg.course) return {status:400, result: "ERROR: no course id specified"} as const
+  if(!msg.email && !msg.username) return {status: 400, result: "ERROR: Must include username or email"} as const
+
+  let email = msg.email || ''
+  if(msg.username) {
+    let person = await prisma.people.findOne({where: {username: msg.username}, select:{email: true}})
+    if(!person) return {status: 404, result: `no user with username ${msg.username} found`} as const
+    email = person.email
+  }
+
+  await prisma.course_invites.create({data: {
+    email,
+    courses: {
+      connect: {
+        id: msg.course
+      }
+    }
+  }})
+
+  return {status: 200, result: {email}} as const
 }
