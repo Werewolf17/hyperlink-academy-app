@@ -17,12 +17,13 @@ import { Modal } from '../../../components/Modal'
 import Text from '../../../components/Text'
 
 import { getTaggedPostContent } from '../../../src/discourse'
-import { callApi } from '../../../src/apiHelpers'
+import { callApi, useApi } from '../../../src/apiHelpers'
 import { instanceDataQuery, courseDataQuery } from '../../api/get/[...item]'
-import { CompleteInstanceMsg, CompleteInstanceResponse } from '../../api/courses/[action]'
+import { CompleteInstanceMsg, CompleteInstanceResponse, EnrollMsg, EnrollResponse } from '../../api/courses/[action]'
 import { useInstanceData, useUserData, useCourseData } from '../../../src/data'
 import { instancePrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
+import { useStripe } from '@stripe/react-stripe-js'
 
 const COPY = {
   detailsTab: "Details",
@@ -103,7 +104,7 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
           }
         })),
       inInstance || isFacilitator ? null
-        : h(Sidebar, {} ,h(Enroll, {instanceId: props.id, course}))
+        : h(Sidebar, {} ,h(Enroll, {instanceId: props.id, course}, h(EnrollInInstance, {id: props.id})))
     ])
   ])
 }
@@ -115,6 +116,25 @@ display: grid;
 grid-template-columns: max-content min-content;
 grid-gap: 16px;
 `
+
+const EnrollInInstance = (props:{id:string}) => {
+    let {data: user} = useUserData()
+    let stripe = useStripe()
+    let router = useRouter()
+    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], (res)=>{
+        stripe?.redirectToCheckout({sessionId: res.sessionId})
+    })
+
+  let onClick= async (e:React.MouseEvent)=> {
+    e.preventDefault()
+    if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
+    if(!props.id) return
+    if(!stripe) return
+    await callEnroll('/api/courses/enroll', {instanceID: props.id})
+  }
+
+  return  h(Primary, {onClick}, status === 'loading' ? h(Loader) : ' Join this Cohort')
+}
 
 const MarkInstanceComplete = (props:{id: string})=> {
   let {data: instance, mutate} = useInstanceData(props.id)
