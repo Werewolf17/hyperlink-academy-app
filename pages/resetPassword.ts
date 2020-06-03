@@ -8,16 +8,16 @@ import {Primary} from '../components/Button'
 import { Input, Error, Label, Info} from '../components/Form'
 import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
-import { callApi } from '../src/apiHelpers'
+import { useApi } from '../src/apiHelpers'
 
 const ResetPassword = ()=>{
   let [formData, setFormData] = useState({password:'', confirmPassword: ''})
-  let [formState, setFormState] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
+  let [status, callResetPassword] = useApi<ResetMsg, ResetResult>([formData])
   let router = useRouter()
   let key = router.query.key as string
 
   useEffect(()=>{
-    if(formState === 'success') {
+    if(status === 'success') {
       setTimeout(()=> {
         router.push('/login')
       }, 5000)
@@ -28,14 +28,10 @@ const ResetPassword = ()=>{
 
   const onSubmit = async (e:React.FormEvent)=> {
     e.preventDefault()
-    setFormState('loading')
-    let res = await callApi<ResetMsg, ResetResult>('/api/resetPassword/reset',
-                                                   {key, password: formData.password})
-    if(res.status ===200) setFormState('success')
-    else setFormState('error')
+    await callResetPassword('/api/resetPassword/reset', {key, password: formData.password})
   }
 
-  switch(formState) {
+  switch(status) {
     case 'normal':
     case 'loading':
       return h('form', {onSubmit}, h(Box, {width:400, ma: true }, [
@@ -56,7 +52,7 @@ const ResetPassword = ()=>{
             onChange: e => setFormData({...formData, confirmPassword:e.target.value})
           })
         ]),
-        h(Primary, {type: 'submit'}, formState === 'loading' ? h(Loader) : 'Submit')
+        h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'Submit')
       ]))
     case 'success': return h(Info, [
       'Awesome, we reset your password, go ahead and ',

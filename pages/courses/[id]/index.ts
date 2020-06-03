@@ -19,7 +19,7 @@ import { Primary, Destructive} from '../../../components/Button'
 import { useUserData, useUserInstances, useCourseData } from '../../../src/data'
 import { courseDataQuery } from '../../api/get/[...item]'
 import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[action]'
-import { callApi } from '../../../src/apiHelpers'
+import { useApi } from '../../../src/apiHelpers'
 import { instancePrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
 
@@ -141,31 +141,25 @@ const Settings = () => {
 
 const AddInstance = ()=> {
   let [newInstance, setNewInstance] = useState({start: '', facillitator: ''})
-  let [formState, setFormState] = useState<'normal' | 'error' |'success' | 'loading'>('normal')
+  let [status, callCreateInstance] = useApi<CreateInstanceMsg, CreateInstanceResponse>([newInstance])
   let router = useRouter()
   let {data:courseData, mutate} = useCourseData(router.query.id as string)
-  useEffect(()=>setFormState('normal'), [newInstance])
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
     if(!courseData) return
-    setFormState('loading')
-    let res = await callApi<CreateInstanceMsg, CreateInstanceResponse>('/api/courses/createInstance', {courseId: courseData.id, ...newInstance})
-    if(res.status === 200) {
-      mutate({
+    let res = await callCreateInstance('/api/courses/createInstance', {courseId: courseData.id, ...newInstance})
+    if(res.status === 200) mutate({
         ...courseData,
         course_instances: [...courseData.course_instances, {...res.result, people_in_instances:[], courses: {name: courseData.name}}]
       })
-      setFormState('success')
-    }
-    else setFormState('error')
   }
 
   return h('form', {onSubmit}, [
     h(Box, {gap: 32, style: {width: 400}}, [
       h('h2', 'Add a new Instance'),
-      formState === 'error' ? h(Error, 'An error occured') : null,
-      formState === 'success' ? h(Info, 'Instance created!') : null,
+      status === 'error' ? h(Error, 'An error occured') : null,
+      status === 'success' ? h(Info, 'Instance created!') : null,
       h(Label, [
         h(Select, {
           required: true,
@@ -189,7 +183,7 @@ const AddInstance = ()=> {
       h(Primary, {
         type: 'submit',
         disabled: !newInstance.start || !newInstance.facillitator
-      }, formState === 'loading' ? h(Loader) : 'Add a new Instance'),
+      }, status === 'loading' ? h(Loader) : 'Add a new Instance'),
       h(Seperator),
     ])
   ])
@@ -201,7 +195,7 @@ const EditDetails = ()=> {
     prerequisites: '',
     description: ''
   })
-  let [formState, setFormState] = useState<'normal' |'loading' | 'success' | 'error'>('normal')
+  let [status, callUpdateCourse] = useApi<UpdateCourseMsg, UpdateCourseResponse>([])
   let router = useRouter()
   let courseId = router.query.id as string
   let {data:course, mutate} = useCourseData(courseId)
@@ -220,16 +214,8 @@ const EditDetails = ()=> {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setFormState('loading')
-    let res = await callApi<UpdateCourseMsg, UpdateCourseResponse>('/api/courses/updateCourse', {...formData, id:courseId})
-    if(res.status === 200) {
-      setFormState('success')
-      console.log(res.result)
-      if(course) mutate({...course, ...res.result})
-    }
-    else {
-      setFormState('error')
-    }
+    let res = await callUpdateCourse('/api/courses/updateCourse', {...formData, id:courseId})
+    if(res.status === 200 && course) mutate({...course, ...res.result})
   }
 
   return h('form', {onSubmit}, [
@@ -268,7 +254,7 @@ const EditDetails = ()=> {
           })
         }}, "Discard Changes"),
         h(Primary, {type: 'submit', disabled: !changed},
-          formState === 'loading' ? h(Loader) : 'Save Changes')
+          status === 'loading' ? h(Loader) : 'Save Changes')
       ])
     ])
   ])

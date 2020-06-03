@@ -1,12 +1,12 @@
 import h from 'react-hyperscript'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 import { Box } from '../components/Layout'
 import { Input, Error, Label, Info } from '../components/Form'
 import { Primary, LinkButton } from '../components/Button'
-import { callApi } from '../src/apiHelpers'
+import { useApi } from '../src/apiHelpers'
 import { Result, Msg } from './api/login'
 import { RequestMsg, RequestResult } from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
@@ -15,39 +15,29 @@ import { useUserData } from '../src/data'
 const Login = () => {
   let router = useRouter()
   let [formData, setFormData] = useState({ email: '', password: '' })
-  let [formState, setFormState] = useState<'error' | 'normal' | 'loading'>('normal')
-
-  let { data, mutate } = useUserData()
-
   let redirect = router.query.redirect as string | null
   let { reset } = router.query
-  if (data) router.push(redirect as string || '/')
-
-  useEffect(() => setFormState('normal'), [formData])
-
-  if (typeof reset !== 'undefined') return h(ResetPassword)
+  let { data, mutate } = useUserData()
+  let [status, callLogin] = useApi<Msg, Result>([formData], async (result)=> {
+    if (redirect) {
+      if (redirect[0] !== '/' || redirect.startsWith('/sso')) return window.location.assign(redirect)
+      await mutate(result)
+      await router.push(redirect as string)
+    }
+    else await router.push('/dashboard')
+  })
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setFormState('loading')
-    let res = await callApi<Msg, Result>('/api/login', formData)
-    if (res.status === 200) {
-      let data = res.result
-      if (redirect) {
-        if (redirect[0] !== '/' || redirect.startsWith('/sso')) return window.location.assign(redirect)
-        await mutate(data)
-        router.push(redirect as string)
-      }
-      else router.push('/dashboard')
-    }
-    else {
-      setFormState('error')
-    }
+    callLogin('/api/login', formData)
   }
+
+  if (data) router.push(redirect as string || '/')
+  if (typeof reset !== 'undefined') return h(ResetPassword)
 
   return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
     h('h1', 'Welcome Back!'),
-    formState === 'error' ? h(Error, {}, h('div', [
+    status === 'error' ? h(Error, {}, h('div', [
       "That email and password don't match. You can ",
       h(Link, { href: '/login?reset' }, h('a', 'reset your password here')),
       '.'
@@ -71,22 +61,18 @@ const Login = () => {
       }),
       h(Link, { href: '/login?reset' }, h(LinkButton, 'Reset Password'))
     ]),
-    h(Primary, { type: 'submit', style: { justifySelf: 'end' } }, formState === 'loading' ? h(Loader) : 'Log In'),
+    h(Primary, { type: 'submit', style: { justifySelf: 'end' } }, status === 'loading' ? h(Loader) : 'Log In'),
   ]))
 }
 
 
 const ResetPassword: React.SFC = () => {
   let [email, setEmail] = useState('')
-  let [status, setStatus] = useState<'normal' | 'loading' | 'success' | 'error'>('normal')
+  let [status, callResetPassword, setStatus] = useApi<RequestMsg, RequestResult>([email])
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    setStatus('loading')
-    let res = await callApi<RequestMsg, RequestResult>('/api/resetPassword/request', { email })
-
-    if (res.status === 200) setStatus('success')
-    else setStatus('error')
-          }
+    await callResetPassword('/api/resetPassword/request', { email })
+  }
 
   switch (status) {
     case 'normal':
