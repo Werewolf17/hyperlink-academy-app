@@ -110,7 +110,7 @@ let Instance = (props: {
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
             //TODO Route this to a stripe payment flow
-            h(Primary, {onClick, disabled: props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),
+            h(Primary, {onClick, disabled: !props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),
             h('small', [
                 //TODO make this href go to the cohort page
                 h(Link, {href: '/courses/[id]/[instanceID]', as: `/courses/${props.course}/${props.id}`}, h('a.notBlue', {style: {textDecoration: 'underline'}}, 'See more details'))
