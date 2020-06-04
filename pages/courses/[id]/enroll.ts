@@ -81,7 +81,7 @@ let Instance = (props: {
     let router = useRouter()
     let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], (res)=>{
         if(res.zeroCost) router.push('/courses/[id]/[instanceID]', `/courses/${props.course}/${props.id}?welcome`)
-        stripe?.redirectToCheckout({sessionId: res.sessionId})
+        else stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
     let onClick= async (e:React.MouseEvent)=> {
