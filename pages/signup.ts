@@ -79,7 +79,7 @@ const Signup = () => {
                 onChange: (e)=> setFormData({...formData, email:e.currentTarget.value})})
     ]),
     h(Label, [
-      "A Password",
+      "Password",
       h(Input, {type: 'password',
                 required: true,
                 minLength: 8,

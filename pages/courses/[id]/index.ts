@@ -154,9 +154,9 @@ const Settings = (props: {inviteOnly?: boolean, mutate: (course:Course)=> any, c
       ]),
       h(Seperator),
     ]),
+    props.inviteOnly ? h(InvitePerson, {id: props.courseId}) : null,
     h(AddInstance),
-    h(EditDetails),
-    props.inviteOnly ? h(InvitePerson, {id: props.courseId}) : null
+    h(EditDetails)
   ])
 }
 
