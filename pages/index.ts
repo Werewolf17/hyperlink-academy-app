@@ -14,7 +14,7 @@ import { useCourses, useUserData } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import {getToken} from '../src/token'
 
-let COPY = {
+export let COPY = {
   CoursesHeader: "The Courses List",
   register: "Join the Alpha",
   signupForNewsletter: "Signup for updates",
