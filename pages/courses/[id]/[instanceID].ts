@@ -172,7 +172,7 @@ const MarkInstanceComplete = (props:{id: string})=> {
 const WelcomeModal = (props: {display:boolean, instance:{start_date: string, id: string, courses: {id: string}}})=>{
   return h(Modal, {display:props.display}, [
     h(Box, {gap: 32}, [
-      h('h2', "You're enrollled!"),
+      h('h2', "You're enrolled!"),
       h(Info, {}, h('b', `This instance starts on ${prettyDate(props.instance.start_date)}`)),
       h('p',
         `For now, you can head to the instance form to introduce yourself see what you

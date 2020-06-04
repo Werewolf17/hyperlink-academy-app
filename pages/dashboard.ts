@@ -9,6 +9,7 @@ import { Box} from '../components/Layout'
 import { useUserInstances, useUserData, useCourses } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import { BigInstanceCard } from '../components/Card'
+import {COPY} from './index'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Dashboard = (props:Props) => {
@@ -45,7 +46,7 @@ const Dashboard = (props:Props) => {
     ]),
     h('hr'),
     !courses ? null : h(Box, {gap: 16}, [
-      h('h2', "The Courses List"),
+      h('h2', COPY.CoursesHeader),
       user.admin ? h('span', {style:{color: 'blue'}}, [
         h(Link,{href: '/courses/create'},  h('a.mono', 'Publish a New Course')),
         h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
@@ -64,10 +65,10 @@ const Dashboard = (props:Props) => {
     ]),
     h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
       h(Box, {width: 640, ma: true}, [
-        h('h2', 'The Course Kindergarten'),
-        'The course kindergarten is where we grow new courses. Check out some in development, or propose your own!',
+        h('h2', COPY.courseGardenHeader),
+        COPY.courseGardenDescription,
         h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
-          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  'Check out the kindergarten'),
+          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-kindergarten/'},  COPY.courseGardenLink),
           h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
         ])
       ])
