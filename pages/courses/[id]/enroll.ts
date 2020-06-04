@@ -37,7 +37,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
     let {data:userInstances} = useUserInstances()
     let {data: course} = useCourseData(props.courseId, props.course)
     let {data: user} = useUserData()
-    let invited = !!course?.invite_only && !!user && course?.course_invites.length === 0
+    let invited = !!userInstances?.invited_courses.find(course=>course.id === props.course.id )
 
     let instances = (props.instances || [])
             .filter(instance=>{
@@ -56,13 +56,13 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
             //Upcoming Cohort List
             ...(instances.length === 0
                 ? [h(Info, COPY.empty)]
-                : instances.map(instance => h(Instance, {...instance, invited})))
+                : instances.map(instance => h(Instance, {...instance, invited, invite_only: course?.invite_only})))
         ]),
         //Course Details Panel
         h(Sidebar, [h(Enroll, {course}, [
-            h('div.textSecondary', {style:{width:232}}, [
-                course?.invite_only && !invited ? COPY.inviteOnly : null,
-                course?.invite_only && invited ? COPY.invited : null
+            !course ? null : h('div.textSecondary', {style:{width:232}}, [
+                course.invite_only && !invited ? COPY.inviteOnly : null,
+                course.invite_only && invited ? COPY.invited : null
             ])
         ])]),
     ])
@@ -72,6 +72,7 @@ let Instance = (props: {
     details: string,
     people: {username: string, display_name: string | null},
     invited: boolean,
+    invite_only?: boolean,
     id: string,
     course: string
     start_date: string
@@ -110,7 +111,7 @@ let Instance = (props: {
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
             //TODO Route this to a stripe payment flow
-            h(Primary, {onClick, disabled: !props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),
+            h(Primary, {onClick, disabled: props.invite_only && !props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),
             h('small', [
                 //TODO make this href go to the cohort page
                 h(Link, {href: '/courses/[id]/[instanceID]', as: `/courses/${props.course}/${props.id}`}, h('a.notBlue', {style: {textDecoration: 'underline'}}, 'See more details'))

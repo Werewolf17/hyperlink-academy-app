@@ -42,6 +42,7 @@ export default WrappedCoursePage
 
 const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: user} = useUserData()
+  let {data:userInstances} = useUserInstances()
   let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
   let router = useRouter()
 
@@ -53,7 +54,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   }) || []
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
-  let invited = !!props.course?.invite_only && user && props.course?.course_invites.length === 0
+  let invited = !!userInstances?.invited_courses.find(course=>course.id === props.course.id )
 
   //Setting up the layout for the course page
   return h(TwoColumn, {}, [
