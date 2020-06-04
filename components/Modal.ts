@@ -24,6 +24,7 @@ padding: 32px;
 left: 50%;
 top: 50%;
 transform: translate(-50%, -50%);
+z-index: 10;
 `
 
 export const ModalBlur = styled('div')`
@@ -33,4 +34,5 @@ left: 0;
 width: 100%;
 height: 100%;
 backdrop-filter: blur(2.5px);
+z-index: 9;
 `

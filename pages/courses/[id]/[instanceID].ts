@@ -184,7 +184,7 @@ you'll be doing on your first day`),
       h(Link, {
         href:'/courses/[id]/[instanceID]',
         as: `/courses/${props.instance.courses.id}/${props.instance.id}`
-      }, 'Back to the instance page')
+      }, h('a', 'Back to the instance page'))
     ])
   ])
 }
