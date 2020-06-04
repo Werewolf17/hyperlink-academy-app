@@ -152,7 +152,7 @@ async function enroll (req: Request) {
     }
   })
   await prisma.disconnect()
-  if(!instance || !instance.courses.cost) return {status: 400, result: "Error: no instance with id " + msg.instanceID + " found"}  as const
+  if(!instance || instance.courses.cost === undefined) return {status: 400, result: "Error: no instance with id " + msg.instanceID + " found"}  as const
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
