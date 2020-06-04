@@ -46,12 +46,23 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
   let router = useRouter()
 
+  if(!course) return null
+
   let activeCohorts = course?.course_instances.filter(i => {
     if(!user) return false
     return i.facillitator === user.id
       || i.people_in_instances
       .find(p => p.people.id === (user ? user.id : undefined)) && i.completed === null
   }) || []
+
+  let pastCohorts = course.course_instances
+    .filter(c=>c.completed)
+    .map(i=>{
+      if(!user) return i
+      let enrolled = i.people_in_instances.find(p => p.people.id === (user ? user.id : undefined))
+      let facilitating = i.facillitator === user.id
+      return {...i, enrolled, facilitating}
+    })
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   let invited = !!userInstances?.invited_courses.find(course=>course.id === props.course.id )
@@ -75,7 +86,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
     ]),
     h(Tabs, {tabs: {
       [COPY.curriculumTab]:  h(Text, {source: props.content}),
-      [COPY.cohortTab]: h(Cohorts, {course: props.id}),
+      [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
       [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
     }}),
     h(Sidebar, [
@@ -94,56 +105,25 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   ])
 }
 
-const Cohorts = (props:{course: string}) => {
-  let {data: userInstances} = useUserInstances()
-  let {data: course} = useCourseData(props.course)
-  let {data: user} = useUserData()
-
-  if(!course) return null
-  let {userInvolved, completed} = course.course_instances
-    .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
-    .reduce((acc, instance)=> {
-      if(user) {
-        if(instance.facillitator === user.id ||
-           userInstances?.course_instances.find(i => i.id === instance.id)
-          ) acc.userInvolved.push(h(Instance, {instance}))
-        return acc
-      }
-      if(instance.completed) acc.completed.push(h(Instance, {instance}))
-    return acc
-  }, {
-    userInvolved:[] as React.ReactElement[],
-    // upcoming:[] as React.ReactElement[],
-    completed:[] as  React.ReactElement[]
-  })
-
+const Cohorts = (props:{cohorts: Course['course_instances'] & {facilitating?: boolean, enrolled?: boolean}}) => {
   return h(Box, {gap:32}, [
-       ...(userInvolved.length === 0 ? [] : [
-         h('h2', 'Your Cohorts'),
-         ...userInvolved,
-         h(Seperator),
-       ]),
-      h('h2', 'Past Cohorts'),
-      ...completed
+    h('h2', 'Past Cohorts'),
+    ...props.cohorts
+      .filter(i => i.completed)
+      .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
+      .map(instance => h(Instance, {instance}))
     ])
 }
 
-type Instances =  Exclude<ReturnType<typeof useCourseData>["data"], undefined>['course_instances']
-const Instance = (props: {instance: Instances[0]}) => {
-  let {data: userInstances} = useUserInstances()
-  let {data: user} = useUserData()
-
+const Instance = (props: {instance: Course['course_instances'][0] & {facilitating?: boolean, enrolled?: boolean}}) => {
   let id= props.instance.id.split('-').slice(-1)[0]
-
-  let inInstance = userInstances?.course_instances.find(x=> x.id===props.instance.id)
-  let isFacillitator = user && props.instance.facillitator === user.id
 
   return h(Box, {gap: 16}, [
     h(Box, {gap: 8}, [
-      !inInstance && !isFacillitator ? null : h('div', [
-        inInstance ? h(Pill, 'enrolled') : null,
+      !props.instance.enrolled && !props.instance.facilitating ? null : h('div', [
+        props.instance.enrolled ? h(Pill, 'enrolled') : null,
         ' ',
-        isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,
+        props.instance.facilitating ? h(Pill, {borderOnly: true}, 'facillitating') : null,
       ]),
       h('h3', {}, h(Link, {
         href:'/courses/[id]/[instanceID]',
