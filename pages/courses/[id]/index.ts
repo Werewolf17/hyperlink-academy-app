@@ -25,14 +25,14 @@ import { instancePrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
 import { useDebouncedEffect } from '../../../src/hooks'
 
-const COPY = {
+export const COPY = {
   courseForum: "Check out the course forum",
   curriculumTab: "Curriculum",
   cohortTab: "Past Cohorts",
   activeCohorts: "You Current Cohorts",
   settingsTab: "Settings",
-  inviteOnly: "This course is invite only right now. Reach out on the forum if you're interested!",
-  invited: "You're invited!"
+  inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
+  invited: h('span.accentSuccess', "You're invited!")
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
