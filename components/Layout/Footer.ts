@@ -29,6 +29,7 @@ export default ()=>{
       ]),
       h('br'),
       h(Seperator),
+      h('br'),
       h('p', `© Learning Futures Inc`)
     ])
   ])
