@@ -11,7 +11,8 @@ export const colors = {
   borderSelected: "blue",
   backgroundRed: "#F9EBE8",
   accentRed: "#C23C1E",
-  accentSuccess: "#348C1E"
+  accentSuccess: "#348C1E",
+  linkHover: "#00008B"
 }
 
 export type Spacing = 0 | 4 | 8 | 16 | 24 | 32 | 48 | 64 | 256
