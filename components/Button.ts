@@ -8,9 +8,12 @@ height: fit-content;
 width: fit-content;
 background-color: ${colors.grey15};
 color: white;
-padding: 8px 16px;
+
+border: 2px solid;
+border-color: ${colors.grey15};
 border-radius: 2px;
-border: none;
+
+padding: 6px 14px;
 text-decoration:none;
 &:visited {color: white;}
 &:hover {
@@ -19,15 +22,13 @@ cursor: pointer;
 
 ${props => {
 if(props.disabled) return `
+border-color: ${colors.grey80};
 background-color: ${colors.grey80};
 color: ${colors.grey55};
 `}}
 `
 
 export const Secondary = styled(Primary)<{disabled?:boolean}>`
-border: 2px solid;
-box-sizing: border-box;
-border-color: ${colors.grey15};
 color: black;
 background-color: white;
 
