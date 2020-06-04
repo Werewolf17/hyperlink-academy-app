@@ -104,7 +104,7 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
           }
         })),
       inInstance || isFacilitator ? null
-        : h(Sidebar, {} ,h(Enroll, {instanceId: props.id, course}, h(EnrollInInstance, {id: props.id})))
+        : h(Sidebar, {} ,h(Enroll, {instanceId: props.id, course}, h(EnrollInInstance, {id: props.id, course: props.courseId})))
     ])
   ])
 }
@@ -117,12 +117,13 @@ grid-template-columns: max-content min-content;
 grid-gap: 16px;
 `
 
-const EnrollInInstance = (props:{id:string}) => {
+const EnrollInInstance = (props:{id:string, course: string}) => {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
     let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], (res)=>{
-        stripe?.redirectToCheckout({sessionId: res.sessionId})
+        if(res.zeroCost) router.push('/courses/[id]/[instanceID]', `/courses/${props.course}/${props.id}?welcome`)
+        else stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
   let onClick= async (e:React.MouseEvent)=> {

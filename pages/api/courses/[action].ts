@@ -1,9 +1,9 @@
 import { ResultType, Request, multiRouteHandler} from '../../../src/apiHelpers'
 import { PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
-import { createInstanceGroup, createCategory, createTopic} from '../../../src/discourse'
+import { createInstanceGroup, createCategory, createTopic, addMember, getGroupId} from '../../../src/discourse'
 import Stripe from 'stripe'
-import { sendInviteToCourseEmail } from '../../../emails'
+import { sendInviteToCourseEmail, sendCohortEnrollmentEmail } from '../../../emails'
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
 
@@ -154,27 +154,52 @@ async function enroll (req: Request) {
   await prisma.disconnect()
   if(!instance || instance.courses.cost === undefined) return {status: 400, result: "Error: no instance with id " + msg.instanceID + " found"}  as const
 
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: [{
-      name: instance.courses.name,
-      amount: instance.courses.cost * 100,
-      currency: 'usd',
-      quantity: 1,
-    }],
-    cancel_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}`,
-    success_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}?welcome`,
-    customer_email: user.email,
-    metadata: {
-      instanceId: instance.id,
-      userId: user.id
-    }
-  });
+  if(instance.courses.cost === 0) {
+    let groupId = await getGroupId(msg.instanceID)
 
-  return {
-    status: 200,
-    result: {sessionId: session.id}
-  } as const
+    await prisma.people_in_instances.create({data: {
+      people: {connect: {id: user.id}},
+      course_instances: {connect: {id: msg.instanceID}}
+    }})
+
+    await addMember(groupId, user.username)
+    await sendCohortEnrollmentEmail(user.email, {
+      name: user.display_name || user.username,
+      course_start_date: instance.start_date,
+      course_name: instance.courses.name,
+      cohort_page_url: `https://hyperlink.academy/${instance.course}/${instance.id}`,
+      cohort_forum_link: `https://forum.hyperlink.academy/c/${instance.course}/${instance.id}`,
+      get_started_topic_url: 'PLACEHOLDER'
+    })
+    return {
+      status: 200,
+      result: {zeroCost: true} as const
+    }
+  }
+
+  else {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        name: instance.courses.name,
+        amount: instance.courses.cost * 100,
+        currency: 'usd',
+        quantity: 1,
+      }],
+      cancel_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}`,
+      success_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}?welcome`,
+      customer_email: user.email,
+      metadata: {
+        instanceId: instance.id,
+        userId: user.id
+      }
+    });
+
+    return {
+      status: 200,
+      result: {sessionId: session.id}
+    } as const
+  }
 }
 
 async function createCourse(req: Request) {
