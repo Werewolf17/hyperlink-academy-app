@@ -9,7 +9,7 @@ import Enroll from '../../../components/Course/Enroll'
 import { Primary } from '../../../components/Button'
 import { useCourseData, useUserData, useUserInstances } from '../../../src/data'
 import { PrismaClient } from '@prisma/client'
-import { getTaggedPostContent } from '../../../src/discourse'
+import { getTaggedPost } from '../../../src/discourse'
 import { useStripe } from '@stripe/react-stripe-js'
 import { useApi } from '../../../src/apiHelpers'
 import { EnrollMsg, EnrollResponse } from '../../api/courses/[action]'
@@ -68,7 +68,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
 }
 
 let Instance = (props: {
-    details: string,
+    details: {text: string, id: string},
     people: {username: string, display_name: string | null},
     invited: boolean,
     invite_only?: boolean,
@@ -107,7 +107,7 @@ let Instance = (props: {
                          props.people.display_name || props.people.username)),
                 ])
             ]),
-            h(Text, {source: props.details.slice(0, 400) + (props.details.length > 400 ?'...' : '')}),
+            h(Text, {source: props.details.text.slice(0, 400) + (props.details.text.length > 400 ?'...' : '')}),
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
             //TODO Route this to a stripe payment flow
@@ -144,7 +144,7 @@ export const getStaticProps = async (ctx: any) =>{
 
 
     let instancesWithContent = await Promise.all(instances.map(async instance => {
-        let details = await getTaggedPostContent(courseId + '/' + instance.id, 'note')
+        let details = await getTaggedPost(courseId + '/' + instance.id, 'note')
         return {...instance, details}
     }))
 

@@ -16,7 +16,7 @@ import { Info } from '../../../components/Form'
 import { Modal } from '../../../components/Modal'
 import Text from '../../../components/Text'
 
-import { getTaggedPostContent } from '../../../src/discourse'
+import { getTaggedPost } from '../../../src/discourse'
 import { callApi, useApi } from '../../../src/apiHelpers'
 import { instanceDataQuery, courseDataQuery } from '../../api/get/[...item]'
 import { CompleteInstanceMsg, CompleteInstanceResponse, EnrollMsg, EnrollResponse } from '../../api/courses/[action]'
@@ -30,7 +30,12 @@ const COPY = {
   curriculumTab: "Curriculum",
   backToCourse: 'back to the course',
   details: "Details",
-  participants: "Participants"
+  participants: "Participants",
+  updateNotes: (props: {id: string}) => h(Info, [
+    `💡 You can make changes to the cohort details by editing `,
+    h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
+    ` in the forum`
+  ])
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
@@ -43,6 +48,7 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
   let {data: course} = useCourseData(props.courseId, props.course)
   if(instance === false) return null
 
+  console.log(props)
   let inInstance = instance?.people_in_instances.find(p => p.person_id === (user ? user.id : undefined))
   let isFacilitator  = user && instance?.people.username === user.username
   let isStarted = instance && new Date() > new Date(instance.start_date)
@@ -76,9 +82,10 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
           tabs: {
             [COPY.detailsTab]: h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
+                isFacilitator ? h(COPY.updateNotes, {id: props.notes?.id}) : null,
                 !props.notes ? null : h(Box, [
                   h('h3', COPY.details),
-                  h(Text, {source: props.notes})
+                  h(Text, {source: props.notes?.text})
                 ]),
                 h(Box, {gap:16}, !instance ? [] : [
                   h('h3', COPY.participants),
@@ -100,7 +107,7 @@ const InstancePage = (props: Extract<Props, {notFound:false}>) => {
                     })])
               ] )
             ]),
-            [COPY.curriculumTab]: h(Text, {source:props.curriculum})
+            [COPY.curriculumTab]: h(Text, {source:props.curriculum?.text})
           }
         })),
       inInstance || isFacilitator ? null
@@ -272,8 +279,8 @@ export const getStaticProps = async (ctx:any)=>{
 
   if(!instance || !course) return {props: {notFound: true}} as const
 
-  let notes= await getTaggedPostContent(courseId + '/' + instanceId, 'note')
-  let curriculum = await getTaggedPostContent(ctx.params.id, 'curriculum')
+  let notes = await getTaggedPost(courseId + '/' + instanceId, 'note')
+  let curriculum = await getTaggedPost(ctx.params.id, 'curriculum')
   return {props: {notFound: false, id:instanceId, instance, courseId, course, notes, curriculum}, unstable_revalidate: 1} as const
 }
 

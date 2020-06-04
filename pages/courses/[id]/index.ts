@@ -15,7 +15,7 @@ import Enroll from '../../../components/Course/Enroll'
 import Text from '../../../components/Text'
 import {SmallInstanceCard} from '../../../components/Card'
 
-import { getTaggedPostContent } from '../../../src/discourse'
+import { getTaggedPost } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
 import { useUserData, useUserInstances, useCourseData, Course } from '../../../src/data'
 import { courseDataQuery, CheckUsernameResult } from '../../api/get/[...item]'
@@ -32,7 +32,12 @@ export const COPY = {
   activeCohorts: "You Current Cohorts",
   settingsTab: "Settings",
   inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
-  invited: h('span.accentSuccess', "You're invited!")
+  invited: h('span.accentSuccess', "You're invited!"),
+  updateCurriculum: (props: {id: string}) => h(Info, [
+    `💡 You can make changes to the curriculum by editing `,
+    h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
+    ` in the forum`
+  ])
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
@@ -85,7 +90,10 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       ]) : null
     ]),
     h(Tabs, {tabs: {
-      [COPY.curriculumTab]:  h(Text, {source: props.content}),
+      [COPY.curriculumTab]:  h(Box, [
+        isMaintainer ? h(COPY.updateCurriculum, {id: props.content.id}) : null,
+        h(Text, {source: props.content.text})
+      ]),
       [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
       [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
     }}),
@@ -325,7 +333,7 @@ export const getStaticProps = async (ctx:any) => {
 
   let data = await courseDataQuery(id)
   if(!data) return {props:{notFound: true}} as const
-  let content = await getTaggedPostContent(id, 'curriculum')
+  let content = await getTaggedPost(id, 'curriculum')
 
   return {props: {notFound: false, content, id, course: data}, unstable_revalidate: 1} as const
 }
