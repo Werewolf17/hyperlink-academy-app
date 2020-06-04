@@ -16,7 +16,8 @@ export function setTokenHeader(token:Token)  {
     'Set-Cookie':cookie.serialize('loginToken', JSON.stringify(token), {
       path: '/',
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
-      httpOnly: true
+      httpOnly: true,
+      sameSite: "strict"
     })
   }
 }
