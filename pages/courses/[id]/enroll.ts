@@ -80,8 +80,8 @@ let Instance = (props: {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
-    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], (res)=>{
-        if(res.zeroCost) router.push('/courses/[id]/[instanceID]', `/courses/${props.course}/${props.id}?welcome`)
+    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], async (res) => {
+        if(res.zeroCost) await router.push('/courses/[id]/[instanceID]?welcome', `/courses/${props.course}/${props.id}?welcome`)
         else stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
