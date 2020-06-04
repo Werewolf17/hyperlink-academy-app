@@ -108,7 +108,7 @@ let Instance = (props: {
                          props.people.display_name || props.people.username)),
                 ])
             ]),
-            h(Text, {source: props.details.slice(400) + (props.details.length > 400 ?'...' : '')}),
+            h(Text, {source: props.details.slice(0, 400) + (props.details.length > 400 ?'...' : '')}),
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
             //TODO Route this to a stripe payment flow
