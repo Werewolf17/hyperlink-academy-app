@@ -36,7 +36,6 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
     let router = useRouter()
     let {data:userInstances} = useUserInstances()
     let {data: course} = useCourseData(props.courseId, props.course)
-    let {data: user} = useUserData()
     let invited = !!userInstances?.invited_courses.find(course=>course.id === props.course.id )
 
     let instances = (props.instances || [])
