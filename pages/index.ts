@@ -3,13 +3,13 @@ import styled from '@emotion/styled'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import { colors, Mobile} from '../components/Tokens'
 import { Box } from '../components/Layout'
-import { Primary, Secondary } from '../components/Button'
+import { Primary } from '../components/Button'
 import { Label, Input } from '../components/Form'
 // import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
@@ -20,8 +20,8 @@ export let COPY = {
   hyperlinkTagline: "Hyperlink is a course platform and online school built for seriously effective learning.",
   registerHeader: "Calling all superlearners! Join the Hyperlink Alpha to propose a course idea, and (very soon!) enroll one of our first courses.",
   registerButton: "Browse the Courses",
-  emailHeader: "Or drop your email to get updates!",
-  emailDescription: "We will only use this email to send our weekly update. Unsubscribe at any time. ",
+  emailHeader: "Drop your email to get updates!",
+  emailDescription: "We only use this email to send our fortnightly update. Unsubscribe at any time.",
   emailButton: "Get Updates",
   coursesHeader: "All Courses",
   courseGardenHeader: "Have an idea for a course?",
@@ -71,10 +71,10 @@ const Landing = (props:Props) => {
 
 const Welcome = ()=>{
   //Setting up the email subscription stuff 
-  let [formData, setFormData] = useState({
-    // TODO when the user clicks Email Button, this will add them to the email list
-  })
-  let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
+  // let [formData, setFormData] = useState({
+  //   // TODO when the user clicks Email Button, this will add them to the email list
+  // })
+  // let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
 
 
   return h(Box, {gap:32}, [
@@ -87,22 +87,19 @@ const Welcome = ()=>{
         h(Tagline, COPY.hyperlinkTagline),
         
         h(CTAGrid, [
-          //Main CTA
-          h(Primary, 'Browse the Courses'),
+          //Main CTA (hidden for now undtil we have more courses)
+          // h(Primary, 'Browse the Courses'),
 
-          // Secondary CTA
+          // Secondary CTA (remember to make button seconday when the Main CTA is restored)
           h(Box, {gap: 16, style:{maxWidth: 320}}, [
             h(Label, [
               h(Box, {gap:4}, [
                 COPY.emailHeader,
                 h(Description, COPY.emailDescription),
               ]),
-              h(Input, {
-                value: formData.link,
-                onChange: e=>setFormData({...formData, link: e.currentTarget.value})
-              })
+              h(Input, {})
             ]),
-            h(Secondary, COPY.emailButton),
+            h(Primary, COPY.emailButton),
           ]),
         ]),
       ]),
