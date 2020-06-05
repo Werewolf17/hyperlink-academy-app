@@ -1,5 +1,7 @@
 import crypto from 'crypto'
 import querystring from 'querystring'
+import TemplateCohortNotes from '../writing/TemplateCohortNotes.txt'
+import TemplateCohortGettingStarted from '../writing/TemplateCohortGettingStarted.txt'
 
 let headers = {
       "Api-Key": process.env.DISCOURSE_API_KEY || '',
@@ -39,10 +41,18 @@ export const createCohortGroup = async (name: string, admin: string, courseID: n
     return false
   }
   let category = await createCategory(name, {permissions: {[name]:1}, parent_category_id: courseID})
-  if(category) await createTopic({
+  if(!category) return false
+  await createTopic({
     category,
     title: name + " Notes",
-    raw: "Fill out these notes for your new cohort",
+    raw: TemplateCohortNotes,
+    tags: ['note']
+  })
+
+  await createTopic({
+    category,
+    title: name + " Getting Started",
+    raw: TemplateCohortGettingStarted,
     tags: ['note']
   })
   return true

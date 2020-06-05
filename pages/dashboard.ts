@@ -46,7 +46,7 @@ const Dashboard = (props:Props) => {
     ]),
     h('hr'),
     !courses ? null : h(Box, {gap: 16}, [
-      h('h2', COPY.CoursesHeader),
+      h('h2', COPY.coursesHeader),
       user.admin ? h('span', {style:{color: 'blue'}}, [
         h(Link,{href: '/courses/create'},  h('a.mono', 'Publish a New Course')),
         h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
