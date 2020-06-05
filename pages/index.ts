@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
@@ -15,6 +15,10 @@ import { Label, Input } from '../components/Form'
 import { useCourses, useUserData } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import {getToken} from '../src/token'
+import { useApi } from '../src/apiHelpers'
+import { NewsletterSignupMsg, NewsletterSignupResponse } from './api/signup/[action]'
+import Loader from '../components/Loader'
+import { Checkmark } from '../components/Icons'
 
 export let COPY = {
   hyperlinkTagline: "Hyperlink is a course platform and online school built for seriously effective learning.",
@@ -69,12 +73,22 @@ const Landing = (props:Props) => {
   ])
 }
 
-const Welcome = ()=>{
-  //Setting up the email subscription stuff 
-  // let [formData, setFormData] = useState({
-  //   // TODO when the user clicks Email Button, this will add them to the email list
-  // })
-  // let [formState, setFormState] = useState<'normal' | 'error' | 'loading'>('normal')
+const Welcome = () =>{
+  //Setting up the email subscription stuff
+  let [email, setEmail] = useState('')
+  let [status, callNewsletterSignup] = useApi<NewsletterSignupMsg, NewsletterSignupResponse>([email])
+
+  let onSubmit = (e: React.FormEvent)=>{
+    e.preventDefault()
+    callNewsletterSignup('/api/signup/newsletter',{email})
+  }
+
+  let ButtonText = {
+    normal: COPY.emailButton,
+    loading: h(Loader),
+    success: Checkmark,
+    error: "Something went wrong!"
+  }
 
 
   return h(Box, {gap:32}, [
@@ -91,16 +105,20 @@ const Welcome = ()=>{
           // h(Primary, 'Browse the Courses'),
 
           // Secondary CTA (remember to make button seconday when the Main CTA is restored)
-          h(Box, {gap: 16, style:{maxWidth: 320}}, [
+          h('form', {onSubmit}, h(Box, {gap: 16, style:{maxWidth: 320}}, [
             h(Label, [
               h(Box, {gap:4}, [
                 COPY.emailHeader,
                 h(Description, COPY.emailDescription),
               ]),
-              h(Input, {})
+              h(Input, {
+                type: "email",
+                value: email,
+                onChange: e => setEmail(e.currentTarget.value)
+              }),
             ]),
-            h(Primary, COPY.emailButton),
-          ]),
+            h(Primary, {type: "submit", success: status === 'success'}, ButtonText[status]),
+          ])),
         ]),
       ]),
       
