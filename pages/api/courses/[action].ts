@@ -4,6 +4,8 @@ import {getToken} from '../../../src/token'
 import { createCohortGroup, createCategory, createTopic, addMember, getGroupId} from '../../../src/discourse'
 import Stripe from 'stripe'
 import { sendInviteToCourseEmail, sendCohortEnrollmentEmail } from '../../../emails'
+import TemplateCourseDescription from '../../../writing/TemplateCourseDescription.txt'
+
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
 
@@ -218,7 +220,7 @@ async function createCourse(req: Request) {
     category,
     title: `${msg.name} Curriculum`,
     tags: ['curriculum'],
-    raw: "Please fill out the course curriculum"
+    raw: TemplateCourseDescription
   })
 
   await prisma.courses.create({

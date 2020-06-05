@@ -15,9 +15,12 @@ import { coursesQuery } from './api/get/[...item]'
 import {getToken} from '../src/token'
 
 export let COPY = {
-  CoursesHeader: "The Courses List",
-  register: "Join the Alpha",
-  signupForNewsletter: "Signup for updates",
+  tagline: "Hyperlink is a course platform and online school built for seriously effective learning.",
+  registerHeader: "Calling all superlearners! Join the Hyperlink Alpha to propose a course idea, and (very soon!) enroll one of our first courses.",
+  registerButton: "Make Your Account!",
+  emailHeader: "Or drop your email to get updates!",
+  emailButton: "Get Updates",
+  coursesHeader: "All Courses",
   courseGardenHeader: "Have an idea for a course?",
   courseGardenDescription: `Hyperlink courses are created by our community. We seed and grow them in the Course
 Garden. Check out some in development, or propose your own!`,
@@ -37,7 +40,7 @@ const Landing = (props:Props) => {
     h(Welcome),
     h('hr'),
     h(Box, {gap: 16}, [
-      h('h2', COPY.CoursesHeader),
+      h('h2', COPY.coursesHeader),
       !courses ? null : h(FlexGrid, {min: 328, mobileMin: 200},
                           courses.courses
                           .map(course => {

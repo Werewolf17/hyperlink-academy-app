@@ -1,0 +1,25 @@
+This is a template for adding additional information specific to this particular cohort of the course. 
+
+Please edit this topic to include most or all of the elements listed below!
+
+❗️**Important:** The contents of this post will automatically get published on the cohort page. That means it'll be publicly available for ANYONE, not just learners in this cohort, to see. Don't post anything you wouldn't want everyone to know (like links to video conference calls).
+
+All *other* posts in this forum category are private to participants in this cohort. Note that each course also has its own forum space, parent to this one, that is publicly visible.
+
+## **Schedule**
+
+Replace with: outline of specific dates and times for any synchronous meetings or deadlines for this cohort.
+
+**Please be specific** — include dates, times, timezones, and estimated length for live meetings. This is very important so that participants can make sure their schedule works before signing up.
+
+If your meetings are regularly scheduled (for example, every Monday for six weeks), be sure to list any days when the course will deviate from the norm (rescheduling around holidays, for example).
+
+## **Amendments**
+
+Replace with: anything changes to the curriculum specific to this cohort, that deviate from or override the main course description.
+
+## Anything Else…
+
+Replace with: anything else about this cohort that you think is essential for participants to know! For example any particular thematic focus or learning experiments you want to explore…
+
+Feel free to rename this section or add additional ones as needed. Or if nothing comes to mind, simply remove this section.

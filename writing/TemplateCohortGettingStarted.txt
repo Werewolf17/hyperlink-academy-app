@@ -1,0 +1,21 @@
+This is a template for outlining a few simple steps for how students should start with the course.
+
+Please edit this topic to include most or all of the following elements — or anything else you like!
+
+## Introductions
+
+Replace with: brief note encouraging participants to introduce themselves in this topic. Something like:
+
+Please post a brief intro below! Let everyone know who you are, why you're taking this course, and what you hope to learn. And say hello to other participants; let's get to know each other!
+
+## Logistics
+
+Replace with: notes about any logistical details participants need to know. 
+
+Any other tools / services participants will need to sign up for or download (e.g. Google Drive, Zoom, etc.)? Materials to prepare? Be sure to let everyone know any preliminary action items.
+
+This topic contains details for this particular cohort of the course. Right now you're in the cohort forum, just for members of this cohort. Note that there is also a main course forum.
+
+## Start Learning!
+
+Replace with: any day-one action items that participants should complete prior to the first meeting of the course. First first reading(s) or assignment(s)? Share those here.

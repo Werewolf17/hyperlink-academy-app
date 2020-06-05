@@ -27,6 +27,7 @@
     "gray-matter": "^4.0.2",
     "next": "^9.4.4",
     "postmark": "^2.5.3",
+    "raw-loader": "^4.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-hyperscript": "^3.2.0",
