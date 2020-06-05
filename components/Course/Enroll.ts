@@ -7,7 +7,6 @@ import { Course} from '../../src/data'
 import { ReactElement } from 'react'
 
 type Props = {
-  instanceId?: string,
   course?: Course
 }
 

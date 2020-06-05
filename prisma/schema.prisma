@@ -21,15 +21,15 @@ model admins {
   people people @relation(fields: [person], references: [id])
 }
 
-model course_instances {
-  completed           String?
-  course              String
-  facillitator        String
-  id                  String                @id
-  start_date          String
-  courses             courses               @relation(fields: [course], references: [id])
-  people              people                @relation(fields: [facillitator], references: [id])
-  people_in_instances people_in_instances[]
+model course_cohorts {
+  completed         String?
+  course            String
+  facilitator       String
+  id                String              @id
+  start_date        String
+  courses           courses             @relation(fields: [course], references: [id])
+  people            people              @relation(fields: [facilitator], references: [id])
+  people_in_cohorts people_in_cohorts[]
 }
 
 model course_invites {
@@ -58,7 +58,7 @@ model courses {
   invite_only        Boolean              @default(false)
   name               String
   prerequisites      String
-  course_instances   course_instances[]
+  course_cohorts     course_cohorts[]
   course_invites     course_invites[]
   course_maintainers course_maintainers[]
 }
@@ -78,16 +78,16 @@ model people {
   password_hash       String                @unique
   username            String                @unique
   admins              admins[]
-  course_instances    course_instances[]
+  course_cohorts      course_cohorts[]
   course_maintainers  course_maintainers[]
-  people_in_instances people_in_instances[]
+  people_in_cohorts   people_in_cohorts[]
 }
 
-model people_in_instances {
-  instance_id      String
-  person_id        String
-  course_instances course_instances @relation(fields: [instance_id], references: [id])
-  people           people           @relation(fields: [person_id], references: [id])
+model people_in_cohorts {
+  cohort         String
+  person         String
+  course_cohorts course_cohorts @relation(fields: [cohort], references: [id])
+  people         people         @relation(fields: [person], references: [id])
 
-  @@id([person_id, instance_id])
+  @@id([person, cohort])
 }

@@ -6,19 +6,19 @@ import { InferGetStaticPropsType } from 'next'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { Box} from '../components/Layout'
-import { useUserInstances, useUserData, useCourses } from '../src/data'
+import { useUserCohorts, useUserData, useCourses } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
-import { BigInstanceCard } from '../components/Card'
+import { BigCohortCard } from '../components/Card'
 import {COPY} from './index'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Dashboard = (props:Props) => {
   let {data: user} = useUserData()
   let {data: courses} = useCourses(props)
-  let {data: instances} = useUserInstances()
+  let {data: cohorts} = useUserCohorts()
   let router = useRouter()
 
-  if(!user || instances === undefined) {
+  if(!user || cohorts === undefined) {
     if(user === false) router.push('/')
     return null
   }
@@ -37,11 +37,11 @@ const Dashboard = (props:Props) => {
         ]),
       ])
     ]),
-    !instances ? null : h(Box, [
+    !cohorts ? null : h(Box, [
       h('h2', "Your Courses"),
-      h(FlexGrid, {min: 250, mobileMin:250}, instances.course_instances.map(instance => {
-        let facillitating = instance.people.username === (user ? user.username : '')
-        return h(BigInstanceCard, {...instance, enrolled: !facillitating, facillitating})
+      h(FlexGrid, {min: 250, mobileMin:250}, cohorts.course_cohorts.map(cohort => {
+        let facilitating = cohort.people.username === (user ? user.username : '')
+        return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
       }))
     ]),
     h('hr'),
@@ -58,7 +58,7 @@ const Dashboard = (props:Props) => {
             key: course.id,
             id: course.id,
             description: course.description,
-            start_date: new Date(course.course_instances[0]?.start_date),
+            start_date: new Date(course.course_cohorts[0]?.start_date),
             name: course.name,
           }, [])
         })),
