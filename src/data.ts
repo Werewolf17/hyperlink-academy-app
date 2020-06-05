@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import {callApi, Success} from './apiHelpers'
-import { CourseResult, InstanceResult, UserInstancesResult, WhoAmIResult, CourseDataResult, ProfileResult} from '../pages/api/get/[...item]'
+import { CourseResult, CohortResult, UserCohortsResult, WhoAmIResult, CourseDataResult, ProfileResult} from '../pages/api/get/[...item]'
 export const useUserData = ()=>{
   return useSWR('/api/get/whoami', async (api) => {
     let res = await callApi<null, WhoAmIResult>(api)
@@ -24,17 +24,17 @@ export const useCourseData = (id: string, initialData?:Success<CourseDataResult>
   }, {initialData})
 }
 
-export const useInstanceData = (id: string, initialData?:Success<InstanceResult>) => {
-  return useSWR('/api/get/instance/' + id, async api => {
-    let res = await callApi<null, InstanceResult>(api)
+export const useCohortData = (id: string, initialData?:Success<CohortResult>) => {
+  return useSWR('/api/get/cohort/' + id, async api => {
+    let res = await callApi<null, CohortResult>(api)
     if(res.status === 200) return res.result
     else return false
   }, {initialData})
 }
 
-export const useUserInstances = () => {
-  return useSWR('/api/get/user_instances', async(api) => {
-    let res = await callApi<null, UserInstancesResult>(api)
+export const useUserCohorts = () => {
+  return useSWR('/api/get/user_cohorts', async(api) => {
+    let res = await callApi<null, UserCohortsResult>(api)
     if(res.status===200) return res.result
   })
 }

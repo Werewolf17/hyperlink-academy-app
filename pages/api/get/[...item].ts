@@ -5,8 +5,8 @@ import { getToken } from '../../../src/token'
 
 export type CourseResult = ResultType<typeof getCourses>
 export type CourseDataResult = ResultType<typeof getCourseData>
-export type InstanceResult = ResultType<typeof getInstanceData>
-export type UserInstancesResult = ResultType<typeof getUserInstances>
+export type CohortResult = ResultType<typeof getCohortData>
+export type UserCohortsResult = ResultType<typeof getUserCohorts>
 export type WhoAmIResult = ResultType<typeof whoami>
 export type ProfileResult = ResultType<typeof getProfileData>
 export type CheckUsernameResult = ResultType<typeof checkUsername>
@@ -16,10 +16,10 @@ let prisma = new PrismaClient()
 export default multiRouteHandler('item', {
   'courses': getCourses,
   'course': getCourseData,
-  'user_instances': getUserInstances,
+  'user_cohorts': getUserCohorts,
   'username': checkUsername,
   'whoami': whoami,
-  'instance': getInstanceData,
+  'cohort': getCohortData,
   'profile': getProfileData
 })
 
@@ -31,7 +31,7 @@ export const courseDataQuery = (id:string) => prisma.courses.findOne({
         people: {select: {display_name: true}}
       }
     },
-    course_instances: {
+    course_cohorts: {
       include: {
         courses: {
           select: {
@@ -44,7 +44,7 @@ export const courseDataQuery = (id:string) => prisma.courses.findOne({
             username: true
           }
         },
-        people_in_instances: {
+        people_in_cohorts: {
           select: {
             people: {
               select: {
@@ -67,7 +67,7 @@ async function getCourseData(req: Request) {
   return {status:200, result: data} as const
 }
 
-export const instanceDataQuery = (id: string)=>prisma.course_instances.findOne({
+export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
     where: {id},
     select: {
       start_date: true,
@@ -79,7 +79,7 @@ export const instanceDataQuery = (id: string)=>prisma.course_instances.findOne({
       courses: {
         select: {name: true, id: true, cost: true, duration: true, description: true}
       },
-      people_in_instances: {
+      people_in_cohorts: {
         include: {
           people: {
             select: {
@@ -92,12 +92,12 @@ export const instanceDataQuery = (id: string)=>prisma.course_instances.findOne({
     },
 })
 
-async function getInstanceData(req: Request) {
+async function getCohortData(req: Request) {
   let id = req.query.item[1]
-  if(!id) return {status: 400, result: 'ERROR: no instance id provided'} as const
+  if(!id) return {status: 400, result: 'ERROR: no cohort id provided'} as const
 
-  let data = await instanceDataQuery(id)
-  if(!data) return {status: 404, result: `Error: no instance with id ${id} found`} as const
+  let data = await cohortDataQuery(id)
+  if(!data) return {status: 404, result: `Error: no cohort with id ${id} found`} as const
   return {status: 200, result: data} as const
 }
 
@@ -122,7 +122,7 @@ async function getProfileData(req:Request) {
 
 export const coursesQuery = () => prisma.courses.findMany({
     include: {
-      course_instances: {
+      course_cohorts: {
         select: {start_date: true},
         orderBy: {start_date: "asc"},
         take: 1
@@ -136,12 +136,12 @@ async function getCourses() {
 }
 
 
-async function getUserInstances(req:Request) {
+async function getUserCohorts(req:Request) {
   let token = getToken(req)
   if(!token) return {status: 403 as const, result: "Error: no user logged in"}
-  let course_instances = await prisma.course_instances.findMany({
+  let course_cohorts = await prisma.course_cohorts.findMany({
     where:{
-      people_in_instances: {some: {person_id: token.id}}
+      people_in_cohorts: {some: {person: token.id}}
     },
     include:{
       courses: {select: {name: true}},
@@ -163,7 +163,7 @@ async function getUserInstances(req:Request) {
     }
   })
   await prisma.disconnect()
-  return {status: 200, result: {course_instances, invited_courses}} as const
+  return {status: 200, result: {course_cohorts, invited_courses}} as const
 }
 
 async function whoami(req:Request) {

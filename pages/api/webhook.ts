@@ -33,13 +33,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
-    const {metadata} = event.data.object as {customer_email:string, metadata: {instanceId:string, userId:string}} ;
+    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:string, userId:string}} ;
 
     let person = await prisma.people.findOne({where: {id: metadata.userId}})
     if(!person) return {status: 400, result: "ERROR: cannot find user with id: " + metadata.userId} as const
 
-    let instance = await prisma.course_instances.findOne({
-      where: {id: metadata.instanceId},
+    let cohort = await prisma.course_cohorts.findOne({
+      where: {id: metadata.cohortId},
       include: {
         courses: {
           select: {
@@ -48,16 +48,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }
       }
     })
-    if(!instance) return {status: 400, result: "ERROR: no instance with id: " + metadata.instanceId}
+    if(!cohort) return {status: 400, result: "ERROR: no cohort with id: " + metadata.cohortId}
 
     let username = await getUsername(metadata.userId)
-    let groupId = await getGroupId(metadata.instanceId)
+    let groupId = await getGroupId(metadata.cohortId)
 
     if(!username || !groupId) return res.status(400).send('ERROR: Cannot find user or group id, with metadata: ' + JSON.stringify(metadata))
 
-    await prisma.people_in_instances.create({data: {
+    await prisma.people_in_cohorts.create({data: {
       people: {connect: {id: metadata.userId}},
-      course_instances: {connect: {id: metadata.instanceId}}
+      course_cohorts: {connect: {id: metadata.cohortId}}
     }})
     await prisma.disconnect()
 
@@ -65,10 +65,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     await addMember(groupId, username)
     await sendCohortEnrollmentEmail(person.email, {
       name: person.display_name || person.username,
-      course_start_date: instance.start_date,
-      course_name: instance.courses.name,
-      cohort_page_url: `https://hyperlink.academy/${instance.course}/${instance.id}`,
-      cohort_forum_link: `https://forum.hyperlink.academy/c/${instance.course}/${instance.id}`,
+      course_start_date: cohort.start_date,
+      course_name: cohort.courses.name,
+      cohort_page_url: `https://hyperlink.academy/${cohort.course}/${cohort.id}`,
+      cohort_forum_link: `https://forum.hyperlink.academy/c/${cohort.course}/${cohort.id}`,
       get_started_topic_url: 'PLACEHOLDER'
     })
 

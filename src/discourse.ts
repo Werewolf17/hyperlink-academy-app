@@ -16,7 +16,7 @@ export type Category = {
   }
 }
 
-export const createInstanceGroup = async (name: string, admin: string, courseID: number) => {
+export const createCohortGroup = async (name: string, admin: string, courseID: number) => {
   let username = await getUsername(admin)
   console.log(username)
   if(!username) return false
@@ -42,7 +42,7 @@ export const createInstanceGroup = async (name: string, admin: string, courseID:
   if(category) await createTopic({
     category,
     title: name + " Notes",
-    raw: "Fill out these notes for your new instance",
+    raw: "Fill out these notes for your new cohort",
     tags: ['note']
   })
   return true
