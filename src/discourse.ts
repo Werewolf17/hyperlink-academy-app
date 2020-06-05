@@ -16,7 +16,7 @@ export type Category = {
   }
 }
 
-export const createInstanceGroup = async (name: string, admin: string, courseID: number) => {
+export const createCohortGroup = async (name: string, admin: string, courseID: number) => {
   let username = await getUsername(admin)
   console.log(username)
   if(!username) return false
@@ -42,7 +42,7 @@ export const createInstanceGroup = async (name: string, admin: string, courseID:
   if(category) await createTopic({
     category,
     title: name + " Notes",
-    raw: "Fill out these notes for your new instance",
+    raw: "Fill out these notes for your new cohort",
     tags: ['note']
   })
   return true
@@ -109,7 +109,7 @@ export const addMember = async (groupId:string, username: string) => {
   return result.status  === 200
 }
 
-export const getTaggedPostContent = async (c: string, tag: string) => {
+export const getTaggedPost = async (c: string, tag: string) => {
   let res = await fetch(`https://forum.hyperlink.academy/c/${c}.json`, {
     method: 'GET',
     headers: {
@@ -120,9 +120,9 @@ export const getTaggedPostContent = async (c: string, tag: string) => {
 
   let category = await res.json() as Category
   let topicID = category.topic_list.topics.find((topic) => topic.tags.includes(tag))?.id
-  if(!topicID) return ''
+  if(!topicID) return {text: '', id: ''}
   let topicRequest = await fetch('https://forum.hyperlink.academy/raw/' + topicID, {headers})
-  return await topicRequest.text()
+  return {text: await topicRequest.text(), id: topicID}
 }
 
 export const makeSSOPayload = (params: {[key:string]: string}) => {

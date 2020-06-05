@@ -11,10 +11,10 @@ export default ()=>{
       h(Columns, [
         h(Box, {gap: 4}, [
           h('h4', "More Info"),
-          h(Link, {href: '/team'}, h(FooterLink, 'About the Team')),
-          h(Link, {href: '/manual'}, h(FooterLink, 'The Hyperlink Manual')),
-          h(Link, {href: '/blog'}, h(FooterLink, 'Blog')),
-          h(Link, {href: '/faq'}, h(FooterLink, 'FAQ')),
+          h(Link, {href: '/team', passHref: true}, h(FooterLink, 'About the Team')),
+          h(Link, {href: '/manual', passHref: true}, h(FooterLink, 'The Hyperlink Manual')),
+          h(Link, {href: '/blog', passHref: true}, h(FooterLink, 'Blog')),
+          h(Link, {href: '/faq', passHref: true}, h(FooterLink, 'FAQ')),
         ]),
         h(Box, {gap: 4}, [
           h('h4', "Contact Us"),
@@ -29,6 +29,7 @@ export default ()=>{
       ]),
       h('br'),
       h(Seperator),
+      h('br'),
       h('p', `© Learning Futures Inc`)
     ])
   ])
@@ -36,7 +37,8 @@ export default ()=>{
 
 const FooterLink = styled('a')`
 color: ${colors.textSecondary};
-&:visited {color: ${colors.textSecondary}};
+&:visited {color: ${colors.textSecondary};}
+&:hover {color: ${colors.linkHover};}
 text-decoration: none;
 `
 

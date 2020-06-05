@@ -28,7 +28,7 @@ a.notBlue:visited {
 }
 
 a.notBlue:hover {
-  color: #00008B;
+  color: ${colors.linkHover};
 }
 
 a.mono {
@@ -40,7 +40,7 @@ a.notBlue:visited {
 }
 
 a.notBlue:hover {
-  color: #00008B;
+  color: ${colors.linkHover};
 }
 
 

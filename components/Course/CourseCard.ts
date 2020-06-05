@@ -12,7 +12,7 @@ type Props = {
   id: string,
   href?:string,
   start_date?: Date
-  instance?: boolean
+  cohort?: boolean
 }
 export default (props:Props) => {
   return h(Link, {
@@ -28,7 +28,7 @@ export default (props:Props) => {
         h('h3', props.name),
         h('p', props.description),
       ]),
-      !props.start_date ? null : h(DateContainer, (props.instance ? 'starts ' : 'Next instance starts ') + props.start_date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}))
+      !props.start_date ? null : h(DateContainer, (props.cohort ? 'starts ' : 'Next cohort starts ') + props.start_date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}))
     ])
   ]))
 }

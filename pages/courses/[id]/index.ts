@@ -13,26 +13,31 @@ import { Input, Label, Error, Info, Select, Textarea} from '../../../components/
 import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
 import Text from '../../../components/Text'
-import {SmallInstanceCard} from '../../../components/Card'
+import {SmallCohortCard} from '../../../components/Card'
 
-import { getTaggedPostContent } from '../../../src/discourse'
+import { getTaggedPost } from '../../../src/discourse'
 import { Primary, Destructive} from '../../../components/Button'
-import { useUserData, useUserInstances, useCourseData, Course } from '../../../src/data'
+import { useUserData, useUserCohorts, useCourseData, Course } from '../../../src/data'
 import { courseDataQuery, CheckUsernameResult } from '../../api/get/[...item]'
-import { CreateInstanceMsg, CreateInstanceResponse, UpdateCourseMsg, UpdateCourseResponse, InviteToCourseMsg, InviteToCourseResponse} from '../../api/courses/[action]'
+import { CreateCohortMsg, CreateCohortResponse, UpdateCourseMsg, UpdateCourseResponse, InviteToCourseMsg, InviteToCourseResponse} from '../../api/courses/[action]'
 import { callApi, useApi } from '../../../src/apiHelpers'
-import { instancePrettyDate } from '../../../components/Card'
+import { cohortPrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
 import { useDebouncedEffect } from '../../../src/hooks'
 
-const COPY = {
+export const COPY = {
   courseForum: "Check out the course forum",
   curriculumTab: "Curriculum",
   cohortTab: "Past Cohorts",
   activeCohorts: "You Current Cohorts",
   settingsTab: "Settings",
-  inviteOnly: "This course is invite only right now. Reach out on the forum if you're interested!",
-  invited: "You're invited!"
+  inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
+  invited: h('span.accentSuccess', "You're invited!"),
+  updateCurriculum: (props: {id: string}) => h(Info, [
+    `💡 You can make changes to the curriculum by editing `,
+    h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
+    ` in the forum`
+  ])
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
@@ -42,19 +47,30 @@ export default WrappedCoursePage
 
 const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: user} = useUserData()
-  let {data:userInstances} = useUserInstances()
+  let {data:userCohorts} = useUserCohorts()
   let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
   let router = useRouter()
 
-  let activeCohorts = course?.course_instances.filter(i => {
+  if(!course) return null
+
+  let activeCohorts = course?.course_cohorts.filter(i => {
     if(!user) return false
-    return i.facillitator === user.id
-      || i.people_in_instances
+    return i.facilitator === user.id
+      || i.people_in_cohorts
       .find(p => p.people.id === (user ? user.id : undefined)) && i.completed === null
   }) || []
 
+  let pastCohorts = course.course_cohorts
+    .filter(c=>c.completed)
+    .map(i=>{
+      if(!user) return i
+      let enrolled = i.people_in_cohorts.find(p => p.people.id === (user ? user.id : undefined))
+      let facilitating = i.facilitator=== user.id
+      return {...i, enrolled, facilitating}
+    })
+
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
-  let invited = !!userInstances?.invited_courses.find(course=>course.id === props.course.id )
+  let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course.id )
 
   //Setting up the layout for the course page
   return h(TwoColumn, {}, [
@@ -66,16 +82,19 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       course?.description || '',
       activeCohorts.length > 0 ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [
           h('h3', COPY.activeCohorts),
-          ...activeCohorts.map(instance=> h(SmallInstanceCard, {
-            ...instance,
-            facillitating: instance.facillitator === (user ? user?.id : undefined),
-            enrolled: !(instance.facillitator === (user ? user?.id : undefined))
+          ...activeCohorts.map(cohort=> h(SmallCohortCard, {
+            ...cohort,
+            facillitating: cohort.facilitator === (user ? user?.id : undefined),
+            enrolled: !(cohort.facilitator === (user ? user?.id : undefined))
           }))
       ]) : null
     ]),
     h(Tabs, {tabs: {
-      [COPY.curriculumTab]:  h(Text, {source: props.content}),
-      [COPY.cohortTab]: h(Cohorts, {course: props.id}),
+      [COPY.curriculumTab]:  h(Box, [
+        isMaintainer ? h(COPY.updateCurriculum, {id: props.content.id}) : null,
+        h(Text, {source: props.content.text})
+      ]),
+      [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
       [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
     }}),
     h(Sidebar, [
@@ -94,65 +113,34 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   ])
 }
 
-const Cohorts = (props:{course: string}) => {
-  let {data: userInstances} = useUserInstances()
-  let {data: course} = useCourseData(props.course)
-  let {data: user} = useUserData()
-
-  if(!course) return null
-  let {userInvolved, completed} = course.course_instances
-    .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
-    .reduce((acc, instance)=> {
-      if(user) {
-        if(instance.facillitator === user.id ||
-           userInstances?.course_instances.find(i => i.id === instance.id)
-          ) acc.userInvolved.push(h(Instance, {instance}))
-        return acc
-      }
-      if(instance.completed) acc.completed.push(h(Instance, {instance}))
-    return acc
-  }, {
-    userInvolved:[] as React.ReactElement[],
-    // upcoming:[] as React.ReactElement[],
-    completed:[] as  React.ReactElement[]
-  })
-
+const Cohorts = (props:{cohorts: Course['course_cohorts'] & {facilitating?: boolean, enrolled?: boolean}}) => {
   return h(Box, {gap:32}, [
-       ...(userInvolved.length === 0 ? [] : [
-         h('h2', 'Your Cohorts'),
-         ...userInvolved,
-         h(Seperator),
-       ]),
-      h('h2', 'Past Cohorts'),
-      ...completed
+    h('h2', 'Past Cohorts'),
+    ...props.cohorts
+      .filter(i => i.completed)
+      .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
+      .map(cohort => h(Cohort, {cohort}))
     ])
 }
 
-type Instances =  Exclude<ReturnType<typeof useCourseData>["data"], undefined>['course_instances']
-const Instance = (props: {instance: Instances[0]}) => {
-  let {data: userInstances} = useUserInstances()
-  let {data: user} = useUserData()
-
-  let id= props.instance.id.split('-').slice(-1)[0]
-
-  let inInstance = userInstances?.course_instances.find(x=> x.id===props.instance.id)
-  let isFacillitator = user && props.instance.facillitator === user.id
+const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean}}) => {
+  let id= props.cohort.id.split('-').slice(-1)[0]
 
   return h(Box, {gap: 16}, [
     h(Box, {gap: 8}, [
-      !inInstance && !isFacillitator ? null : h('div', [
-        inInstance ? h(Pill, 'enrolled') : null,
+      !props.cohort.enrolled && !props.cohort.facilitating ? null : h('div', [
+        props.cohort.enrolled ? h(Pill, 'enrolled') : null,
         ' ',
-        isFacillitator ? h(Pill, {borderOnly: true}, 'facillitating') : null,
+        props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facillitating') : null,
       ]),
       h('h3', {}, h(Link, {
-        href:'/courses/[id]/[instanceID]',
-        as:  `/courses/${props.instance.course}/${props.instance.id}`
-      }, h('a', {style: {textDecoration: 'none'}}, `#${id} ${props.instance.courses.name}`))),
+        href:'/courses/[id]/[cohortId]',
+        as:  `/courses/${props.cohort.course}/${props.cohort.id}`
+      }, h('a', {style: {textDecoration: 'none'}}, `#${id} ${props.cohort.courses.name}`))),
     ]),
     h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
-      h('strong', instancePrettyDate(props.instance.start_date, props.instance.completed)),
-      h('div', `Facillitated by ${props.instance.people.display_name}`)
+      h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
+      h('div', `Facillitated by ${props.cohort.people.display_name}`)
     ])
   ])
 }
@@ -161,14 +149,14 @@ const Settings = (props: {inviteOnly?: boolean, mutate: (course:Course)=> any, c
   return h(Box, {gap: 64}, [
     h(Box, {style: {width:400}}, [
       h('div', [
-        `To add a new maintainer or remove an instance please email `,
+        `To add a new maintainer or remove an cohort please email `,
         h('a',{href:'mailto:contact@hyperlink.academy'}, 'contact@hyperlink.academy'),
       ]),
       h(Seperator),
     ]),
-    h(AddInstance),
-    h(EditDetails),
-    props.inviteOnly ? h(InvitePerson, {id: props.courseId}) : null
+    props.inviteOnly ? h(InvitePerson, {id: props.courseId}) : null,
+    h(AddCohort),
+    h(EditDetails)
   ])
 }
 
@@ -211,31 +199,31 @@ const InvitePerson = (props:{id: string})=> {
   ]))
 }
 
-const AddInstance = ()=> {
-  let [newInstance, setNewInstance] = useState({start: '', facillitator: ''})
-  let [status, callCreateInstance] = useApi<CreateInstanceMsg, CreateInstanceResponse>([newInstance])
+const AddCohort = ()=> {
+  let [newCohort, setNewCohort] = useState({start: '', facillitator: ''})
+  let [status, callCreateCohort] = useApi<CreateCohortMsg, CreateCohortResponse>([newCohort])
   let router = useRouter()
   let {data:courseData, mutate} = useCourseData(router.query.id as string)
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
     if(!courseData) return
-    let res = await callCreateInstance('/api/courses/createInstance', {courseId: courseData.id, ...newInstance})
+    let res = await callCreateCohort('/api/courses/createCohort', {courseId: courseData.id, ...newCohort})
     if(res.status === 200) mutate({
         ...courseData,
-        course_instances: [...courseData.course_instances, {...res.result, people_in_instances:[], courses: {name: courseData.name}}]
+        course_cohorts: [...courseData.course_cohorts, {...res.result, people_in_cohorts:[], courses: {name: courseData.name}}]
       })
   }
 
   return h('form', {onSubmit}, [
     h(Box, {gap: 32, style: {width: 400}}, [
-      h('h2', 'Add a new Instance'),
+      h('h2', 'Add a new Cohort'),
       status === 'error' ? h(Error, 'An error occured') : null,
-      status === 'success' ? h(Info, 'Instance created!') : null,
+      status === 'success' ? h(Info, 'Cohort created!') : null,
       h(Label, [
         h(Select, {
           required: true,
-          onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewInstance({...newInstance, facillitator: e.currentTarget.value})
+          onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facillitator: e.currentTarget.value})
         }, [
           h('option', {value: ''}, "Select a facillitator"),
           ...(courseData?.course_maintainers.map(maintainer => {
@@ -248,14 +236,14 @@ const AddInstance = ()=> {
         h(Input, {
           type: 'date',
           required: true,
-          value: newInstance.start,
-          onChange: e => setNewInstance({...newInstance, start: e.currentTarget.value})
+          value: newCohort.start,
+          onChange: e => setNewCohort({...newCohort, start: e.currentTarget.value})
         })
       ]),
       h(Primary, {
         type: 'submit',
-        disabled: !newInstance.start || !newInstance.facillitator
-      }, status === 'loading' ? h(Loader) : 'Add a new Instance'),
+        disabled: !newCohort.start || !newCohort.facillitator
+      }, status === 'loading' ? h(Loader) : 'Add a new Cohort'),
       h(Seperator),
     ])
   ])
@@ -345,7 +333,7 @@ export const getStaticProps = async (ctx:any) => {
 
   let data = await courseDataQuery(id)
   if(!data) return {props:{notFound: true}} as const
-  let content = await getTaggedPostContent(id, 'curriculum')
+  let content = await getTaggedPost(id, 'curriculum')
 
   return {props: {notFound: false, content, id, course: data}, unstable_revalidate: 1} as const
 }

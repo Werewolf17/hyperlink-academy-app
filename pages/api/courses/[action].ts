@@ -1,20 +1,20 @@
 import { ResultType, Request, multiRouteHandler} from '../../../src/apiHelpers'
 import { PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
-import { createInstanceGroup, createCategory, createTopic, addMember, getGroupId} from '../../../src/discourse'
+import { createCohortGroup, createCategory, createTopic, addMember, getGroupId} from '../../../src/discourse'
 import Stripe from 'stripe'
 import { sendInviteToCourseEmail, sendCohortEnrollmentEmail } from '../../../emails'
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
 
-export type CreateInstanceMsg = {
+export type CreateCohortMsg = {
   courseId: string,
   start: string,
   facillitator: string,
 }
-export type CreateInstanceResponse = ResultType<typeof createInstance>
+export type CreateCohortResponse = ResultType<typeof createCohort>
 
-export type EnrollMsg = { instanceID:string}
+export type EnrollMsg = { cohortId:string}
 export type EnrollResponse= ResultType<typeof enroll>
 
 export type CreateCourseMsg = {
@@ -36,40 +36,40 @@ export type UpdateCourseMsg = {
 }
 export type UpdateCourseResponse = ResultType<typeof updateCourse>
 
-export type CompleteInstanceMsg = {
-  instanceId: string
+export type CompleteCohortMsg = {
+  cohortId: string
 }
-export type CompleteInstanceResponse = ResultType<typeof completeInstance>
+export type CompleteCohortResponse = ResultType<typeof completeCohort>
 
 export type InviteToCourseMsg = {course: string}
   & ({ email: string, username: undefined} | {username: string, email: undefined})
 export type InviteToCourseResponse = ResultType<typeof inviteToCourse>
 
 export default multiRouteHandler('action', {
-  createInstance,
+  createCohort,
   enroll,
   createCourse,
   updateCourse,
-  completeInstance,
+  completeCohort,
   inviteToCourse
 })
 
-async function completeInstance(req:Request) {
-  let msg = req.body as Partial<CompleteInstanceMsg>
-  if(!msg.instanceId) return {status: 400, result: "Error: invalid request, missing parameters"} as const
+async function completeCohort(req:Request) {
+  let msg = req.body as Partial<CompleteCohortMsg>
+  if(!msg.cohortId) return {status: 400, result: "Error: invalid request, missing parameters"} as const
   let completed = (new Date()).toISOString()
-  let newData = await prisma.course_instances.update({
-    where: {id:msg.instanceId},
+  let newData = await prisma.course_cohorts.update({
+    where: {id:msg.cohortId},
     data: {
       completed
     }
   })
-  if(!newData) return {status: 404, result: `No instance with id ${msg.instanceId} found`} as const
+  if(!newData) return {status: 404, result: `No cohort with id ${msg.cohortId} found`} as const
   return {status:200, result: {completed}} as const
 }
 
-async function createInstance(req: Request) {
-  let msg = req.body as Partial<CreateInstanceMsg>
+async function createCohort(req: Request) {
+  let msg = req.body as Partial<CreateCohortMsg>
   if(!msg.courseId || !msg.start ||
      !msg.facillitator) return {status: 400, result: "Error: invalid request, missing parameters"} as const
 
@@ -91,20 +91,20 @@ async function createInstance(req: Request) {
     select: {
       id: true,
       category_id: true,
-      course_instances: {
+      course_cohorts: {
         select: {id: true}
       }
     },
   })
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
 
-  let id = course.id + '-' + course.course_instances.length
-  if(!(await createInstanceGroup(id, msg.facillitator, course.category_id))){
-    return {status: 500, result: "ERROR: unable to create instance group"} as const
+  let id = course.id + '-' + course.course_cohorts.length
+  if(!(await createCohortGroup(id, msg.facillitator, course.category_id))){
+    return {status: 500, result: "ERROR: unable to create cohort group"} as const
   }
 
   try {
-    let instance = await prisma.course_instances.create({
+    let cohort = await prisma.course_cohorts.create({
       include: {
         people: {select: {display_name: true, username: true}}
       },
@@ -124,7 +124,7 @@ async function createInstance(req: Request) {
       }
     })
 
-    return {status: 200, result: instance} as const
+    return {status: 200, result: cohort} as const
   }
   catch(e) {
     console.log(e)
@@ -135,13 +135,13 @@ async function createInstance(req: Request) {
 
 async function enroll (req: Request) {
   let msg = req.body as Partial<EnrollMsg>
-  if(!msg.instanceID) return {status: 400, result: "Error: invalid request, missing instanceID"} as const
+  if(!msg.cohortId) return {status: 400, result: "Error: invalid request, missing cohortId"} as const
 
   let user = getToken(req)
   if(!user) return {status: 403, result: "Error: no user logged in"} as const
 
-  let instance = await prisma.course_instances.findOne({
-    where: {id: msg.instanceID},
+  let cohort = await prisma.course_cohorts.findOne({
+    where: {id: msg.cohortId},
     include: {
       courses: {
         select: {
@@ -152,23 +152,23 @@ async function enroll (req: Request) {
     }
   })
   await prisma.disconnect()
-  if(!instance || instance.courses.cost === undefined) return {status: 400, result: "Error: no instance with id " + msg.instanceID + " found"}  as const
+  if(!cohort || cohort.courses.cost === undefined) return {status: 400, result: "Error: no cohort with id " + msg.cohortId + " found"}  as const
 
-  if(instance.courses.cost === 0) {
-    let groupId = await getGroupId(msg.instanceID)
+  if(cohort.courses.cost === 0) {
+    let groupId = await getGroupId(msg.cohortId)
 
-    await prisma.people_in_instances.create({data: {
+    await prisma.people_in_cohorts.create({data: {
       people: {connect: {id: user.id}},
-      course_instances: {connect: {id: msg.instanceID}}
+      course_cohorts: {connect: {id: msg.cohortId}}
     }})
 
     await addMember(groupId, user.username)
     await sendCohortEnrollmentEmail(user.email, {
       name: user.display_name || user.username,
-      course_start_date: instance.start_date,
-      course_name: instance.courses.name,
-      cohort_page_url: `https://hyperlink.academy/${instance.course}/${instance.id}`,
-      cohort_forum_link: `https://forum.hyperlink.academy/c/${instance.course}/${instance.id}`,
+      course_start_date: cohort.start_date,
+      course_name: cohort.courses.name,
+      cohort_page_url: `https://hyperlink.academy/${cohort.course}/${cohort.id}`,
+      cohort_forum_link: `https://forum.hyperlink.academy/c/${cohort.course}/${cohort.id}`,
       get_started_topic_url: 'PLACEHOLDER'
     })
     return {
@@ -181,16 +181,16 @@ async function enroll (req: Request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
-        name: instance.courses.name,
-        amount: instance.courses.cost * 100,
+        name: cohort.courses.name,
+        amount: cohort.courses.cost * 100,
         currency: 'usd',
         quantity: 1,
       }],
-      cancel_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}`,
-      success_url: `${req.headers.origin}/courses/${instance.course}/${instance.id}?welcome`,
+      cancel_url: `${req.headers.origin}/courses/${cohort.course}/${cohort.id}`,
+      success_url: `${req.headers.origin}/courses/${cohort.course}/${cohort.id}?welcome`,
       customer_email: user.email,
       metadata: {
-        instanceId: instance.id,
+        cohortId: cohort.id,
         userId: user.id
       }
     });

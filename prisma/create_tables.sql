@@ -38,30 +38,29 @@ CREATE TABLE IF NOT EXISTS courses (
 CREATE TABLE IF NOT EXISTS course_maintainers (
     course        text REFERENCES courses(id) NOT NULL,
     maintainer    text REFERENCES people(id) NOT NULL,
-    PRIMARY KEY (person_id, instance_id)
+    PRIMARY KEY (course, maintainer)
 );
 
 CREATE TABLE IF NOT EXISTS admins (
     person text references people(id) UNIQUE NOT NULL PRIMARY KEY
 );
 
-
-CREATE TABLE IF NOT EXISTS course_instances (
+CREATE TABLE IF NOT EXISTS course_cohorts (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     start_date    text NOT NULL,
-    facillitator  text REFERENCES people(id) NOT NULL,
+    facilitator  text REFERENCES people(id) NOT NULL,
     course        text REFERENCES courses(id) NOT NULL,
     completed     text
+);
+
+CREATE TABLE IF NOT EXISTS people_in_cohorts (
+    person_id     text REFERENCES people(id) NOT NULL,
+    cohort_id   text REFERENCES course_cohorts(id) NOT NULL,
+    PRIMARY KEY (person_id, cohort_id)
 );
 
 CREATE TABLE IF NOT EXISTS course_invites (
     course        text REFERENCES courses(id) NOT NULL,
     email         text NOT NULL,
     PRIMARY KEY (course, email)
-);
-
-CREATE TABLE IF NOT EXISTS people_in_instances (
-    person_id     text REFERENCES people(id) NOT NULL,
-    instance_id   text REFERENCES course_instances(id) NOT NULL,
-    PRIMARY KEY (person_id, instance_id)
 );
