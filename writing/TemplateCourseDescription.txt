@@ -1,0 +1,35 @@
+This is a template for a detailed description of this course — an overview of its entire curriculum. 
+
+Please edit this topic to include most or all of the elements listed below!
+
+Note that the following will be included on the course details page, and don't have to be added here:
+
+- Short description (one-liner elevator pitch of the course)
+- Cost
+- Requirements (short line items; for more detail, include in "Who Should Sign Up")
+
+## Course Goals
+
+Replace with: a brief overview of what material the course covers, and its overall learning goals.
+
+## Length / Commitment
+
+Replace with: summary of the course schedule — how many sessions; estimate of time required
+
+## Syllabus / Schedule
+
+Replace with: a detailed outline of what will be covered in each session of the course (typically week by week) — including both synchronous meetings and expectations for asynchronous activities (readings, discussions, etc.) 
+
+Note that this should be generalized e.g. "Week 1, Week 2…" — when the course is run, each cohort will also include its own specific dates and times.
+
+## Artifacts
+
+Replace with: tangible outcomes of the course — specific goals for final projects, evaluations, next steps, or any other specific output your course may produce.
+
+## Who Should Sign Up
+
+Replace with: further detail on prerequisites for the course, and description of its ideal participant — who would get the most out of this course? Who is it *not* for?
+
+## Anything Else…
+
+Replace with: anything else that you think is essential for participants to know! Feel free to rename this section or add additional ones as needed. Or if nothing comes to mind, simply remove this section.
