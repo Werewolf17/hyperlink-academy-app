@@ -8,7 +8,10 @@ import { useUserData } from '../../src/data'
 import {Primary, Secondary} from '../Button'
 
 export default () => {
+  let router = useRouter()
+
   const {data: user}= useUserData()
+  if(router.pathname === '/') return h(Header)
   return h(Header, [
     h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h(Title, 'h.')),
     h(LoginButtons),
