@@ -128,9 +128,9 @@ const EnrollInCohort = (props:{id:string, course: string}) => {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
-    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], (res)=>{
-        if(res.zeroCost) router.push('/courses/[id]/[cohortId]', `/courses/${props.course}/${props.id}?welcome`)
-        else stripe?.redirectToCheckout({sessionId: res.sessionId})
+    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], async (res)=>{
+        if(res.zeroCost) await router.push('/courses/[id]/[cohortId]', `/courses/${props.course}/${props.id}?welcome`)
+        else await stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
   let onClick= async (e:React.MouseEvent)=> {
