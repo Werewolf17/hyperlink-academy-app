@@ -1,6 +1,5 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
 import { useEffect, useState } from 'react'
@@ -8,7 +7,7 @@ import { useEffect, useState } from 'react'
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import { colors, Mobile} from '../components/Tokens'
-import { Box } from '../components/Layout'
+import { Box, Body} from '../components/Layout'
 import { Primary } from '../components/Button'
 import { Label, Input } from '../components/Form'
 // import {TitleImg} from '../components/Images'
@@ -46,6 +45,7 @@ const Landing = (props:Props) => {
   return h(Box, {gap:48}, [
     h(Welcome),
     h('hr'),
+    h(WhyHyperlink, {}, h(Body, {}, h(Intro))),
     h(Box, {gap: 16}, [
       h('h2', COPY.coursesHeader),
       !courses ? null : h(FlexGrid, {min: 328, mobileMin: 200},
@@ -94,17 +94,12 @@ const Welcome = () =>{
   return h(Box, {gap:32}, [
     //Landing Page Top Banner
     h(LandingContainer, [
-    
       h(Box, {gap:32}, [
         //Title and Tagline
         h(Title, ['hyperlink.', h('wbr'), 'academy']),
         h(Tagline, COPY.hyperlinkTagline),
         
         h(CTAGrid, [
-          //Main CTA (hidden for now undtil we have more courses)
-          // h(Primary, 'Browse the Courses'),
-
-          // Secondary CTA (remember to make button seconday when the Main CTA is restored)
           h('form', {onSubmit}, h(Box, {gap: 16, style:{maxWidth: 320}}, [
             h(Label, [
               h(Box, {gap:4}, [
@@ -121,27 +116,21 @@ const Welcome = () =>{
           ])),
         ]),
       ]),
-      
-      //NOTE: The Landing Image is handled as a background image in "Landing Container" const
-
     ]),
 
     //Page Content
-    h(Box , {style: {backgroundColor: '#FFF'}}, [
-    h(Intro),
-    h(Box, {style:{textAlign: 'right'}}, [
-      h('span', {style:{color: 'blue'}}, [
-        h(Link,{href: '/manual'}, h('a.mono', 'Read the manual' )),
-        h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
-      ]),
-      h('span', {style:{color: 'blue'}}, [
-        h('a.mono', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
-        h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
-      ]),
-    ]),
-  ])
 ])
 }
+
+let WhyHyperlink = styled('div')`
+background-color: #F0F7FA;
+width: 100vw;
+position: relative;
+left: 50%;
+right: 50%;
+margin-left: -50vw;
+margin-right: -50vw;
+`
 
 export const getServerSideProps = async ({req,res}:GetServerSidePropsContext) => {
   let token = getToken(req)
@@ -233,7 +222,6 @@ const CTAGrid = styled('div')`
 
   }
 
-  
 `
 
 export default Landing
