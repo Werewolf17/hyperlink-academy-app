@@ -24,8 +24,6 @@ export default SSO
 export const getServerSideProps:GetServerSideProps = async ({req,res, query}) => {
   let token = getToken(req)
   if(!token) {
-    console.log(req)
-    console.log(token)
     res.writeHead(301, {Location: '/login?redirect='+encodeURIComponent(req.url as string)})
     res.end()
     return {props:{}}
