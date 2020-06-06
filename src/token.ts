@@ -17,7 +17,7 @@ export function setTokenHeader(token:Token)  {
       path: '/',
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
       httpOnly: true,
-      sameSite: "strict"
+      sameSite: "lax"
     })
   }
 }
