@@ -17,7 +17,7 @@ type EmailMetadata = {
 }
 export function sendEmail<T extends EmailMetadata>(meta:T){
   return (email: string, vars: T["TestRenderModel"]) => client.sendEmailWithTemplate({
-    From: 'accounts@hyperlink.academy',
+    From: 'Hyperlink accounts@hyperlink.academy',
     To: email,
     TemplateAlias: meta.Alias,
     TemplateModel: vars
