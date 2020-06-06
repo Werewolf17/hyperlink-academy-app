@@ -72,7 +72,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             ]),
           ]),
           !inCohort || !isFacilitator ? null : h(Box, [
-            h('a', {href: `https://forum.hyperlink.academy/c/${cohort?.courses.id}/${cohort?.id}`}
+            h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort?.courses.id}/${cohort?.id}`}
               , h(Primary, 'Go to the forum')),
             cohort && !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null
           ]),
@@ -186,7 +186,7 @@ const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: s
 you'll be doing on your first day`),
       h('a', {
         style: {margin: 'auto'},
-        href: `https://forum.hyperlink.academy/c/${props.cohort.courses.id}/${props.cohort.id}`
+        href: `https://forum.hyperlink.academy/sesssion/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
       }, h(Primary, "Get started")),
       h(Link, {
         href:'/courses/[id]/[cohortId]',
@@ -205,7 +205,7 @@ const Banners = (props:{
   courses:{id: string}
 })=>{
   let isStarted = (new Date(props.start_date)).getTime() - (new Date()).getTime()
-  let forum = `https://forum.hyperlink.academy/c/${props.courses.id}/${props.id}`
+  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.courses.id}/${props.id}`
 
   if(props.completed)  return h(Banner, {}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
