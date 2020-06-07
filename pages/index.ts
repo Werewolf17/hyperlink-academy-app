@@ -25,7 +25,7 @@ export let COPY = {
   registerButton: "Browse the Courses",
   emailHeader: "Get updates about new courses and more!",
   emailDescription: "We'll never spam or share your email. You can unsubscribe at any time.",
-  emailButton: "Get Hyped!",
+  emailButton: "Get Updates",
   coursesHeader: "All Courses",
   courseGardenHeader: "Have an idea for a course?",
   courseGardenDescription: `Hyperlink courses are created by our community. We seed and grow them in the Course
