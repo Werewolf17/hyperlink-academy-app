@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 
 import {colors, Mobile} from '../Tokens'
 import { useUserData } from '../../src/data'
-import {Primary, Secondary} from '../Button'
 
 export default () => {
   const {data: user}= useUserData()
@@ -23,8 +22,8 @@ export const LoginButtons = () => {
 
   let redirect = router.pathname === '/' ? '' : '?redirect=' + encodeURIComponent(router.asPath)
   if(!data) return h(Container, {}, [
-    h(Link, {href: '/signup'}, h(Primary,  'Sign up')),
-    h(Link, {href: '/login' + redirect}, h(Secondary, "Log in")),
+    h(Link, {href: '/signup'}, h(NavLink,  'sign up')),
+    h(Link, {href: '/login' + redirect}, h(NavLink, "log in")),
   ])
   else {
     return h(Container, [

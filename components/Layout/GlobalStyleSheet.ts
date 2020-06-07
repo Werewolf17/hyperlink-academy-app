@@ -13,6 +13,7 @@ html {
   font-size: 16px;
   font-family: 'Lato', sans-serif;
   color: ${colors.textPrimary};
+  scroll-behavior: smooth;
 }
 
 body {

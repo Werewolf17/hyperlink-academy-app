@@ -106,3 +106,16 @@ grid-row: 2;
 grid-column: 1;
 }
 `
+
+export const LandingPageFeatures = styled('div')`
+width: 100%;
+margin: auto;
+display: grid;
+grid-gap: 64px;
+grid-template-columns: auto auto auto;
+@media (max-width: 768px) {
+  grid-template-rows: auto auto auto;
+  grid-template-columns: auto;
+  max-width: 400px;
+};
+`
