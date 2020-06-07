@@ -10,6 +10,7 @@ import { useUserCohorts, useUserData, useCourses } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import { BigCohortCard } from '../components/Card'
 import {COPY} from './index'
+import { useEffect } from 'react'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Dashboard = (props:Props) => {
@@ -18,8 +19,11 @@ const Dashboard = (props:Props) => {
   let {data: cohorts} = useUserCohorts()
   let router = useRouter()
 
-  if(!user || cohorts === undefined) {
+  useEffect(() => {
     if(user === false) router.push('/')
+  }, [user])
+
+  if(!user || cohorts === undefined) {
     return null
   }
 
