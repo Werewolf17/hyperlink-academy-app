@@ -23,9 +23,9 @@ export let COPY = {
   hyperlinkTagline: "Hyperlink is a course platform and online school built for seriously effective learning.",
   registerHeader: "Calling all superlearners! Join the Hyperlink Alpha to propose a course idea, and (very soon!) enroll one of our first courses.",
   registerButton: "Browse the Courses",
-  emailHeader: "Drop your email to get updates!",
-  emailDescription: "We only use this email to send our fortnightly update. Unsubscribe at any time.",
-  emailButton: "Get Updates",
+  emailHeader: "Get updates about new courses and more!",
+  emailDescription: "We'll never spam or share your email. You can unsubscribe at any time.",
+  emailButton: "Get Hyped!",
   coursesHeader: "All Courses",
   courseGardenHeader: "Have an idea for a course?",
   courseGardenDescription: `Hyperlink courses are created by our community. We seed and grow them in the Course
