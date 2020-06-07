@@ -8,7 +8,7 @@ import Intro from '../writing/Intro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import { colors, Mobile} from '../components/Tokens'
 import { Box, Body} from '../components/Layout'
-import { Primary } from '../components/Button'
+import { Primary, Secondary } from '../components/Button'
 import { Label, Input } from '../components/Form'
 // import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
@@ -44,10 +44,9 @@ const Landing = (props:Props) => {
 
   return h(Box, {gap:48}, [
     h(Welcome),
-    h('hr'),
     h(WhyHyperlink, {}, h(Body, {}, h(Intro))),
     h(Box, {gap: 16}, [
-      h('h2', COPY.coursesHeader),
+      h('h2', {id: 'courses'}, COPY.coursesHeader),
       !courses ? null : h(FlexGrid, {min: 328, mobileMin: 200},
                           courses.courses
                           .map(course => {
@@ -100,6 +99,7 @@ const Welcome = () =>{
         h(Tagline, COPY.hyperlinkTagline),
         
         h(CTAGrid, [
+          h('a', {href:'#courses'}, h(Secondary, {}, COPY.registerButton)),
           h('form', {onSubmit}, h(Box, {gap: 16, style:{maxWidth: 320}}, [
             h(Label, [
               h(Box, {gap:4}, [
@@ -130,6 +130,7 @@ left: 50%;
 right: 50%;
 margin-left: -50vw;
 margin-right: -50vw;
+text-align: center;
 `
 
 export const getServerSideProps = async ({req,res}:GetServerSidePropsContext) => {
@@ -214,14 +215,7 @@ const CTAGrid = styled('div')`
 
   @media (max-width: 768px) {
     width: 100%;
-    grid-template-rows: auto auto;
-    
   }
-
-  ${Mobile} {
-
-  }
-
 `
 
 export default Landing

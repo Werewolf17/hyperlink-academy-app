@@ -1,33 +1,51 @@
-import {Box} from '../components/Layout'
+import {Box, LandingPageFeatures} from '../components/Layout'
 
-<Box>
+<Box gap={64}>
 
-## What is Hyperlink?
+<Box width={700} ma>
 
-It's a simple, integrated learning platform that makes it easy to facilitate great courses and workshops.
+# How does it work?
+Hyperlink is a platform for creating and participating in community-driven
+online courses. Each course is a template for a learning experience. It can be
+run repeatedly, in independent cohorts.
 
-And it's an online school where you can participate in transformative learning experiences with real people — we believe the best learning happens with communities of highly engaged learners, not just file downloads and video playlists.
+Join to create a course, learn something new — or both!
 
-## How does it work?
+</Box>
 
-Hyperlink courses are created and cultivated by the community. Each course focuses on a specific niche topic, and aims to create unreasonably effective learning.
+<LandingPageFeatures min={200}>
 
-Courses are run in independent cohorts, each supported by a *facilitator*. If you create a *course*, you can run many *cohorts* of that course. You can also participate as a *learner* in as many cohorts as you like.
+<div>
 
-[TK diagram - Celine will add!]
+![](/img/landing/Community.png)
 
-Here's what we provide:
+**community-driven**
 
-- Simple infrastructure for course creation and facilitation
-- Hands-on help designing and building your course
-- Easy payments with Stripe
-- Community discussion space with Discourse
-- Network of peers excited to learn together
+Each course cohort brings together a small group of peers excited to learn together. And we're making new courses together every day.
 
-[TK icons for the above - Celine will add!]
+</div>
 
-Hyperlink is built on open source software like [Discourse](https://www.discourse.org/), [Jitsi](https://jitsi.org/), and [this very website](https://gitlab.com/jaredpereira/hyperlink-academy). You can fork, modify, and contribute to any of it.
+<div>
 
-We’re experimenting with new courses every day. We’d love for you to join us as a facilitator, learner — or both!
+![](/img/landing/Experiment.png)
+
+**experiments**
+
+Cohorts serve as lightweight experiments. Hyperlink's focus on iterative development means courses always keep improving.
+
+</div>
+
+<div>
+
+
+![](/img/landing/Infrastructure.png)
+
+**simple infrastructure**
+
+Easy enrollment, payments, and community discussion space — an all-in-one learning platform, building on open source software.
+
+</div>
+
+</LandingPageFeatures>
 
 </Box>
