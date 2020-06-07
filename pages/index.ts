@@ -99,7 +99,7 @@ const Welcome = () =>{
         h(Tagline, COPY.hyperlinkTagline),
         
         h(CTAGrid, [
-          h('a', {href:'#courses'}, h(Secondary, {}, COPY.registerButton)),
+          h('a', {href:'#courses'}, h(Primary, {}, COPY.registerButton)),
           h('form', {onSubmit}, h(Box, {gap: 16, style:{maxWidth: 320}}, [
             h(Label, [
               h(Box, {gap:4}, [
@@ -112,7 +112,7 @@ const Welcome = () =>{
                 onChange: e => setEmail(e.currentTarget.value)
               }),
             ]),
-            h(Primary, {type: "submit", success: status === 'success'}, ButtonText[status]),
+            h(Secondary, {type: "submit", success: status === 'success'}, ButtonText[status]),
           ])),
         ]),
       ]),
