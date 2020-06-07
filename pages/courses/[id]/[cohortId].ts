@@ -72,7 +72,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             ]),
           ]),
           !inCohort || !isFacilitator ? null : h(Box, [
-            h('a', {href: `https://forum.hyperlink.academy/c/${cohort?.courses.id}/${cohort?.id}`}
+            h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort?.courses.id}/${cohort?.id}`}
               , h(Primary, 'Go to the forum')),
             cohort && !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null
           ]),
@@ -128,9 +128,9 @@ const EnrollInCohort = (props:{id:string, course: string}) => {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
-    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], (res)=>{
-        if(res.zeroCost) router.push('/courses/[id]/[cohortId]', `/courses/${props.course}/${props.id}?welcome`)
-        else stripe?.redirectToCheckout({sessionId: res.sessionId})
+    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], async (res)=>{
+        if(res.zeroCost) await router.push('/courses/[id]/[cohortId]', `/courses/${props.course}/${props.id}?welcome`)
+        else await stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
   let onClick= async (e:React.MouseEvent)=> {
@@ -186,7 +186,7 @@ const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: s
 you'll be doing on your first day`),
       h('a', {
         style: {margin: 'auto'},
-        href: `https://forum.hyperlink.academy/c/${props.cohort.courses.id}/${props.cohort.id}`
+        href: `https://forum.hyperlink.academy/sesssion/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
       }, h(Primary, "Get started")),
       h(Link, {
         href:'/courses/[id]/[cohortId]',
@@ -205,7 +205,7 @@ const Banners = (props:{
   courses:{id: string}
 })=>{
   let isStarted = (new Date(props.start_date)).getTime() - (new Date()).getTime()
-  let forum = `https://forum.hyperlink.academy/c/${props.courses.id}/${props.id}`
+  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.courses.id}/${props.id}`
 
   if(props.completed)  return h(Banner, {}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
     h(Box, {gap: 8, className: "textSecondary"}, [

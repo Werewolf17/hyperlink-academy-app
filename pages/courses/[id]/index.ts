@@ -72,12 +72,14 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course.id )
 
+  let forum = `https://forum.hyperlink.academy/${user ? 'session/sso?return_path=/':''}c/${course?.id}`
+
   //Setting up the layout for the course page
   return h(TwoColumn, {}, [
     h(Box, {gap: 32}, [
       h(Box, {gap: 16}, [
         h('h1', course?.name),
-        h('span', {style:{color: 'blue'}}, [h('a.mono',{href:`https://forum.hyperlink.academy/c/${course?.id}`},  COPY.courseForum), ' ➭'])
+        h('span', {style:{color: 'blue'}}, [h('a.mono',{href:forum},  COPY.courseForum), ' ➭'])
       ]),
       course?.description || '',
       activeCohorts.length > 0 ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [

@@ -68,7 +68,7 @@ const Dashboard = (props:Props) => {
         h('h2', COPY.courseGardenHeader),
         COPY.courseGardenDescription,
         h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
-          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-garden/'},  COPY.courseGardenLink),
+          h('a.mono',{href: 'https://forum.hyperlink.academy/session/sso?return_path=/c/course-kindergarten/'},  COPY.courseGardenLink),
           h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
         ])
       ])

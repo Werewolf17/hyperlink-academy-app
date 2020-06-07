@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
@@ -47,7 +47,7 @@ const Login = () => {
     callLogin('/api/login', formData)
   }
 
-  if (data) router.push(redirect as string || '/')
+  useEffect(()=> {if (data) router.push(redirect as string || '/dashboard')},[data])
   if (typeof reset !== 'undefined') return h(ResetPassword)
 
   return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
