@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import {colors} from  './Tokens'
 
-export const Primary = styled('button')<{disabled?: boolean}>`
+export const Primary = styled('button')<{disabled?: boolean, success?:boolean}>`
 font-family: Roboto Mono;
 font-size: inherit;
 height: fit-content;
@@ -26,7 +26,13 @@ border-color: ${colors.grey80};
 background-color: ${colors.grey80};
 color: ${colors.grey55};
 `}}
+
+${props => {
+if(props.success) return `
+background-color: ${colors.accentSuccess};
+`}}
 `
+
 
 export const Secondary = styled(Primary)<{disabled?:boolean}>`
 color: black;

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+
 export let TitleImg = styled('img')<{height?: number, width: number}>`
 image-rendering: pixelated;
 image-rendering: crisp-edges;

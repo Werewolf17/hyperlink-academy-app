@@ -21,12 +21,16 @@ export type VerifyEmailMsg = {
   key: string
 }
 
+export type NewsletterSignupMsg = {email: string}
+
 export type SignupResponse = ResultType<typeof Signup>
 export type VerifyEmailResponse = ResultType<typeof VerifyEmail>
+export type NewsletterSignupResponse = ResultType<typeof newsletterSignup>
 
 export default multiRouteHandler('action', {
   request: Signup,
-  verify: VerifyEmail
+  verify: VerifyEmail,
+  newsletter: newsletterSignup
 })
 
 async function Signup(req: Request) {
@@ -141,4 +145,24 @@ const getActivationKey = async (hash: string)=> {
     where: {key_hash: hash},
     select: {username: true, email: true, password_hash: true, created_time: true, newsletter: true}
   })
+}
+
+async function newsletterSignup (req: Request) {
+  let msg = req.body as Partial<NewsletterSignupMsg>
+  if(!msg.email) return {status: 400, result: "ERROR: no email provided"} as const
+
+  await fetch('https://api.buttondown.email/v1/subscribers',{
+    method: "POST",
+    headers: {
+      Authorization: `Token ${process.env.BUTTONDOWN_API_KEY}`,
+      "Content-Type": 'application/json; charset=utf-8'
+    },
+    body: JSON.stringify({
+      email: msg.email,
+      tags: [
+        'homepage'
+      ]
+    })
+  })
+  return {status:200, result: 'Signed up for newsletter'}
 }
