@@ -34,7 +34,7 @@ background-color: ${colors.accentSuccess};
 `
 
 
-export const Secondary = styled(Primary)<{disabled?:boolean}>`
+export const Secondary = styled(Primary)<{disabled?:boolean, success?:boolean}>`
 color: black;
 background-color: white;
 
@@ -42,6 +42,11 @@ ${props => {
 if(props.disabled) return `
 border-color: ${colors.grey80};
 color: ${colors.grey55};
+`}}
+
+${props => {
+if(props.success) return `
+border-color: ${colors.accentSuccess};
 `}}
 `
 
