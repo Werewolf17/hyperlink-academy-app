@@ -2,13 +2,26 @@ Hi, {{name}},
 
 You've been invited to join a course on Hyperlink! (https://hyperlink.academy)
 
-Head here to learn more and consider signing up:
+Head here to learn more and consider joining:
 
 {{course_name}}
 {{course_url}}
 
-First time hearing about Hyperlink? The TL;DR is that it's a simple yet powerful platform for facilitating serious, high-quality learning experiences. We'd love to have you join the community! You can learn more here in the Hyperlink Manual: https://hyperlink.academy/manual
+Please note that you need an account to join — log in, or sign up if you don't yet have an account, then you'll be able to register.
 
-If there's a cohort that fits your schedule, we hope to see you in the course! Any questions, just hit reply and let us know.
+https://hyperlink.academy/login
+https://hyperlink.academy/signup
+
+If there's a cohort that fits your schedule, we hope to see you in this course soon!
+
+---
+
+First time hearing about Hyperlink?
+
+It's a course platform and online school built for seriously effective learning — and we'd love to have you join the community! You can learn more here in the Hyperlink Manual:
+
+https://hyperlink.academy/manual
+
+Any questions, just hit reply and let us know.
 
 —The Hyperlink Team

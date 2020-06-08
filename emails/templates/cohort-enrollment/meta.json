@@ -8,8 +8,8 @@
     "name": "name_Value",
     "course_name": "course_name_Value",
     "course_start_date": "course_start_date_Value",
+    "get_started_topic_url": "get_started_topic_url_Value",
     "cohort_page_url": "cohort_page_url_Value",
-    "cohort_forum_link": "cohort_forum_link_Value",
-    "get_started_topic_url": "get_started_topic_url_Value"
+    "cohort_forum_url": "cohort_forum_url_Value"
   }
 }
