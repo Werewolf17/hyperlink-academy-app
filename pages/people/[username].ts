@@ -10,6 +10,7 @@ import {profileDataQuery} from '../api/get/[...item]'
 import { useProfileData } from '../../src/data'
 import { colors } from '../../components/Tokens'
 import ErrorPage from '../404'
+import Text from '../../components/Text'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -28,7 +29,7 @@ const Profile= (props: Extract<Props, {notFound: false}>)=>{
       h('b', {style: {color: colors.textSecondary}}, `@${username}`),
       !person.link ? null : h('a', {href: person.link}, h('b', person.link)),
     ]),
-    !person.bio ? null : h('div', person.bio)
+    !person.bio ? null : h(Box, {width: 640}, h(Text, {source: person.bio}))
   ])
 }
 
