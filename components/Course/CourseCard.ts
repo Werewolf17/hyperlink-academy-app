@@ -5,13 +5,14 @@ import Link from 'next/link'
 import { Box} from '../Layout'
 import { colors, Mobile} from '../Tokens'
 import Card  from '../Card'
+import { prettyDate } from '../../src/utils'
 
 type Props = {
   name:string,
   description: string
   id: string,
   href?:string,
-  start_date?: Date
+  start_date: string
   cohort?: boolean
 }
 export default (props:Props) => {
@@ -28,7 +29,7 @@ export default (props:Props) => {
         h('h3', props.name),
         h('p', props.description),
       ]),
-      !props.start_date ? null : h(DateContainer, (props.cohort ? 'starts ' : 'Next cohort starts ') + props.start_date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}))
+      !props.start_date ? null : h(DateContainer, (props.cohort ? 'starts ' : 'Next cohort starts ') + prettyDate(props.start_date))
     ])
   ]))
 }
