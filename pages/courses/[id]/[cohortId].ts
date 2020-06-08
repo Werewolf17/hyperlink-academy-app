@@ -16,6 +16,7 @@ import { Info } from '../../../components/Form'
 import { Modal } from '../../../components/Modal'
 import Text from '../../../components/Text'
 
+import {prettyDate} from '../../../src/utils'
 import { getTaggedPost } from '../../../src/discourse'
 import { callApi, useApi } from '../../../src/apiHelpers'
 import { cohortDataQuery, courseDataQuery } from '../../api/get/[...item]'
@@ -115,8 +116,6 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     ])
   ])
 }
-
-let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
 
 let LearnerEntry = styled('div')`
 display: grid;

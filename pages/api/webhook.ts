@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import Stripe from 'stripe'
 import {PrismaClient} from '@prisma/client'
-import { getUsername, getGroupId, addMember} from '../../src/discourse'
+import { getUsername, getGroupId, addMember, getTaggedPost} from '../../src/discourse'
 import { sendCohortEnrollmentEmail } from '../../emails';
+import { prettyDate } from '../../src/utils';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 const prisma = new PrismaClient()
@@ -61,15 +62,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }})
     await prisma.disconnect()
 
+    let gettingStarted = await getTaggedPost(`${cohort.course}/${cohort.id}`, 'getting-started')
 
     await addMember(groupId, username)
     await sendCohortEnrollmentEmail(person.email, {
       name: person.display_name || person.username,
-      course_start_date: cohort.start_date,
+      course_start_date: prettyDate(cohort.start_date),
       course_name: cohort.courses.name,
       cohort_page_url: `https://hyperlink.academy/${cohort.course}/${cohort.id}`,
-      cohort_forum_link: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.course}/${cohort.id}`,
-      get_started_topic_url: 'PLACEHOLDER'
+      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.course}/${cohort.id}`,
+      get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
     })
 
   }

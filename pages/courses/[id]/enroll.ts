@@ -18,6 +18,7 @@ import { Info } from '../../../components/Form'
 import ErrorPage from '../../404'
 import { courseDataQuery } from '../../api/get/[...item]'
 import Text from '../../../components/Text'
+import {prettyDate} from '../../../src/utils'
 import {COPY as COURSECOPY} from './index'
 
 const COPY = {
@@ -120,8 +121,6 @@ let Cohort = (props: {
         h(Seperator),
     ])
 }
-
-let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
 
 export const getStaticProps = async (ctx: any) =>{
     let courseId = (ctx.params?.id || '' )as string

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {colors} from './Tokens'
 import {Box} from './Layout'
 import { Pill } from './Pill'
+import {prettyDate} from '../src/utils'
 
 const Card = styled('a')`
 box-sizing: border-box;
@@ -94,5 +95,3 @@ export const cohortPrettyDate = (start_date: string, completed?: string | null)=
   if(new Date() > new Date(start_date)) return `Started ${prettyDate(start_date)}`
   return `Starts ${prettyDate(start_date)}`
 }
-
-let prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})

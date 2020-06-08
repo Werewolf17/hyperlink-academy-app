@@ -53,7 +53,7 @@ export const createCohortGroup = async (name: string, admin: string, courseID: n
     category,
     title: name + " Getting Started",
     raw: TemplateCohortGettingStarted,
-    tags: ['note']
+    tags: ['getting-started']
   })
   return true
 }

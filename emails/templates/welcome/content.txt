@@ -6,15 +6,17 @@ Your Hyperlink account has been created! We're excited to welcome you to the com
 
 We started Hyperlink because we wanted a better way to learn online — a space where we can come together for active, serious, impactful learning…and make some new friends while we're at it!
   
-To confirm your account, copy and paste this code to the signup page:
+First things first — please confirm your account! 
+
+Copy and paste the following code to the signup page:
 
 {{activation_code}}
 
-Or if that doesn't work, you can copy and paste this link into your browser:
+Alternatively, you can copy and paste this link into your browser to confirm:
 
 {{activation_url}}
 
-Two quick next steps!
+Two quick next steps—
 
 Once you’ve activated your account:
 
