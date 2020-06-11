@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
-import { colors, Mobile} from '../components/Tokens'
+import { colors, Mobile, Tablet} from '../components/Tokens'
 import { Box, Body} from '../components/Layout'
 import { Primary, Secondary } from '../components/Button'
 import { Label, Input } from '../components/Form'
@@ -156,10 +156,9 @@ image-rendering: pixelated;
 image-rendering: crisp-edges;
 height: 700px;
 
-@media (max-width: 768px) {
+${Tablet} {
   height: auto;
   background-position: right 80px;
-
 };
 
 
@@ -179,13 +178,8 @@ font-weight: bold;
 color: blue;
 z-index: 2;
 
-@media (max-width: 768px) {
+${Tablet} {
   font-size: 2.625rem;  
-}
-
-${Mobile} {
-  font-size: 2.625rem;  
-
 }
 `
 
@@ -213,7 +207,7 @@ const CTAGrid = styled('div')`
   grid-gap: 32px; 
   grid-template-rows: auto auto;
 
-  @media (max-width: 768px) {
+  ${Tablet}{
     width: 100%;
   }
 `

@@ -4,7 +4,7 @@ import Head from 'next/head'
 import h from 'react-hyperscript'
 import { Fragment } from 'react'
 
-import { Spacing, colors, Widths, Mobile} from '../Tokens'
+import { Spacing, colors, Widths, Mobile, Tablet} from '../Tokens'
 import {GlobalStyleSheet} from './GlobalStyleSheet'
 import Header from './Header'
 import Footer from './Footer'
@@ -93,7 +93,7 @@ display: grid;
 grid-template-columns: 2fr 1fr;
 grid-gap: 64px;
 
-@media(max-width: 768px) {
+${Tablet} {
 grid-template-columns: auto;
 }
 `
@@ -101,9 +101,9 @@ grid-template-columns: auto;
 export const Sidebar = styled('div')`
 grid-column: 2;
 grid-row: 1 / 3;
-@media(max-width: 768px) {
-grid-row: 2;
-grid-column: 1;
+${Tablet} {
+  grid-row: 2;
+  grid-column: 1;
 }
 `
 
@@ -113,7 +113,7 @@ margin: auto;
 display: grid;
 grid-gap: 64px;
 grid-template-columns: auto auto auto;
-@media (max-width: 768px) {
+${Tablet} {
   grid-template-rows: auto auto auto;
   grid-template-columns: auto;
   max-width: 400px;

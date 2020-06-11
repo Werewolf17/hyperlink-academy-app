@@ -7,7 +7,7 @@ import { InferGetStaticPropsType } from 'next'
 
 import Enroll from '../../../components/Course/Enroll'
 import { TwoColumn, Box, Seperator, Sidebar} from '../../../components/Layout'
-import { colors, Mobile } from '../../../components/Tokens'
+import { colors, Mobile, Tablet } from '../../../components/Tokens'
 import { Tabs } from '../../../components/Tabs'
 import { Pill } from '../../../components/Pill'
 import { Primary, Destructive, Secondary} from '../../../components/Button'
@@ -249,9 +249,9 @@ const BannerInner = styled('div')`
 display: grid;
 grid-template-columns: 2fr 1fr;
 grid-gap: 64px;
-@media(max-width: 768px) {
-grid-template-columns: auto;
-grid-template-rows: auto ;
+${Tablet} {
+  grid-template-columns: auto;
+  grid-template-rows: auto ;
 }
 `
 
