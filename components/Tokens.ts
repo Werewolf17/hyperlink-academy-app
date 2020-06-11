@@ -19,3 +19,4 @@ export type Spacing = 0 | 4 | 8 | 16 | 24 | 32 | 48 | 64 | 256
 export type Widths = 400 | 640 | 904 | 968 | 1024
 
 export const Mobile = '@media(max-width:420px)'
+export const Tablet = '@media(max-width:768px)'

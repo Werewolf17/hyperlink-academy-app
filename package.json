@@ -32,6 +32,7 @@
     "react-dom": "^16.13.1",
     "react-hyperscript": "^3.2.0",
     "react-markdown": "^4.3.1",
+    "rehype-slug": "^3.0.0",
     "stripe": "^8.50.0",
     "swr": "^0.2.0",
     "typescript": "^3.8.3",

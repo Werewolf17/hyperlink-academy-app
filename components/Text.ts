@@ -3,8 +3,8 @@ import h from 'react-hyperscript'
 import Markdown from 'react-markdown'
 import {colors} from './Tokens'
 
-export default (props:{source:string}) => h(Text, {}, h(Markdown, props))
-export const Text = styled('div')`
+export default (props:{source:string}) => h(TextStyles, {}, h(Markdown, props))
+export const TextStyles = styled('div')`
 h1 {
   margin-top: 64px;
   margin-bottom: 8px;
