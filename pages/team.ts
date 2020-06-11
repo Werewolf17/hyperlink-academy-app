@@ -33,7 +33,7 @@ I've been learning to make technology for learning in one form or the other sinc
 
 My interests: weird synthesizers, sci-fi and fantasy worlds, free software and information theory.`,
                 twitter: 'jrdprr',
-                website: 'awarm.space'
+                website: 'https://awarm.space'
             }),
 
             h(TeamProfile, {
@@ -48,7 +48,7 @@ In my free time I enjoy making clothes, making pots and dishes, making tables, m
 
 My interests: havin' a good time over a diet coke and some cake.`,
                 twitter: 'cyberspaceline',
-                website: 'celinepark.design'
+                website: 'https://celinepark.design'
             }),
             h(TeamProfile, {
                 profileImg: '/img/teamProfiles/brendan.jpg',
@@ -60,7 +60,7 @@ I like to make things, in many media: photography to film, hip-hop lyrics to web
 
 My interests: indie creator economics, libraries, experimental writing, deep time, learning and pedagogy, translation, ecology, the open web.`,
                 twitter: 'schlagetown',
-                website: 'www.brendanschlagel.com'
+                website: 'https://www.brendanschlagel.com'
             })
         ])
     ])
