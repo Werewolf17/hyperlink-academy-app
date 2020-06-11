@@ -13,8 +13,8 @@ export default ()=>{
           h('h4', "More Info"),
           h(Link, {href: '/team', passHref: true}, h(FooterLink, 'About the Team')),
           h(Link, {href: '/manual', passHref: true}, h(FooterLink, 'The Hyperlink Manual')),
-          h(Link, {href: '/blog', passHref: true}, h(FooterLink, 'Blog')),
-          h(Link, {href: '/faq', passHref: true}, h(FooterLink, 'FAQ')),
+          // h(Link, {href: '/blog', passHref: true}, h(FooterLink, 'Blog')),
+          // h(Link, {href: '/faq', passHref: true}, h(FooterLink, 'FAQ')),
         ]),
         h(Box, {gap: 4}, [
           h('h4', "Contact Us"),
