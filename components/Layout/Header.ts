@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import {colors, Mobile} from '../Tokens'
+import {Logo} from '../Icons'
 import { useUserData } from '../../src/data'
 
 export default () => {
   const {data: user}= useUserData()
   return h(Header, [
-    h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h(Title, 'h.')),
+    h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
     h(LoginButtons),
   ])
 }
@@ -76,13 +77,11 @@ font-family: serif;
 grid-template-columns: auto auto;
 height: 32px;
 padding-bottom: 64px;
+align-items: center;
+
 ${Mobile} {
   padding-bottom: 32px ;
   padding-top: 16px ;
 }
 `
 
-const Title = styled('a')`
-font-weight: bold;
-font-size: 24px;
-`

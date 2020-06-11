@@ -24,7 +24,7 @@ export const Team = () => {
         h('h1', 'The Team'),
         h(TeamLayoutGrid, [
             h(TeamProfile, {
-                profileImg: '/img/teamProfiles/jared.jpg',
+                profileImg: '/img/teamProfiles/Jared.jpg',
                 name: 'Jared',
                 username: 'jared',
                 title: 'Co-Founder',
