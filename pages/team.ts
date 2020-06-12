@@ -97,7 +97,7 @@ const TeamProfile = (props:TeamProfile) => {
 
             //name and title
             h(Box, {gap:4}, [
-                h('h3', {}, h(Link, {href: `/people/${props.username}`}, h('a.notBlue', {style: {textDecoration: 'none'}}, props.name))),
+                h('h3', {}, h(Link, {href:'/people/[username]', as: `/people/${props.username}`}, h('a.notBlue', {style: {textDecoration: 'none'}}, props.name))),
                 h('strong', props.title),
             ]),
 
