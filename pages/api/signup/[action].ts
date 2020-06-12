@@ -49,7 +49,7 @@ async function Signup(req: Request) {
   let salt = await bcrypt.genSalt()
   let password_hash = await bcrypt.hash(msg.password, salt)
 
-  let key = await createActivationKey({email: msg.email, username:msg.username, password_hash, newsletter:msg.newsletter})
+  let key = await createActivationKey({email: msg.email.toLowerCase(), username:msg.username, password_hash, newsletter:msg.newsletter})
   await prisma.disconnect()
 
   let activation_url = `${req.headers.origin}/signup?verifyEmail=${key}`
@@ -121,7 +121,7 @@ const createActivationKey = async (person:{email: string, password_hash: string,
 }
 
 const checkUser = async (email:string):Promise<boolean> => {
-  return !(await prisma.people.findOne({where: {email}}))
+  return !(await prisma.people.findOne({where: {email: email.toLowerCase()}}))
 }
 
 

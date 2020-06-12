@@ -51,7 +51,7 @@ export default APIHandler(handler)
 async function validateLogin(email: string, password: string){
   try {
     let person = await prisma.people.findOne({
-      where:{email}, include: {admins: true}
+      where:{email: email.toLowerCase()}, include: {admins: true}
     })
     await prisma.disconnect()
     if(!person) return false

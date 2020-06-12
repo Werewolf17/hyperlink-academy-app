@@ -24,6 +24,9 @@ CREATE TABLE IF NOT EXISTS people (
     link          text
 );
 
+CREATE UNIQUE INDEX people_username_index on people (lower(username));
+CREATE UNIQUE INDEX people_email_index on people (lower(email));
+
 CREATE TABLE IF NOT EXISTS courses (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     name          text NOT NULL,
