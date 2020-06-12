@@ -42,20 +42,61 @@ export const createCohortGroup = async (name: string, admin: string, courseID: n
   }
   let category = await createCategory(name, {permissions: {[name]:1}, parent_category_id: courseID})
   if(!category) return false
-  await createTopic({
-    category,
+  await updateTopic(category.topic_url, {
+    category_id: category.id,
     title: name + " Notes",
     raw: TemplateCohortNotes,
     tags: ['note']
   }, username)
 
   await createTopic({
-    category,
+    category: category.id,
     title: name + " Getting Started",
     raw: TemplateCohortGettingStarted,
     tags: ['getting-started']
   }, username)
   return true
+}
+
+async function updateTopic(topic:string, input: {category_id: number, title: string, raw: string, tags: string[]}, username?: string) {
+  // Update the title
+  await fetch (`https://forum.hyperlink.academy${topic}`, {
+    method: "PUT",
+    headers:{
+      "Content-Type": 'application/json; charset=utf-8',
+      ...headers
+    },
+    body: JSON.stringify({
+      tags: input.tags,
+      title: input.title
+    })
+  })
+
+  // Update the content
+  let topicData = await (await fetch(`https://forum.hyperlink.academy${topic}`)).json()
+  let postID = topicData.post_stream[0].id
+  await fetch (`https://forum.hyperlink.academy/posts/${postID}`, {
+    method: "PUT",
+    headers:{
+      "Content-Type": 'application/json; charset=utf-8',
+      ...headers
+    },
+    body: JSON.stringify({
+      post: {
+        raw: input.raw
+      }
+    })
+  })
+
+  // Update the owner
+  if(username) await fetch('https://forum.hyperlink.academy${topic}/change-owner', {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json; charset=utf-8',
+      ...headers
+    },
+    body: JSON.stringify({post_ids: [postID], username})
+  })
 }
 
 export async function createTopic(input:{title: string, category: number, raw: string, tags?: string[]}, username?: string) {
@@ -71,7 +112,7 @@ export async function createTopic(input:{title: string, category: number, raw: s
   console.log(result)
 }
 
-export const createCategory = async (name: string, options?: {id?: string,permissions?: {[key:string]:number}, parent_category_id?: number}):Promise<number | false> => {
+export const createCategory = async (name: string, options?: {id?: string,permissions?: {[key:string]:number}, parent_category_id?: number}) => {
   let result = await fetch('https://forum.hyperlink.academy/categories.json', {
     method: 'POST',
     headers: {
@@ -80,7 +121,7 @@ export const createCategory = async (name: string, options?: {id?: string,permis
     },
     body: JSON.stringify({name, color: '0088CC', text_color: 'FFFFFF', ...options})
   })
-  if(result.status === 200) return (await result.json()).category.id as number
+  if(result.status === 200) return (await result.json()).category as {id: number, topic_url: string}
   console.log(await result.text())
   return false
 }

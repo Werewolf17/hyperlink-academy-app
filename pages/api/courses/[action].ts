@@ -241,15 +241,15 @@ async function createCourse(req: Request) {
   let category = await createCategory(msg.name, {id: msg.courseId})
   if(!category) return {status: 500, result: "ERROR: couldn't create course category"}
   await createTopic({
-    category,
+    category: category.id,
     title: `${msg.name} Curriculum`,
     tags: ['curriculum'],
     raw: TemplateCourseDescription
-  })
+  }, user.username)
 
   await prisma.courses.create({
     data: {
-      category_id: category,
+      category_id: category.id,
       id: msg.courseId,
       name: msg.name,
       description: msg.description,
