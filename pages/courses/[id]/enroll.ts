@@ -25,7 +25,7 @@ const COPY = {
     empty: "There are no upcoming cohorts for this course :(",
     header: "Join a Cohort",
     backToCourse: 'back to the course',
-    subtitle: "'Pick a cohort with a start date that works for you. Be sure to check the notes underneath for specifc meeting times and any tweaks to the curriculum.'",
+    subtitle: 'Pick a cohort with a start date that works for you. Be sure to check the notes underneath for specific meeting times and any tweaks to the curriculum.',
 }
 
 
