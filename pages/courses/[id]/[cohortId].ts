@@ -20,7 +20,7 @@ import {prettyDate} from '../../../src/utils'
 import { getTaggedPost } from '../../../src/discourse'
 import { callApi, useApi } from '../../../src/apiHelpers'
 import { cohortDataQuery, courseDataQuery } from '../../api/get/[...item]'
-import { CompleteCohortMsg, CompleteCohortResponse, EnrollMsg, EnrollResponse } from '../../api/courses/[action]'
+import { CompleteCohortMsg, CompleteCohortResponse, EnrollMsg, EnrollResponse, UpdateCohortMsg, UpdateCohortResponse } from '../../api/courses/[action]'
 import { useCohortData, useUserData, useCourseData } from '../../../src/data'
 import { cohortPrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
@@ -49,9 +49,8 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let {data: course} = useCourseData(props.courseId, props.course)
   if(cohort === false) return null
 
-  console.log(props)
   let inCohort = cohort?.people_in_cohorts.find(p => p.person === (user ? user.id : undefined))
-  let isFacilitator  = user && cohort?.people.username === user.username
+  let isFacilitator  = !!user && cohort?.people.username === user.username
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
 
   return h('div', {}, [
@@ -72,10 +71,10 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
               `Facilitated by ${cohort?.people.display_name}`
             ]),
           ]),
-          !inCohort || !isFacilitator ? null : h(Box, [
+          !inCohort && !isFacilitator ? null : h(Box, [
             h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort?.courses.id}/${cohort?.id}`}
               , h(Primary, 'Go to the forum')),
-            cohort && !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null
+            cohort && !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null,
           ]),
         ]),
       ]),
@@ -143,6 +142,39 @@ const EnrollInCohort = (props:{id:string, course: string}) => {
   return  h(Primary, {onClick}, status === 'loading' ? h(Loader) : ' Join this Cohort')
 }
 
+const MarkCohortLive = (props:{id: string})=> {
+  let {data: cohort, mutate} = useCohortData(props.id)
+  let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
+
+  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
+    h(Box, {gap: 32}, [
+      h('h2', "Are you sure?"),
+      h(Box, {gap: 16}, [
+        'Before going live please check that you’ve done these things!',
+        h(Box.withComponent('ul'), {gap: 16}, [
+          h('li', "Write  the 'notes' topic for any details relevant to your cohort"),
+          h('li', "Fill out the 'Getting Started' topic for the first things learners should do when they enroll.")
+        ]),
+        h('p', [`Check out the `, h('a', {href: 'https://hyperlink.academy/manual/facilitators#creating-a-new-cohort'}, 'facilitator guide'), ' for more details']),
+        h(Primary, {onClick: async e => {
+          e.preventDefault()
+          if(!cohort) return
+          setState('loading')
+          let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>('/api/courses/updateCohort', {cohortId:cohort.id, data: {live: true}})
+          if(res.status === 200) mutate({...cohort, live: res.result.live})
+          setState('complete')
+        }}, state === 'loading' ? h(Loader) : 'Go Live'),
+        h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+      ]),
+    ])
+  ])
+
+  return h(Destructive, {onClick: async e => {
+    e.preventDefault()
+    setState('confirm')
+  }}, 'Go Live!')
+}
+
 const MarkCohortComplete = (props:{id: string})=> {
   let {data: cohort, mutate} = useCohortData(props.id)
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
@@ -200,11 +232,21 @@ const Banners = (props:{
   facilitating?: boolean,
   enrolled?: boolean,
   start_date: string,
+  live: boolean,
   id: string,
   courses:{id: string}
 })=>{
   let isStarted = (new Date(props.start_date)).getTime() - (new Date()).getTime()
   let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.courses.id}/${props.id}`
+
+  if(props.facilitating && !props.live) return h(Banner, {red: true}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
+    h(Box, {gap: 8, className: "textSecondary"}, [
+      h('h4', `This cohort isn't live yet!`),
+      h('p', `This cohort is hidden from public view. You can make edits to the cohort forum and the topics within.`),
+      h('p', `When you're ready click the button below to put the cohort live on the site`),
+      h(MarkCohortLive, {id: props.id})
+    ])
+  ])))
 
   if(props.completed)  return h(Banner, {}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
@@ -222,7 +264,7 @@ const Banners = (props:{
             h('p', [
               `Check out the `,
               h('a', {href: forum}, 'forum'),
-              ` and meet the learners. You can also read our `, h('a', {href: "/manual/facilitators"}, 'facilitator guide'), `in the Hyperlink Manual`
+              ` and meet the learners. You can also read our `, h('a', {href: "/manual/facilitators"}, 'facilitator guide'), ` in the Hyperlink Manual`
             ])
           ])
         ]))
@@ -256,12 +298,15 @@ ${Tablet} {
 `
 
 const Banner = styled('div')<{red?: boolean}>`
+background-color: ${props => props.red ? colors.backgroundRed: colors.grey95};
+position: relative;
+width: 100vw;
+position: relative;
+left: 50%;
+right: 50%;
+margin-left: -50vw;
+margin-right: -50vw;
 
-background-color: ${props => props.red ? colors.accentRed: colors.grey95};
-position: relative;
-width: calc(100vw);
-position: relative;
-left: calc(50% - 50vw);
 margin-bottom: 16px;
 margin-top: -48px;
 ${Mobile}{

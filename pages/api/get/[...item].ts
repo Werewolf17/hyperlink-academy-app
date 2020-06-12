@@ -72,6 +72,7 @@ export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
     select: {
       start_date: true,
       id: true,
+      live: true,
       completed: true,
       people: {
         select: {display_name: true, username: true}
@@ -141,7 +142,10 @@ async function getUserCohorts(req:Request) {
   if(!token) return {status: 403 as const, result: "Error: no user logged in"}
   let course_cohorts = await prisma.course_cohorts.findMany({
     where:{
-      people_in_cohorts: {some: {person: token.id}}
+      OR: [
+        {people_in_cohorts: {some: {person: token.id}}},
+        {facilitator: token.id}
+      ]
     },
     include:{
       courses: {select: {name: true}},

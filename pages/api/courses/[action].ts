@@ -12,7 +12,7 @@ let prisma = new PrismaClient()
 export type CreateCohortMsg = {
   courseId: string,
   start: string,
-  facillitator: string,
+  facilitator: string,
 }
 export type CreateCohortResponse = ResultType<typeof createCohort>
 
@@ -38,6 +38,15 @@ export type UpdateCourseMsg = {
 }
 export type UpdateCourseResponse = ResultType<typeof updateCourse>
 
+export type UpdateCohortMsg = {
+  cohortId: string,
+  data: Partial<{
+    live: boolean
+  }>
+}
+
+export type UpdateCohortResponse = ResultType<typeof updateCohort>
+
 export type CompleteCohortMsg = {
   cohortId: string
 }
@@ -53,8 +62,23 @@ export default multiRouteHandler('action', {
   createCourse,
   updateCourse,
   completeCohort,
-  inviteToCourse
+  inviteToCourse,
+  updateCohort
 })
+
+async function updateCohort(req:Request) {
+  let msg = req.body as Partial<UpdateCohortMsg>
+  if(!msg.cohortId) return {status: 400, result: "Error: invalid request, missing cohortId parameter"} as const
+  if(!msg.data) return {status: 400, result: "Error: invalid request, missing data"} as const
+  let newData = await prisma.course_cohorts.update({
+    where: {id: msg.cohortId},
+    data: {
+      live: msg.data.live
+    }
+  })
+  if(!newData) return {status: 404, result: `No cohort with id ${msg.cohortId} found`} as const
+  return {status: 200, result: newData} as const
+}
 
 async function completeCohort(req:Request) {
   let msg = req.body as Partial<CompleteCohortMsg>
@@ -73,7 +97,7 @@ async function completeCohort(req:Request) {
 async function createCohort(req: Request) {
   let msg = req.body as Partial<CreateCohortMsg>
   if(!msg.courseId || !msg.start ||
-     !msg.facillitator) return {status: 400, result: "Error: invalid request, missing parameters"} as const
+     !msg.facilitator) return {status: 400, result: "Error: invalid request, missing parameters"} as const
 
   let user = getToken(req)
   if(!user) return {status: 403, result: "Error: no user logged in"} as const
@@ -101,7 +125,7 @@ async function createCohort(req: Request) {
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
 
   let id = course.id + '-' + course.course_cohorts.length
-  if(!(await createCohortGroup(id, msg.facillitator, course.category_id))){
+  if(!(await createCohortGroup(id, msg.facilitator, course.category_id))){
     return {status: 500, result: "ERROR: unable to create cohort group"} as const
   }
 
@@ -120,7 +144,7 @@ async function createCohort(req: Request) {
         },
         people: {
           connect: {
-            id: msg.facillitator
+            id: msg.facilitator
           }
         }
       }

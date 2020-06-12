@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS course_cohorts (
     start_date    text NOT NULL,
     facilitator  text REFERENCES people(id) NOT NULL,
     course        text REFERENCES courses(id) NOT NULL,
+    live          boolean NOT NULL DEFAULT(false),
     completed     text
 );
 

@@ -37,7 +37,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
     let router = useRouter()
     let {data:userCohorts} = useUserCohorts()
     let {data: course} = useCourseData(props.courseId, props.course)
-    let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course.id )
+    let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course?.id )
 
     let cohorts = (props.cohorts || [])
             .filter(cohort=>{
@@ -130,7 +130,10 @@ export const getStaticProps = async (ctx: any) =>{
     if(!course) return {props: {notFound: true}} as const
 
     let cohorts = await prisma.course_cohorts.findMany({
-        where: {course: courseId},
+        where: {AND: [{
+            course: courseId,
+            live: true
+        }]},
         include: {
             people: {
                 select: {
