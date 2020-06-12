@@ -73,8 +73,8 @@ async function updateTopic(topic:string, input: {category_id: number, title: str
   })
 
   // Update the content
-  let topicData = await (await fetch(`https://forum.hyperlink.academy${topic}.json`)).json()
-  let postID = topicData.post_stream[0].id
+  let topicData = await (await fetch(`https://forum.hyperlink.academy${topic}.json`, {headers})).json()
+  let postID = topicData.post_stream.posts[0].id
   await fetch (`https://forum.hyperlink.academy/posts/${postID}`, {
     method: "PUT",
     headers:{
@@ -89,7 +89,7 @@ async function updateTopic(topic:string, input: {category_id: number, title: str
   })
 
   // Update the owner
-  if(username) await fetch('https://forum.hyperlink.academy${topic}/change-owner', {
+  if(username) await fetch(`https://forum.hyperlink.academy/t/${topicData.id}/change-owner`, {
     method: "POST",
     headers: {
       "Content-Type": 'application/json; charset=utf-8',
