@@ -44,7 +44,7 @@ const Dashboard = (props:Props) => {
     !cohorts ? null : h(Box, [
       h('h2', "Your Courses"),
       h(FlexGrid, {min: 250, mobileMin:250}, cohorts.course_cohorts.map(cohort => {
-        let facilitating = cohort.people.username === (user ? user.username : '')
+        let facilitating = cohort.facilitator === (user ? user.id: '')
         return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
       }))
     ]),

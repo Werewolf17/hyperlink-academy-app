@@ -86,7 +86,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h('h3', COPY.activeCohorts),
           ...activeCohorts.map(cohort=> h(SmallCohortCard, {
             ...cohort,
-            facillitating: cohort.facilitator === (user ? user?.id : undefined),
+            facilitating: cohort.facilitator === (user ? user?.id : undefined),
             enrolled: !(cohort.facilitator === (user ? user?.id : undefined))
           }))
       ]) : null
@@ -133,7 +133,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
       !props.cohort.enrolled && !props.cohort.facilitating ? null : h('div', [
         props.cohort.enrolled ? h(Pill, 'enrolled') : null,
         ' ',
-        props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facillitating') : null,
+        props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
       ]),
       h('h3', {}, h(Link, {
         href:'/courses/[id]/[cohortId]',
@@ -142,7 +142,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
     ]),
     h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
       h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
-      h('div', `Facillitated by ${props.cohort.people.display_name}`)
+      h('div', `Facilitated by ${props.cohort.people.display_name}`)
     ])
   ])
 }
@@ -202,7 +202,7 @@ const InvitePerson = (props:{id: string})=> {
 }
 
 const AddCohort = ()=> {
-  let [newCohort, setNewCohort] = useState({start: '', facillitator: ''})
+  let [newCohort, setNewCohort] = useState({start: '', facilitator: ''})
   let [status, callCreateCohort] = useApi<CreateCohortMsg, CreateCohortResponse>([newCohort])
   let router = useRouter()
   let {data:courseData, mutate} = useCourseData(router.query.id as string)
@@ -225,9 +225,9 @@ const AddCohort = ()=> {
       h(Label, [
         h(Select, {
           required: true,
-          onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facillitator: e.currentTarget.value})
+          onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facilitator: e.currentTarget.value})
         }, [
-          h('option', {value: ''}, "Select a facillitator"),
+          h('option', {value: ''}, "Select a facilitator"),
           ...(courseData?.course_maintainers.map(maintainer => {
             return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
           })||[])
@@ -244,7 +244,7 @@ const AddCohort = ()=> {
       ]),
       h(Primary, {
         type: 'submit',
-        disabled: !newCohort.start || !newCohort.facillitator
+        disabled: !newCohort.start || !newCohort.facilitator
       }, status === 'loading' ? h(Loader) : 'Add a new Cohort'),
       h(Seperator),
     ])

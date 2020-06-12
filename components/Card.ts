@@ -33,8 +33,9 @@ type Cohort = {
   people: {display_name?:string | null,
            username:string},
   completed?: string | null,
+  live: boolean,
   enrolled?:boolean,
-  facillitating?: boolean,
+  facilitating?: boolean,
   id: string,
   course: string,
 }
@@ -46,14 +47,15 @@ export const SmallCohortCard = (props: Cohort) => {
   }, [
     h(Card, {style:{border: '1px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 8}, [
-        props.enrolled || props.facillitating ? h(Box, {gap: 8, h: true}, [
-          props.facillitating ? h(Pill, {borderOnly: true}, 'facilitator') : null,
-          props.enrolled ? h(Pill, 'enrolled') : null
+        props.enrolled || props.facilitating ? h(Box, {gap: 8, h: true}, [
+          props.facilitating ? h(Pill, {borderOnly: true}, 'facilitator') : null,
+          props.enrolled ? h(Pill, 'enrolled') : null,
+          !props.live ? h(Pill, {red: true, borderOnly: true},'draft') : null
         ]): null,
         h('div', [
           h('h4', `Starts ${prettyDate(props.start_date)}`),
           h('p', {style:{color: colors.textSecondary}},
-            `Facillitated by ${props.people.display_name || props.people.username}`)
+            `Facilitated by ${props.people.display_name || props.people.username}`)
         ])
       ])
     ])
@@ -73,9 +75,10 @@ export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
     h(Card, {style:{border: '2px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 8}, [
-          props.enrolled || props.facillitating ? h(Box, {gap: 8, h: true}, [
-            props.facillitating ? h(Pill, {borderOnly: true}, 'facilitator') : null,
-            props.enrolled ? h(Pill, 'enrolled') : null
+          props.enrolled || props.facilitating ? h(Box, {gap: 8, h: true}, [
+            props.facilitating ? h(Pill, {borderOnly: true}, 'facilitator') : null,
+            props.enrolled ? h(Pill, 'enrolled') : null,
+          !props.live ? h(Pill, {red: true, borderOnly: true},'draft') : null
           ]): null,
           h('h3', props.courses.name),
           h('p.textSecondary', `Cohort #${props.id.split('-').slice(-1)[0]}`)
@@ -83,7 +86,7 @@ export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
         h('div', [
           h('b', status),
           h('p.textSecondary', {}, cohortPrettyDate(props.start_date, props.completed)),
-          h('p.textSecondary', `Facillitated by ${props.people.display_name || props.people.username}`)
+          h('p.textSecondary', `Facilitated by ${props.people.display_name || props.people.username}`)
         ] )
       ])
     ])

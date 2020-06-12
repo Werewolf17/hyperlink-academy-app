@@ -26,6 +26,7 @@ model course_cohorts {
   course            String
   facilitator       String
   id                String              @id
+  live              Boolean             @default(false)
   start_date        String
   courses           courses             @relation(fields: [course], references: [id])
   people            people              @relation(fields: [facilitator], references: [id])
@@ -70,17 +71,17 @@ model password_reset_keys {
 }
 
 model people {
-  bio                 String?
-  display_name        String?
-  email               String                @unique
-  id                  String                @id
-  link                String?
-  password_hash       String                @unique
-  username            String                @unique
-  admins              admins[]
-  course_cohorts      course_cohorts[]
-  course_maintainers  course_maintainers[]
-  people_in_cohorts   people_in_cohorts[]
+  bio                String?
+  display_name       String?
+  email              String               @unique
+  id                 String               @id
+  link               String?
+  password_hash      String               @unique
+  username           String               @unique
+  admins             admins[]
+  course_cohorts     course_cohorts[]
+  course_maintainers course_maintainers[]
+  people_in_cohorts  people_in_cohorts[]
 }
 
 model people_in_cohorts {
