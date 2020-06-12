@@ -73,7 +73,7 @@ async function updateTopic(topic:string, input: {category_id: number, title: str
   })
 
   // Update the content
-  let topicData = await (await fetch(`https://forum.hyperlink.academy${topic}`)).json()
+  let topicData = await (await fetch(`https://forum.hyperlink.academy${topic}.json`)).json()
   let postID = topicData.post_stream[0].id
   await fetch (`https://forum.hyperlink.academy/posts/${postID}`, {
     method: "PUT",
