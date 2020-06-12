@@ -47,23 +47,24 @@ export const createCohortGroup = async (name: string, admin: string, courseID: n
     title: name + " Notes",
     raw: TemplateCohortNotes,
     tags: ['note']
-  })
+  }, username)
 
   await createTopic({
     category,
     title: name + " Getting Started",
     raw: TemplateCohortGettingStarted,
     tags: ['getting-started']
-  })
+  }, username)
   return true
 }
 
-export async function createTopic(input:{title: string, category: number, raw: string, tags?: string[]}) {
+export async function createTopic(input:{title: string, category: number, raw: string, tags?: string[]}, username?: string) {
   let result = await fetch('https://forum.hyperlink.academy/posts.json', {
     method: "POST",
     headers: {
       "Content-Type": 'application/json; charset=utf-8',
-      ...headers
+      ...headers,
+      "Api-Username": username || headers["Api-Username"]
     },
     body: JSON.stringify({...input})
   })
