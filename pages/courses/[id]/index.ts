@@ -29,7 +29,7 @@ export const COPY = {
   courseForum: "Check out the course forum",
   curriculumTab: "Curriculum",
   cohortTab: "Past Cohorts",
-  activeCohorts: "You Current Cohorts",
+  activeCohorts: "Your Current Cohorts",
   settingsTab: "Settings",
   inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
   invited: h('span.accentSuccess', "You're invited!"),
