@@ -8,7 +8,7 @@ import { InferGetStaticPropsType } from 'next'
 import { Box, Seperator, TwoColumn, Sidebar } from '../../../components/Layout'
 import {Tabs} from '../../../components/Tabs'
 import { colors } from '../../../components/Tokens'
-import Loader from '../../../components/Loader'
+import Loader, { PageLoader } from '../../../components/Loader'
 import { Input, Label, Error, Info, Select, Textarea} from '../../../components/Form'
 import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
@@ -51,7 +51,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
   let router = useRouter()
 
-  if(!course) return null
+  if(!course) return h(PageLoader)
 
   let activeCohorts = course?.course_cohorts.filter(i => {
     if(!user) return false

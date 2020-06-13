@@ -11,7 +11,7 @@ import { colors, Mobile, Tablet } from '../../../components/Tokens'
 import { Tabs } from '../../../components/Tabs'
 import { Pill } from '../../../components/Pill'
 import { Primary, Destructive, Secondary} from '../../../components/Button'
-import Loader from '../../../components/Loader'
+import Loader, { PageLoader } from '../../../components/Loader'
 import { Info } from '../../../components/Form'
 import { Modal } from '../../../components/Modal'
 import Text from '../../../components/Text'
@@ -47,17 +47,17 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let {data: user} = useUserData()
   let {data: cohort} = useCohortData(props.id, props.cohort)
   let {data: course} = useCourseData(props.courseId, props.course)
-  if(cohort === false) return null
+  if(!cohort) return h(PageLoader)
 
-  let inCohort = cohort?.people_in_cohorts.find(p => p.person === (user ? user.id : undefined))
-  let isFacilitator  = !!user && cohort?.people.username === user.username
+  let inCohort = cohort.people_in_cohorts.find(p => p.person === (user ? user.id : undefined))
+  let isFacilitator  = !!user && cohort.people.username === user.username
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
 
   return h('div', {}, [
-    cohort && (inCohort || isFacilitator)
+    inCohort || isFacilitator
       ? h(Banners, {...cohort, enrolled: !!inCohort, facilitating: isFacilitator}) : null,
     h(TwoColumn, [
-      !cohort ? null : h(WelcomeModal, {display:router.query.welcome !== undefined, cohort}),
+      h(WelcomeModal, {display:router.query.welcome !== undefined, cohort}),
       h(Box, {gap: 64}, [
         h(Box, {gap: 32}, [
           h(Box, {gap: 16}, [
@@ -67,14 +67,14 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
               h('h3.textSecondary', 'Cohort #'+cohort?.id.split('-').slice(-1)[0]),
             ]),
             h('span', [
-              cohortPrettyDate(cohort?.start_date || '', cohort?.completed), h('span', ' | '),
-              `Facilitated by ${cohort?.people.display_name}`
+              cohortPrettyDate(cohort.start_date, cohort.completed), h('span', ' | '),
+              `Facilitated by ${cohort.people.display_name}`
             ]),
           ]),
           !inCohort && !isFacilitator ? null : h(Box, [
-            h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort?.courses.id}/${cohort?.id}`}
+            h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.id}/${cohort.id}`}
               , h(Primary, 'Go to the forum')),
-            cohort && !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null,
+            !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null,
           ]),
         ]),
       ]),
@@ -264,7 +264,7 @@ const Banners = (props:{
             h('p', [
               `Check out the `,
               h('a', {href: forum}, 'forum'),
-              ` and meet the learners. You can also read our `, h('a', {href: "/manual/facilitators"}, 'facilitator guide'), ` in the Hyperlink Manual`
+              ` and meet the learners. You can also read our `, h('a', {href: "/manual/facilitators"}, 'facilitator guide'), `in the Hyperlink Manual`
             ])
           ])
         ]))

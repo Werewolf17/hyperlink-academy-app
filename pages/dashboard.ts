@@ -11,6 +11,7 @@ import { coursesQuery } from './api/get/[...item]'
 import { BigCohortCard } from '../components/Card'
 import {COPY} from './index'
 import { useEffect } from 'react'
+import { PageLoader } from '../components/Loader'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Dashboard = (props:Props) => {
@@ -24,7 +25,7 @@ const Dashboard = (props:Props) => {
   }, [user])
 
   if(!user || cohorts === undefined) {
-    return null
+    return h(PageLoader)
   }
 
   return h(Box, {gap:48}, [
