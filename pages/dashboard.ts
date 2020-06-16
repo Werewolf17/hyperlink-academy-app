@@ -2,10 +2,13 @@ import h from 'react-hyperscript'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { InferGetStaticPropsType } from 'next'
+import styled from '@emotion/styled'
+
 
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { Box} from '../components/Layout'
+// import { AccentImg } from '../components/Images'
 import { useUserCohorts, useUserData, useCourses } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import { BigCohortCard } from '../components/Card'
@@ -42,9 +45,19 @@ const Dashboard = (props:Props) => {
         ]),
       ])
     ]),
+
+
+    //Your cohorts section 
     !cohorts ? null : h(Box, [
-      h('h2', "Your Courses"),
-      h(FlexGrid, {min: 250, mobileMin:250}, cohorts.course_cohorts.map(cohort => {
+      h('h2', "Your Cohorts"),
+      //if not enrolled in anything, throw empty
+      cohorts.course_cohorts.length === 0 
+      ? h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
+        h( EmptyImg, {src: 'img/empty.png'}),
+        h('small.textSecondary', "Hmmm... Looks like you haven't enolled in anything yet. Check out some available courses in the Course List below!" ),
+      ])
+      // if enrolled, show grid of enrolled cohorts
+      : h(FlexGrid, {min: 250, mobileMin:250}, cohorts.course_cohorts.map(cohort => {
         let facilitating = cohort.facilitator === (user ? user.id: '')
         return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
       }))
@@ -80,6 +93,18 @@ const Dashboard = (props:Props) => {
     ]),
   ])
 }
+
+export let EmptyImg = styled ('img') `
+image-rendering: pixelated;
+image-rendering: -moz-crisp-edges;
+image-rendering: crisp-edges;
+display: block;
+margin: auto auto;
+border: none;
+height: 200px;
+width: 200px;
+`
+
 
 export const getStaticProps = async () => {
   let courses = await coursesQuery()
