@@ -33,6 +33,8 @@ export const COPY = {
   settingsTab: "Settings",
   inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
   invited: h('span.accentSuccess', "You're invited!"),
+  noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
+
   updateCurriculum: (props: {id: string}) => h(Info, [
     `💡 You can make changes to the curriculum by editing `,
     h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
@@ -68,6 +70,8 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       let facilitating = i.facilitator=== user.id
       return {...i, enrolled, facilitating}
     })
+
+  let upcomingCohorts = course.course_cohorts.filter(c=> (new Date(c.start_date) > new Date()) && c.live)
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course.id )
@@ -107,8 +111,11 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             disabled: !invited
           }, 'Enroll in this Course'),
           h('div.textSecondary', {style:{width:232}}, [
-          course?.invite_only && !invited ? COPY.inviteOnly : null,
-          course?.invite_only && invited ? COPY.invited : null
+            h(Box, {gap:16}, [
+              upcomingCohorts.length === 0 ? COPY.noUpcoming : null,
+              course?.invite_only && !invited ? COPY.inviteOnly : null,
+              course?.invite_only && invited ? COPY.invited : null
+            ]),
           ])
         ])
       ])]),
@@ -162,6 +169,7 @@ const Settings = (props: {inviteOnly?: boolean, mutate: (course:Course)=> any, c
   ])
 }
 
+//Features for incite only courses
 const InvitePerson = (props:{id: string})=> {
   let [emailOrUsername, setEmailOrUsername] = useState('')
   let [valid, setValid] = useState<null | boolean>(null)
@@ -201,6 +209,7 @@ const InvitePerson = (props:{id: string})=> {
   ]))
 }
 
+//feature to add a new cohort to a course
 const AddCohort = ()=> {
   let [newCohort, setNewCohort] = useState({start: '', facilitator: ''})
   let [status, callCreateCohort] = useApi<CreateCohortMsg, CreateCohortResponse>([newCohort])
