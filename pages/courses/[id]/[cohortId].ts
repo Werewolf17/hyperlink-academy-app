@@ -1,4 +1,5 @@
 import h from 'react-hyperscript'
+
 import styled from '@emotion/styled'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -14,6 +15,7 @@ import { Primary, Destructive, Secondary} from '../../../components/Button'
 import Loader, { PageLoader } from '../../../components/Loader'
 import { Info } from '../../../components/Form'
 import { Modal } from '../../../components/Modal'
+import {TwoColumnBanner} from '../../../components/Banner'
 import Text from '../../../components/Text'
 
 import {prettyDate} from '../../../src/utils'
@@ -156,15 +158,17 @@ const MarkCohortLive = (props:{id: string})=> {
           h('li', "Fill out the 'Getting Started' topic for the first things learners should do when they enroll.")
         ]),
         h('p', [`Check out the `, h('a', {href: 'https://hyperlink.academy/manual/facilitators#creating-a-new-cohort'}, 'facilitator guide'), ' for more details']),
-        h(Primary, {onClick: async e => {
-          e.preventDefault()
-          if(!cohort) return
-          setState('loading')
-          let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>('/api/courses/updateCohort', {cohortId:cohort.id, data: {live: true}})
-          if(res.status === 200) mutate({...cohort, live: res.result.live})
-          setState('complete')
-        }}, state === 'loading' ? h(Loader) : 'Go Live'),
-        h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+        h(Box, {gap: 16, style: {textAlign: 'right'}}, [
+          h(Primary, {onClick: async e => {
+            e.preventDefault()
+            if(!cohort) return
+            setState('loading')
+            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>('/api/courses/updateCohort', {cohortId:cohort.id, data: {live: true}})
+            if(res.status === 200) mutate({...cohort, live: res.result.live})
+            setState('complete')
+          }}, state === 'loading' ? h(Loader) : 'Go Live'),
+          h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+        ])
       ]),
     ])
   ])
@@ -188,15 +192,17 @@ const MarkCohortComplete = (props:{id: string})=> {
           h('li', "Write a retrospective in your cohort forum"),
           h('li', "Post any artifacts the cohort created in the artifact topic in the course form")
         ]),
-        h(Primary, {onClick: async e => {
-          e.preventDefault()
-          if(!cohort) return
-          setState('loading')
-          let res = await callApi<CompleteCohortMsg, CompleteCohortResponse>('/api/courses/completeCohort', {cohortId:cohort.id})
-          if(res.status === 200) mutate({...cohort, completed: res.result.completed})
-          setState('complete')
-        }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
-        h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+        h(Box, {gap: 16, style: {textAlign: "right"}}, [
+          h(Primary, {onClick: async e => {
+            e.preventDefault()
+            if(!cohort) return
+            setState('loading')
+            let res = await callApi<CompleteCohortMsg, CompleteCohortResponse>('/api/courses/completeCohort', {cohortId:cohort.id})
+            if(res.status === 200) mutate({...cohort, completed: res.result.completed})
+            setState('complete')
+          }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
+          h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+        ])
       ]),
     ])
   ])
@@ -239,26 +245,25 @@ const Banners = (props:{
   let isStarted = (new Date(props.start_date)).getTime() - (new Date()).getTime()
   let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.courses.id}/${props.id}`
 
-  if(props.facilitating && !props.live) return h(Banner, {red: true}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
+  if(props.facilitating && !props.live) return h(TwoColumnBanner, {red: true}, [
     h(Box, {gap: 8, className: "textSecondary"}, [
       h('h4', `This cohort isn't live yet!`),
       h('p', `This cohort is hidden from public view. You can make edits to the cohort forum and the topics within.`),
       h('p', `When you're ready click the button below to put the cohort live on the site`),
-      h(MarkCohortLive, {id: props.id})
-    ])
-  ])))
+    ]),
+    h(MarkCohortLive, {id: props.id})
+  ])
 
-  if(props.completed)  return h(Banner, {}, h(Box, {width:904, ma: true, style: {padding:'32px'}}, h(BannerInner, [
+  if(props.completed)  return h(TwoColumnBanner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
       h('h4', `You completed this course on ${prettyDate(props.completed || '')}!`),
       h('p', [`This cohort's `, h('a', {href: forum}, 'private forum'), ` will always be open! Feel free to come back whenever`])
     ])
-  ])))
+  ])
 
   if(isStarted > 0 && (props.enrolled || props.facilitating)) {
     if(props.facilitating) {
-      return h(Banner, {}, [
-        h(Box, {width: 904, ma: true, padding: 32}, h(BannerInner, [
+      return h(TwoColumnBanner, [
           h(Box, {gap: 8, className: "textSecondary"}, [
             h('h4', `You're facilitating in ${Math.round(isStarted / (1000 * 60 * 60 * 24))} days `),
             h('p', [
@@ -267,12 +272,9 @@ const Banners = (props:{
               ` and meet the learners. You can also read our `, h('a', {href: "/manual/facilitators"}, 'facilitator guide'), `in the Hyperlink Manual`
             ])
           ])
-        ]))
       ])
-
     }
-    return h(Banner, {}, [
-      h(Box, {width: 904, ma: true, padding: 32}, h(BannerInner, [
+    return h(TwoColumnBanner, [
         h(Box, {gap: 8, className: "textSecondary"}, [
           h('h4', `You start in ${Math.round(isStarted / (1000 * 60 * 60 * 24))} days `),
           h('p', [
@@ -281,38 +283,10 @@ const Banners = (props:{
             ` while you're waiting. You can introduce yourself and learn more about what you'll be doing when your cohort starts!`
           ])
         ])
-      ]))
     ])
   }
   return null
 }
-
-const BannerInner = styled('div')`
-display: grid;
-grid-template-columns: 2fr 1fr;
-grid-gap: 64px;
-${Tablet} {
-  grid-template-columns: auto;
-  grid-template-rows: auto ;
-}
-`
-
-const Banner = styled('div')<{red?: boolean}>`
-background-color: ${props => props.red ? colors.backgroundRed: colors.grey95};
-position: relative;
-width: 100vw;
-position: relative;
-left: 50%;
-right: 50%;
-margin-left: -50vw;
-margin-right: -50vw;
-
-margin-bottom: 16px;
-margin-top: -48px;
-${Mobile}{
-margin-top: 0px
-}
-`
 
 export const getStaticProps = async (ctx:any)=>{
   let cohortId = (ctx.params?.cohortId || '' )as string
