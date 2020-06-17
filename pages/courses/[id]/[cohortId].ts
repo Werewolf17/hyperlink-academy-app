@@ -8,7 +8,6 @@ import { InferGetStaticPropsType } from 'next'
 
 import Enroll from '../../../components/Course/Enroll'
 import { TwoColumn, Box, Seperator, Sidebar} from '../../../components/Layout'
-import { colors, Mobile, Tablet } from '../../../components/Tokens'
 import { Tabs } from '../../../components/Tabs'
 import { Pill } from '../../../components/Pill'
 import { Primary, Destructive, Secondary} from '../../../components/Button'
