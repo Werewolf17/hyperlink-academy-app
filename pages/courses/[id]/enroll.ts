@@ -26,6 +26,7 @@ const COPY = {
     header: "Join a Cohort",
     backToCourse: 'back to the course',
     subtitle: 'Pick a cohort with a start date that works for you. Be sure to check the notes underneath for specific meeting times and any tweaks to the curriculum.',
+    seeMore: "See more details"
 }
 
 
@@ -49,7 +50,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
         h(Box, {gap:16}, [
             h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
             h('h1', COPY.header),
-            h('p', COPY.subtitle)
+
         ]),
         h(Box, {gap: 64}, [
             //Page Header
@@ -97,9 +98,8 @@ let Cohort = (props: {
         //Individual cohort details
         h (Box, {gap:16}, [
             h(Box, {gap: 8}, [
-                h('h3', prettyDate(props.start_date)),
-                h('small', [
-                    //TODO make the Jared href to the facilitator profile page
+                h('h2', prettyDate(props.start_date)),
+                h('span', [
                     'Facilitated by ',
                     h(Link, {
                         href:'/people/[username]',
@@ -109,14 +109,10 @@ let Cohort = (props: {
                 ])
             ]),
             h(Text, {source: props.details.text.slice(0, 400) + (props.details.text.length > 400 ?'...' : '')}),
+            h(Link, {href: '/courses/[id]/[cohortId]', as: `/courses/${props.course}/${props.id}`}, h('a.notBlue', {style: {textDecoration: 'underline'}}, 'See more details'))
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
-            //TODO Route this to a stripe payment flow
             h(Primary, {onClick, disabled: props.invite_only && !props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),
-            h('small', [
-                //TODO make this href go to the cohort page
-                h(Link, {href: '/courses/[id]/[cohortId]', as: `/courses/${props.course}/${props.id}`}, h('a.notBlue', {style: {textDecoration: 'underline'}}, 'See more details'))
-            ]),
         ]),
         h(Seperator),
     ])
