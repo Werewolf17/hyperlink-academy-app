@@ -3,7 +3,7 @@
   "Alias": "cohort-cancellation",
   "Subject": "Sorry, your cohort for {{course}} on Hyperlink has been cancelled",
   "TemplateType": "Standard",
-  "LayoutTemplate": "basic",
+  "LayoutTemplate": "Hyperlink",
   "TestRenderModel": {
     "name": "name_Value",
     "course_name": "course_name_Value",

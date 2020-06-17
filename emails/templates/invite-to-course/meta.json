@@ -3,7 +3,7 @@
   "Alias": "invite-to-course",
   "Subject": "You've been invited to join {{course_name}} on Hyperlink!",
   "TemplateType": "Standard",
-  "LayoutTemplate": "basic",
+  "LayoutTemplate": "Hyperlink",
   "TestRenderModel": {
     "name": "name_Value",
     "course_url": "course_url_Value",

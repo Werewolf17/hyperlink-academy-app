@@ -3,7 +3,7 @@
   "Alias": "cohort-enrollment",
   "Subject": "You're enrolled in {{course_name}} on Hyperlink!",
   "TemplateType": "Standard",
-  "LayoutTemplate": "basic",
+  "LayoutTemplate": "Hyperlink",
   "TestRenderModel": {
     "name": "name_Value",
     "course_name": "course_name_Value",

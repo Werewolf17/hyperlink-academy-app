@@ -3,7 +3,7 @@
   "Alias": "welcome",
   "Subject": "Welcome to Hyperlink - confirm your account and get started!",
   "TemplateType": "Standard",
-  "LayoutTemplate": "basic",
+  "LayoutTemplate": "Hyperlink",
   "TestRenderModel": {
     "name": "name_Value",
     "activation_code": "activation_code_Value",

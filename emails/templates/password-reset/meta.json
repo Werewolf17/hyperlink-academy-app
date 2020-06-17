@@ -3,7 +3,7 @@
   "Alias": "password-reset",
   "Subject": "Set up a new password for your Hyperlink account",
   "TemplateType": "Standard",
-  "LayoutTemplate": "basic",
+  "LayoutTemplate": "Hyperlink",
   "TestRenderModel": {
     "name": "name_Value",
     "action_url": "action_url_Value"

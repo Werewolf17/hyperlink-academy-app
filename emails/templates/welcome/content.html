@@ -1,39 +1,36 @@
 <h1>Welcome {{name}},</h1>
-
+                        
 <p>Your Hyperlink account has been created! We're excited to welcome you to the community, and we look forward to learning with you.</p>
 
-<p>We started Hyperlink because we wanted a better way to learn online — a space where we can come together for active, serious, impactful learning…and make some new friends while we're at it!</p>
-
-<h2>First things first: please confirm your account!</h2>
+<h2>Please confirm your account!</h2>
   
 <p> Copy and paste the following code to the signup page:</p>
-<!-- Action -->
-<table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0">
+
+<div class="contentBox" align="center">
+ <p href="{{activation_code}}" target="_blank"><em>{{activation_code}}</em></p>
+</div>
+
+<p style= "text-align: center">or</p>
+
+<!--Primary Button-->
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
   <tr>
-    <td align="center">
-      <!-- Border based button https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design -->
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <td>
+      <table border="0" cellspacing="0" cellpadding="0" align="center">
         <tr>
-          <td align="center">
-            <table border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td>
-                  <p href="{{activation_code}}" class="action-text" target="_blank">{{activation_code}}</p>
-                </td>
-              </tr>
-            </table>
+          <td class= "primaryButtonBackground" align="center">
+            <a href="{{activation_url}}" class ="primaryButtonText">click here to verify!</a>
           </td>
         </tr>
       </table>
     </td>
   </tr>
 </table>
-
-<p><em>Alternatively, you can <a href="{{activation_url}}">click here to confirm</a></em>.</p>
+<!-- End Primary Button-->
 
 <hr>
 
-<h2>Two quick next steps—</h2>
+<h2>Next steps—</h2>
 
 <p>Once you’ve activated your account:</p>
 <ul>
@@ -41,6 +38,7 @@
   <li><a href="https://forum.hyperlink.academy/">Join us on the forum and say hello</a></li>
 </ul>
 
-<p>Thanks, and we'll see you soon! If you have any questions getting started, just hit reply.</p>
+<p>We started Hyperlink because we wanted a better way to learn online — a space where we can come together for active, serious, impactful learning…and make some new friends while we're at it!</p>
 
-<p>—The Hyperlink Team</p>
+<p>We're excited to start learning with you! If you have any questions getting started, just hit reply.</p>
+
