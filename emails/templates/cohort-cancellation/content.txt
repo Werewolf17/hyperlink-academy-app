@@ -1,6 +1,8 @@
-Hi {{name}}, thanks so much for signing up for {{course_name}}.
+Hi {{name}}, 
 
-Unfortunate news — we have to cancel this cohort of the course.
+Thanks so much for signing up for {{course_name}}.
+
+We have some unfortunate news — your facilitator has had to cancel this cohort of the course.
 
 We've refunded your course fee in full, and this should be reflected in your account within a couple days.
 
@@ -11,5 +13,3 @@ Please take a look at the course page, and consider signing up for a different c
 We'll also be sure to keep you posted when we're able to offer the course again in the future.
 
 Very sorry for the inconvenience. Please hit reply and reach out if you have further questions, and we hope to see you for another course soon!
-
-—The Hyperlink Team

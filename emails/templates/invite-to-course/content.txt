@@ -7,12 +7,12 @@ Head here to learn more and consider joining:
 {{course_name}}
 {{course_url}}
 
-Please note that you need an account to join — log in, or sign up if you don't yet have an account, then you'll be able to register.
+Please note that you need an account to join — log in, or sign up if you don't yet have an account and you'll be able to register.
 
 https://hyperlink.academy/login
 https://hyperlink.academy/signup
 
-If there's a cohort that fits your schedule, we hope to see you in this course soon!
+We hope to see you in this course soon!
 
 ---
 
@@ -23,5 +23,3 @@ It's a course platform and online school built for seriously effective learning 
 https://hyperlink.academy/manual
 
 Any questions, just hit reply and let us know.
-
-—The Hyperlink Team

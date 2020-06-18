@@ -4,12 +4,12 @@ You're enrolled in {{course_name}}, starting {{course_start_date}}!
 
 Thanks for signing up, we're glad to have you and excited for this cohort of the course to begin.
 
-Just one thing to do for now:
+Go check out the cohort forum for instructions on what to do to prepare!
 
 {{course_name}} - Get Started!
 {{get_started_topic_url}}
 
-And for reference, view course and cohort details here:
+And for reference, view course details here:
 
 {{cohort_page_url}}
 
@@ -18,5 +18,3 @@ If you have questions, please post in the cohort community:
 {{cohort_forum_url}}
 
 Or reach out privately by hitting reply on this email.
-
-—The Hyperlink Team
