@@ -1,4 +1,5 @@
 {
   "env": {},
-  "cleanUrls": true
+  "cleanUrls": true,
+  "regions": ["cle1"]
 }
