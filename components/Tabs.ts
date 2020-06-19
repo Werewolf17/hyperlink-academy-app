@@ -3,6 +3,7 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 
 import {Box} from './Layout'
+import { Mobile } from './Tokens'
 
 type Props = {
   tabs: {
@@ -14,13 +15,29 @@ export const Tabs = (props:Props) => {
   let [nav, setNav] = useState(tabs[0])
 
   return h(Box, {gap: 32}, [
-    h(Nav, tabs.map(tab => h(Tab, {
-      active: nav === tab,
-      onClick: ()=> setNav(tab)
-    }, tab))),
+    h(StickyWrapper, [
+      h(Nav, tabs.map(tab => h(Tab, {
+        active: nav === tab,
+        onClick: ()=> setNav(tab)
+      }, tab))),
+    ]),
     props.tabs[nav]
   ])
 }
+
+export const StickyWrapper = styled('div')`
+position: sticky;
+top: 0px;
+background-color: white;
+
+padding-top: 48px;
+margin-top: -48px;
+
+${Mobile} {
+  padding-top: 16px;
+  margin-top: -16px;
+}
+`
 
 const Nav = styled('div')`
 display: grid;
