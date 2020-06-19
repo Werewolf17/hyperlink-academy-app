@@ -77,7 +77,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null,
         ]),
       ]),
-      h(Tabs, {
+      h('div', {style: {gridColumn: 1}}, h(Tabs, {
           tabs: {
             [COPY.detailsTab]: h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
@@ -108,7 +108,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             ]),
             [COPY.curriculumTab]: h(Text, {source:props.curriculum?.text})
           }
-        }),
+      })),
       inCohort || isFacilitator ? null
         : h(Sidebar, {} ,h(Enroll, {course}, h(EnrollInCohort, {id: props.id, course: props.courseId})))
     ])
