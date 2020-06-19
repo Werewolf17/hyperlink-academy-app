@@ -220,7 +220,7 @@ const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: s
 you'll be doing on your first day`),
       h('a', {
         style: {margin: 'auto'},
-        href: `https://forum.hyperlink.academy/sesssion/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
+        href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
       }, h(Primary, "Get started")),
       h(Link, {
         href:'/courses/[id]/[cohortId]',

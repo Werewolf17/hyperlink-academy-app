@@ -194,7 +194,7 @@ async function enroll (req: Request) {
       course_start_date: cohort.start_date,
       course_name: cohort.courses.name,
       cohort_page_url: `https://hyperlink.academy/${cohort.course}/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/sesssion/sso?return_path=/c/${cohort.course}/${cohort.id}`,
+      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.course}/${cohort.id}`,
       get_started_topic_url: 'PLACEHOLDER'
     })
     return {
