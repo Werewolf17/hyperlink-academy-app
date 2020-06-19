@@ -144,7 +144,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   ])
 
   return h('form', {onSubmit}, h(Box, {width: 400, ma: true, gap: 32}, [
-    h(AccentImg, {src: '/img/plane.gif'}),
+    h(AccentImg, {src: '/img/plane.gif', alt: "an animated gif of a paper airplane taking off" }),
     h('h1', 'Verify your email'),
     props.email ? h(Box, {gap: 8}, [
       `Sweet! We sent an email with a verification code to`,

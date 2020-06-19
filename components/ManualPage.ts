@@ -37,7 +37,7 @@ const ManualPage:React.SFC<{image?: string}> = (props) => {
   return h(Container, {}, [
     h('div', [
       h(TOCContainer, {}, [
-        h(AccentImg, {src: '/img/manual.gif'}),
+        h(AccentImg, {src: '/img/manual.gif', alt: "A gif of a spellbook floating in the air as a computer cursor turns its pages"}),
         ...Object.keys(Pages).flatMap(page => {
           return [
             h('a.notBlue', {href: Pages[page]}, h('h1', {class: Pages[page].slice(1)}, page)),

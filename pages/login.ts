@@ -113,7 +113,7 @@ const ResetPassword: React.SFC = () => {
         ])
       ]))
     case 'success': return h(Box, { gap: 16, width: 400, ma: true }, [
-      h(AccentImg, {src: '/img/plane.gif'}),
+      h(AccentImg, {src: '/img/plane.gif', alt: "an animated gif of a paper airplane taking off"}),
       h('h1', RESETCOPY.successHeader),
       'We sent an email with a password reset link to',
       h(Info, email),
