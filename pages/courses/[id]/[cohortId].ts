@@ -55,31 +55,29 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
 
   return h('div', {}, [
+    h(WelcomeModal, {display:router.query.welcome !== undefined, cohort}),
     inCohort || isFacilitator
       ? h(Banners, {...cohort, enrolled: !!inCohort, facilitating: isFacilitator}) : null,
     h(TwoColumn, [
-      h(WelcomeModal, {display:router.query.welcome !== undefined, cohort}),
-      h(Box, {gap: 64}, [
-        h(Box, {gap: 32}, [
-          h(Box, {gap: 16}, [
-            h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
-            h(Box, {gap:4}, [
-              h('h1', cohort?.courses.name),
-              h('h3.textSecondary', 'Cohort #'+cohort?.id.split('-').slice(-1)[0]),
-            ]),
-            h('span', [
-              cohortPrettyDate(cohort.start_date, cohort.completed), h('span', ' | '),
-              `Facilitated by ${cohort.people.display_name}`
-            ]),
+      h(Box, {gap: 32}, [
+        h(Box, {gap: 16}, [
+          h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
+          h(Box, {gap:4}, [
+            h('h1', cohort?.courses.name),
+            h('h3.textSecondary', 'Cohort #'+cohort?.id.split('-').slice(-1)[0]),
           ]),
-          !inCohort && !isFacilitator ? null : h(Box, [
-            h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.id}/${cohort.id}`}
-              , h(Primary, 'Go to the forum')),
-            !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null,
+          h('span', [
+            cohortPrettyDate(cohort.start_date, cohort.completed), h('span', ' | '),
+            `Facilitated by ${cohort.people.display_name}`
           ]),
         ]),
+        !inCohort && !isFacilitator ? null : h(Box, [
+          h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.id}/${cohort.id}`}
+            , h(Primary, 'Go to the forum')),
+          !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null,
+        ]),
       ]),
-      h('div', {style: {gridColumn: 1}}, h(Tabs, {
+      h(Tabs, {
           tabs: {
             [COPY.detailsTab]: h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
@@ -110,7 +108,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             ]),
             [COPY.curriculumTab]: h(Text, {source:props.curriculum?.text})
           }
-        })),
+        }),
       inCohort || isFacilitator ? null
         : h(Sidebar, {} ,h(Enroll, {course}, h(EnrollInCohort, {id: props.id, course: props.courseId})))
     ])
@@ -212,7 +210,7 @@ const MarkCohortComplete = (props:{id: string})=> {
   }}, 'Mark as complete')
 }
 
-const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: string, courses: {id: string}}})=>{
+const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: string, courses: {id: string}}}) => {
   return h(Modal, {display:props.display}, [
     h(Box, {gap: 32}, [
       h('h2', "You're enrolled!"),
