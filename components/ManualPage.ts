@@ -32,8 +32,6 @@ const ManualPage:React.SFC<{image?: string}> = (props) => {
     ])
   })
 
-  console.log(TOC)
-
   return h(Container, {}, [
     h('div', [
       h(TOCContainer, {}, [
