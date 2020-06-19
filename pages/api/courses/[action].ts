@@ -1,7 +1,7 @@
 import { ResultType, Request, multiRouteHandler} from '../../../src/apiHelpers'
 import { PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
-import { createCohortGroup, createCategory, createTopic, addMember, getGroupId} from '../../../src/discourse'
+import { createCohortGroup, createCategory, createTopic, addMember, getGroupId, getTaggedPost} from '../../../src/discourse'
 import Stripe from 'stripe'
 import { sendInviteToCourseEmail, sendCohortEnrollmentEmail } from '../../../emails'
 import TemplateCourseDescription from '../../../writing/TemplateCourseDescription.txt'
@@ -189,13 +189,15 @@ async function enroll (req: Request) {
     }})
 
     await addMember(groupId, user.username)
+    let gettingStarted = await getTaggedPost(`${cohort.course}/${cohort.id}`, 'getting-started')
+
     await sendCohortEnrollmentEmail(user.email, {
       name: user.display_name || user.username,
       course_start_date: cohort.start_date,
       course_name: cohort.courses.name,
-      cohort_page_url: `https://hyperlink.academy/${cohort.course}/${cohort.id}`,
+      cohort_page_url: `https://hyperlink.academy/courses/${cohort.course}/${cohort.id}`,
       cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.course}/${cohort.id}`,
-      get_started_topic_url: 'PLACEHOLDER'
+      get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
     })
     return {
       status: 200,
