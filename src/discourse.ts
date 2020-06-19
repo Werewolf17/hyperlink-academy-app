@@ -207,3 +207,16 @@ export const syncSSO = async (params: {[key:string]: string})=>{
     })
   })
 }
+
+export async function createPost(params:{topic_id: number,raw:string}) {
+  let result = await fetch('https://forum.hyperlink.academy/posts.json', {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json; charset=utf-8',
+      ...headers,
+      "Api-Username":'system'
+    },
+    body: JSON.stringify(params)
+  })
+  console.log(result)
+}
