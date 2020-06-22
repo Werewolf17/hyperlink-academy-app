@@ -59,6 +59,7 @@ model courses {
   invite_only        Boolean              @default(false)
   name               String
   prerequisites      String
+  status             course_status?       @default(draft)
   course_cohorts     course_cohorts[]
   course_invites     course_invites[]
   course_maintainers course_maintainers[]
@@ -91,4 +92,9 @@ model people_in_cohorts {
   people         people         @relation(fields: [person], references: [id])
 
   @@id([person, cohort])
+}
+
+enum course_status {
+  draft
+  live
 }

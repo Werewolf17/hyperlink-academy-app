@@ -27,9 +27,11 @@ CREATE TABLE IF NOT EXISTS people (
 CREATE UNIQUE INDEX people_username_index on people (lower(username));
 CREATE UNIQUE INDEX people_email_index on people (lower(email));
 
+CREATE TYPE course_status AS ENUM ('draft', 'live');
 CREATE TABLE IF NOT EXISTS courses (
     id            text NOT NULL UNIQUE PRIMARY KEY,
     name          text NOT NULL,
+    status        course_status NOT NULL DEFAULT 'draft',
     category_id   integer NULL,
     duration      text NOT NULL,
     invite_only   boolean NOT NULL DEFAULT false,
