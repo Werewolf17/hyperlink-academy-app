@@ -122,13 +122,14 @@ async function getProfileData(req:Request) {
 }
 
 export const coursesQuery = () => prisma.courses.findMany({
-    include: {
-      course_cohorts: {
-        select: {start_date: true},
-        orderBy: {start_date: "asc"},
-        take: 1
-      }
+  where: {status: "live"},
+  include: {
+    course_cohorts: {
+      select: {start_date: true},
+      orderBy: {start_date: "asc"},
+      take: 1
     }
+  }
 })
 
 async function getCourses() {
