@@ -1,6 +1,7 @@
 import {Children} from 'react'
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
+import Link from 'next/link'
 import { TextStyles } from './Text'
 import { AccentImg } from './Images'
 import { colors, Tablet } from './Tokens'
@@ -38,7 +39,7 @@ const ManualPage:React.SFC<{image?: string}> = (props) => {
         h(AccentImg, {src: '/img/manual.gif', alt: "A gif of a spellbook floating in the air as a computer cursor turns its pages"}),
         ...Object.keys(Pages).flatMap(page => {
           return [
-            h('a.notBlue', {href: Pages[page]}, h('h1', {class: Pages[page].slice(1)}, page)),
+            h(Link, {href: Pages[page]}, h('a.notBlue', {}, h('h1', {class: Pages[page].slice(1)}, page))),
             Pages[page] === router.pathname ? h('div', TOC) : null
           ]
         })
