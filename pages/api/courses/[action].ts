@@ -1,10 +1,13 @@
 import { ResultType, Request, multiRouteHandler} from '../../../src/apiHelpers'
 import { PrismaClient} from '@prisma/client'
 import {getToken} from '../../../src/token'
-import { createCohortGroup, createCategory, createTopic, addMember, getGroupId, getTaggedPost} from '../../../src/discourse'
+import { getUsername, createGroup, createCategory, createTopic, updateTopic, addMember, getGroupId, getTaggedPost, updateCategory} from '../../../src/discourse'
 import Stripe from 'stripe'
 import { sendInviteToCourseEmail, sendCohortEnrollmentEmail } from '../../../emails'
+
 import TemplateCourseDescription from '../../../writing/TemplateCourseDescription.txt'
+import TemplateCohortNotes from '../../../writing/TemplateCohortNotes.txt'
+import TemplateCohortGettingStarted from '../../../writing/TemplateCohortGettingStarted.txt'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
@@ -56,12 +59,16 @@ export type InviteToCourseMsg = {course: string}
   & ({ email: string, username: undefined} | {username: string, email: undefined})
 export type InviteToCourseResponse = ResultType<typeof inviteToCourse>
 
+export type MarkCourseLiveMsg = {id: string}
+export type MarkCourseLiveResponse = ResultType<typeof markCourseLive>
+
 export default multiRouteHandler('action', {
   createCohort,
   enroll,
   createCourse,
   updateCourse,
   completeCohort,
+  markCourseLive,
   inviteToCourse,
   updateCohort
 })
@@ -83,14 +90,20 @@ async function updateCohort(req:Request) {
 async function completeCohort(req:Request) {
   let msg = req.body as Partial<CompleteCohortMsg>
   if(!msg.cohortId) return {status: 400, result: "Error: invalid request, missing parameters"} as const
+  let user = getToken(req)
+  if(!user) return {status: 400, result: "ERROR: no user logged in'"} as const
+  let cohort = await prisma.course_cohorts.findOne({where:{id:msg.cohortId}, select: {facilitator: true}})
+  if(!cohort) return {status: 404, result: `No cohort with id ${msg.cohortId} found`} as const
+
+  if(cohort.facilitator !== user.id) return {status: 401, result: "ERROR: user is not a facilitator of this course"} as const
+
   let completed = (new Date()).toISOString()
-  let newData = await prisma.course_cohorts.update({
+  await prisma.course_cohorts.update({
     where: {id:msg.cohortId},
     data: {
       completed
     }
   })
-  if(!newData) return {status: 404, result: `No cohort with id ${msg.cohortId} found`} as const
   return {status:200, result: {completed}} as const
 }
 
@@ -117,6 +130,8 @@ async function createCohort(req: Request) {
     select: {
       id: true,
       category_id: true,
+      name: true,
+      status: true,
       course_cohorts: {
         select: {id: true}
       }
@@ -125,9 +140,39 @@ async function createCohort(req: Request) {
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
 
   let id = course.id + '-' + course.course_cohorts.length
-  if(!(await createCohortGroup(id, msg.facilitator, course.category_id))){
-    return {status: 500, result: "ERROR: unable to create cohort group"} as const
+  let admin = await getUsername(msg.facilitator)
+  if(!admin) return {status: 404, result: "ERROR: no user found with id: " + msg.facilitator} as const
+  await createGroup({name: id, visibility_level:2, owner_usernames: admin})
+
+  // If the course is in draft status it's category will be private so we need
+  // to explicitly add the cohort group
+  if(course.status === 'draft') {
+    await updateCategory(course.category_id, {name: course.name, permissions: {
+      // Make sure to keep any existing cohorts as well
+      ...course.course_cohorts.reduce((acc, cohort) => {
+        acc[cohort.id] = 1
+        return acc
+      }, {} as {[i:string]:number}),
+      [id]: 1,
+      [course.id + '-m']: 1
+    }})
+    console.log('updated category')
   }
+  let category = await createCategory(id, {permissions: {[id]:1}, parent_category_id: course.category_id})
+  if(!category) return {status: 500, result: "ERROR: Could not create cohort category"} as const
+  await updateTopic(category.topic_url, {
+    category_id: category.id,
+    title: id + " Notes",
+    raw: TemplateCohortNotes,
+    tags: ['note']
+  }, admin)
+
+  await createTopic({
+    category: category.id,
+    title: id + " Getting Started",
+    raw: TemplateCohortGettingStarted,
+    tags: ['getting-started']
+  }, admin)
 
   try {
     let cohort = await prisma.course_cohorts.create({
@@ -240,14 +285,24 @@ async function createCourse(req: Request) {
   let isAdmin = prisma.admins.findOne({where: {person: user.id}})
   if(!isAdmin) return {status: 403, result: "ERROR: user is not an admin"} as const
 
-  let category = await createCategory(msg.name, {id: msg.courseId})
-  if(!category) return {status: 500, result: "ERROR: couldn't create course category"}
-  await createTopic({
-    category: category.id,
+  let maintainers = await prisma.people.findMany({
+    where: {email: {in: msg.maintainers}},
+    select: {username: true, id: true}
+  })
+
+  let groupName = msg.courseId+'-m'
+  if(!(await createGroup({name: groupName, visibility_level: 2, owner_usernames: maintainers.map(m=>m.username)}))) {
+    return {status: 500, result: "ERROR: couldn't create course maintainers group"} as const
+  }
+
+  let category = await createCategory(msg.name, {slug: msg.courseId, permissions: {[groupName]:1}})
+  if(!category) return {status: 500, result: "ERROR: couldn't create course category"} as const
+  await updateTopic(category.topic_url, {
+    category_id: category.id,
     title: `${msg.name} Curriculum`,
     tags: ['curriculum'],
     raw: TemplateCourseDescription
-  }, user.username)
+  }, await getUsername(maintainers[0].id))
 
   await prisma.courses.create({
     data: {
@@ -334,4 +389,23 @@ async function inviteToCourse(req:Request) {
   })
 
   return {status: 200, result: {email}} as const
+}
+
+async function markCourseLive(req: Request) {
+  let msg = req.body as Partial<MarkCourseLiveMsg>
+  if(!msg.id) return {status: 400, result: "ERROR: invalid request, missing id paramter"} as const
+  let user = getToken(req)
+  if(!user) return {status: 401, result: "ERROR: no user logged in"} as const
+  let course = await prisma.courses.findOne({
+    where:{id: msg.id},
+    select: {course_maintainers: {select: {maintainer: true}}, status: true, category_id: true, name: true}
+  })
+
+  if(!course) return {status:404, result: `ERROR: no course with id ${msg.id} found`} as const
+  if(course.status !== 'draft') return {status: 400, result: "ERROR: course is not in draft status"} as const
+  if(!course.course_maintainers.find(m => m.maintainer === user?.id)) return {status: 401, result: "ERROR: user is not a maintainer of this course"} as const
+
+  if(!await updateCategory(course.category_id, {permissions: {everyone: 1}, name: course.name})) return {status:500, result: "ERROR: unable to update course category"} as const
+  await prisma.courses.update({where: {id: msg.id}, data:{status: 'live'}})
+  return {status: 200, result: "Set course status to live"} as const
 }

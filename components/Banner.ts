@@ -2,10 +2,10 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import { Tablet, Mobile, colors } from './Tokens'
 
-export const TwoColumnBanner = (props: any) => {
-  return h(Banner, [
+export const TwoColumnBanner:React.SFC<{red?:boolean}> = (props) => {
+  return h(Banner, props, [
     h('div', {style:{maxWidth: 960, padding: 16, margin: 'auto'}}, h(BannerInner, [
-      props.children
+      props.children as React.ReactElement
     ]))
   ])
 }

@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import {callApi, Success} from './apiHelpers'
-import { CourseResult, CohortResult, UserCohortsResult, WhoAmIResult, CourseDataResult, ProfileResult} from '../pages/api/get/[...item]'
+import { CourseResult, CohortResult, UserCohortsResult, WhoAmIResult, CourseDataResult, ProfileResult, UserCoursesResult} from '../pages/api/get/[...item]'
 export const useUserData = ()=>{
   return useSWR('/api/get/whoami', async (api) => {
     let res = await callApi<null, WhoAmIResult>(api)
@@ -35,6 +35,13 @@ export const useCohortData = (id: string, initialData?:Success<CohortResult>) =>
 export const useUserCohorts = () => {
   return useSWR('/api/get/user_cohorts', async(api) => {
     let res = await callApi<null, UserCohortsResult>(api)
+    if(res.status===200) return res.result
+  })
+}
+
+export const useUserCourses = ()=>{
+  return useSWR('/api/get/user_courses', async(api)=>{
+    let res=await(callApi<null, UserCoursesResult>(api))
     if(res.status===200) return res.result
   })
 }

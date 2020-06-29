@@ -59,7 +59,7 @@ model courses {
   invite_only        Boolean              @default(false)
   name               String
   prerequisites      String
-  status             course_status?       @default(draft)
+  status             course_status        @default(draft)
   course_cohorts     course_cohorts[]
   course_invites     course_invites[]
   course_maintainers course_maintainers[]

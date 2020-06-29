@@ -1,7 +1,5 @@
 import crypto from 'crypto'
 import querystring from 'querystring'
-import TemplateCohortNotes from '../writing/TemplateCohortNotes.txt'
-import TemplateCohortGettingStarted from '../writing/TemplateCohortGettingStarted.txt'
 
 let headers = {
       "Api-Key": process.env.DISCOURSE_API_KEY || '',
@@ -18,47 +16,25 @@ export type Category = {
   }
 }
 
-export const createCohortGroup = async (name: string, admin: string, courseID: number) => {
-  let username = await getUsername(admin)
-  console.log(username)
-  if(!username) return false
+export async function createGroup(group:{name: string, visibility_level: number, owner_usernames: string | string[]}) {
+  if(typeof group.owner_usernames !== 'string') group.owner_usernames = group.owner_usernames.join(',')
   let result = await fetch('https://forum.hyperlink.academy/admin/groups', {
     method: 'POST',
     headers: {
       ...headers,
       "Content-Type": 'application/json; charset=utf-8'
     },
-    body: JSON.stringify({
-      group: {
-        name,
-        visibility_level: 2,
-        owner_usernames: username
-      }
-    })
+    body: JSON.stringify({group})
   })
+
   if(result.status !== 200) {
     console.log(await result.text())
     return false
   }
-  let category = await createCategory(name, {permissions: {[name]:1}, parent_category_id: courseID})
-  if(!category) return false
-  await updateTopic(category.topic_url, {
-    category_id: category.id,
-    title: name + " Notes",
-    raw: TemplateCohortNotes,
-    tags: ['note']
-  }, username)
-
-  await createTopic({
-    category: category.id,
-    title: name + " Getting Started",
-    raw: TemplateCohortGettingStarted,
-    tags: ['getting-started']
-  }, username)
   return true
 }
 
-async function updateTopic(topic:string, input: {category_id: number, title: string, raw: string, tags: string[]}, username?: string) {
+export async function updateTopic(topic:string, input: {category_id: number, title: string, raw: string, tags: string[]}, username?: string) {
   // Update the title
   await fetch (`https://forum.hyperlink.academy${topic}`, {
     method: "PUT",
@@ -99,20 +75,22 @@ async function updateTopic(topic:string, input: {category_id: number, title: str
   })
 }
 
-export async function createTopic(input:{title: string, category: number, raw: string, tags?: string[]}, username?: string) {
+export async function createTopic(input:{title: string, category: number, raw: string, tags?: string[]}, asUser?: string) {
   let result = await fetch('https://forum.hyperlink.academy/posts.json', {
     method: "POST",
     headers: {
       "Content-Type": 'application/json; charset=utf-8',
       ...headers,
-      "Api-Username": username || headers["Api-Username"]
+      "Api-Username": asUser || headers["Api-Username"]
     },
-    body: JSON.stringify({...input})
+    body: JSON.stringify(input)
   })
-  console.log(result)
+  if(result.status !== 200) {
+    console.log(await result.text())
+  }
 }
 
-export const createCategory = async (name: string, options?: {id?: string,permissions?: {[key:string]:number}, parent_category_id?: number}) => {
+export const createCategory = async (name: string, options?: {slug?: string,permissions?: {[key:string]:number}, parent_category_id?: number}) => {
   let result = await fetch('https://forum.hyperlink.academy/categories.json', {
     method: 'POST',
     headers: {
@@ -124,6 +102,19 @@ export const createCategory = async (name: string, options?: {id?: string,permis
   if(result.status === 200) return (await result.json()).category as {id: number, topic_url: string}
   console.log(await result.text())
   return false
+}
+
+export async function updateCategory (id: string | number, options: {permissions?: {[key:string]: number}, name: string}) {
+  let result = await fetch(`https://forum.hyperlink.academy/categories/${id}`, {
+    method: "PUT",
+    headers: {
+      ...headers,
+      "Content-Type": 'application/json; charset=utf-8'
+    },
+    body: JSON.stringify({...options, color: '0088CC', text_color: 'FFFFFF'})
+  })
+  if(result.status !== 200) console.log(await result.text())
+  else return true
 }
 
 export const getUsername = async (userId:string):Promise<string | undefined> => {

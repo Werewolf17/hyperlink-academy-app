@@ -3,6 +3,7 @@ import h from 'react-hyperscript'
 import Link from 'next/link'
 
 import { Box} from '../Layout'
+import {Pill} from '../Pill'
 import { colors, Mobile} from '../Tokens'
 import Card  from '../Card'
 import { prettyDate } from '../../src/utils'
@@ -14,6 +15,7 @@ type Props = {
   href?:string,
   start_date: string
   cohort?: boolean
+  status?:  'draft' | 'live' | null
 }
 export default (props:Props) => {
   return h(Link, {
@@ -29,6 +31,7 @@ export default (props:Props) => {
         h('h3', props.name),
         h('p', props.description),
       ]),
+      props.status === 'draft' ? h(Pill, 'draft') : null,
       !props.start_date ? null : h(DateContainer, (props.cohort ? 'starts ' : 'Next cohort starts ') + prettyDate(props.start_date))
     ])
   ]))

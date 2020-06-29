@@ -7,6 +7,7 @@ export type CourseResult = ResultType<typeof getCourses>
 export type CourseDataResult = ResultType<typeof getCourseData>
 export type CohortResult = ResultType<typeof getCohortData>
 export type UserCohortsResult = ResultType<typeof getUserCohorts>
+export type UserCoursesResult = ResultType<typeof getUserCourses>
 export type WhoAmIResult = ResultType<typeof whoami>
 export type ProfileResult = ResultType<typeof getProfileData>
 export type CheckUsernameResult = ResultType<typeof checkUsername>
@@ -17,6 +18,7 @@ export default multiRouteHandler('item', {
   'courses': getCourses,
   'course': getCourseData,
   'user_cohorts': getUserCohorts,
+  'user_courses': getUserCourses,
   'username': checkUsername,
   'whoami': whoami,
   'cohort': getCohortData,
@@ -137,7 +139,6 @@ async function getCourses() {
   return {status: 200, result: {courses}} as const
 }
 
-
 async function getUserCohorts(req:Request) {
   let token = getToken(req)
   if(!token) return {status: 403 as const, result: "Error: no user logged in"}
@@ -167,8 +168,24 @@ async function getUserCohorts(req:Request) {
       }
     }
   })
+
   await prisma.disconnect()
   return {status: 200, result: {course_cohorts, invited_courses}} as const
+}
+async function getUserCourses(req: Request) {
+  let token = getToken(req)
+  if(!token) return {status: 403 as const, result: "Error: no user logged in"}
+
+  let maintaining_courses = await prisma.courses.findMany({
+    where: {
+      course_maintainers: {
+        some: {
+          maintainer: token.id
+        }
+      }
+    }
+  })
+  return {status: 200, result: {maintaining_courses}} as const
 }
 
 async function whoami(req:Request) {
