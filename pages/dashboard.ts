@@ -9,7 +9,7 @@ import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
 import { Box} from '../components/Layout'
 // import { AccentImg } from '../components/Images'
-import { useUserCohorts, useUserData, useCourses } from '../src/data'
+import { useUserCohorts, useUserData, useCourses, useUserCourses } from '../src/data'
 import { coursesQuery } from './api/get/[...item]'
 import { BigCohortCard } from '../components/Card'
 import {COPY} from './index'
@@ -21,13 +21,14 @@ const Dashboard = (props:Props) => {
   let {data: user} = useUserData()
   let {data: courses} = useCourses(props)
   let {data: cohorts} = useUserCohorts()
+  let {data: userCourses} = useUserCourses()
   let router = useRouter()
 
   useEffect(() => {
     if(user === false) router.push('/')
   }, [user])
 
-  if(!user || cohorts === undefined) {
+  if(!user || cohorts === undefined || userCourses === undefined) {
     return h(PageLoader)
   }
 
@@ -63,6 +64,15 @@ const Dashboard = (props:Props) => {
       }))
     ]),
     h('hr'),
+
+    // Courses you maintain
+    userCourses.maintaining_courses.length < 0 ? null :  h(Box, {}, [
+      h('h2', 'Courses you maintain'),
+      h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.map(course=>{
+        return h(CourseCard,{...course, start_date: ''})
+      }))
+    ]),
+
     !courses ? null : h(Box, {gap: 16}, [
       h('h2', COPY.coursesHeader),
       user.admin ? h('span', {style:{color: 'blue'}}, [

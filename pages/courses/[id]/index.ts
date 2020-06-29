@@ -14,12 +14,17 @@ import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
 import Text from '../../../components/Text'
 import {SmallCohortCard} from '../../../components/Card'
+import {TwoColumnBanner} from '../../../components/Banner'
+import {Modal} from '../../../components/Modal'
+import { Primary, Destructive, Secondary} from '../../../components/Button'
 
 import { getTaggedPost } from '../../../src/discourse'
-import { Primary, Destructive} from '../../../components/Button'
 import { useUserData, useUserCohorts, useCourseData, Course } from '../../../src/data'
 import { courseDataQuery, CheckUsernameResult } from '../../api/get/[...item]'
-import { CreateCohortMsg, CreateCohortResponse, UpdateCourseMsg, UpdateCourseResponse, InviteToCourseMsg, InviteToCourseResponse} from '../../api/courses/[action]'
+import { CreateCohortMsg, CreateCohortResponse,
+         UpdateCourseMsg, UpdateCourseResponse,
+         InviteToCourseMsg, InviteToCourseResponse,
+         MarkCourseLiveMsg, MarkCourseLiveResponse} from '../../api/courses/[action]'
 import { callApi, useApi } from '../../../src/apiHelpers'
 import { cohortPrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
@@ -79,46 +84,50 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let forum = `https://forum.hyperlink.academy/${user ? 'session/sso?return_path=/':''}c/${course?.id}`
 
   //Setting up the layout for the course page
-  return h(TwoColumn, {}, [
-    h(Box, {gap: 32}, [
-      h(Box, {gap: 16}, [
-        h('h1', course?.name),
-        h('span', {style:{color: 'blue'}}, [h('a.mono',{href:forum},  COPY.courseForum), ' ➭'])
-      ]),
-      course?.description || '',
-      activeCohorts.length > 0 ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [
+  return h('div', [
+    h(Banners, {draft: course.status === 'draft'}),
+    h(TwoColumn, [
+      h(Box, {gap: 32}, [
+        h(Box, {gap: 16}, [
+          h('h1', course?.name),
+          h('span', {style:{color: 'blue'}}, [h('a.mono',{href:forum},  COPY.courseForum), ' ➭'])
+        ]),
+        course?.description || '',
+        activeCohorts.length > 0 ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [
           h('h3', COPY.activeCohorts),
           ...activeCohorts.map(cohort=> h(SmallCohortCard, {
             ...cohort,
             facilitating: cohort.facilitator === (user ? user?.id : undefined),
             enrolled: !(cohort.facilitator === (user ? user?.id : undefined))
           }))
-      ]) : null
-    ]),
-    h(Tabs, {tabs: {
-      [COPY.curriculumTab]:  h(Box, [
-        isMaintainer ? h(COPY.updateCurriculum, {id: props.content.id}) : null,
-        h(Text, {source: props.content.text})
+        ]) : null,
+        course.status ==='draft' && isMaintainer ? h(MarkCourseLive, {id: props.id}) : null
       ]),
-      [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
-      [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
-    }}),
-    h(Sidebar, [
-      h(Enroll, {course}, [
-        h(Box, {gap: 8}, [
-          h(Primary, {
-            onClick: ()=> router.push('/courses/[id]/enroll', `/courses/${props.course?.id}/enroll`),
-            disabled: !invited
-          }, 'Enroll in this Course'),
-          h('div.textSecondary', {style:{width:232}}, [
-            h(Box, {gap:16}, [
-              upcomingCohorts.length === 0 ? COPY.noUpcoming : null,
-              course?.invite_only && !invited ? COPY.inviteOnly : null,
-              course?.invite_only && invited ? COPY.invited : null
-            ]),
+      h(Tabs, {tabs: {
+        [COPY.curriculumTab]:  h(Box, [
+          isMaintainer ? h(COPY.updateCurriculum, {id: props.content.id}) : null,
+          h(Text, {source: props.content.text})
+        ]),
+        [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
+        [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
+      }}),
+      h(Sidebar, [
+        h(Enroll, {course}, [
+          h(Box, {gap: 8}, [
+            h(Primary, {
+              onClick: ()=> router.push('/courses/[id]/enroll', `/courses/${props.course?.id}/enroll`),
+              disabled: !invited
+            }, 'Enroll in this Course'),
+            h('div.textSecondary', {style:{width:232}}, [
+              h(Box, {gap:16}, [
+                upcomingCohorts.length === 0 ? COPY.noUpcoming : null,
+                course?.invite_only && !invited ? COPY.inviteOnly : null,
+                course?.invite_only && invited ? COPY.invited : null
+              ]),
+            ])
           ])
-        ])
-      ])]),
+        ])]),
+    ])
   ])
 }
 
@@ -169,7 +178,7 @@ const Settings = (props: {inviteOnly?: boolean, mutate: (course:Course)=> any, c
   ])
 }
 
-//Features for incite only courses
+//Features for invite only courses
 const InvitePerson = (props:{id: string})=> {
   let [emailOrUsername, setEmailOrUsername] = useState('')
   let [valid, setValid] = useState<null | boolean>(null)
@@ -260,6 +269,44 @@ const AddCohort = ()=> {
   ])
 }
 
+function MarkCourseLive(props: {id:string}) {
+  let {data:course, mutate} = useCourseData(props.id)
+  let [state, setState] = useState<'normal'|'confirm'|'loading'|'complete'>('normal')
+
+  const onClick = async (e: React.MouseEvent)  =>{
+    e.preventDefault()
+    if(!course) return
+    setState('loading')
+    let res = await callApi<MarkCourseLiveMsg, MarkCourseLiveResponse>('/api/courses/markCourseLive', {id: props.id})
+    if(res.status===200){
+      setState('normal')
+      mutate({...course, status: 'live'})
+    }
+  }
+
+  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=>setState('normal')},[
+    h(Box, {gap: 32}, [
+      h('h2', "Are you sure?"),
+      h(Box, {gap: 16}, [
+        "Before going live please check that you've done these things",
+        h(Box.withComponent('ul'), {gap:16}, [
+          h('li', "Written a curriculum"),
+          h('li', "Filled out the getting started template for cohorts")
+        ]),
+        h(Box, {gap:16, style:{textAlign: 'right'}}, [
+          h(Primary, {onClick}, state === 'loading' ? h(Loader) : 'Go Live!'),
+          h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+        ])
+      ])
+    ])
+  ])
+
+  return h(Destructive, {onClick: async e => {
+    e.preventDefault()
+    setState('confirm')
+  }}, 'Go Live')
+}
+
 // Feature to edit course detail (length, prereqs, one line description)
 const EditDetails = ()=> {
   let [formData, setFormData] = useState({
@@ -330,6 +377,15 @@ const EditDetails = ()=> {
       ])
     ])
   ])
+}
+
+const Banners = (props:{draft: boolean}) => {
+  if(props.draft) {
+    return h(TwoColumnBanner, {red: true}, h(Box, [
+      h('h3', "This is a preview, this course isn't live yet!")
+    ]))
+  }
+  return null
 }
 
 const SubmitButtons = styled('div')`
