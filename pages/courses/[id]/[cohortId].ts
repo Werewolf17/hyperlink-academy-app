@@ -56,8 +56,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
 
   return h('div', {}, [
     h(WelcomeModal, {display:router.query.welcome !== undefined, cohort}),
-    inCohort || isFacilitator
-      ? h(Banners, {...cohort, enrolled: !!inCohort, facilitating: isFacilitator}) : null,
+    h(Banners, {...cohort, enrolled: !!inCohort, facilitating: isFacilitator}),
     h(TwoColumn, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
@@ -242,14 +241,14 @@ const Banners = (props:{
   let isStarted = (new Date(props.start_date)).getTime() - (new Date()).getTime()
   let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.courses.id}/${props.id}`
 
-  if(props.facilitating && !props.live) return h(TwoColumnBanner, {red: true}, [
+  if(props.facilitating && !props.live) return h(TwoColumnBanner, {red: true}, h(Box, {gap:16}, [
     h(Box, {gap: 8, className: "textSecondary"}, [
       h('h4', `This cohort isn't live yet!`),
       h('p', `This cohort is hidden from public view. You can make edits to the cohort forum and the topics within.`),
       h('p', `When you're ready click the button below to put the cohort live on the site`),
     ]),
     h(MarkCohortLive, {id: props.id})
-  ])
+  ]))
 
   if(props.completed)  return h(TwoColumnBanner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
