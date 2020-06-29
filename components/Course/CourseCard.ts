@@ -24,14 +24,14 @@ export default (props:Props) => {
     passHref: true}, h(CourseCard, {
   }, [
     h(ImageContainer, [
-      h(Image, {src: `/img/courses/${props.id}.png`}),
+      props.status === 'draft' ? null : h(Image, {src: `/img/courses/${props.id}.png`}),
     ]),
     h(Box, {padding: 16, gap:32}, [
       h(Box, {gap: 16, style: {minHeight: 152}}, [
         h('h3', props.name),
         h('p', props.description),
       ]),
-      props.status === 'draft' ? h(Pill, 'draft') : null,
+      props.status === 'draft' ? h(Pill, {red: true, borderOnly: true}, 'draft') : null,
       !props.start_date ? null : h(DateContainer, (props.cohort ? 'starts ' : 'Next cohort starts ') + prettyDate(props.start_date))
     ])
   ]))

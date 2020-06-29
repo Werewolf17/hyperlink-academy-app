@@ -85,7 +85,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
 
   //Setting up the layout for the course page
   return h('div', [
-    h(Banners, {draft: course.status === 'draft'}),
+    h(Banners, {draft: course.status === 'draft', id: props.id, isMaintainer}),
     h(TwoColumn, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
@@ -101,7 +101,6 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             enrolled: !(cohort.facilitator === (user ? user?.id : undefined))
           }))
         ]) : null,
-        course.status ==='draft' && isMaintainer ? h(MarkCourseLive, {id: props.id}) : null
       ]),
       h(Tabs, {tabs: {
         [COPY.curriculumTab]:  h(Box, [
@@ -304,7 +303,7 @@ function MarkCourseLive(props: {id:string}) {
   return h(Destructive, {onClick: async e => {
     e.preventDefault()
     setState('confirm')
-  }}, 'Go Live')
+  }}, "I'm Ready. Go Live!")
 }
 
 // Feature to edit course detail (length, prereqs, one line description)
@@ -379,10 +378,17 @@ const EditDetails = ()=> {
   ])
 }
 
-const Banners = (props:{draft: boolean}) => {
-  if(props.draft) {
-    return h(TwoColumnBanner, {red: true}, h(Box, [
-      h('h3', "This is a preview, this course isn't live yet!")
+const Banners = (props:{draft: boolean, id: string, isMaintainer: boolean}) => {
+  if(props.draft && props.isMaintainer) {
+    return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
+      h(Box, {gap:16}, [
+        h('h3', "This course isn't live yet!"),
+        h('p', `This course is currently hidden from public view. You can make edits and get set
+up. You can read `),
+        h(Link, {href: '/manual/courses'}, h('a', 'this section')),
+        h('p', ' in the manual for some tips and help getting started')
+      ]),
+      h(MarkCourseLive, {id: props.id})
     ]))
   }
   return null
