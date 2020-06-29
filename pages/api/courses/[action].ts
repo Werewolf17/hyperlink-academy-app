@@ -35,6 +35,8 @@ export type CreateCourseResponse = ResultType<typeof createCourse>
 
 export type UpdateCourseMsg = {
   id: string
+  cost: number,
+  name: string,
   prerequisites?: string
   duration?: string
   description: string
@@ -337,8 +339,6 @@ async function updateCourse(req: Request) {
     }
   })
 
-  console.log(isMaintainer)
-
   if(!isMaintainer || isMaintainer.course_maintainers.length === 0) return {
     status: 403,
     result: `ERROR: user is not maintainer of course ${msg.id}`
@@ -349,7 +349,9 @@ async function updateCourse(req: Request) {
     data: {
       duration: msg.duration,
       prerequisites: msg.prerequisites,
-      description: msg.description
+      description: msg.description,
+      cost: msg.cost,
+      name: msg.name
     }
   })
 

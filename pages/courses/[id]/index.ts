@@ -108,7 +108,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h(Text, {source: props.content.text})
         ]),
         [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
-        [COPY.settingsTab]: isMaintainer ? h(Settings, {inviteOnly:course?.invite_only, courseId: props.id, mutate}) : null
+        [COPY.settingsTab]: isMaintainer ? h(Settings, {course, mutate}) : null
       }}),
       h(Sidebar, [
         h(Enroll, {course}, [
@@ -162,7 +162,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
   ])
 }
 
-const Settings = (props: {inviteOnly?: boolean, mutate: (course:Course)=> any, courseId:string}) => {
+const Settings = (props: {course:Course, mutate: (course:Course)=> any}) => {
   return h(Box, {gap: 64}, [
     h(Box, {style: {width:400}}, [
       h('div', [
@@ -171,9 +171,9 @@ const Settings = (props: {inviteOnly?: boolean, mutate: (course:Course)=> any, c
       ]),
       h(Seperator),
     ]),
-    props.inviteOnly ? h(InvitePerson, {id: props.courseId}) : null,
+    props.course.invite_only ? h(InvitePerson, {id: props.course.id}) : null,
     h(AddCohort),
-    h(EditDetails)
+    h(EditDetails, props)
   ])
 }
 
@@ -307,40 +307,48 @@ function MarkCourseLive(props: {id:string}) {
 }
 
 // Feature to edit course detail (length, prereqs, one line description)
-const EditDetails = ()=> {
+const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
   let [formData, setFormData] = useState({
-    duration: '',
-    prerequisites: '',
-    description: ''
+    name: props.course.name,
+    description: props.course.description,
+    prerequisites: props.course.prerequisites,
+    cost: props.course.cost,
+    duration: props.course.duration
   })
   let [status, callUpdateCourse] = useApi<UpdateCourseMsg, UpdateCourseResponse>([])
-  let router = useRouter()
-  let courseId = router.query.id as string
-  let {data:course, mutate} = useCourseData(courseId)
 
-  useEffect(()=>{
-    if(course) setFormData({
-      duration: course.duration,
-      prerequisites: course.prerequisites,
-      description: course.description
-    })
-  }, [course])
+  useEffect(()=>setFormData(props.course), [props])
 
-  let changed = course && (course.duration !== formData.duration
-                           || course.prerequisites !== formData.prerequisites
-                           || course.description !== formData.description)
+  let changed = props.course.duration !== formData.duration
+    || props.course.cost !== formData.cost
+    || props.course.prerequisites !== formData.prerequisites
+    || props.course.description !== formData.description
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    let res = await callUpdateCourse('/api/courses/updateCourse', {...formData, id:courseId})
-    if(res.status === 200 && course) mutate({...course, ...res.result})
+    let res = await callUpdateCourse('/api/courses/updateCourse', {...formData, id:props.course.id})
+    if(res.status === 200) props.mutate({...props.course, ...res.result})
   }
 
   return h('form', {onSubmit}, [
     h(Box, {gap:32, style:{width: 400}}, [
       h('h3', 'Edit Course Details'),
-      h(Box, {gap:8}, [h('b', 'Course Name'),h(Info, course?.name)]),
-      h(Box, {gap:8}, [h('b', 'Course Cost'),h(Info, course?.cost ? `$${course.cost}` : null)]),
+      h(Label, [
+        'Name',
+        h(Input, {
+          type: 'text',
+          value: formData.name,
+          onChange: e => setFormData({...formData, name: e.currentTarget.value})
+        })
+      ]),
+      h(Label, [
+        'Cost (USD)',
+        h(Input, {
+          type: 'number',
+          value: formData.cost,
+          onChange: e => setFormData({...formData, cost: parseInt(e.currentTarget.value)})
+        })
+      ]),
       h(Label, [
         'Description',
         h(Textarea, {
@@ -365,11 +373,7 @@ const EditDetails = ()=> {
       h(SubmitButtons, [
         h(Destructive, {disabled: !changed, onClick: (e)=>{
           e.preventDefault()
-          if(course)setFormData({
-            prerequisites: course.prerequisites,
-            duration: course.duration,
-            description: course.description
-          })
+          setFormData(props.course)
         }}, "Discard Changes"),
         h(Primary, {type: 'submit', disabled: !changed},
           status === 'loading' ? h(Loader) : 'Save Changes')
