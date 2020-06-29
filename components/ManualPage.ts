@@ -68,7 +68,7 @@ position: sticky;
 top: 32px;
 display: grid;
 padding-right: 32px;
-padding-bottom: 16;
+padding-bottom: 16px;
 border-right: 2px solid;
 text-align: right;
 justify-items: right;
