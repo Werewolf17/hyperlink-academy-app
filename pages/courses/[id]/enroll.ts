@@ -109,7 +109,7 @@ let Cohort = (props: {
                 ])
             ]),
             h(Text, {source: props.details.text.slice(0, 400) + (props.details.text.length > 400 ?'...' : '')}),
-            h(Link, {href: '/courses/[id]/[cohortId]', as: `/courses/${props.course}/${props.id}`}, h('a.notBlue', {style: {textDecoration: 'underline'}}, 'See more details'))
+            h(Link, {href: '/courses/[id]/[cohortId]', as: `/courses/${props.course}/${props.id}`}, h('a', {style: {textDecoration: 'underline'}}, h('b', 'See more details')))
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
             h(Primary, {onClick, disabled: props.invite_only && !props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),

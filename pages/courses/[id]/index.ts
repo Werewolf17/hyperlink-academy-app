@@ -37,8 +37,11 @@ export const COPY = {
   activeCohorts: "Your Current Cohorts",
   settingsTab: "Settings",
   inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
+  inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested! If you've been invited, please log in."),
   invited: h('span.accentSuccess', "You're invited!"),
   noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
+  enrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!"),
+  enrollButton: "See Upcoming Cohorts",
 
   updateCurriculum: (props: {id: string}) => h(Info, [
     `💡 You can make changes to the curriculum by editing `,
@@ -76,6 +79,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       return {...i, enrolled, facilitating}
     })
 
+  let enrolled = activeCohorts.filter(i=>i.facilitator !== user ? user.id : '')
   let upcomingCohorts = course.course_cohorts.filter(c=> (new Date(c.start_date) > new Date()) && c.live)
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
@@ -113,15 +117,18 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       h(Sidebar, [
         h(Enroll, {course}, [
           h(Box, {gap: 8}, [
-            h(Primary, {
-              onClick: ()=> router.push('/courses/[id]/enroll', `/courses/${props.course?.id}/enroll`),
-              disabled: !invited
-            }, 'Enroll in this Course'),
+            h(Link, {href: '/courses/[id]/enroll', as:`/courses/${props.course?.id}/enroll` }, [
+              h('a', [
+                h(Primary, {
+                  disabled: !invited
+                }, COPY.enrollButton),
+              ])
+            ]),
             h('div.textSecondary', {style:{width:232}}, [
               h(Box, {gap:16}, [
                 upcomingCohorts.length === 0 ? COPY.noUpcoming : null,
-                course?.invite_only && !invited ? COPY.inviteOnly : null,
-                course?.invite_only && invited ? COPY.invited : null
+                enrolled ? COPY.enrolled :
+                  course?.invite_only && !invited ? (user ? COPY.inviteOnly : COPY.inviteOnlyLoggedOut) : null,
               ]),
             ])
           ])
