@@ -14,13 +14,13 @@ import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
 
 const COPY = {
-  emailInput: "Your Email",
+  emailOrUsernameInput: "Your Email or Username",
   passwordInput: "Password",
   resetPassword: "Reset password",
   loginHeader: "Welcome Back!",
   createAccount: "Create a new account",
   wrongLogin: h('div', [
-    "That email and password don't match. ", h('br'), "You can ",
+    "Heck! The email or username didn't match the password. ", h('br'), "If you want, you can ",
     h(Link, { href: '/login?reset' }, h('a', 'reset your password here')),
     '.'
   ]),
@@ -29,7 +29,7 @@ const COPY = {
 
 const Login = () => {
   let router = useRouter()
-  let [formData, setFormData] = useState({ email: '', password: '' })
+  let [formData, setFormData] = useState({ emailOrUsername: '', password: '' })
   let redirect = router.query.redirect as string | null
   let { reset } = router.query
   let { data, mutate } = useUserData()
@@ -54,12 +54,12 @@ const Login = () => {
     h('h1', COPY.loginHeader),
     status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
     h(Label, [
-      COPY.emailInput,
+      COPY.emailOrUsernameInput,
       h(Input, {
-        type: 'email',
-        value: formData.email,
+        type: 'text',
+        value: formData.emailOrUsername,
         required: true,
-        onChange: (e) => setFormData({ ...formData, email: e.currentTarget.value })
+        onChange: (e) => setFormData({ ...formData, emailOrUsername: e.currentTarget.value })
       }),
     ]),
     h(Label, [

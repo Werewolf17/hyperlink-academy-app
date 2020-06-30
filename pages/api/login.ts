@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export type Msg = {
-  email: string
+  emailOrUsername: string
   password: string
 }
 
@@ -14,18 +14,18 @@ export type Result = ResultType<typeof handler>
 
 const handler = async (req: Request) => {
   let msg = req.body as Partial<Msg>
-  if(!msg.email || !msg.password) {
+  if(!msg.emailOrUsername || !msg.password) {
     return {
       status: 400 as const,
       result: "Invalid request, email or password missing" as const
     }
   }
 
-  let person = await validateLogin(msg.email, msg.password)
+  let person = await validateLogin(msg.emailOrUsername, msg.password)
   if(person) {
     let token = {
       username: person.username,
-      email:msg.email,
+      email:msg.emailOrUsername,
       id:person.id,
       display_name:person.display_name,
       bio: person.bio,
@@ -48,15 +48,18 @@ const handler = async (req: Request) => {
 
 export default APIHandler(handler)
 
-async function validateLogin(email: string, password: string){
+async function validateLogin(emailOrUsername: string, password: string){
   try {
-    let person = await prisma.people.findOne({
-      where:{email: email.toLowerCase()}, include: {admins: true}
+    let people = await prisma.people.findMany({
+      where:{OR: [
+        {email: emailOrUsername.toLowerCase()},
+        {username: emailOrUsername.toLowerCase()}
+      ]}, include: {admins: true}
     })
     await prisma.disconnect()
-    if(!person) return false
-    if(!await bcrypt.compare(password, person.password_hash)) return false
-    return person
+    if(!people[0]) return false
+    if(!await bcrypt.compare(password, people[0].password_hash)) return false
+    return people[0]
   } catch (e) {
     console.log(e)
     return false
