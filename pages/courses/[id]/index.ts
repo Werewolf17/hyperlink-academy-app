@@ -393,10 +393,11 @@ const Banners = (props:{draft: boolean, id: string, isMaintainer: boolean}) => {
     return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
       h(Box, {gap:16}, [
         h('h3', "This course isn't live yet!"),
-        h('p', `This course is currently hidden from public view. You can make edits and get set
-up. You can read `),
-        h(Link, {href: '/manual/courses'}, h('a', 'this section')),
-        h('p', ' in the manual for some tips and help getting started')
+        h('p',[
+          `This course is currently hidden from public view. You can make edits and get set
+up. You can read `,
+          h(Link, {href: '/manual/courses'}, h('a', 'this section')),
+          ' in the manual for some tips and help getting started'])
       ]),
       h(MarkCourseLive, {id: props.id})
     ]))
