@@ -64,9 +64,9 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
 
   let activeCohorts = course?.course_cohorts.filter(i => {
     if(!user) return false
-    return i.facilitator === user.id
+    return i.completed === null && (i.facilitator === user.id
       || i.people_in_cohorts
-      .find(p => p.people.id === (user ? user.id : undefined)) && i.completed === null
+        .find(p => p.people.id === (user ? user.id : undefined)))
   }) || []
 
   let pastCohorts = course.course_cohorts
