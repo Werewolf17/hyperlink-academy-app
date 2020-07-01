@@ -66,7 +66,7 @@ const Dashboard = (props:Props) => {
     h('hr'),
 
     // Courses you maintain
-    userCourses.maintaining_courses.length < 0 ? null :  h(Box, {}, [
+    userCourses.maintaining_courses.length === 0 ? null :  h(Box, {}, [
       h('h2', 'Courses you maintain'),
       h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.map(course=>{
         return h(CourseCard,{...course, start_date: ''})
