@@ -59,7 +59,6 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: user} = useUserData()
   let {data:userCohorts} = useUserCohorts()
   let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
-  let router = useRouter()
 
   if(!course) return h(PageLoader)
 
@@ -79,7 +78,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       return {...i, enrolled, facilitating}
     })
 
-  let enrolled = activeCohorts.filter(i=>i.facilitator !== user ? user.id : '')
+  let enrolled = activeCohorts.filter(i=>i.facilitator !== (user ? user.id : ''))
   let upcomingCohorts = course.course_cohorts.filter(c=> (new Date(c.start_date) > new Date()) && c.live)
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
