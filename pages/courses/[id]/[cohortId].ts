@@ -79,7 +79,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
       ]),
       h('div', {style: {gridColumn: 1}}, h(Tabs, {
           tabs: {
-            [COPY.artifactsTab]: props.artifacts ? h(Text, {source: props.artifacts?.text}) : null,
+            [COPY.artifactsTab]: props.artifacts.text ? h(Text, {source: props.artifacts.text}) : null,
             [COPY.detailsTab]: h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
                 isFacilitator ? h(COPY.updateNotes, {id: props.notes?.id}) : null,
@@ -297,7 +297,7 @@ export const getStaticProps = async (ctx:any)=>{
 
   let notes = await getTaggedPost(courseId + '/' + cohortId, 'note')
   let curriculum = await getTaggedPost(ctx.params.id, 'curriculum')
-  let artifacts = await getTaggedPost(ctx.params.id, 'artifact')
+  let artifacts = await getTaggedPost(ctx.params.id + '/' + cohortId, 'artifact')
   return {props: {notFound: false, id:cohortId, cohort, courseId, course, notes, curriculum, artifacts}, unstable_revalidate: 1} as const
 }
 
