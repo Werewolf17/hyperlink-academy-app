@@ -29,6 +29,7 @@ import { useStripe } from '@stripe/react-stripe-js'
 
 const COPY = {
   detailsTab: "Details",
+  artifactsTab: "Artifacts",
   curriculumTab: "Curriculum",
   backToCourse: 'back to the course',
   details: "Details",
@@ -78,6 +79,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
       ]),
       h('div', {style: {gridColumn: 1}}, h(Tabs, {
           tabs: {
+            [COPY.artifactsTab]: props.artifacts ? h(Text, {source: props.artifacts?.text}) : null,
             [COPY.detailsTab]: h(Box, {gap: 64}, [
               h(Box, {gap: 32},[
                 isFacilitator ? h(COPY.updateNotes, {id: props.notes?.id}) : null,
@@ -295,7 +297,8 @@ export const getStaticProps = async (ctx:any)=>{
 
   let notes = await getTaggedPost(courseId + '/' + cohortId, 'note')
   let curriculum = await getTaggedPost(ctx.params.id, 'curriculum')
-  return {props: {notFound: false, id:cohortId, cohort, courseId, course, notes, curriculum}, unstable_revalidate: 1} as const
+  let artifacts = await getTaggedPost(ctx.params.id, 'artifact')
+  return {props: {notFound: false, id:cohortId, cohort, courseId, course, notes, curriculum, artifacts}, unstable_revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
