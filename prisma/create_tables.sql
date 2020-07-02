@@ -40,6 +40,13 @@ CREATE TABLE IF NOT EXISTS courses (
     prerequisites text NOT NULL
 );
 
+CREATE TYPE template_types AS ENUM ('prepopulated', 'triggered')
+CREATE TABL IF NOT EXISTS course_templates (
+    course        text REFERENCES (courses(id) NOT NULL,
+    template      text NOT NULL,
+    id
+)
+
 CREATE TABLE IF NOT EXISTS course_maintainers (
     course        text REFERENCES courses(id) NOT NULL,
     maintainer    text REFERENCES people(id) NOT NULL,

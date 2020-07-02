@@ -19,14 +19,15 @@ import ErrorPage from '../../404'
 import { courseDataQuery } from '../../api/get/[...item]'
 import Text from '../../../components/Text'
 import {prettyDate} from '../../../src/utils'
-import {COPY as COURSECOPY} from './index'
 
 const COPY = {
     empty: "There are no upcoming cohorts for this course :(",
     header: "Join a Cohort",
     backToCourse: 'back to the course',
     subtitle: 'Pick a cohort with a start date that works for you. Be sure to check the notes underneath for specific meeting times and any tweaks to the curriculum.',
-    seeMore: "See more details"
+    seeMore: "See more details",
+  inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
+  invited: h('span.accentSuccess', "You're invited!"),
 }
 
 
@@ -62,8 +63,8 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
         //Course Details Panel
         h(Sidebar, [h(Enroll, {course}, [
             !course ? null : h('div.textSecondary', {style:{width:232}}, [
-                course.invite_only && !invited ? COURSECOPY.inviteOnly : null,
-                course.invite_only && invited ? COURSECOPY.invited : null
+                course.invite_only && !invited ? COPY.inviteOnly : null,
+                course.invite_only && invited ? COPY.invited : null
             ])
         ])]),
     ])
