@@ -1,15 +1,13 @@
 import h from 'react-hyperscript'
-import styled from '@emotion/styled'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { InferGetStaticPropsType } from 'next'
 
 import { Box, Seperator, TwoColumn, Sidebar } from '../../../components/Layout'
 import {Tabs} from '../../../components/Tabs'
 import { colors } from '../../../components/Tokens'
 import Loader, { PageLoader } from '../../../components/Loader'
-import { Input, Label, Error, Info, Select, Textarea} from '../../../components/Form'
+import { Info} from '../../../components/Form'
 import {Pill} from '../../../components/Pill'
 import Enroll from '../../../components/Course/Enroll'
 import Text from '../../../components/Text'
@@ -20,22 +18,18 @@ import { Primary, Destructive, Secondary} from '../../../components/Button'
 
 import { getTaggedPost } from '../../../src/discourse'
 import { useUserData, useUserCohorts, useCourseData, Course } from '../../../src/data'
-import { courseDataQuery, CheckUsernameResult } from '../../api/get/[...item]'
-import { CreateCohortMsg, CreateCohortResponse,
-         UpdateCourseMsg, UpdateCourseResponse,
-         InviteToCourseMsg, InviteToCourseResponse,
-         MarkCourseLiveMsg, MarkCourseLiveResponse} from '../../api/courses/[action]'
-import { callApi, useApi } from '../../../src/apiHelpers'
+import { courseDataQuery } from '../../api/get/[...item]'
+import { MarkCourseLiveMsg, MarkCourseLiveResponse} from '../../api/courses/[action]'
+import { callApi } from '../../../src/apiHelpers'
 import { cohortPrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
-import { useDebouncedEffect } from '../../../src/hooks'
 
-export const COPY = {
+const COPY = {
   courseForum: "Check out the course forum",
   curriculumTab: "Curriculum",
   cohortTab: "Past Cohorts",
   activeCohorts: "Your Current Cohorts",
-  settingsTab: "Settings",
+  settings: "You can edit course details, create new cohorts, and more.",
   inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
   inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested! If you've been invited, please log in."),
   invited: h('span.accentSuccess', "You're invited!"),
@@ -58,7 +52,7 @@ export default WrappedCoursePage
 const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let {data: user} = useUserData()
   let {data:userCohorts} = useUserCohorts()
-  let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
+  let {data: course} = useCourseData(props.id, props.course || undefined)
 
   if(!course) return h(PageLoader)
 
@@ -111,7 +105,6 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h(Text, {source: props.content.text})
         ]),
         [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
-        [COPY.settingsTab]: isMaintainer ? h(Settings, {course, mutate}) : null
       }}),
       h(Sidebar, [
         h(Enroll, {course}, [
@@ -129,6 +122,12 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
                 enrolled ? COPY.enrolled :
                   course?.invite_only && !invited ? (user ? COPY.inviteOnly : COPY.inviteOnlyLoggedOut) : null,
               ]),
+            ]),
+            h(Seperator),
+            h(Box, [
+              h('h3', "You maintain this course"),
+              h('p.textSecondary', COPY.settings),
+              h(Link, {href:'/courses/[id/settings', as:`/courses/${props.course.id}/settings`}, h(Destructive, 'Edit Course Settings'))
             ])
           ])
         ])]),
@@ -167,113 +166,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
     ])
   ])
 }
-
-const Settings = (props: {course:Course, mutate: (course:Course)=> any}) => {
-  return h(Box, {gap: 64}, [
-    h(Box, {style: {width:400}}, [
-      h('div', [
-        `To add a new maintainer or remove an cohort please email `,
-        h('a',{href:'mailto:contact@hyperlink.academy'}, 'contact@hyperlink.academy'),
-      ]),
-      h(Seperator),
-    ]),
-    props.course.invite_only ? h(InvitePerson, {id: props.course.id}) : null,
-    h(AddCohort),
-    h(EditDetails, props)
-  ])
-}
-
-//Features for invite only courses
-const InvitePerson = (props:{id: string})=> {
-  let [emailOrUsername, setEmailOrUsername] = useState('')
-  let [valid, setValid] = useState<null | boolean>(null)
-  let [formState, callInviteToCourse] = useApi<InviteToCourseMsg, InviteToCourseResponse>([emailOrUsername])
-
-  useDebouncedEffect(async ()=>{
-    if(emailOrUsername.includes('@') || emailOrUsername === '') return setValid(null)
-    let res = await callApi<null, CheckUsernameResult>('/api/get/username/'+emailOrUsername)
-    if(res.status===404) setValid(false)
-    else setValid(true)
-  }, 500, [emailOrUsername])
-  useEffect(()=>setValid(null),[emailOrUsername])
-
-  let onSubmit = async (e: React.FormEvent)=>{
-    e.preventDefault()
-    let x = emailOrUsername.includes('@') ? {email: emailOrUsername} : {username: emailOrUsername}
-    callInviteToCourse(`/api/courses/inviteToCourse`, {course:props.id, ...x})
-  }
-  return h('form', {onSubmit}, h(Box, {gap:32, width: 400}, [
-    h('h2', "Invite someone to this course"),
-    h(Label, [
-      "Username or Email",
-      h(Input, {
-        type: emailOrUsername.includes('@') ? 'email' : 'text',
-        required: true,
-        value: emailOrUsername,
-        onChange: e=> setEmailOrUsername(e.currentTarget.value)
-      }),
-      valid === null ? null :
-        valid ? h('span.accentSuccess', "Great, found @"+emailOrUsername): h('span.accentRed', "We can't find a user with that username")
-    ]),
-    h(Primary, {
-      style: {justifySelf: 'right'},
-      type: 'submit',
-      disabled: (!emailOrUsername.includes('@') && valid !== true)
-    }, formState === 'loading' ? h(Loader) : 'Invite'),
-  ]))
-}
-
 //feature to add a new cohort to a course
-const AddCohort = ()=> {
-  let [newCohort, setNewCohort] = useState({start: '', facilitator: ''})
-  let [status, callCreateCohort] = useApi<CreateCohortMsg, CreateCohortResponse>([newCohort])
-  let router = useRouter()
-  let {data:courseData, mutate} = useCourseData(router.query.id as string)
-
-  const onSubmit = async (e:React.FormEvent) => {
-    e.preventDefault()
-    if(!courseData) return
-    let res = await callCreateCohort('/api/courses/createCohort', {courseId: courseData.id, ...newCohort})
-    if(res.status === 200) mutate({
-        ...courseData,
-        course_cohorts: [...courseData.course_cohorts, {...res.result, people_in_cohorts:[], courses: {name: courseData.name}}]
-      })
-  }
-
-  return h('form', {onSubmit}, [
-    h(Box, {gap: 32, style: {width: 400}}, [
-      h('h2', 'Add a new Cohort'),
-      status === 'error' ? h(Error, 'An error occured') : null,
-      status === 'success' ? h(Info, 'Cohort created!') : null,
-      h(Label, [
-        h(Select, {
-          required: true,
-          onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facilitator: e.currentTarget.value})
-        }, [
-          h('option', {value: ''}, "Select a facilitator"),
-          ...(courseData?.course_maintainers.map(maintainer => {
-            return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
-          })||[])
-        ]),
-      ]),
-      h(Label, [
-        'Start Date',
-        h(Input, {
-          type: 'date',
-          required: true,
-          value: newCohort.start,
-          onChange: e => setNewCohort({...newCohort, start: e.currentTarget.value})
-        })
-      ]),
-      h(Primary, {
-        type: 'submit',
-        disabled: !newCohort.start || !newCohort.facilitator
-      }, status === 'loading' ? h(Loader) : 'Add a new Cohort'),
-      h(Seperator),
-    ])
-  ])
-}
-
 function MarkCourseLive(props: {id:string}) {
   let {data:course, mutate} = useCourseData(props.id)
   let [state, setState] = useState<'normal'|'confirm'|'loading'|'complete'>('normal')
@@ -313,81 +206,6 @@ function MarkCourseLive(props: {id:string}) {
 }
 
 // Feature to edit course detail (length, prereqs, one line description)
-const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
-  let [formData, setFormData] = useState({
-    name: props.course.name,
-    description: props.course.description,
-    prerequisites: props.course.prerequisites,
-    cost: props.course.cost,
-    duration: props.course.duration
-  })
-  let [status, callUpdateCourse] = useApi<UpdateCourseMsg, UpdateCourseResponse>([])
-
-  useEffect(()=>setFormData(props.course), [props])
-
-  let changed = props.course.duration !== formData.duration
-    || props.course.cost !== formData.cost
-    || props.course.prerequisites !== formData.prerequisites
-    || props.course.description !== formData.description
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    let res = await callUpdateCourse('/api/courses/updateCourse', {...formData, id:props.course.id})
-    if(res.status === 200) props.mutate({...props.course, ...res.result})
-  }
-
-  return h('form', {onSubmit}, [
-    h(Box, {gap:32, style:{width: 400}}, [
-      h('h3', 'Edit Course Details'),
-      h(Label, [
-        'Name',
-        h(Input, {
-          type: 'text',
-          value: formData.name,
-          onChange: e => setFormData({...formData, name: e.currentTarget.value})
-        })
-      ]),
-      h(Label, [
-        'Cost (USD)',
-        h(Input, {
-          type: 'number',
-          value: formData.cost,
-          onChange: e => setFormData({...formData, cost: parseInt(e.currentTarget.value)})
-        })
-      ]),
-      h(Label, [
-        'Description',
-        h(Textarea, {
-          value: formData.description,
-          onChange: e => setFormData({...formData, description: e.currentTarget.value})
-        })
-      ]),
-      h(Label, [
-        'Prerequisites',
-        h(Textarea, {
-          value: formData.prerequisites,
-          onChange: e => setFormData({...formData, prerequisites: e.currentTarget.value})
-        })
-      ]),
-      h(Label, [
-        'Duration',
-        h(Input, {
-          value: formData.duration,
-          onChange: e => setFormData({...formData, duration: e.currentTarget.value})
-        })
-      ]),
-      h(SubmitButtons, [
-        h(Destructive, {disabled: !changed, onClick: (e)=>{
-          e.preventDefault()
-          setFormData(props.course)
-        }}, "Discard Changes"),
-        h(Primary, {type: 'submit', disabled: !changed},
-          status === 'loading' ? h(Loader) : 'Save Changes')
-      ])
-    ])
-  ])
-}
-
 const Banners = (props:{draft: boolean, id: string, isMaintainer: boolean}) => {
   if(props.draft && props.isMaintainer) {
     return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
@@ -404,13 +222,6 @@ up. You can read `,
   }
   return null
 }
-
-const SubmitButtons = styled('div')`
-justify-self: right;
-display: grid;
-grid-template-columns: auto auto;
-grid-gap: 16px;
-`
 
 export const getStaticProps = async (ctx:any) => {
   let id = (ctx.params?.id || '' )as string
