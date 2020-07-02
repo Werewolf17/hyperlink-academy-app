@@ -66,6 +66,7 @@ export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
   let now = new Date()
   let status: "Completed" | "Upcoming" | "Ongoing" = "Upcoming"
   if(now > new Date(props.start_date)) status = "Ongoing"
+  if(props.completed) status = "Completed"
 
   return h(Link, {
     href: "/courses/[id]/[cohortId]",
