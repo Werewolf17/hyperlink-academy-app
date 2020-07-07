@@ -124,7 +124,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
               ]),
             ]),
             h(Seperator),
-            h(Box, [
+            !isMaintainer ? null : h(Box, [
               h('h3', "You maintain this course"),
               h('p.textSecondary', COPY.settings),
               h(Link, {href:'/courses/[id/settings', as:`/courses/${props.course.id}/settings`}, h(Destructive, 'Edit Course Settings'))
