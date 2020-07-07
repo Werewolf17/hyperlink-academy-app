@@ -43,6 +43,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
 
     let cohorts = (props.cohorts || [])
             .filter(cohort=>{
+                if(cohort.completed) return false
                 if(userCohorts?.course_cohorts.find(i=> i.id ===cohort.id)) return false
                 return true
             })
