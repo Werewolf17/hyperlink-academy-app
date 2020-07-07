@@ -25,7 +25,7 @@ const handler = async (req: Request) => {
   if(person) {
     let token = {
       username: person.username,
-      email:msg.emailOrUsername,
+      email:person.email,
       id:person.id,
       display_name:person.display_name,
       bio: person.bio,
