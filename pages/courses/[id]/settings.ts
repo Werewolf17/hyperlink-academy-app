@@ -6,7 +6,7 @@ import { CreateCohortResponse, CreateCohortMsg, UpdateCourseMsg, UpdateCourseRes
 import { courseDataQuery, CheckUsernameResult } from '../../api/get/[...item]'
 import ErrorPage from '../../404'
 import { InferGetStaticPropsType } from 'next'
-import { Course, useCourseData } from '../../../src/data'
+import { Course, useCourseData, useUserData } from '../../../src/data'
 import Loader, { PageLoader } from '../../../components/Loader'
 import { Box, Seperator } from '../../../components/Layout'
 import { Info, Error, Label, Select, Input, Textarea } from '../../../components/Form'
@@ -28,8 +28,18 @@ type Props = InferGetStaticPropsType<typeof getStaticProps>
 const WrappedCourseSettingsPage = (props: Props)=>props.notFound ? h(ErrorPage) : h(CourseSettings, props)
 function CourseSettings(props:Extract<Props, {notFound:false}>){
   let {data: course, mutate} = useCourseData(props.id, props.course || undefined)
+  let {data: user} = useUserData()
   let router = useRouter()
-  if(!course) return h(PageLoader)
+
+  useEffect(()=>{
+    if(user === undefined) return
+    if(course) {
+      let isMaintainer = !!(course.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
+      if(!isMaintainer) router.push('/')
+    }
+  }, [user, course])
+  if(!course || !user) return h(PageLoader)
+
 
   return h(Box, {gap:64, width: 640}, [
     h(Box, {gap: 16}, [
