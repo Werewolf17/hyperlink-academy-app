@@ -41,9 +41,9 @@ type Cohort = {
 }
 export const SmallCohortCard = (props: Cohort) => {
   return h(Link, {
-    href: "/courses/[id]/[cohortId]",
+    href: "/courses/[id]/cohorts/[cohortId]",
     passHref: true,
-    as:`/courses/${props.course}/${props.id}`
+    as:`/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)}`
   }, [
     h(Card, {style:{border: '1px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 8}, [
@@ -69,9 +69,9 @@ export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
   if(props.completed) status = "Completed"
 
   return h(Link, {
-    href: "/courses/[id]/[cohortId]",
+    href: "/courses/[id]/cohorts/[cohortId]",
     passHref: true,
-    as:`/courses/${props.course}/${props.id}`
+    as:`/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)}`
   }, [
     h(Card, {style:{border: '2px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 32}, [

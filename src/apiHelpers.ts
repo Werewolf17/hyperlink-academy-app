@@ -16,9 +16,24 @@ type Result = {
   }
 }
 
-export const APIHandler = (handler: Handler) => {
+type Methods = "POST" | "GET" | "PUT" | "DELETE"
+
+export const APIHandler = (handler: Handler | Partial<{POST: Handler, GET: Handler, PUT: Handler, DELETE: Handler}>) => {
   return async (req:NextApiRequest, res: NextApiResponse) => {
-    let result = await handler(req)
+    let result
+    if(typeof handler === 'object') {
+      let method = req.method as Methods
+      let methodHandler = handler[method]
+      if(!methodHandler) {
+        res.status(404).end()
+        return
+      }
+      result = await methodHandler(req)
+    }
+    else {
+      result = await handler(req)
+    }
+
     if(result.headers) {
       for(let header of Object.keys(result.headers)) {
         res.setHeader(header, result.headers[header])

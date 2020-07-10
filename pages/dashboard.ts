@@ -10,11 +10,11 @@ import {colors} from '../components/Tokens'
 import { Box} from '../components/Layout'
 // import { AccentImg } from '../components/Images'
 import { useUserCohorts, useUserData, useCourses, useUserCourses } from '../src/data'
-import { coursesQuery } from './api/get/[...item]'
 import { BigCohortCard } from '../components/Card'
 import {COPY} from './index'
 import { useEffect } from 'react'
 import { PageLoader } from '../components/Loader'
+import { coursesQuery } from './api/courses'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Dashboard = (props:Props) => {

@@ -5,12 +5,12 @@ import { InferGetStaticPropsType } from 'next'
 import { Error } from '../../components/Form'
 import Loader from '../../components/Loader'
 import { Box } from '../../components/Layout'
-import {profileDataQuery} from '../api/get/[...item]'
 
 import { useProfileData } from '../../src/data'
 import { colors } from '../../components/Tokens'
 import ErrorPage from '../404'
 import Text from '../../components/Text'
+import { profileDataQuery } from '../api/people/[id]'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
