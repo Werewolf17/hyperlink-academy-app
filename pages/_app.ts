@@ -4,7 +4,7 @@ import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js'
 import Layout from '../components/Layout';
 
-const stripePromise = loadStripe('pk_test_LOqCqstM6XCEHlA3kVEqBBqq006vmeRRkS');
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
 
 type Props = {
   Component: any,
