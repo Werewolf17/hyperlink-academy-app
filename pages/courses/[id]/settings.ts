@@ -2,8 +2,7 @@ import h from 'react-hyperscript'
 import { Tabs } from '../../../components/Tabs'
 import { useState, useEffect } from 'react'
 import { useApi, callApi } from '../../../src/apiHelpers'
-import { CreateCohortResponse, CreateCohortMsg, UpdateCourseMsg, UpdateCourseResponse, InviteToCourseMsg, InviteToCourseResponse } from '../../api/courses/[action]'
-import { courseDataQuery, CheckUsernameResult } from '../../api/get/[...item]'
+import { CheckUsernameResult } from '../../api/get/[...item]'
 import ErrorPage from '../../404'
 import { InferGetStaticPropsType } from 'next'
 import { Course, useCourseData, useUserData } from '../../../src/data'
@@ -16,6 +15,9 @@ import { useDebouncedEffect } from '../../../src/hooks'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Checkmark } from '../../../components/Icons'
+import { courseDataQuery, UpdateCourseMsg, UpdateCourseResponse } from '../../api/courses/[id]'
+import { CreateCohortMsg, CreateCohortResponse } from '../../api/courses/[id]/cohorts'
+import { InviteToCourseMsg, InviteToCourseResponse } from '../../api/courses/[id]/invite'
 
 const COPY = {
   backToCourse: 'back to the course',
@@ -78,7 +80,7 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    let res = await callCreateCohort('/api/courses/createCohort', {courseId: props.course.id, ...newCohort})
+    let res = await callCreateCohort(`/api/courses/${props.course.id}/cohorts`, {courseId: props.course.id, ...newCohort})
     if(res.status === 200) props.mutate({
         ...props.course,
         course_cohorts: [...props.course.course_cohorts, {...res.result, people_in_cohorts:[], courses: {name: props.course.name}}]
@@ -150,7 +152,7 @@ const InvitePerson = (props:{id: string})=> {
   let onSubmit = async (e: React.FormEvent)=>{
     e.preventDefault()
     let x = emailOrUsername.includes('@') ? {email: emailOrUsername} : {username: emailOrUsername}
-    callInviteToCourse(`/api/courses/inviteToCourse`, {course:props.id, ...x})
+    callInviteToCourse(`/api/courses/${props.id}/invite`, {...x})
   }
   return h('form', {onSubmit}, h(Box, {gap:32, width: 400}, [
     h('h2', "Invite someone to this course"),
@@ -192,7 +194,7 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    let res = await callUpdateCourse('/api/courses/updateCourse', {...formData, id:props.course.id})
+    let res = await callUpdateCourse(`/api/courses/${props.course.id}`, {...formData})
     if(res.status === 200) props.mutate({...props.course, ...res.result})
   }
 

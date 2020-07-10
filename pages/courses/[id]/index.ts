@@ -18,11 +18,11 @@ import { Primary, Destructive, Secondary} from '../../../components/Button'
 
 import { getTaggedPost } from '../../../src/discourse'
 import { useUserData, useUserCohorts, useCourseData, Course } from '../../../src/data'
-import { courseDataQuery } from '../../api/get/[...item]'
-import { MarkCourseLiveMsg, MarkCourseLiveResponse} from '../../api/courses/[action]'
+import { UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[id]'
 import { callApi } from '../../../src/apiHelpers'
 import { cohortPrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
+import { courseDataQuery } from '../../api/courses/[id]'
 
 const COPY = {
   courseForum: "Check out the course forum",
@@ -109,7 +109,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       h(Sidebar, [
         h(Enroll, {course}, [
           h(Box, {gap: 8}, [
-            h(Link, {href: '/courses/[id]/enroll', as:`/courses/${props.course?.id}/enroll` }, [
+            h(Link, {href: '/courses/[id]/cohorts', as:`/courses/${props.course?.id}/cohorts` }, [
               h('a', [
                 h(Primary, {
                   disabled: upcomingCohorts.length === 0 || (course.invite_only && !invited)
@@ -156,8 +156,8 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
         props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
       ]),
       h('h3', {}, h(Link, {
-        href:'/courses/[id]/[cohortId]',
-        as:  `/courses/${props.cohort.course}/${props.cohort.id}`
+        href:'/courses/[id]/cohorts/[cohortId]',
+        as:  `/courses/${props.cohort.course}/cohorts/${id}`
       }, h('a', {style: {textDecoration: 'none'}}, `#${id} ${props.cohort.courses.name}`))),
     ]),
     h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
@@ -175,7 +175,7 @@ function MarkCourseLive(props: {id:string}) {
     e.preventDefault()
     if(!course) return
     setState('loading')
-    let res = await callApi<MarkCourseLiveMsg, MarkCourseLiveResponse>('/api/courses/markCourseLive', {id: props.id})
+    let res = await callApi<UpdateCourseMsg, UpdateCourseResponse>(`/api/courses/${props.id}`, {status: 'live'})
     if(res.status===200){
       setState('normal')
       mutate({...course, status: 'live'})

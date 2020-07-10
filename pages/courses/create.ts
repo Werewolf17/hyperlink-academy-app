@@ -7,9 +7,10 @@ import { Primary } from '../../components/Button'
 import Loader from '../../components/Loader'
 
 import { useApi } from '../../src/apiHelpers'
-import { CreateCourseMsg, CreateCourseResponse } from '../api/courses/[action]'
 import { useUserData } from '../../src/data'
 import { Box } from '../../components/Layout'
+import { CreateCourseMsg } from '../api/courses'
+import { CreateCohortResponse } from '../api/courses/[id]/cohorts'
 
 const CreateCourse = ()=> {
   let {data: user} = useUserData()
@@ -24,14 +25,14 @@ const CreateCourse = ()=> {
     maintainers: [] as string[]
   })
 
-  let [status, callCreateCourse] = useApi<CreateCourseMsg, CreateCourseResponse>([formData])
+  let [status, callCreateCourse] = useApi<CreateCourseMsg, CreateCohortResponse>([formData])
 
   if(user === false) router.push('/')
   if(user &&  user.admin === false) router.push('/dashboard')
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    await callCreateCourse('/api/courses/createCourse', {...formData})
+    await callCreateCourse('/api/courses', {...formData})
   }
 
   return h('div', [

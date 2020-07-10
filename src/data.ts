@@ -1,6 +1,10 @@
 import useSWR from 'swr'
 import {callApi, Success} from './apiHelpers'
-import { CourseResult, CohortResult, UserCohortsResult, WhoAmIResult, CourseDataResult, ProfileResult, UserCoursesResult} from '../pages/api/get/[...item]'
+import { UserCohortsResult, WhoAmIResult, UserCoursesResult} from '../pages/api/get/[...item]'
+import { CohortResult } from '../pages/api/courses/[id]/cohorts/[cohortId]'
+import { CourseDataResult } from '../pages/api/courses/[id]'
+import { ProfileResult } from '../pages/api/people/[id]'
+import { CourseResult } from '../pages/api/courses'
 export const useUserData = ()=>{
   return useSWR('/api/get/whoami', async (api) => {
     let res = await callApi<null, WhoAmIResult>(api)
@@ -9,7 +13,7 @@ export const useUserData = ()=>{
 }
 
 export const useProfileData = (username:string, initialData?:Success<ProfileResult>)=>{
-  return useSWR('/api/get/profile/'+username, async api =>{
+  return useSWR('/api/people/'+username, async api =>{
     let res = await callApi<null, ProfileResult>(api)
     if(res.status===200) return res.result
     else return false
@@ -18,14 +22,15 @@ export const useProfileData = (username:string, initialData?:Success<ProfileResu
 
 export type Course = Success<CourseDataResult>
 export const useCourseData = (id: string, initialData?:Success<CourseDataResult>) => {
-  return useSWR('/api/get/course/' + id, async api => {
+  return useSWR('/api/courses/' + id, async api => {
     let res = await callApi<null, CourseDataResult>(api)
     if(res.status === 200) return res.result
   }, {initialData})
 }
 
-export const useCohortData = (id: string, initialData?:Success<CohortResult>) => {
-  return useSWR('/api/get/cohort/' + id, async api => {
+export type Cohort = Success<CohortResult>
+export const useCohortData = (course:string, cohort: string, initialData?:Success<CohortResult>) => {
+  return useSWR(`/api/courses/${course}/cohorts/${cohort}`, async api => {
     let res = await callApi<null, CohortResult>(api)
     if(res.status === 200) return res.result
     else return false
@@ -47,7 +52,7 @@ export const useUserCourses = ()=>{
 }
 
 export const useCourses = (initialData?:Success<CourseResult>) => {
-  return useSWR('/api/get/courses', async (api) => {
+  return useSWR('/api/courses', async (api) => {
     let res = await callApi<null, CourseResult>(api)
     return res.result
   }, {initialData})

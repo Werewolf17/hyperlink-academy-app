@@ -9,9 +9,9 @@ import { Primary, Destructive} from '../components/Button'
 import Loader from '../components/Loader'
 import { colors } from '../components/Tokens'
 
-import {Msg, Result} from './api/updatePerson'
 import { useUserData } from '../src/data'
 import { useApi } from '../src/apiHelpers'
+import { UpdatePersonMsg, UpdatePersonResult } from './api/people/[id]'
 
 const COPY = {
   header: "Your Settings",
@@ -33,7 +33,7 @@ const Settings = () => {
     display_name: '',
     link: ''
   })
-  let [status, callUpdatePerson] = useApi<Msg, Result>([])
+  let [status, callUpdatePerson] = useApi<UpdatePersonMsg, UpdatePersonResult>([])
 
   useEffect(()=> {
     if(user) setFormData({bio:user.bio || '', display_name:user.display_name || '', link: user.link || ''})
@@ -51,7 +51,8 @@ const Settings = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if(!changed) return
-    let res = await callUpdatePerson('/api/updatePerson', {profile:formData})
+    if(!user) return
+    let res = await callUpdatePerson(`/api/people/${user.username}`, {profile:formData})
     if(res.status === 200) {
       if(user) mutate({...user, ...formData})
     }

@@ -1,12 +1,10 @@
-import {APIHandler, ResultType, Request} from '../../src/apiHelpers'
-import {setTokenHeader, getToken} from '../../src/token'
-import {syncSSO} from '../../src/discourse'
-import { PrismaClient, people} from '@prisma/client'
+import { APIHandler, Request, ResultType } from "../../../src/apiHelpers";
+import {setTokenHeader, getToken} from '../../../src/token'
+import {syncSSO} from '../../../src/discourse'
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
-
-export type Msg = {
+export type UpdatePersonMsg = {
   profile?: {
     display_name?: string,
     link?: string,
@@ -18,10 +16,13 @@ export type Msg = {
   },
 }
 
-export type Result = ResultType<typeof handler>
+export type UpdatePersonResult = ResultType<typeof updatePerson>
+export type ProfileResult = ResultType<typeof getProfileData>
 
-const handler = async (req: Request) => {
-  let body = req.body as Partial<Msg>
+export default APIHandler({POST: updatePerson, GET: getProfileData})
+
+async function updatePerson(req: Request) {
+  let body = req.body as Partial<UpdatePersonMsg>
   let user = getToken(req)
   if(!user) {
     return {
@@ -42,7 +43,10 @@ const handler = async (req: Request) => {
 
   if(body.profile) {
     let data = {display_name: body.profile.display_name, link: body.profile.link, bio: body.profile.bio}
-    let newData = await updatePerson(user.id, data)
+    let newData = await prisma.people.update({
+      where:{id: user.id},
+      data
+    })
     setHeaders = setTokenHeader({...user, display_name:newData.display_name, link: newData.link, bio: newData.bio})
     await syncSSO({
       external_id: user.id,
@@ -53,7 +57,6 @@ const handler = async (req: Request) => {
     })
   }
 
-
   return {
     status: 200,
     result: '',
@@ -62,14 +65,6 @@ const handler = async (req: Request) => {
 }
 
 
-export default APIHandler(handler)
-
-async function updatePerson(id:string, data: Partial<people>) {
-  return await prisma.people.update({
-    where:{id},
-    data
-  })
-}
 
 async function validateLogin(email: string, password: string):Promise<boolean> {
   try {
@@ -84,4 +79,24 @@ async function validateLogin(email: string, password: string):Promise<boolean> {
 async function updatePassword(email: string, newPassword: string) {
   let password_hash= await bcrypt.hash(newPassword, await bcrypt.genSalt())
   await prisma.people.update({where:{email}, data:{password_hash}})
+}
+let prisma = new PrismaClient()
+
+export const profileDataQuery = (username: string)=>{
+  return prisma.people.findOne({
+    where: {username: username.toLowerCase()},
+    select: {
+      display_name: true,
+      bio: true,
+      link: true,
+    }
+  })
+}
+
+async function getProfileData(req:Request) {
+  let username = req.query.item[1]
+  if(!username) return {status: 400, result: 'ERROR: no user id provided'} as const
+  let data = await profileDataQuery(username)
+  if(!data) return {status: 404, result: `Error: no user with id ${username} found`} as const
+  return {status: 200, result: data} as const
 }

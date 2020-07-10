@@ -63,6 +63,14 @@ model courses {
   course_cohorts     course_cohorts[]
   course_invites     course_invites[]
   course_maintainers course_maintainers[]
+  course_templates   course_templates[]
+}
+
+model course_templates {
+  content String
+  course  String
+  id      String  @id
+  courses courses @relation(fields: [course], references: [id])
 }
 
 model password_reset_keys {

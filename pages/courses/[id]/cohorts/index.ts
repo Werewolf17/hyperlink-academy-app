@@ -3,22 +3,22 @@ import { useRouter } from 'next/router'
 import {InferGetStaticPropsType} from 'next'
 import Link from 'next/link'
 
-import { Box, TwoColumn, Sidebar, Seperator } from '../../../components/Layout'
-import Enroll from '../../../components/Course/Enroll'
+import { Box, TwoColumn, Sidebar, Seperator } from '../../../../components/Layout'
+import Enroll from '../../../../components/Course/Enroll'
 
-import { Primary } from '../../../components/Button'
-import { useCourseData, useUserData, useUserCohorts } from '../../../src/data'
+import { Primary } from '../../../../components/Button'
+import { useCourseData, useUserData, useUserCohorts } from '../../../../src/data'
 import { PrismaClient } from '@prisma/client'
-import { getTaggedPost } from '../../../src/discourse'
+import { getTaggedPost } from '../../../../src/discourse'
 import { useStripe } from '@stripe/react-stripe-js'
-import { useApi } from '../../../src/apiHelpers'
-import { EnrollMsg, EnrollResponse } from '../../api/courses/[action]'
-import Loader from '../../../components/Loader'
-import { Info } from '../../../components/Form'
-import ErrorPage from '../../404'
-import { courseDataQuery } from '../../api/get/[...item]'
-import Text from '../../../components/Text'
-import {prettyDate} from '../../../src/utils'
+import { useApi } from '../../../../src/apiHelpers'
+import { EnrollResponse } from '../../../api/courses/[id]/cohorts/[cohortId]/enroll'
+import Loader from '../../../../components/Loader'
+import { Info } from '../../../../components/Form'
+import ErrorPage from '../../../404'
+import Text from '../../../../components/Text'
+import {prettyDate} from '../../../../src/utils'
+import { courseDataQuery } from '../../../api/courses/[id]'
 
 const COPY = {
     empty: "There are no upcoming cohorts for this course :(",
@@ -83,7 +83,7 @@ let Cohort = (props: {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
-    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], async (res) => {
+    let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res) => {
         if(res.zeroCost) await router.push('/courses/[id]/[cohortId]?welcome', `/courses/${props.course}/${props.id}?welcome`)
         else stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
@@ -93,7 +93,7 @@ let Cohort = (props: {
         if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
         if(!props.id) return
         if(!stripe) return
-        await callEnroll('/api/courses/enroll', {cohortId: props.id})
+        await callEnroll(`/api/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)}`)
     }
 
     return h(Box, {gap:32},[

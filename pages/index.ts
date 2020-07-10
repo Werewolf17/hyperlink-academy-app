@@ -12,12 +12,12 @@ import { Primary, Secondary } from '../components/Button'
 import { Label, Input } from '../components/Form'
 // import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
-import { coursesQuery } from './api/get/[...item]'
 import {getToken} from '../src/token'
 import { useApi } from '../src/apiHelpers'
 import { NewsletterSignupMsg, NewsletterSignupResponse } from './api/signup/[action]'
 import Loader from '../components/Loader'
 import { Checkmark } from '../components/Icons'
+import { coursesQuery } from './api/courses'
 
 export let COPY = {
   hyperlinkTagline: "Hyperlink is a course platform and online school built for seriously effective learning.",

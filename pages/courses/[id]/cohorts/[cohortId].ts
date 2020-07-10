@@ -6,26 +6,27 @@ import Link from 'next/link'
 import {useState} from 'react'
 import { InferGetStaticPropsType } from 'next'
 
-import Enroll from '../../../components/Course/Enroll'
-import { TwoColumn, Box, Seperator, Sidebar} from '../../../components/Layout'
-import { Tabs } from '../../../components/Tabs'
-import { Pill } from '../../../components/Pill'
-import { Primary, Destructive, Secondary} from '../../../components/Button'
-import Loader, { PageLoader } from '../../../components/Loader'
-import { Info } from '../../../components/Form'
-import { Modal } from '../../../components/Modal'
-import {TwoColumnBanner} from '../../../components/Banner'
-import Text from '../../../components/Text'
+import Enroll from '../../../../components/Course/Enroll'
+import { TwoColumn, Box, Seperator, Sidebar} from '../../../../components/Layout'
+import { Tabs } from '../../../../components/Tabs'
+import { Pill } from '../../../../components/Pill'
+import { Primary, Destructive, Secondary} from '../../../../components/Button'
+import Loader, { PageLoader } from '../../../../components/Loader'
+import { Info } from '../../../../components/Form'
+import { Modal } from '../../../../components/Modal'
+import {TwoColumnBanner} from '../../../../components/Banner'
+import Text from '../../../../components/Text'
 
-import {prettyDate} from '../../../src/utils'
-import { getTaggedPost } from '../../../src/discourse'
-import { callApi, useApi } from '../../../src/apiHelpers'
-import { cohortDataQuery, courseDataQuery } from '../../api/get/[...item]'
-import { CompleteCohortMsg, CompleteCohortResponse, EnrollMsg, EnrollResponse, UpdateCohortMsg, UpdateCohortResponse } from '../../api/courses/[action]'
-import { useCohortData, useUserData, useCourseData } from '../../../src/data'
-import { cohortPrettyDate } from '../../../components/Card'
-import ErrorPage from '../../404'
+import {prettyDate} from '../../../../src/utils'
+import { getTaggedPost } from '../../../../src/discourse'
+import { callApi, useApi } from '../../../../src/apiHelpers'
+import { useCohortData, useUserData, useCourseData, Cohort } from '../../../../src/data'
+import { cohortPrettyDate } from '../../../../components/Card'
+import ErrorPage from '../../../404'
 import { useStripe } from '@stripe/react-stripe-js'
+import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from '../../../api/courses/[id]/cohorts/[cohortId]'
+import { courseDataQuery } from '../../../api/courses/[id]'
+import { EnrollResponse } from '../../../api/courses/[id]/cohorts/[cohortId]/enroll'
 
 const COPY = {
   detailsTab: "Details",
@@ -47,7 +48,7 @@ export default WrappedCohortPage
 const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let router = useRouter()
   let {data: user} = useUserData()
-  let {data: cohort} = useCohortData(props.id, props.cohort)
+  let {data: cohort, mutate} = useCohortData(props.courseId, props.cohortNum, props.cohort)
   let {data: course} = useCourseData(props.courseId, props.course)
   if(!cohort) return h(PageLoader)
 
@@ -57,7 +58,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
 
   return h('div', {}, [
     h(WelcomeModal, {display:router.query.welcome !== undefined, cohort}),
-    h(Banners, {...cohort, enrolled: !!inCohort, facilitating: isFacilitator}),
+    h(Banners, {cohort, mutate, enrolled: !!inCohort, facilitating: isFacilitator}),
     h(TwoColumn, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
@@ -74,7 +75,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
         !inCohort && !isFacilitator ? null : h(Box, [
           h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.id}/${cohort.id}`}
             , h(Primary, 'Go to the forum')),
-          !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {id:props.id}) : null,
+          !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {cohort, mutate}) : null,
         ]),
       ]),
       h('div', {style: {gridColumn: 1}}, h(Tabs, {
@@ -111,7 +112,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           }
       })),
       inCohort || isFacilitator ? null
-        : h(Sidebar, {} ,h(Enroll, {course}, h(EnrollInCohort, {id: props.id, course: props.courseId})))
+        : h(Sidebar, {} ,h(Enroll, {course}, h(EnrollInCohort, {id: props.cohortNum, course: props.courseId})))
     ])
   ])
 }
@@ -126,8 +127,8 @@ const EnrollInCohort = (props:{id:string, course: string}) => {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
-    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], async (res)=>{
-        if(res.zeroCost) await router.push('/courses/[id]/[cohortId]', `/courses/${props.course}/${props.id}?welcome`)
+    let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res)=>{
+        if(res.zeroCost) await router.push('/courses/[id]/cohorts/[cohortId]', `/courses/${props.course}/${props.id}?welcome`)
         else await stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
@@ -136,14 +137,13 @@ const EnrollInCohort = (props:{id:string, course: string}) => {
     if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
     if(!props.id) return
     if(!stripe) return
-    await callEnroll('/api/courses/enroll', {cohortId: props.id})
+    await callEnroll('/api/courses/${props.course}/cohorts/${props.id}/enroll')
   }
 
   return  h(Primary, {onClick}, status === 'loading' ? h(Loader) : ' Join this Cohort')
 }
 
-const MarkCohortLive = (props:{id: string})=> {
-  let {data: cohort, mutate} = useCohortData(props.id)
+const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
 
   if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
@@ -159,10 +159,9 @@ const MarkCohortLive = (props:{id: string})=> {
         h(Box, {gap: 16, style: {textAlign: 'right'}}, [
           h(Primary, {onClick: async e => {
             e.preventDefault()
-            if(!cohort) return
             setState('loading')
-            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>('/api/courses/updateCohort', {cohortId:cohort.id, data: {live: true}})
-            if(res.status === 200) mutate({...cohort, live: res.result.live})
+            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/courses/${props.cohort.courses.id}/cohorts/${props.cohort.id.split('-').slice(-1)}`, {data: {live: true}})
+            if(res.status === 200) props.mutate({...props.cohort, live: res.result.live})
             setState('complete')
           }}, state === 'loading' ? h(Loader) : 'Go Live'),
           h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
@@ -177,9 +176,9 @@ const MarkCohortLive = (props:{id: string})=> {
   }}, 'Go Live!')
 }
 
-const MarkCohortComplete = (props:{id: string})=> {
-  let {data: cohort, mutate} = useCohortData(props.id)
+const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
+  let cohortId = props.cohort.id.split('-').slice(-1)
 
   if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
     h(Box, {gap: 32}, [
@@ -193,10 +192,9 @@ const MarkCohortComplete = (props:{id: string})=> {
         h(Box, {gap: 16, style: {textAlign: "right"}}, [
           h(Primary, {onClick: async e => {
             e.preventDefault()
-            if(!cohort) return
             setState('loading')
-            let res = await callApi<CompleteCohortMsg, CompleteCohortResponse>('/api/courses/completeCohort', {cohortId:cohort.id})
-            if(res.status === 200) mutate({...cohort, completed: res.result.completed})
+            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/courses/${props.cohort.courses.id}/cohorts/${cohortId}`, {data:{completed:true}})
+            if(res.status === 200) props.mutate({...props.cohort, completed: res.result.completed})
             setState('complete')
           }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
           h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
@@ -224,37 +222,34 @@ you'll be doing on your first day`),
         href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
       }, h(Primary, "Get started")),
       h(Link, {
-        href:'/courses/[id]/[cohortId]',
-        as: `/courses/${props.cohort.courses.id}/${props.cohort.id}`
+        href:'/courses/[id]/cohorts/[cohortId]',
+        as: `/courses/${props.cohort.courses.id}/cohorts/${props.cohort.id.split('-').slice(-1)}`
       }, h('a', 'Back to the cohort page'))
     ])
   ])
 }
 
 const Banners = (props:{
-  completed:string | null,
+  cohort: Cohort
+  mutate: (c:Cohort)=>void
   facilitating?: boolean,
   enrolled?: boolean,
-  start_date: string,
-  live: boolean,
-  id: string,
-  courses:{id: string}
 })=>{
-  let isStarted = (new Date(props.start_date)).getTime() - (new Date()).getTime()
-  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.courses.id}/${props.id}`
+  let isStarted = (new Date(props.cohort.start_date)).getTime() - (new Date()).getTime()
+  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
 
-  if(props.facilitating && !props.live) return h(TwoColumnBanner, {red: true}, h(Box, {gap:16}, [
+  if(props.facilitating && !props.cohort.live) return h(TwoColumnBanner, {red: true}, h(Box, {gap:16}, [
     h(Box, {gap: 8, className: "textSecondary"}, [
       h('h4', `This cohort isn't live yet!`),
       h('p', `This cohort is hidden from public view. You can make edits to the cohort forum and the topics within.`),
       h('p', `When you're ready click the button below to put the cohort live on the site`),
     ]),
-    h(MarkCohortLive, {id: props.id})
+    h(MarkCohortLive, {cohort:props.cohort, mutate: props.mutate})
   ]))
 
-  if(props.completed)  return h(TwoColumnBanner, [
+  if(props.cohort.completed)  return h(TwoColumnBanner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
-      h('h4', `You completed this course on ${prettyDate(props.completed || '')}!`),
+      h('h4', `You completed this course on ${prettyDate(props.cohort.completed || '')}!`),
       h('p', [`This cohort's `, h('a', {href: forum}, 'private forum'), ` will always be open! Feel free to come back whenever`])
     ])
   ])
@@ -287,8 +282,10 @@ const Banners = (props:{
 }
 
 export const getStaticProps = async (ctx:any)=>{
-  let cohortId = (ctx.params?.cohortId || '' )as string
+  let cohortNum = (ctx.params?.cohortId || '' )as string
   let courseId = (ctx.params?.id || '' )as string
+
+  let cohortId = courseId + '-' + cohortNum
 
   let cohort = await cohortDataQuery(cohortId)
   let course = await courseDataQuery(courseId)
@@ -298,7 +295,7 @@ export const getStaticProps = async (ctx:any)=>{
   let notes = await getTaggedPost(courseId + '/' + cohortId, 'note')
   let curriculum = await getTaggedPost(ctx.params.id, 'curriculum')
   let artifacts = await getTaggedPost(ctx.params.id + '/' + cohortId, 'artifact')
-  return {props: {notFound: false, id:cohortId, cohort, courseId, course, notes, curriculum, artifacts}, unstable_revalidate: 1} as const
+  return {props: {notFound: false, cohortNum, cohort, courseId, course, notes, curriculum, artifacts}, unstable_revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
