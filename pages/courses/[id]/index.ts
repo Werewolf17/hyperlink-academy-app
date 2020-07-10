@@ -112,7 +112,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             h(Link, {href: '/courses/[id]/enroll', as:`/courses/${props.course?.id}/enroll` }, [
               h('a', [
                 h(Primary, {
-                  disabled: !invited
+                  disabled: upcomingCohorts.length === 0 || (course.invite_only && !invited)
                 }, COPY.enrollButton),
               ])
             ]),
