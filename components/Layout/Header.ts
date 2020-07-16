@@ -28,6 +28,7 @@ export default () => {
     h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
     mobile ? h(MobileMenu, {user, mutateUser}) : h(Container, {}, [
       h(FeedbackModal),
+      h(Link, {href: "/blog"}, h(NavLink, 'blog')),
       h(Seperator),
       h(LoginButtons, {user, mutateUser})
     ]),
@@ -50,6 +51,8 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
     h(Box, {gap: 16, style: {textAlign: 'right'}}, [
       h(LoginButtons, props),
     ]),
+    h(Seperator),
+    h(Link, {href: "/blog"}, h(NavLink, {style:{justifySelf: 'right'}}, 'blog')),
     h(Seperator),
     h(Feedback)
   ]))
