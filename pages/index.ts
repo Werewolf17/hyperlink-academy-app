@@ -2,21 +2,17 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/router'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import Intro from '../writing/Intro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import { colors, Mobile, Tablet} from '../components/Tokens'
 import { Box, Body} from '../components/Layout'
-import { Primary, Secondary } from '../components/Button'
-import { Label, Input } from '../components/Form'
+import { Primary } from '../components/Button'
 // import {TitleImg} from '../components/Images'
 import { useCourses, useUserData } from '../src/data'
 import {getToken} from '../src/token'
-import { useApi } from '../src/apiHelpers'
-import { NewsletterSignupMsg, NewsletterSignupResponse } from './api/signup/[action]'
-import Loader from '../components/Loader'
-import { Checkmark } from '../components/Icons'
+import NewsletterSignup from '../components/NewsletterSignup'
 import { coursesQuery } from './api/courses'
 
 export let COPY = {
@@ -73,23 +69,6 @@ const Landing = (props:Props) => {
 }
 
 const Welcome = () =>{
-  //Setting up the email subscription stuff
-  let [email, setEmail] = useState('')
-  let [status, callNewsletterSignup] = useApi<NewsletterSignupMsg, NewsletterSignupResponse>([email])
-
-  let onSubmit = (e: React.FormEvent)=>{
-    e.preventDefault()
-    callNewsletterSignup('/api/signup/newsletter',{email})
-  }
-
-  let ButtonText = {
-    normal: COPY.emailButton,
-    loading: h(Loader),
-    success: Checkmark,
-    error: "Something went wrong!"
-  }
-
-
   return h(Box, {gap:32}, [
     //Landing Page Top Banner
     h(LandingContainer, [
@@ -100,25 +79,10 @@ const Welcome = () =>{
         
         h(CTAGrid, [
           h('a', {href:'#courses'}, h(Primary, {}, COPY.registerButton)),
-          h('form', {onSubmit}, h(Box, {gap: 16, style:{maxWidth: 320}}, [
-            h(Label, [
-              h(Box, {gap:4}, [
-                COPY.emailHeader,
-                h(Description, COPY.emailDescription),
-              ]),
-              h(Input, {
-                type: "email",
-                value: email,
-                onChange: e => setEmail(e.currentTarget.value)
-              }),
-            ]),
-            h(Secondary, {type: "submit", success: status === 'success'}, ButtonText[status]),
-          ])),
+          h(NewsletterSignup)
         ]),
       ]),
     ]),
-
-    //Page Content
 ])
 }
 
@@ -192,15 +156,7 @@ width: 33%;
     width: 100%;
   }
 `
-const Description = styled('p')`
-font-size: 0.75rem;
-font-weight: normal;
-color: ${colors.textSecondary};
-  ${Mobile} {
-    width: 100%;
-    
-  }
-`
+
 const CTAGrid = styled('div')`
   width: 25%;
   display: grid;
