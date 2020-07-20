@@ -34,6 +34,9 @@ const COPY = {
   inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested! If you've been invited, please log in."),
   invited: h('span.accentSuccess', "You're invited!"),
   noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
+  noUpcomingMaintainer: (props:{courseId:string})=> h('span.accentRed', [
+    "Looks like there aren't any cohorts of this course planned, maybe ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'create one'))
+  ]),
   enrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!"),
   enrollButton: "See Upcoming Cohorts",
 
@@ -118,7 +121,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             ]),
             h('div.textSecondary', {style:{width:232}}, [
               h(Box, {gap:16}, [
-                upcomingCohorts.length === 0 ? COPY.noUpcoming : null,
+                upcomingCohorts.length === 0 ? isMaintainer ? h(COPY.noUpcomingMaintainer, {courseId: props.id}) : COPY.noUpcoming : null,
                 enrolled ? COPY.enrolled :
                   course?.invite_only && !invited ? (user ? COPY.inviteOnly : COPY.inviteOnlyLoggedOut) : null,
               ]),
