@@ -247,7 +247,7 @@ const Banners = (props:{
     h(MarkCohortLive, {cohort:props.cohort, mutate: props.mutate})
   ]))
 
-  if(props.cohort.completed)  return h(TwoColumnBanner, [
+  if(props.cohort.completed && props.enrolled)  return h(TwoColumnBanner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
       h('h4', `You completed this course on ${prettyDate(props.cohort.completed || '')}!`),
       h('p', [`This cohort's `, h('a', {href: forum}, 'private forum'), ` will always be open! Feel free to come back whenever`])
