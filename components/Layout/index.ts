@@ -119,3 +119,12 @@ ${Tablet} {
   max-width: 400px;
 };
 `
+
+export const WhiteContainer = styled('div')`
+padding: 16px;
+background-color: white;
+border-style: dashed;
+border-width: 1px;
+border-color: ${colors.grey55};
+border-radius: 2px;
+`

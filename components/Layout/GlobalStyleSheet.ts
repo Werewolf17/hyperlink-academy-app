@@ -17,6 +17,7 @@ html {
 }
 
 body {
+  background-color: #FDFCFA;
 }
 
 a.notBlue {
@@ -81,7 +82,14 @@ h4 {
 font-weight: 900;
 }
 
-p { margin: 0; }
+p { 
+  margin: 0; 
+}
+
+p.big {
+  font-size: 1.25rem;
+}
+
 hr {
   width: 100%;
   color: black;

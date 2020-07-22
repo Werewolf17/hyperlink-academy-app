@@ -92,7 +92,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h('h1', course?.name),
           h('span', {style:{color: 'blue'}}, [h('a.mono',{href:forum},  COPY.courseForum), ' ➭'])
         ]),
-        course?.description || '',
+        h('p.big', course?.description || ''),
         activeCohorts.length > 0 ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [
           h('h3', COPY.activeCohorts),
           ...activeCohorts.map(cohort=> h(SmallCohortCard, {

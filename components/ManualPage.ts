@@ -2,7 +2,7 @@ import {Children} from 'react'
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Link from 'next/link'
-import { TextStyles } from './Text'
+import { BlogTextStyles } from './BlogText'
 import { AccentImg } from './Images'
 import { colors, Tablet } from './Tokens'
 import { useRouter } from 'next/router'
@@ -36,16 +36,16 @@ const ManualPage:React.SFC<{image?: string}> = (props) => {
   return h(Container, {}, [
     h('div', [
       h(TOCContainer, {}, [
-        h(AccentImg, {src: '/img/manual.gif', alt: "A gif of a spellbook floating in the air as a computer cursor turns its pages"}),
         ...Object.keys(Pages).flatMap(page => {
           return [
             h(Link, {href: Pages[page]}, h('a.notBlue', {}, h('h1', {class: Pages[page].slice(1)}, page))),
             Pages[page] === router.pathname ? h('div', TOC) : null
           ]
-        })
+        }), 
+        h(AccentImg , {height:64, width:64, src: '/img/manual.gif', alt: "A gif of a spellbook floating in the air", style: {marginTop:32}}),
       ]),
     ]),
-    h(TextStyles, [
+    h(BlogTextStyles, [
       props.children as React.ReactElement
     ])
   ])

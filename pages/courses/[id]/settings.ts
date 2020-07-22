@@ -20,7 +20,7 @@ import { CreateCohortMsg, CreateCohortResponse } from '../../api/courses/[id]/co
 import { InviteToCourseMsg, InviteToCourseResponse } from '../../api/courses/[id]/invite'
 
 const COPY = {
-  backToCourse: 'back to the course',
+  backToCourse: 'Back to Course',
   cancelCohort: h('p.textSecondary', [
     `Contact us at `, h('a', {href:'mailto:contact@hyperlink.academy'}, `contact@hyperlink.academy`), ` to cancel a cohort. Optionally,  let us know the reason you’re cancelling (we’re curious 🤓)`,
   ])
