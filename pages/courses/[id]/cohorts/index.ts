@@ -45,6 +45,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
             .filter(cohort=>{
                 if(cohort.completed) return false
                 if(userCohorts?.course_cohorts.find(i=> i.id ===cohort.id)) return false
+                if(new Date(cohort.start_date)< new Date()) return false
                 return true
             })
     return h(TwoColumn, {}, [
