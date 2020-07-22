@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import {InferGetStaticPropsType} from 'next'
 import Link from 'next/link'
 
-import { Box, TwoColumn, Sidebar, Seperator } from '../../../../components/Layout'
+
+import { Box, TwoColumn, Sidebar, WhiteContainer } from '../../../../components/Layout'
 import Enroll from '../../../../components/Course/Enroll'
 
 import { Primary } from '../../../../components/Button'
@@ -23,8 +24,8 @@ import { courseDataQuery } from '../../../api/courses/[id]'
 const COPY = {
     empty: "There are no upcoming cohorts for this course :(",
     header: "Join a Cohort",
-    backToCourse: 'back to the course',
-    subtitle: 'Pick a cohort with a start date that works for you. Be sure to check the notes underneath for specific meeting times and any tweaks to the curriculum.',
+    backToCourse: 'Back to Course',
+    subtitle: 'Pick a cohort with a start date that works for you. Be sure to check the meeting times and any tweaks to the curriculum.',
     seeMore: "See more details",
   inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
   invited: h('span.accentSuccess', "You're invited!"),
@@ -53,6 +54,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
         h(Box, {gap:16}, [
             h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
             h('h1', COPY.header),
+            h('p.big', COPY.subtitle)
 
         ]),
         h(Box, {gap: 64}, [
@@ -111,16 +113,17 @@ let Cohort = (props: {
                          props.people.display_name || props.people.username)),
                 ])
             ]),
-            h(Text, {source: props.details.text.slice(0, 400) + (props.details.text.length > 400 ?'...' : '')}),
-            h(Link, {
-                href: '/courses/[id]/cohorts/[cohortId]',
-                as: `/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)[0]}`
-            }, h('a', {style: {textDecoration: 'underline'}}, h('b', 'See more details')))
+            h(WhiteContainer, [
+                h(Text, {source: props.details.text.slice(0, 400) + (props.details.text.length > 400 ?'...' : '')}),
+                h(Link, {
+                    href: '/courses/[id]/cohorts/[cohortId]',
+                    as: `/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)[0]}`
+                }, h('a', {style: {textDecoration: 'underline'}}, h('b', 'See more details')))
+            ]),
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
             h(Primary, {onClick, disabled: props.invite_only && !props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),
         ]),
-        h(Seperator),
     ])
 }
 
@@ -158,3 +161,4 @@ export const getStaticProps = async (ctx: any) =>{
 export const getStaticPaths = () => {
   return {paths:[], fallback: true}
 }
+

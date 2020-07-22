@@ -7,7 +7,7 @@ import styled from '@emotion/styled'
 
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import {colors} from '../components/Tokens'
-import { Box} from '../components/Layout'
+import { Box, WhiteContainer} from '../components/Layout'
 // import { AccentImg } from '../components/Images'
 import { useUserCohorts, useUserData, useCourses, useUserCourses } from '../src/data'
 import { BigCohortCard } from '../components/Card'
@@ -53,9 +53,11 @@ const Dashboard = (props:Props) => {
       h('h2', "Your Cohorts"),
       //if not enrolled in anything, throw empty
       cohorts.course_cohorts.length === 0 
-      ? h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
-        h( EmptyImg, {src: 'img/empty.png'}),
-        h('small.textSecondary', "Hmmm... Looks like you haven't enolled in anything yet. Check out some available courses in the Course List below!" ),
+      ? h (WhiteContainer, [
+        h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
+          h( EmptyImg, {src: 'img/empty.png'}),
+          h('small.textSecondary', "Hmmm... Looks like you haven't enolled in anything yet. Check out some available courses in the Course List below!" ),
+        ]),
       ])
       // if enrolled, show grid of enrolled cohorts
       : h(FlexGrid, {min: 250, mobileMin:250}, cohorts.course_cohorts.map(cohort => {

@@ -32,7 +32,7 @@ const COPY = {
   detailsTab: "Details",
   artifactsTab: "Artifacts",
   curriculumTab: "Curriculum",
-  backToCourse: 'back to the course',
+  backToCourse: 'Back to Course',
   details: "Details",
   participants: "Participants",
   updateNotes: (props: {id: string}) => h(Info, [

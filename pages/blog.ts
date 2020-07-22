@@ -51,11 +51,11 @@ const BlogPost = (props:Blog) => {
     return h(Box, {gap: 16, style: {width: 640}} , [
         h(Box, {h:true}, props.tags.map(tag => h(Tag, {tagType: tag}))),
         h(Box, {gap:8}, [
-          h(Link, {href: props.path}, h('a.notBlue', {},h('h2', props.title))),
-          h('small', {}, h('b', `by ${props.author}  |  ${props.date}`)),
+          h(Link, {href: props.path}, h('a.notBlue', {style: {textDecoration:'none'}},h('h2', props.title))),
+          h('p.textSecondary', {}, h('b', `by ${props.author}  |  ${props.date}`)),
         ]),
 
-        h('p', props.description)
+        h('p.big', props.description)
     ])
 }
 
