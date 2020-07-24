@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import h from 'react-hyperscript'
 import {colors} from './Tokens'
 import { Box } from './Layout'
+import { useState } from 'react'
 
 export let Label = styled('label')`
 font-weight: bold;
@@ -10,7 +11,6 @@ grid-gap: 8px;
 `
 
 export let CheckBox = styled('label')`
-font-weight: bold;
 display: grid;
 align-items: center;
 grid-template-columns: 16px auto;
@@ -55,6 +55,36 @@ input[type="checkbox"]:checked {
 }
 
 
+`
+
+export function PasswordInput(props:Exclude<Parameters<typeof Input>[0], 'type'>) {
+  let [visible, setVisible] = useState(false)
+  return h('div', {style: {width: '100%', marginBottom: '-16px'}}, [
+    h(Input, {
+      ...props,
+      type: visible ? "text" : 'password',
+      style: {width: '100%', boxSizing:'border-box'}
+    }),
+    h(ToggleButton, {onClick: (e)=>{
+      e.preventDefault()
+      setVisible(!visible)
+    }}, visible ? 'hide' : 'show')
+  ])
+}
+
+let ToggleButton = styled('button')`
+font-family: monospace;
+color: ${colors.textSecondary};
+outline: none;
+background-color: inherit;
+border: none;
+position: relative;
+&:hover {
+cursor: pointer;
+}
+top: -30px;
+left: -16px;
+float: right;
 `
 
 export let Input = styled('input')`

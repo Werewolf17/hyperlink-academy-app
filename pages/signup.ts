@@ -4,8 +4,8 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 
 import { Box} from '../components/Layout'
-import { Label, Input, Error, Info, CheckBox} from '../components/Form'
-import {Primary} from '../components/Button'
+import { Label, Input, Error, Info, CheckBox, PasswordInput} from '../components/Form'
+import { Primary, LinkButton} from '../components/Button'
 import {AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
 import Loader from '../components/Loader'
@@ -14,12 +14,15 @@ import { callApi, useApi } from '../src/apiHelpers'
 import { useDebouncedEffect} from '../src/hooks'
 import { CheckUsernameResult } from './api/get/[...item]'
 
+const COPY = {
+   submitButton: "Create your account"
+}
+
 const Signup = () => {
   let [formData, setFormData] = useState({
     email:'',
     username: '',
     password:'',
-    confPassword:'',
     newsletter: false,
   })
 
@@ -45,15 +48,19 @@ const Signup = () => {
     return h(VerifyEmail, {email: formData.email, resendEmail: onSubmit})
   }
 
-  return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
+  return h('form', {onSubmit}, h(Box, {width: 400, ma: true, gap: 32}, [
     h('h1', 'Sign Up'),
     status === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
       '.'
     ])) : null,
-    h(Label, [
-      "Your username",
+    h(Box, {gap:8},[
+      h('div',[
+        h('label', {for: 'username'}, h('h4', "Your username")),
+        h('small.textSecondary', "Pick a username unique to you"),
+      ]),
       h(Input, {type: 'text',
+                name: "username",
                 required: true,
                 minLength: 3,
                 maxLength: 20,
@@ -71,51 +78,56 @@ const Signup = () => {
         ? ''
         : usernameValid ? h('span.accentSuccess', 'Great! This username is available') : h('span.accentRed', "Sorry, that username is taken")
     ]),
-    h(Label, [
-      "Your Email",
+    h(Box, {gap:8}, [
+      h('div', [
+        h('label', {for: 'username'}, h('h4', "Your Email")),
+        h('small.textSecondary', "You'll have to verify this in a moment"),
+      ]),
       h(Input, {type: 'email',
+                name: 'email',
                 required: true,
                 value: formData.email,
                 onChange: (e)=> setFormData({...formData, email:e.currentTarget.value})})
     ]),
-    h(Label, [
-      "Password",
-      h(Input, {type: 'password',
+    h(Box, {gap:8}, [
+      h("div", [
+        h('label', {for: 'new-password'}, h('h4', "A Password")),
+        h('small.textSecondary', "Minimum length 8 characters"),
+      ]),
+      h(PasswordInput, {
+                name: "new-password",
                 required: true,
                 minLength: 8,
                 value: formData.password,
                 onChange: (e)=> setFormData({...formData, password:e.currentTarget.value})})
     ]),
-    h(Label, [
-      "Confirm Password",
-      h(Input, {type: 'password',
-                required: true,
-                value: formData.confPassword,
-                onChange: (e)=> {
-                  setFormData({...formData, confPassword:e.currentTarget.value})
-                  if(e.currentTarget.value !== formData.password) {
-                    e.currentTarget.setCustomValidity('Your passwords do not match')
-                  }
-                  else {
-                    e.currentTarget.setCustomValidity('')
-                  }
-                }
-               })
+    h(Box, {gap:8}, [
+      h('div', [
+      h('label', {for: 'newsletter'}, h('h4', "Want to get email updates")),
+      h('small.textSecondary', "We send out updates on new courses and features. We'll never spam or share your email."),
+      ]),
+      h(CheckBox, [
+        h(Input, {type: 'checkbox', name: 'newsletter', checked: formData.newsletter, onChange: e=> {
+          setFormData({...formData, newsletter: e.currentTarget.checked})
+        }}),
+        "Sure! Gimme the updates"
+      ]),
     ]),
-    h(CheckBox, [
-      h(Input, {type: 'checkbox', checked: formData.newsletter, onChange: e=> {
-        setFormData({...formData, newsletter: e.currentTarget.checked})
-      }}),
-      "Do you want to receive our newsletter?"
-    ]),
-    h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, status === 'loading' ? h(Loader) : 'Submit')
+    h(Box, {gap: 8}, [
+      h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, status === 'loading' ? h(Loader) : COPY.submitButton),
+      h(Link, {href:"/login"}, h(LinkButton, {style:{justifySelf: 'end'}}, 'Log in with an existing account'))
+    ])
   ]))
 }
 
 const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   let router = useRouter()
   let [key, setKey] = useState('')
-  let [status, callSignupVerify] = useApi<VerifyEmailMsg, VerifyEmailResponse>([key])
+  let [status, callSignupVerify] = useApi<VerifyEmailMsg, VerifyEmailResponse>([key], ()=>{
+    setTimeout(()=>{
+      router.push('/dashboard')
+    }, 3000)
+  })
 
   const onSubmit = async (e: React.FormEvent)=>{
     e.preventDefault()
@@ -127,13 +139,6 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
       callSignupVerify('/api/signup/verify', {key:router.query.verifyEmail})
     }
   }, [])
-
-  useEffect(()=>{
-    if(status !== 'success') return
-    setTimeout(()=>{
-      router.push('/dashboard')
-    }, 3000)
-  }, [status])
 
   if(router.query.verifyEmail && status === null) return null
 
