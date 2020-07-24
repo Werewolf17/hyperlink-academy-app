@@ -51,6 +51,7 @@ async function updatePerson(req: Request) {
     await syncSSO({
       external_id: user.id,
       email: user.email,
+      username: user.username,
       name: newData.display_name || '',
       bio: newData.bio || '',
       website: newData.link || ''
