@@ -3,6 +3,8 @@ import { getUsername, createGroup, createCategory, updateTopic } from '../../../
 import TemplateCourseDescription from '../../../writing/TemplateCourseDescription.txt'
 import {getToken} from '../../../src/token'
 import { ResultType, Request, APIHandler} from '../../../src/apiHelpers'
+import TemplateCohortGettingStarted from 'writing/TemplateCohortGettingStarted.txt'
+import TemplateCohortNotes from 'writing/TemplateCohortNotes.txt'
 
 let prisma = new PrismaClient()
 
@@ -81,6 +83,21 @@ async function createCourse(req: Request) {
             connect: {email}
           }}
         })
+      },
+      course_templates: {
+        create: [{
+          content: TemplateCohortGettingStarted,
+          name: "Getting Started",
+          title: "Getting Started",
+          type: 'prepopulated',
+          required: true
+        }, {
+          content: TemplateCohortNotes,
+          name: "Notes",
+          title: "Notes",
+          type: 'prepopulated',
+          required: true
+        }]
       }
     },
   })

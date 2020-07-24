@@ -64,6 +64,7 @@ export const courseDataQuery = (id:string) => prisma.courses.findOne({
         people: {select: {display_name: true}}
       }
     },
+    course_templates: true,
     course_cohorts: {
       include: {
         courses: {
