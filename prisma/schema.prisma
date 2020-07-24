@@ -67,10 +67,15 @@ model courses {
 }
 
 model course_templates {
-  content String
-  course  String
-  id      String  @id
-  courses courses @relation(fields: [course], references: [id])
+  content  String
+  course   String
+  name     String
+  required Boolean?       @default(false)
+  title    String
+  type     template_types @default(prepopulated)
+  courses  courses        @relation(fields: [course], references: [id])
+
+  @@id([name, course])
 }
 
 model password_reset_keys {
@@ -105,4 +110,9 @@ model people_in_cohorts {
 enum course_status {
   draft
   live
+}
+
+enum template_types {
+  prepopulated
+  triggered
 }

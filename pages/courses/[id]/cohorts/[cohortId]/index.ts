@@ -6,27 +6,27 @@ import Link from 'next/link'
 import {useState} from 'react'
 import { InferGetStaticPropsType } from 'next'
 
-import Enroll from '../../../../components/Course/Enroll'
-import { TwoColumn, Box, Seperator, Sidebar} from '../../../../components/Layout'
-import { Tabs } from '../../../../components/Tabs'
-import { Pill } from '../../../../components/Pill'
-import { Primary, Destructive, Secondary} from '../../../../components/Button'
-import Loader, { PageLoader } from '../../../../components/Loader'
-import { Info } from '../../../../components/Form'
-import { Modal } from '../../../../components/Modal'
-import {TwoColumnBanner} from '../../../../components/Banner'
-import Text from '../../../../components/Text'
+import Enroll from 'components/Course/Enroll'
+import { TwoColumn, Box, Seperator, Sidebar} from 'components/Layout'
+import { Tabs } from 'components/Tabs'
+import { Pill } from 'components/Pill'
+import { Primary, Destructive, Secondary} from 'components/Button'
+import Loader, { PageLoader } from 'components/Loader'
+import { Info } from 'components/Form'
+import { Modal } from 'components/Modal'
+import {TwoColumnBanner} from 'components/Banner'
+import Text from 'components/Text'
 
-import {prettyDate} from '../../../../src/utils'
-import { getTaggedPost } from '../../../../src/discourse'
-import { callApi, useApi } from '../../../../src/apiHelpers'
-import { useCohortData, useUserData, useCourseData, Cohort } from '../../../../src/data'
-import { cohortPrettyDate } from '../../../../components/Card'
-import ErrorPage from '../../../404'
+import {prettyDate} from 'src/utils'
+import { getTaggedPost } from 'src/discourse'
+import { callApi, useApi } from 'src/apiHelpers'
+import { useCohortData, useUserData, useCourseData, Cohort } from 'src/data'
+import { cohortPrettyDate } from 'components/Card'
+import ErrorPage from 'pages/404'
 import { useStripe } from '@stripe/react-stripe-js'
-import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from '../../../api/courses/[id]/cohorts/[cohortId]'
-import { courseDataQuery } from '../../../api/courses/[id]'
-import { EnrollResponse } from '../../../api/courses/[id]/cohorts/[cohortId]/enroll'
+import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]'
+import { courseDataQuery } from 'pages/api/courses/[id]'
+import { EnrollResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]/enroll'
 
 const COPY = {
   detailsTab: "Details",
@@ -75,6 +75,10 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
         !inCohort && !isFacilitator ? null : h(Box, [
           h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.id}/${cohort.id}`}
             , h(Primary, 'Go to the forum')),
+          !isFacilitator ? null : h(Link, {
+            href: "/courses/[id]/cohorts/[cohortId]/templates",
+            as: `/courses/${cohort.courses.id}/cohorts/${router.query.cohortId}/templates`
+          }, h(Secondary, 'New Forum Topic from Template')),
           !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {cohort, mutate}) : null,
         ]),
       ]),

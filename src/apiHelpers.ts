@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import { useState, useEffect} from 'react'
+import useSWR from 'swr'
 
 export type ResultType<T extends (...args:any)=> any> = PromiseReturn<ReturnType<T>>
 export type Request = NextApiRequest
 export type Success<T extends Result> = Extract<T, {status: 200}>['result']
+export type Errors<T extends Result> = Exclude<T, {status: 200}>
 
 type Handler = (req:Request) => Promise<Result>
 type PromiseReturn<T> = T extends PromiseLike<infer U> ? U : T
@@ -53,9 +55,9 @@ export const multiRouteHandler = (query:string, handlers:{[key:string]: Handler}
   })
 }
 
-export async function callApi<Msg extends object | string | null, R extends Omit<Result, 'headers'>> (endpoint:string, msg?: Msg){
+export async function callApi<Msg extends object | string | null, R extends Omit<Result, 'headers'>> (endpoint:string, msg?: Msg, method?: Methods){
     let result = await fetch(endpoint, {
-      method: msg ? "POST" : "GET",
+      method: method ? method : msg ? "POST" : "GET",
       headers: {
         'Content-type': (typeof msg === 'object') ? 'application/json' : 'text/html'
       },
@@ -74,9 +76,9 @@ type Status = 'normal' | 'error' | 'loading' | 'success'
 export function useApi<Msg extends object | string | null, R extends Omit<Result, 'headers'>>(deps: any[], successCallback?: (result: Extract<R, {status:200}>['result'])=> any) {
   let [state, setState] = useState<Status>('normal')
   useEffect(()=> setState('normal'), deps)
-  let call= async (path: string, msg?: Msg) => {
+  let call= async (path: string, msg?: Msg, method?: Methods) => {
     setState('loading')
-    let res = await callApi<Msg, R>(path, msg)
+    let res = await callApi<Msg, R>(path, msg, method)
     if(res.status === 200) {
       if(successCallback) await successCallback(res.result)
       setState('success')
@@ -85,4 +87,12 @@ export function useApi<Msg extends object | string | null, R extends Omit<Result
     return res
   }
   return [state, call, setState] as const
+}
+
+export function useApiData<R extends Omit<Result, 'headers'>>(path?: string, initialData?:R) {
+  return useSWR<Success<R>, Errors<R>>(path ? path : null, async (path)=>{
+    let res = await callApi<null, R>(path)
+    if(res.status = 200) return res.result
+    return res
+  }, {initialData})
 }

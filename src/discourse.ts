@@ -9,6 +9,7 @@ let headers = {
 export type Category = {
   topic_list: {
     topics: Array<{
+      category_id: number
       id: string
       pinned: boolean
       tags: string[]
@@ -75,7 +76,8 @@ export async function updateTopic(topic:string, input: {category_id: number, tit
   })
 }
 
-export async function createTopic(input:{title: string, category: number, raw: string, tags?: string[]}, asUser?: string) {
+export async function createTopic(input:{title: string, category: number | string, raw: string, tags?: string[]}, asUser?: string) {
+  console.log(input.category)
   let result = await fetch('https://forum.hyperlink.academy/posts.json', {
     method: "POST",
     headers: {
@@ -88,6 +90,7 @@ export async function createTopic(input:{title: string, category: number, raw: s
   if(result.status !== 200) {
     console.log(await result.text())
   }
+  if(result.status === 200)  return await result.json() as {id: string, topic_id: number}
 }
 
 export const createCategory = async (name: string, options?: {slug?: string,permissions?: {[key:string]:number}, parent_category_id?: number}) => {
@@ -115,6 +118,17 @@ export async function updateCategory (id: string | number, options: {permissions
   })
   if(result.status !== 200) console.log(await result.text())
   else return true
+}
+export async function getCategory(path: string){
+  let res = await fetch(`https://forum.hyperlink.academy/c/${path}.json`, {
+    method: 'GET',
+    headers: {
+      ...headers,
+      "Content-Type": 'application/json; charset=utf-8',
+    },
+  })
+  let category = await res.json() as Category
+  return category
 }
 
 export const getUsername = async (userId:string):Promise<string | undefined> => {

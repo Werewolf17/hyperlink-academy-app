@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import h from 'react-hyperscript'
 import {colors} from './Tokens'
+import { Box } from './Layout'
 
 export let Label = styled('label')`
 font-weight: bold;
@@ -90,6 +91,81 @@ export const Select = (props: Parameters<typeof SelectEl>[0])=>{
       h('path', {d: "M1 1L9 9L17 1", stroke:colors.textSecondary, strokeWidth: 2}))
   ])
 }
+
+export function Radio<T extends readonly {value:string, component:React.ReactElement, }[]> (props: {
+  name: string,
+  disabled?: boolean
+  items: T,
+  selected: T[number]['value'],
+  onChange: (v: T[number]['value']) => void
+}) {
+  return h(Box, {gap: 8}, props.items.map((item) => {
+    return h(Item,{
+        disabled: props.selected !== item.value && props.disabled,
+    }, [
+      h(RadioButton, {
+        key: item.value,
+        onChange: (e)=>{
+          e.preventDefault()
+          props.onChange(e.currentTarget.value)
+        },
+        value: item.value,
+        name: props.name,
+        type: 'radio',
+        checked: props.selected === item.value
+      }),
+      item.component
+    ])
+  }))
+}
+
+
+export const Item = styled('label')<{disabled?: boolean}>`
+display: grid;
+grid-template-columns: min-content auto;
+grid-gap: 16px;
+&:hover {
+  cursor: pointer;
+  input {
+    border: 2px solid;
+  }
+}
+
+${props=> props.disabled ? `
+color: ${colors.grey55};
+input {
+  background-color: ${colors.grey90};
+  border: 1px solid ${colors.grey80};
+  box-shadow:none;
+}
+
+&:hover {
+  cursor: auto;
+  input {
+    border: 1px solid ${colors.grey80};
+  }
+}
+` : null}
+`
+
+export const RadioButton = styled('input')`
+appearance: none;
+border-radius: 50%;
+border: 1px solid;
+width: 16px;
+height: 16px;
+box-shadow:0px 0px 0px 2px white inset;
+
+&:active {
+outline: none;
+}
+
+&:checked {
+border: 2px solid;
+background-color: black;
+}
+
+`
 
 const Container = styled('div')`
 display: grid;

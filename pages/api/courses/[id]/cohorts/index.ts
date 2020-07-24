@@ -2,8 +2,6 @@ import {APIHandler, Request, ResultType} from '../../../../../src/apiHelpers'
 import { PrismaClient } from '@prisma/client'
 import { getToken } from '../../../../../src/token'
 import { getUsername, createGroup, createCategory, updateTopic, createTopic, updateCategory } from '../../../../../src/discourse'
-import TemplateCohortNotes from '../../../../../writing/TemplateCohortNotes.txt'
-import TemplateCohortGettingStarted from '../../../../../writing/TemplateCohortGettingStarted.txt'
 
 let prisma = new PrismaClient()
 
@@ -41,6 +39,7 @@ async function handler (req: Request) {
       category_id: true,
       name: true,
       status: true,
+      course_templates: true,
       course_cohorts: {
         select: {id: true}
       }
@@ -68,19 +67,27 @@ async function handler (req: Request) {
   }
   let category = await createCategory(id, {permissions: {[id]:1}, parent_category_id: course.category_id})
   if(!category) return {status: 500, result: "ERROR: Could not create cohort category"} as const
-  await updateTopic(category.topic_url, {
-    category_id: category.id,
-    title: id + " Notes",
-    raw: TemplateCohortNotes,
-    tags: ['note']
-  }, admin)
 
-  await createTopic({
-    category: category.id,
-    title: id + " Getting Started",
-    raw: TemplateCohortGettingStarted,
-    tags: ['getting-started']
-  }, admin)
+
+  for(let template of course.course_templates) {
+    if(template.type === 'prepopulated') {
+      if(template.name === 'Notes') {
+        await updateTopic(category.topic_url, {
+          category_id: category.id,
+          title: id + " Notes",
+          raw: template.content,
+          tags: ['note']
+        }, admin)
+      }
+      else {
+        await createTopic({
+          title: template.title,
+          category: category.id,
+          raw: template.content
+        }, admin)
+      }
+    }
+  }
 
   let cohort = await prisma.course_cohorts.create({
     include: {

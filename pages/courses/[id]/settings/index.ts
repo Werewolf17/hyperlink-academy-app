@@ -1,23 +1,26 @@
 import h from 'react-hyperscript'
-import { Tabs } from '../../../components/Tabs'
-import { useState, useEffect } from 'react'
-import { useApi, callApi } from '../../../src/apiHelpers'
-import { CheckUsernameResult } from '../../api/get/[...item]'
-import ErrorPage from '../../404'
-import { InferGetStaticPropsType } from 'next'
-import { Course, useCourseData, useUserData } from '../../../src/data'
-import Loader, { PageLoader } from '../../../components/Loader'
-import { Box, Seperator } from '../../../components/Layout'
-import { Info, Error, Label, Select, Input, Textarea } from '../../../components/Form'
-import { Primary, Destructive } from '../../../components/Button'
-import styled from '@emotion/styled'
-import { useDebouncedEffect } from '../../../src/hooks'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { Checkmark } from '../../../components/Icons'
-import { courseDataQuery, UpdateCourseMsg, UpdateCourseResponse } from '../../api/courses/[id]'
-import { CreateCohortMsg, CreateCohortResponse } from '../../api/courses/[id]/cohorts'
-import { InviteToCourseMsg, InviteToCourseResponse } from '../../api/courses/[id]/invite'
+import { useState, useEffect, Fragment } from 'react'
+import { InferGetStaticPropsType } from 'next'
+import styled from '@emotion/styled'
+
+import { Tabs } from 'components/Tabs'
+import { useApi, callApi } from 'src/apiHelpers'
+import { Course, useCourseData, useUserData } from 'src/data'
+import Loader, { PageLoader } from 'components/Loader'
+import { Box, Seperator } from 'components/Layout'
+import { Info, Error, Label, Select, Input, Textarea } from 'components/Form'
+import { Primary, Destructive, Secondary } from 'components/Button'
+import { Checkmark } from 'components/Icons'
+import ErrorPage from 'pages/404'
+import { useDebouncedEffect } from 'src/hooks'
+import { courseDataQuery, UpdateCourseMsg, UpdateCourseResponse } from 'pages/api/courses/[id]'
+import { CheckUsernameResult } from 'pages/api/get/[...item]'
+import { CreateCohortMsg, CreateCohortResponse } from 'pages/api/courses/[id]/cohorts'
+import { InviteToCourseMsg, InviteToCourseResponse } from 'pages/api/courses/[id]/invite'
+import { Modal } from 'components/Modal'
+import { DeleteTemplateResult } from 'pages/api/courses/[id]/templates/[templateId]'
 
 const COPY = {
   backToCourse: 'Back to Course',
@@ -56,6 +59,7 @@ maintainer, remove an cohort, or anything else, please email `,
       Cohorts: h(CohortSettings, {course, mutate}),
       Details: h(EditDetails, {course, mutate}),
       Invites: course.invite_only ? h(InvitePerson, {id: course.id}) : null,
+      Templates: h(CourseTemplates, {course, mutate})
     } })
   ])
 }
@@ -249,6 +253,63 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
     ])
   ])
 }
+
+function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
+  return h(Box, {gap: 32}, [
+    h(Box, [
+      h('p', `To help facilitators get started every new cohort is created with a forum
+pre-populated with topics.`),
+      h('p', `You can tweak the ones we provided or add new ones here.`),
+      h(Link, {href: '/courses/[id]/settings/templates/new', as:`/courses/${props.course.id}/settings/templates/new`}, h(Primary, "+ Add A New Template")),
+    ]),
+    h(Box, {}, props.course.course_templates
+      .sort((a, b)=>  a.name > b.name ? -1 : 1)
+      .sort((a)=> a.required ? -1 : 1)
+      .flatMap(template => {
+        return [
+          h(Box, {h: true, style: {gridAutoColumns: 'auto'}},[
+            h('div', [
+              h('h3', template.name),
+              h('span.textSecondary', template.type ==='prepopulated' ? "Prepopulated for all cohorts" : "Manually published by facilitator")
+            ]),
+            h(Box, {h: true, style:{justifySelf: 'end', alignItems: 'center'}}, [
+              template.required ? null : h(DeleteTemplate, {course: props.course, mutate: props.mutate, templateName: template.name}),
+              h(Link, {
+                href: '/courses/[id]/settings/templates/[templateId]',
+                as: `/courses/${props.course.id}/settings/templates/${template.name}`
+              }, h(Secondary, 'Edit'))
+            ])
+          ]),
+          h(Seperator)
+        ]}).slice(0, -1))
+  ])
+}
+
+function DeleteTemplate(props:{templateName:string, course:Course, mutate:(c:Course)=>void}) {
+  let [state, setState] = useState<'normal' | 'confirm'>('normal')
+  let [status, callDelete] = useApi<null, DeleteTemplateResult>([props])
+  return h(Fragment, [
+    h(Destructive, {onClick: ()=>setState('confirm')}, 'Delete'),
+    h(Modal, {display: state !== 'normal', onExit: ()=>setState('normal')}, [
+      h(Box, {style: {textAlign: 'center'}}, [
+        h('h3', "Are you sure?"),
+        h(Primary, {onClick:async ()=>{
+          let res = await callDelete(`/api/courses/${props.course.id}/templates/${props.templateName}`, null, "DELETE")
+          if(res.status ===200) {
+            props.mutate({
+              ...props.course,
+              course_templates: props.course.course_templates
+                .filter(t=>t.name!==props.templateName)
+            })
+            setState('normal')
+          }
+        }}, status === 'loading'? h(Loader) : "Yup delete it"),
+        h(Secondary, {}, 'Nope, nevermind')
+      ])
+    ])
+  ])
+}
+
 
 const SubmitButtons = styled('div')`
 justify-self: right;
