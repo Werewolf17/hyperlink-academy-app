@@ -6,7 +6,7 @@ import { useState, Fragment, useEffect } from 'react'
 
 import {colors, Mobile} from '../Tokens'
 import { Logo, Checkmark} from '../Icons'
-import { Box, Seperator} from './index'
+import { Box, Seperator, FormBox} from './index'
 import { useUserData } from '../../src/data'
 import { useMediaQuery } from '../../src/hooks'
 import { Textarea } from '../Form'
@@ -97,8 +97,7 @@ const Feedback = ()=> {
     success: Checkmark,
     error: "Something went wrong!"
   }
-  return h('form', {onSubmit}, [
-    h(Box, {gap: 16}, [
+  return h(FormBox, {onSubmit, gap: 16}, [
       h('h4', COPY.feedbackTitle),
       status === 'success'
         ? h('div', {style: {textAlign: 'center'}}, COPY.feedbackSuccess)
@@ -108,7 +107,6 @@ const Feedback = ()=> {
         success:status==='success',
         style:{justifySelf:'right'}
       }, ButtonText[status])
-    ])
   ])
 }
 

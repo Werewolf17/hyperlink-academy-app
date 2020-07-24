@@ -79,6 +79,8 @@ margin-top: ${props => props.mt || 0}px;
 grid-gap: ${props => props.gap || 16}px;
 ${props=> props.ma ? 'margin: auto;':''}
 `
+export const LabelBox = Box.withComponent('label')
+export const FormBox = Box.withComponent('form')
 
 export const Seperator = styled('hr')`
 border: 1px dashed;

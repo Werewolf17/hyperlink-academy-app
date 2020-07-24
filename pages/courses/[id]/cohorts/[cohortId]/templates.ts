@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { getTemplatesQuery } from 'pages/api/courses/[id]/templates'
 import { InferGetStaticPropsType } from 'next'
-import { Box, Seperator } from 'components/Layout'
+import { Box, Seperator, FormBox, LabelBox } from 'components/Layout'
 import { Secondary, Primary } from 'components/Button'
 import { useState, Fragment } from 'react'
 import { Input } from 'components/Form'
@@ -94,9 +94,9 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
       }, h('a', {}, h(Secondary, {style:{width:'100%'}}, 'Back to Templates')))
       ])
     ])) : null,
-    h('form', {onSubmit}, h(Box, {gap:32}, [
-      h(Box, {width: 400}, [
-        h('label', {for: 'title'}, h('h4', "Title")),
+    h(FormBox, {onSubmit, gap:32}, [
+      h(LabelBox, {width: 400}, [
+        h('h4', "Title"),
         h(Input, {
           type: 'text',
           name: 'title',
@@ -104,15 +104,15 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
           onChange:e=>setFormState({...formState, title: e.currentTarget.value})
         })
       ]),
-      h(Box, [
-        h('label', {for: 'body'}, h('h4', "Body")),
+      h(LabelBox, [
+        h('h4', "Body"),
         h(EditorWithPreview, {value: formState.content, onChange: e=> setFormState({...formState, content: e.currentTarget.value})})
       ]),
       h(Box, {h:true, style:{justifySelf: 'right'}}, [
         h(Secondary, {disabled: !changed, onClick:()=>setFormState(props.template)}, "Reset Template"),
         h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : "Post to the forum"),
       ])
-    ]))
+    ])
   ])
 }
 

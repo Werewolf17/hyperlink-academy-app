@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
-import { Box } from '../components/Layout'
-import { Input, Error, Label, Info } from '../components/Form'
+import { Box, LabelBox, FormBox } from '../components/Layout'
+import { Input, Error, Info } from '../components/Form'
 import { Primary, LinkButton } from '../components/Button'
 import {AccentImg} from '../components/Images'
 import { useApi } from '../src/apiHelpers'
@@ -50,11 +50,11 @@ const Login = () => {
   useEffect(()=> {if (data) router.push(redirect as string || '/dashboard')},[data])
   if (typeof reset !== 'undefined') return h(ResetPassword)
 
-  return h('form', {onSubmit}, h(Box, {width: 400, ma: true}, [
+  return h(FormBox, {onSubmit, width: 400, ma: true}, [
     h('h1', COPY.loginHeader),
     status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
-    h(Label, [
-      COPY.emailOrUsernameInput,
+    h(LabelBox, {gap:16}, [
+      h('h4', COPY.emailOrUsernameInput),
       h(Input, {
         type: 'text',
         value: formData.emailOrUsername,
@@ -62,8 +62,8 @@ const Login = () => {
         onChange: (e) => setFormData({ ...formData, emailOrUsername: e.currentTarget.value })
       }),
     ]),
-    h(Label, [
-      COPY.passwordInput,
+    h(LabelBox, {gap:16}, [
+      h('h4', COPY.passwordInput),
       h(Input, {
         type: 'password',
         value: formData.password,
@@ -76,7 +76,7 @@ const Login = () => {
       h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : COPY.loginButton),
       h(Link, { href: '/signup' }, h(LinkButton, COPY.createAccount))
     ])
-  ]))
+  ])
 }
 
 const RESETCOPY = {
@@ -97,10 +97,10 @@ const ResetPassword: React.SFC = () => {
   switch (status) {
     case 'normal':
     case 'loading':
-      return h('form',{onSubmit}, h(Box, {width: 400, ma:true}, [
+      return h(FormBox, {onSubmit, width: 400, ma:true}, [
         h('h1', RESETCOPY.header),
-        h(Label, [
-          RESETCOPY.emailInput,
+        h(LabelBox, {gap:16}, [
+          h('h4', RESETCOPY.emailInput),
           h(Input, {
             type: 'email',
             required: true,
@@ -111,7 +111,7 @@ const ResetPassword: React.SFC = () => {
         h('div', { style: { display: 'grid', justifyItems: 'end', gridGap: '8px' } }, [
           h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : RESETCOPY.button)
         ])
-      ]))
+      ])
     case 'success': return h(Box, { gap: 16, width: 400, ma: true }, [
       h(AccentImg, {src: '/img/plane.gif', alt: "an animated gif of a paper airplane taking off"}),
       h('h1', RESETCOPY.successHeader),

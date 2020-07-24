@@ -9,8 +9,8 @@ import { Tabs } from 'components/Tabs'
 import { useApi, callApi } from 'src/apiHelpers'
 import { Course, useCourseData, useUserData } from 'src/data'
 import Loader, { PageLoader } from 'components/Loader'
-import { Box, Seperator } from 'components/Layout'
-import { Info, Error, Label, Select, Input, Textarea } from 'components/Form'
+import { Box, Seperator, LabelBox, FormBox } from 'components/Layout'
+import { Info, Error, Select, Input, Textarea } from 'components/Form'
 import { Primary, Destructive, Secondary } from 'components/Button'
 import { Checkmark } from 'components/Icons'
 import ErrorPage from 'pages/404'
@@ -98,38 +98,34 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
     success: Checkmark
   }
 
-  return h('form', {onSubmit}, [
-    h(Box, {gap: 32, style: {width: 400}}, [
-      h('h2', 'Add a new Cohort'),
-      status === 'error' ? h(Error, 'An error occured') : null,
-      status === 'success' ? h(Info, 'Cohort created!') : null,
-      h(Label, [
-        h(Select, {
-          required: true,
-          onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facilitator: e.currentTarget.value})
-        }, [
-          h('option', {value: ''}, "Select a facilitator"),
-          ...(props.course.course_maintainers.map(maintainer => {
-            return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
-          })||[])
-        ]),
-      ]),
-      h(Label, [
-        'Start Date',
-        h(Input, {
-          type: 'date',
-          required: true,
-          value: newCohort.start,
-          onChange: e => setNewCohort({...newCohort, start: e.currentTarget.value})
-        })
-      ]),
-      h(Primary, {
-        style: {justifySelf: 'right'},
-        type: 'submit',
-        success: status === 'success',
-        disabled: !newCohort.start || !newCohort.facilitator
-      }, ButtonState[status]),
-    ])
+  return h(FormBox, {onSubmit, gap: 32, style: {width: 400}}, [
+    h('h2', 'Add a new Cohort'),
+    status === 'error' ? h(Error, 'An error occured') : null,
+    status === 'success' ? h(Info, 'Cohort created!') : null,
+    h(Select, {
+      required: true,
+      onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facilitator: e.currentTarget.value})
+    }, [
+      h('option', {value: ''}, "Select a facilitator"),
+      ...(props.course.course_maintainers.map(maintainer => {
+        return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
+      })||[])
+    ]),
+    h(LabelBox, {gap:8}, [
+      h('h4', 'Start Date'),
+      h(Input, {
+        type: 'date',
+        required: true,
+        value: newCohort.start,
+        onChange: e => setNewCohort({...newCohort, start: e.currentTarget.value})
+      })
+    ]),
+    h(Primary, {
+      style: {justifySelf: 'right'},
+      type: 'submit',
+      success: status === 'success',
+      disabled: !newCohort.start || !newCohort.facilitator
+    }, ButtonState[status]),
   ])
 }
 
@@ -158,10 +154,10 @@ const InvitePerson = (props:{id: string})=> {
     let x = emailOrUsername.includes('@') ? {email: emailOrUsername} : {username: emailOrUsername}
     callInviteToCourse(`/api/courses/${props.id}/invite`, {...x})
   }
-  return h('form', {onSubmit}, h(Box, {gap:32, width: 400}, [
+  return h(FormBox, {onSubmit, gap:32, width: 400}, [
     h('h2', "Invite someone to this course"),
-    h(Label, [
-      "Username or Email",
+    h(LabelBox, {gap:8}, [
+      h('h4', "Username or Email"),
       h(Input, {
         type: emailOrUsername.includes('@') ? 'email' : 'text',
         required: true,
@@ -176,7 +172,7 @@ const InvitePerson = (props:{id: string})=> {
       type: 'submit',
       disabled: (!emailOrUsername.includes('@') && valid !== true)
     }, ButtonState[status]),
-  ]))
+  ])
 }
 
 const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
@@ -202,54 +198,52 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
     if(res.status === 200) props.mutate({...props.course, ...res.result})
   }
 
-  return h('form', {onSubmit}, [
-    h(Box, {gap:32, style:{width: 400}}, [
-      h('h2', 'Edit Course Details'),
-      h(Label, [
-        'Name',
-        h(Input, {
-          type: 'text',
-          value: formData.name,
-          onChange: e => setFormData({...formData, name: e.currentTarget.value})
-        })
-      ]),
-      h(Label, [
-        'Cost (USD)',
-        h(Input, {
-          type: 'number',
-          value: formData.cost,
-          onChange: e => setFormData({...formData, cost: parseInt(e.currentTarget.value)})
-        })
-      ]),
-      h(Label, [
-        'Description',
-        h(Textarea, {
-          value: formData.description,
-          onChange: e => setFormData({...formData, description: e.currentTarget.value})
-        })
-      ]),
-      h(Label, [
-        'Prerequisites',
-        h(Textarea, {
-          value: formData.prerequisites,
-          onChange: e => setFormData({...formData, prerequisites: e.currentTarget.value})
-        })
-      ]),
-      h(Label, [
-        'Duration',
-        h(Input, {
-          value: formData.duration,
-          onChange: e => setFormData({...formData, duration: e.currentTarget.value})
-        })
-      ]),
-      h(SubmitButtons, [
-        h(Destructive, {disabled: !changed, onClick: (e)=>{
-          e.preventDefault()
-          setFormData(props.course)
-        }}, "Discard Changes"),
-        h(Primary, {type: 'submit', disabled: !changed},
-          status === 'loading' ? h(Loader) : 'Save Changes')
-      ])
+  return h(FormBox, {onSubmit, gap:32, style:{width: 400}}, [
+    h('h2', 'Edit Course Details'),
+    h(LabelBox, {gap:8}, [
+      h('h4', 'Name'),
+      h(Input, {
+        type: 'text',
+        value: formData.name,
+        onChange: e => setFormData({...formData, name: e.currentTarget.value})
+      })
+    ]),
+    h(LabelBox, {gap:8}, [
+      h('h4', 'Cost (USD)'),
+      h(Input, {
+        type: 'number',
+        value: formData.cost,
+        onChange: e => setFormData({...formData, cost: parseInt(e.currentTarget.value)})
+      })
+    ]),
+    h(LabelBox, {gap:8}, [
+      h('h4', 'Description'),
+      h(Textarea, {
+        value: formData.description,
+        onChange: e => setFormData({...formData, description: e.currentTarget.value})
+      })
+    ]),
+    h(LabelBox, {gap:8}, [
+      h('h4', 'Prerequisites'),
+      h(Textarea, {
+        value: formData.prerequisites,
+        onChange: e => setFormData({...formData, prerequisites: e.currentTarget.value})
+      })
+    ]),
+    h(LabelBox, {gap:8}, [
+      h('h4', 'Duration'),
+      h(Input, {
+        value: formData.duration,
+        onChange: e => setFormData({...formData, duration: e.currentTarget.value})
+      })
+    ]),
+    h(SubmitButtons, [
+      h(Destructive, {disabled: !changed, onClick: (e)=>{
+        e.preventDefault()
+        setFormData(props.course)
+      }}, "Discard Changes"),
+      h(Primary, {type: 'submit', disabled: !changed},
+        status === 'loading' ? h(Loader) : 'Save Changes')
     ])
   ])
 }

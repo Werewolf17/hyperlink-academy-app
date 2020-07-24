@@ -3,8 +3,8 @@ import styled from '@emotion/styled'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { Box} from '../components/Layout'
-import { Input, Textarea, Info, Label} from '../components/Form'
+import { Box, LabelBox, FormBox} from '../components/Layout'
+import { Input, Textarea, Info } from '../components/Form'
 import { Primary, Destructive} from '../components/Button'
 import Loader from '../components/Loader'
 import { colors } from '../components/Tokens'
@@ -58,14 +58,14 @@ const Settings = () => {
     }
   }
 
-  return h('form', {onSubmit}, h(Box, {width: 400, gap: 64, ma: true}, [
+  return h(FormBox, {onSubmit, width: 400, gap: 64, ma: true}, [
     h(Box, {gap: 32}, [
       h('h2', COPY.header),
-      h(Box, {gap:8}, [h('b', 'Username'),h(Info, user.username)]),
-      h(Box, {gap:8}, [h('b', 'Email'),h(Info, user.email)]),
-      h(Label, [
-        h(Box, {gap:4}, [
-          COPY.displayNameField,
+      h(Box, {gap:8}, [h('h4', 'Username'), h(Info, user.username)]),
+      h(Box, {gap:8}, [h('h4', 'Email'), h(Info, user.email)]),
+      h(LabelBox, {gap:8}, [
+        h('div', [
+          h('h4', COPY.displayNameField),
           h(Description, COPY.displayNameDescription)
         ]),
         h(Input,{
@@ -76,9 +76,9 @@ const Settings = () => {
           }
         })
       ]),
-      h(Label, [
+      h(LabelBox, {gap:8}, [
         h(Box, {gap:4}, [
-          COPY.linkField,
+          h('h4', COPY.linkField),
           h(Description, COPY.linkDescription),
         ]),
         h(Input, {
@@ -86,8 +86,8 @@ const Settings = () => {
           onChange: e=>setFormData({...formData, link: e.currentTarget.value})
         })
       ]),
-      h(Label, [
-        COPY.bioField,
+      h(LabelBox, {gap:8}, [
+        h('h4', COPY.bioField),
         h(Textarea, {
           value: formData.bio,
           onChange: e=>setFormData({...formData, bio: e.currentTarget.value})
@@ -101,7 +101,7 @@ const Settings = () => {
       h(Primary, {type: 'submit', disabled: !changed},
         status === 'loading' ? h(Loader) : 'Save Changes')
     ])
-  ]))
+  ])
 }
 
 export default Settings

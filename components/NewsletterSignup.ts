@@ -4,8 +4,8 @@ import { useApi } from '../src/apiHelpers'
 import { NewsletterSignupMsg, NewsletterSignupResponse } from '../pages/api/signup/[action]'
 import Loader from './Loader'
 import { Checkmark } from './Icons'
-import { Box } from './Layout'
-import { Label, Input } from './Form'
+import { LabelBox, FormBox } from './Layout'
+import { Input } from './Form'
 import styled from '@emotion/styled'
 import { colors, Mobile } from './Tokens'
 import { Secondary } from './Button'
@@ -26,10 +26,10 @@ export default () => {
     error: "Something went wrong!"
   }
 
-  return h('form', {onSubmit}, h(Box, {gap: 16, style:{maxWidth: 320}}, [
-    h(Label, [
-      h(Box, {gap:4}, [
-        "Get updates about new courses and more!",
+  return h(FormBox, {onSubmit, gap: 16, style:{maxWidth: 320}}, [
+    h(LabelBox, {gap:8},[
+      h('div', [
+        h('h4', "Get updates about new courses and more!"),
         h(Description, "We'll never spam or share your email. You can unsubscribe at any time."),
       ]),
       h(Input, {
@@ -39,7 +39,7 @@ export default () => {
       }),
     ]),
     h(Secondary, {type: "submit", success: status === 'success'}, ButtonText[status]),
-  ]))
+  ])
 }
 
 const Description = styled('p')`

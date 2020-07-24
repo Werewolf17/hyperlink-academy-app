@@ -2,13 +2,13 @@ import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import {  Input, Label, Error, Info, Textarea} from '../../components/Form'
+import {  Input, Error, Info, Textarea} from '../../components/Form'
 import { Primary } from '../../components/Button'
 import Loader from '../../components/Loader'
 
 import { useApi } from '../../src/apiHelpers'
 import { useUserData } from '../../src/data'
-import { Box } from '../../components/Layout'
+import { LabelBox, FormBox } from '../../components/Layout'
 import { CreateCourseMsg } from '../api/courses'
 import { CreateCohortResponse } from '../api/courses/[id]/cohorts'
 
@@ -39,9 +39,9 @@ const CreateCourse = ()=> {
     h('h1', 'Create a new course'),
     status === 'error' ? h(Error, 'An error occured') : null,
     status === 'success' ? h(Info, 'Course created!') : null,
-    h('form', {onSubmit}, h(Box, [
-      h(Label, [
-        'id',
+    h(FormBox, {onSubmit}, [
+      h(LabelBox, {gap:8}, [
+        h('h4','id'),
         h(Input, {
           type: 'text',
           required: true,
@@ -49,8 +49,8 @@ const CreateCourse = ()=> {
           onChange: e=> setFormData({...formData, courseId: e.currentTarget.value})
         })
       ]),
-      h(Label, [
-        'name',
+      h(LabelBox, {gap:8}, [
+        h('h4', 'name'),
         h(Input, {
           required: true,
           type: 'text',
@@ -58,31 +58,31 @@ const CreateCourse = ()=> {
           onChange: e=> setFormData({...formData, name: e.currentTarget.value})
         })
       ]),
-      h(Label, [
-        'description',
+      h(LabelBox, {gap:8}, [
+        h('h4', 'description'),
         h(Textarea, {
           required: true,
           value: formData.description,
           onChange: e=> setFormData({...formData, description: e.currentTarget.value})
         })
       ]),
-      h(Label, [
-        'duration',
+      h(LabelBox, {gap:8}, [
+        h('h4', 'duration'),
         h(Input, {
           type: 'text',
           value: formData.duration,
           onChange: e=> setFormData({...formData, duration: e.currentTarget.value})
         })
       ]),
-      h(Label, [
-        'prerequisites',
+      h(LabelBox, {gap:8}, [
+        h('h4', 'prerequisites'),
         h(Textarea, {
           value: formData.prerequisites,
           onChange: e=> setFormData({...formData, prerequisites: e.currentTarget.value})
         })
       ]),
-      h(Label, [
-        'cost',
+      h(LabelBox, {gap:8}, [
+        h('h4', 'cost'),
         h(Input, {
           required: true,
           type: 'number',
@@ -92,8 +92,8 @@ const CreateCourse = ()=> {
           onChange: e=> setFormData({...formData, cost: parseInt(e.currentTarget.value)})
         })
       ]),
-      h(Label, [
-        'maintainers',
+      h(LabelBox, {gap:8}, [
+        h('h4', 'maintainers'),
         h(Input, {
           required: true,
           type: 'email',
@@ -102,7 +102,7 @@ const CreateCourse = ()=> {
         })
       ]),
       h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'submit')
-    ]))
+    ])
 
   ])
 }

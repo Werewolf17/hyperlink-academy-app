@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
-import { Box} from '../components/Layout'
+import { FormBox, LabelBox} from '../components/Layout'
 import {Primary} from '../components/Button'
-import { Input, Error, Label, Info} from '../components/Form'
+import { Input, Error, Info} from '../components/Form'
 import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
 import Loader from '../components/Loader'
 import { useApi } from '../src/apiHelpers'
@@ -45,18 +45,18 @@ const ResetPassword = ()=>{
   switch(status) {
     case 'normal':
     case 'loading':
-      return h('form', {onSubmit}, h(Box, {width:400, ma: true }, [
+      return h(FormBox, {onSubmit, width:400, ma: true }, [
         h('h1', COPY.header),
-        h(Label, [
-          COPY.passwordInput,
+        h(LabelBox, {gap: 8}, [
+          h('h4', COPY.passwordInput),
           h(Input, {
             type: 'password',
             value: formData.password,
             onChange: e => setFormData({...formData, password:e.target.value})
           }),
         ]),
-        h(Label, [
-          COPY.confirmInput,
+        h(LabelBox, {gap:8}, [
+          h('h4', COPY.confirmInput),
           h(Input, {
             type: 'password',
             value: formData.confirmPassword,
@@ -64,7 +64,7 @@ const ResetPassword = ()=>{
           })
         ]),
         h(Primary, {type: 'submit', style: {justifySelf:'end'}}, status === 'loading' ? h(Loader) : 'Submit')
-      ]))
+      ])
     case 'success': return h(Info, [
       'Awesome, we reset your password, go ahead and ',
       h(Link, {href:'/login'}, h('a', 'login'))

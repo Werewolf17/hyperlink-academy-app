@@ -6,7 +6,7 @@ import { GetTemplatesResult } from 'pages/api/courses/[id]/templates'
 import Loader, { PageLoader } from 'components/Loader'
 import { useState, useEffect } from 'react'
 import { course_templates } from '@prisma/client'
-import { Box } from 'components/Layout'
+import { Box, LabelBox, FormBox } from 'components/Layout'
 import { Input, Radio } from 'components/Form'
 import { Primary, Secondary } from 'components/Button'
 import {CreateTemplateMsg, CreateTemplateResult} from 'pages/api/courses/[id]/templates'
@@ -66,8 +66,8 @@ function TemplateSettings() {
       h('p', `You can create templates to be included in every cohort's forum, or to be
 triggered by a facilitator at any time`)
     ]),
-    h('form', {onSubmit}, h(Box, {gap: 32}, [
-      h('label', {}, h(Box, {width: 400}, [
+    h(FormBox, {onSubmit, gap: 32}, [
+      h(LabelBox, {width: 400}, [
         h('h4', "Template Name"),
         h(Input, {
           disabled: template?.required || undefined,
@@ -75,8 +75,8 @@ triggered by a facilitator at any time`)
           value: formState.name,
           onChange: e => setFormState({...formState, name: e.currentTarget.value})
         })
-      ])),
-      h('label', {}, h(Box, {width: 640}, [
+      ]),
+      h(LabelBox, {width: 640}, [
         h('h4', "Type"),
         h(Radio, {
           disabled: template?.required || undefined,
@@ -96,8 +96,8 @@ triggered by a facilitator at any time`)
             ])}
           ] as const
         })
-      ])),
-      h('label', {}, h(Box, {width: 400}, [
+      ]),
+      h(LabelBox, {width: 400}, [
         h('h4', "Template Title"),
         h('p.textSecondary', "Default title of the published template. You'll be able to edit this when publishing to a cohort"),
         h(Input, {
@@ -105,8 +105,8 @@ triggered by a facilitator at any time`)
           value: formState.title,
           onChange: e => setFormState({...formState, title: e.currentTarget.value})
         })
-      ])),
-      h('label', {}, h(Box, [
+      ]),
+      h(LabelBox, [
         h('div', [
           h('h4', "Template Body"),
           h(Box, {width: 400}, [
@@ -118,7 +118,7 @@ triggered by a facilitator at any time`)
           value: formState.content,
           onChange: e=>setFormState({...formState, content: e.currentTarget.value})
         }),
-      ])),
+      ]),
       h(Box, {h: true, gap: 8, style:{justifySelf: 'end'}}, [
         h(Secondary, {
           disabled,
@@ -134,7 +134,7 @@ triggered by a facilitator at any time`)
           ? h(Loader)
           : templateId === 'new' ? 'Create New Template' : "Update Template")
       ])
-    ]))
+    ])
   ])
 }
 

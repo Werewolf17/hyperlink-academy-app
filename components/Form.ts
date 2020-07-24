@@ -4,12 +4,6 @@ import {colors} from './Tokens'
 import { Box } from './Layout'
 import { useState } from 'react'
 
-export let Label = styled('label')`
-font-weight: bold;
-display: grid;
-grid-gap: 8px;
-`
-
 export let CheckBox = styled('label')`
 display: grid;
 align-items: center;

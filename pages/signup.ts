@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
-import { Box} from '../components/Layout'
-import { Label, Input, Error, Info, CheckBox, PasswordInput} from '../components/Form'
+import { Box, LabelBox, FormBox} from '../components/Layout'
+import { Input, Error, Info, CheckBox, PasswordInput} from '../components/Form'
 import { Primary, LinkButton} from '../components/Button'
 import {AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
@@ -48,15 +48,15 @@ const Signup = () => {
     return h(VerifyEmail, {email: formData.email, resendEmail: onSubmit})
   }
 
-  return h('form', {onSubmit}, h(Box, {width: 400, ma: true, gap: 32}, [
+  return h(FormBox, {onSubmit, width: 400, ma: true, gap: 32}, [
     h('h1', 'Sign Up'),
     status === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
       '.'
     ])) : null,
-    h(Box, {gap:8},[
-      h('div',[
-        h('label', {for: 'username'}, h('h4', "Your username")),
+    h(LabelBox, {gap:8},[
+      h('div', [
+        h('h4', "Your username"),
         h('small.textSecondary', "Pick a username unique to you"),
       ]),
       h(Input, {type: 'text',
@@ -78,9 +78,9 @@ const Signup = () => {
         ? ''
         : usernameValid ? h('span.accentSuccess', 'Great! This username is available') : h('span.accentRed', "Sorry, that username is taken")
     ]),
-    h(Box, {gap:8}, [
+    h(LabelBox, {gap:8}, [
       h('div', [
-        h('label', {for: 'username'}, h('h4', "Your Email")),
+        h('h4', "Your Email"),
         h('small.textSecondary', "You'll have to verify this in a moment"),
       ]),
       h(Input, {type: 'email',
@@ -89,9 +89,9 @@ const Signup = () => {
                 value: formData.email,
                 onChange: (e)=> setFormData({...formData, email:e.currentTarget.value})})
     ]),
-    h(Box, {gap:8}, [
+    h(LabelBox, {gap:8}, [
       h("div", [
-        h('label', {for: 'new-password'}, h('h4', "A Password")),
+        h('h4', "A Password"),
         h('small.textSecondary', "Minimum length 8 characters"),
       ]),
       h(PasswordInput, {
@@ -101,10 +101,10 @@ const Signup = () => {
                 value: formData.password,
                 onChange: (e)=> setFormData({...formData, password:e.currentTarget.value})})
     ]),
-    h(Box, {gap:8}, [
+    h(LabelBox, {gap:8}, [
       h('div', [
-      h('label', {for: 'newsletter'}, h('h4', "Want to get email updates")),
-      h('small.textSecondary', "We send out updates on new courses and features. We'll never spam or share your email."),
+        h('h4', "Want to get email updates"),
+        h('small.textSecondary', "We send out updates on new courses and features. We'll never spam or share your email."),
       ]),
       h(CheckBox, [
         h(Input, {type: 'checkbox', name: 'newsletter', checked: formData.newsletter, onChange: e=> {
@@ -117,7 +117,7 @@ const Signup = () => {
       h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, status === 'loading' ? h(Loader) : COPY.submitButton),
       h(Link, {href:"/login"}, h(LinkButton, {style:{justifySelf: 'end'}}, 'Log in with an existing account'))
     ])
-  ]))
+  ])
 }
 
 const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
@@ -148,7 +148,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
       h(Primary, {onClick: ()=> router.push('/dashboard')}, 'Back to hyperlink')
   ])
 
-  return h('form', {onSubmit}, h(Box, {width: 400, ma: true, gap: 32}, [
+  return h(FormBox, {onSubmit, width: 400, ma: true, gap: 32}, [
     h(AccentImg, {src: '/img/plane.gif', alt: "an animated gif of a paper airplane taking off" }),
     h('h1', 'Verify your email'),
     props.email ? h(Box, {gap: 8}, [
@@ -162,17 +162,15 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
         h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
       ]) : null,
       h('div', {style: {width: '100%'}}, [
-        h(Label, [
-          h(Input, {
-            type: 'text',
-            value: key,
-            onChange: e=>setKey(e.currentTarget.value)
-          })
-        ])
+        h(Input, {
+          type: 'text',
+          value: key,
+          onChange: e=>setKey(e.currentTarget.value)
+        })
       ]),
     ]),
     h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, status  === 'loading' ? h(Loader) : "Confirm your email")
-  ]))
+  ])
 }
 
 export default Signup
