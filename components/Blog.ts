@@ -12,7 +12,7 @@ type Props = {
 export const Header = (props:Props) =>{
   return h('div', [
     h(Box, {gap: 16}, [
-    h('div.textSecondary', ['<< ' , h(Link, {href: "/blog"}, h('a.notBlue', 'back to blog'))]),
+    h('div.textSecondary', ['<< ' , h(Link, {href: "/blog"}, h('a.notBlue', 'Back to blog'))]),
       h(Box, {gap:8},[
         h('h2', props.title),
         h('b', `By ${props.author} | ${props.date}`)
@@ -24,7 +24,7 @@ export const Header = (props:Props) =>{
 export const BlogLayout:React.FC<Props> = (props) =>{
   return h(Box, {width:640}, [
     h(Box, {gap: 16}, [
-    h('div.textSecondary', ['<< ' , h(Link, {href: "/blog"}, h('a.notBlue', 'back to blog'))]),
+    h('div.textSecondary', ['<< ' , h(Link, {href: "/blog"}, h('a.notBlue', 'Back to blog'))]),
       h(Box, {gap:8},[
         h('h1', props.title),
         h('b.textSecondary', `By ${props.author} | ${props.date}`)

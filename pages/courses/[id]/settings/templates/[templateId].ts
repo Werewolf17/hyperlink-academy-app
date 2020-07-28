@@ -61,7 +61,7 @@ function TemplateSettings() {
 
   return h(Box, {gap: 64}, [
     h(Box, {width: 640}, [
-      h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]/settings", as: `/courses/${router.query.id}/settings`}, h('a.notBlue', 'back to settings'))]),
+      h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]/settings", as: `/courses/${router.query.id}/settings`}, h('a.notBlue', 'Back to settings'))]),
       h('h2', router.query.templateId === 'new' ? 'Add a New Template' : "Edit this Template"),
       h('p', `You can create templates to be included in every cohort's forum, or to be
 triggered by a facilitator at any time`)
