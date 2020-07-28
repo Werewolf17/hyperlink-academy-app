@@ -35,6 +35,7 @@ async function handler (req: Request) {
   let course = await prisma.courses.findOne({
     where: {id: msg.courseId},
     select: {
+      slug: true,
       id: true,
       category_id: true,
       name: true,
@@ -47,7 +48,7 @@ async function handler (req: Request) {
   })
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
 
-  let id = course.id + '-' + course.course_cohorts.length
+  let id = course.slug + '-' + course.course_cohorts.length
   let admin = await getUsername(msg.facilitator)
   if(!admin) return {status: 404, result: "ERROR: no user found with id: " + msg.facilitator} as const
   await createGroup({name: id, visibility_level:2, owner_usernames: admin})
@@ -94,6 +95,7 @@ async function handler (req: Request) {
       people: {select: {display_name: true, username: true}}
     },
     data: {
+      category_id: category.id,
       id,
       start_date: msg.start,
       courses: {

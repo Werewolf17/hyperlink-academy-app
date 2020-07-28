@@ -299,9 +299,9 @@ export const getStaticProps = async (ctx:any)=>{
 
   if(!cohort) return {props: {notFound: true}} as const
 
-  let notes = await getTaggedPost(course.slug+ '/' + cohortId, 'note')
+  let notes = await getTaggedPost(cohort.category_id, 'note')
+  let artifacts = await getTaggedPost(cohort.category_id, 'artifact')
   let curriculum = await getTaggedPost(course.slug, 'curriculum')
-  let artifacts = await getTaggedPost(course.slug + '/' + cohortId, 'artifact')
   return {props: {notFound: false, cohortNum, cohort, courseId, course, notes, curriculum, artifacts}, unstable_revalidate: 1} as const
 }
 

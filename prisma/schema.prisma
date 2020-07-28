@@ -28,6 +28,7 @@ model course_cohorts {
   completed         String?
   live              Boolean             @default(false)
   course            Int
+  category_id       Int                 @unique
   courses           courses             @relation(fields: [course], references: [id])
   people            people              @relation(fields: [facilitator], references: [id])
   people_in_cohorts people_in_cohorts[]

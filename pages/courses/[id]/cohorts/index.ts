@@ -152,7 +152,7 @@ export const getStaticProps = async (ctx: any) =>{
 
 
     let cohortsWithContent = await Promise.all(cohorts.map(async cohort => {
-        let details = await getTaggedPost(course?.slug+ '/' + cohort.id, 'note')
+        let details = await getTaggedPost(cohort.category_id, 'note')
         return {...cohort, details}
     }))
 

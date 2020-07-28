@@ -63,7 +63,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }})
     await prisma.disconnect()
 
-    let gettingStarted = await getTaggedPost(`${cohort.course}/${cohort.id}`, 'getting-started')
+    let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
     await addMember(groupId, username)
     await sendCohortEnrollmentEmail(person.email, {

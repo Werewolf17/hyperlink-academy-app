@@ -40,7 +40,7 @@ async function enroll (req: Request) {
     }})
 
     await addMember(groupId, user.username)
-    let gettingStarted = await getTaggedPost(`${cohort.course}/${cohort.id}`, 'getting-started')
+    let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
     await sendCohortEnrollmentEmail(user.email, {
       name: user.display_name || user.username,

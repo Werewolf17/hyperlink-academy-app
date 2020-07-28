@@ -46,6 +46,7 @@ async function updateCohort(req:Request) {
 export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
     where: {id},
     select: {
+      category_id: true,
       start_date: true,
       id: true,
       live: true,
