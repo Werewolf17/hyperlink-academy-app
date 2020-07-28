@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse} from 'next'
+import * as Sentry from '@sentry/node'
 import { useState, useEffect} from 'react'
 import useSWR from 'swr'
 
@@ -21,19 +22,28 @@ type Result = {
 type Methods = "POST" | "GET" | "PUT" | "DELETE"
 
 export const APIHandler = (handler: Handler | Partial<{POST: Handler, GET: Handler, PUT: Handler, DELETE: Handler}>) => {
+  Sentry.init({ dsn: process.env.NEXT_PUBLIC_SENTRY_DSN});
   return async (req:NextApiRequest, res: NextApiResponse) => {
     let result
-    if(typeof handler === 'object') {
-      let method = req.method as Methods
-      let methodHandler = handler[method]
-      if(!methodHandler) {
-        res.status(404).end()
-        return
+    try {
+      if(typeof handler === 'object') {
+        let method = req.method as Methods
+        let methodHandler = handler[method]
+        if(!methodHandler) {
+          res.status(404).end()
+          return
+        }
+        result = await methodHandler(req)
       }
-      result = await methodHandler(req)
+      else {
+        result = await handler(req)
+      }
     }
-    else {
-      result = await handler(req)
+    catch(e) {
+      Sentry.captureException(e)
+      await Sentry.flush(2000)
+      console.log(e)
+      return res.status(500).end()
     }
 
     if(result.headers) {
