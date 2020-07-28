@@ -3,8 +3,16 @@ import Head from 'next/head'
 import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js'
 import Layout from '../components/Layout';
+import * as Sentry from '@sentry/node'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
+
+if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+  Sentry.init({
+    enabled: process.env.NODE_ENV === 'production',
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  })
+}
 
 type Props = {
   Component: any,
@@ -12,11 +20,10 @@ type Props = {
 }
 
 const App = ({ Component, pageProps}:Props) => {
-
   return h(Elements, {stripe:stripePromise},[
-           h(Head, {children: []}, h('title', 'hyperlink.academy')),
-           h(Layout, {}, [h(Component, {...pageProps})])
-          ])
+    h(Head, {children: []}, h('title', 'hyperlink.academy')),
+    h(Layout, {}, [h(Component, {...pageProps})])
+  ])
 }
 
 export default App
