@@ -1,0 +1,20 @@
+This is a template for scheduling an event — a synchronous session with the participants of the cohort.
+
+This can be a group meeting for everyone to attend, or you can use to schedule optional office hours or one-on-one meetings.
+
+Please edit this topic to include most or all of the elements listed below!
+
+❗️**Important:** Once you publish this event topic, edit the topic on the forum and insert an Event:
+
+- In the composer, hit the gear icon above the text box and select "Create an Event"
+- Fill out the time and hit "Create" (you can leave the name blank), then save the topic
+
+## [Event Title]
+
+Replace with: short description of the event, and how to join
+
+Be sure to include a live call link! You can insert a Jitsi link by editing the topic on the forum and clicking the video icon in the composer toolbar. Or you can user any other service of your choice, like Zoom or Google Meet.
+
+## Details
+
+Replace with: further details about the event. Do participants need Zoom or a Google account to join the call? Anything else they need to do to prepare?

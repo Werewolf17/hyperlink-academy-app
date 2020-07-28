@@ -6,7 +6,7 @@ Please edit this topic to include most or all of the elements listed below!
 
 All *other* posts in this forum category are private to participants in this cohort. Note that each course also has its own forum space, parent to this one, that is publicly visible.
 
-## **Schedule**
+## Schedule
 
 Replace with: outline of specific dates and times for any synchronous meetings or deadlines for this cohort.
 
@@ -14,7 +14,7 @@ Replace with: outline of specific dates and times for any synchronous meetings o
 
 If your meetings are regularly scheduled (for example, every Monday for six weeks), be sure to list any days when the course will deviate from the norm (rescheduling around holidays, for example).
 
-## **Amendments**
+## Amendments
 
 Replace with: anything changes to the curriculum specific to this cohort, that deviate from or override the main course description.
 
