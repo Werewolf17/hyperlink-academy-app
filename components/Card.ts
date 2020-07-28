@@ -37,7 +37,7 @@ type Cohort = {
   enrolled?:boolean,
   facilitating?: boolean,
   id: string,
-  course: string,
+  course: number,
 }
 export const SmallCohortCard = (props: Cohort) => {
   return h(Link, {

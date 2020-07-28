@@ -21,6 +21,7 @@ async function enroll (req: Request) {
     include: {
       courses: {
         select: {
+          category_id: true,
           cost: true,
           name: true
         }
@@ -46,7 +47,7 @@ async function enroll (req: Request) {
       course_start_date: cohort.start_date,
       course_name: cohort.courses.name,
       cohort_page_url: `https://hyperlink.academy/courses/${cohort.course}/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.course}/${cohort.id}`,
+      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/${cohort.id}`,
       get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
     })
     return {

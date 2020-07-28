@@ -34,7 +34,7 @@ const COPY = {
   inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested! If you've been invited, please log in."),
   invited: h('span.accentSuccess', "You're invited!"),
   noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
-  noUpcomingMaintainer: (props:{courseId:string})=> h('span.accentRed', [
+  noUpcomingMaintainer: (props:{courseId:number})=> h('span.accentRed', [
     "Looks like there aren't any cohorts of this course planned, maybe ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'create one'))
   ]),
   enrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!"),
@@ -170,7 +170,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
   ])
 }
 //feature to add a new cohort to a course
-function MarkCourseLive(props: {id:string}) {
+function MarkCourseLive(props: {id:number}) {
   let {data:course, mutate} = useCourseData(props.id)
   let [state, setState] = useState<'normal'|'confirm'|'loading'|'complete'>('normal')
 
@@ -209,7 +209,7 @@ function MarkCourseLive(props: {id:string}) {
 }
 
 // Feature to edit course detail (length, prereqs, one line description)
-const Banners = (props:{draft: boolean, id: string, isMaintainer: boolean}) => {
+const Banners = (props:{draft: boolean, id: number, isMaintainer: boolean}) => {
   if(props.draft && props.isMaintainer) {
     return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
       h(Box, {gap:16}, [
@@ -227,11 +227,12 @@ up. You can read `,
 }
 
 export const getStaticProps = async (ctx:any) => {
-  let id = (ctx.params?.id || '' )as string
+  let id = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+  if(id === NaN) return {props: {notFound: true}} as const
 
   let data = await courseDataQuery(id)
   if(!data) return {props:{notFound: true}} as const
-  let content = await getTaggedPost(id, 'curriculum')
+  let content = await getTaggedPost(data.category_id, 'curriculum')
 
   return {props: {notFound: false, content, id, course: data}, unstable_revalidate: 1} as const
 }

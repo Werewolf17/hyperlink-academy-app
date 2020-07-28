@@ -21,7 +21,7 @@ export const useProfileData = (username:string, initialData?:Success<ProfileResu
 }
 
 export type Course = Success<CourseDataResult>
-export const useCourseData = (id: string, initialData?:Success<CourseDataResult>) => {
+export const useCourseData = (id: number, initialData?:Success<CourseDataResult>) => {
   return useSWR('/api/courses/' + id, async api => {
     let res = await callApi<null, CourseDataResult>(api)
     if(res.status === 200) return res.result
@@ -29,7 +29,7 @@ export const useCourseData = (id: string, initialData?:Success<CourseDataResult>
 }
 
 export type Cohort = Success<CohortResult>
-export const useCohortData = (course:string, cohort: string, initialData?:Success<CohortResult>) => {
+export const useCohortData = (course:number, cohort: string, initialData?:Success<CohortResult>) => {
   return useSWR(`/api/courses/${course}/cohorts/${cohort}`, async api => {
     let res = await callApi<null, CohortResult>(api)
     if(res.status === 200) return res.result

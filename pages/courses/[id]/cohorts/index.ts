@@ -80,7 +80,7 @@ let Cohort = (props: {
     invited: boolean,
     invite_only?: boolean,
     id: string,
-    course: string
+    course: number
     start_date: string
 })=>{
     let {data: user} = useUserData()
@@ -128,7 +128,8 @@ let Cohort = (props: {
 }
 
 export const getStaticProps = async (ctx: any) =>{
-    let courseId = (ctx.params?.id || '' )as string
+    let courseId = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+    if(courseId === NaN) return {props: {notFound: true}} as const
     let prisma = new PrismaClient()
 
     let course = await courseDataQuery(courseId)

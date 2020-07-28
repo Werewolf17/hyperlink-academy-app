@@ -9,7 +9,9 @@ let prisma = new PrismaClient()
 export default APIHandler(inviteToCourse)
 async function inviteToCourse(req:Request) {
   let msg = req.body as Partial<InviteToCourseMsg>
-  let courseID = req.query.id as string
+  let courseID = parseInt(req.query.id as string)
+  if(courseID === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+
   if(!msg.email && !msg.username) return {status: 400, result: "ERROR: Must include username or email"} as const
 
   let email = msg.email || ''

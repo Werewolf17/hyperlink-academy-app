@@ -54,7 +54,7 @@ export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
         select: {display_name: true, username: true}
       },
       courses: {
-        select: {name: true, id: true, cost: true, duration: true, description: true}
+        select: {name: true, id: true, cost: true, duration: true, description: true, category_id: true}
       },
       people_in_cohorts: {
         include: {
@@ -70,9 +70,13 @@ export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
 })
 
 async function getCohortData(req: Request) {
-  let courseId = req.query.id as string
+  let courseId = parseInt(req.query.id as string)
+  if(courseId === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+
+  let course = await prisma.courses.findOne({where:{id: courseId}})
+  if(!course) return {status: 404, result: "ERROR: cannot find course"} as const
   let cohortId = req.query.cohortId
-  let id = `${courseId}-${cohortId}`
+  let id = `${course.slug}-${cohortId}`
 
   let data = await cohortDataQuery(id)
   if(!data) return {status: 404, result: `Error: no cohort with id ${id} found`} as const

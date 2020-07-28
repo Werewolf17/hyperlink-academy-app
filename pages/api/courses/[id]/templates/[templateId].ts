@@ -15,7 +15,8 @@ export type DeleteTemplateResult = ResultType<typeof deleteTemplate>
 export default APIHandler({POST: updateTemplate, DELETE: deleteTemplate})
 
 async function deleteTemplate(req: Request) {
-  let courseId = req.query.id as string
+  let courseId = parseInt(req.query.id as string)
+  if(courseId === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
   let tempalteId = req.query.templateId as string
   let user = getToken(req)
   if(!user) return {status: 401, result: "ERROR: no user logged in"} as const
@@ -43,7 +44,9 @@ async function deleteTemplate(req: Request) {
 
 async function updateTemplate(req: Request) {
   let msg = req.body as Partial<UpdateTemplateMsg>
-  let courseId = req.query.id as string
+  let courseId = parseInt(req.query.id as string)
+  if(courseId === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+
   let templateId = req.query.templateId as string
   let user = getToken(req)
   if(!user) return {status: 401, result: "ERROR: no user logged in"} as const

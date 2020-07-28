@@ -6,7 +6,7 @@ import { getUsername, createGroup, createCategory, updateTopic, createTopic, upd
 let prisma = new PrismaClient()
 
 export type CreateCohortMsg = {
-  courseId: string,
+  courseId: number,
   start: string,
   facilitator: string,
 }

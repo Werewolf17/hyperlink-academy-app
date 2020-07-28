@@ -73,7 +73,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           ]),
         ]),
         !inCohort && !isFacilitator ? null : h(Box, [
-          h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.id}/${cohort.id}`}
+          h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/${cohort.id}`}
             , h(Primary, 'Go to the forum')),
           !isFacilitator ? null : h(Link, {
             href: "/courses/[id]/cohorts/[cohortId]/templates",
@@ -127,7 +127,7 @@ grid-template-columns: max-content min-content;
 grid-gap: 16px;
 `
 
-const EnrollInCohort = (props:{id:string, course: string}) => {
+const EnrollInCohort = (props:{id:string, course: number}) => {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
@@ -213,7 +213,7 @@ const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   }}, 'Mark as complete')
 }
 
-const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: string, courses: {id: string}}}) => {
+const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: string, courses: {id: number, category_id: number}}}) => {
   return h(Modal, {display:props.display}, [
     h(Box, {gap: 32}, [
       h('h2', "You're enrolled!"),
@@ -223,7 +223,7 @@ const WelcomeModal = (props: {display:boolean, cohort:{start_date: string, id: s
 you'll be doing on your first day`),
       h('a', {
         style: {margin: 'auto'},
-        href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
+        href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.category_id}/${props.cohort.id}`
       }, h(Primary, "Get started")),
       h(Link, {
         href:'/courses/[id]/cohorts/[cohortId]',
@@ -240,7 +240,7 @@ const Banners = (props:{
   enrolled?: boolean,
 })=>{
   let isStarted = (new Date(props.cohort.start_date)).getTime() - (new Date()).getTime()
-  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.id}/${props.cohort.id}`
+  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.category_id}/${props.cohort.id}`
 
   if(props.facilitating && !props.cohort.live) return h(TwoColumnBanner, {red: true}, h(Box, {gap:16}, [
     h(Box, {gap: 8, className: "textSecondary"}, [
@@ -287,18 +287,21 @@ const Banners = (props:{
 
 export const getStaticProps = async (ctx:any)=>{
   let cohortNum = (ctx.params?.cohortId || '' )as string
-  let courseId = (ctx.params?.id || '' )as string
+  let courseId = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+  if(courseId === NaN) return {props: {notFound: true}} as const
 
-  let cohortId = courseId + '-' + cohortNum
 
-  let cohort = await cohortDataQuery(cohortId)
   let course = await courseDataQuery(courseId)
+  if(!course) return {props: {notFound: true}} as const
 
-  if(!cohort || !course) return {props: {notFound: true}} as const
+  let cohortId = course.slug + '-' + cohortNum
+  let cohort = await cohortDataQuery(cohortId)
 
-  let notes = await getTaggedPost(courseId + '/' + cohortId, 'note')
-  let curriculum = await getTaggedPost(ctx.params.id, 'curriculum')
-  let artifacts = await getTaggedPost(ctx.params.id + '/' + cohortId, 'artifact')
+  if(!cohort) return {props: {notFound: true}} as const
+
+  let notes = await getTaggedPost(course.slug+ '/' + cohortId, 'note')
+  let curriculum = await getTaggedPost(course.slug, 'curriculum')
+  let artifacts = await getTaggedPost(course.slug + '/' + cohortId, 'artifact')
   return {props: {notFound: false, cohortNum, cohort, courseId, course, notes, curriculum, artifacts}, unstable_revalidate: 1} as const
 }
 

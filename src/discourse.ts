@@ -77,7 +77,6 @@ export async function updateTopic(topic:string, input: {category_id: number, tit
 }
 
 export async function createTopic(input:{title: string, category: number | string, raw: string, tags?: string[]}, asUser?: string) {
-  console.log(input.category)
   let result = await fetch('https://forum.hyperlink.academy/posts.json', {
     method: "POST",
     headers: {
@@ -166,7 +165,7 @@ export const addMember = async (groupId:string, username: string) => {
   return result.status  === 200
 }
 
-export const getTaggedPost = async (c: string, tag: string) => {
+export const getTaggedPost = async (c: string | number, tag: string) => {
   let res = await fetch(`https://forum.hyperlink.academy/c/${c}.json`, {
     method: 'GET',
     headers: {
