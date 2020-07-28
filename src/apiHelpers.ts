@@ -22,7 +22,9 @@ type Result = {
 type Methods = "POST" | "GET" | "PUT" | "DELETE"
 
 export const APIHandler = (handler: Handler | Partial<{POST: Handler, GET: Handler, PUT: Handler, DELETE: Handler}>) => {
-  Sentry.init({ dsn: process.env.NEXT_PUBLIC_SENTRY_DSN});
+  if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+    Sentry.init({ dsn: process.env.NEXT_PUBLIC_SENTRY_DSN});
+  }
   return async (req:NextApiRequest, res: NextApiResponse) => {
     let result
     try {
@@ -40,8 +42,10 @@ export const APIHandler = (handler: Handler | Partial<{POST: Handler, GET: Handl
       }
     }
     catch(e) {
-      Sentry.captureException(e)
-      await Sentry.flush(2000)
+      if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+        Sentry.captureException(e)
+        await Sentry.flush(2000)
+      }
       console.log(e)
       return res.status(500).end()
     }
