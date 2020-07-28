@@ -1,0 +1,27 @@
+This is a template for your cohort to run a retrospective — collecting valuable feedback from participants that will help the course improve over time.
+
+Please edit this topic to include most or all of the following elements — or anything else you like!
+
+## Questions
+
+Replace with: particular questions you'd like students to answer at the end of the cohort, aimed at helping your course improve.
+
+The questions below are just examples. You'll get better feedback if you ask targeted questions about specific aspects of your course. Tweak these questions, or write your own!
+
+- What did you expect to get out of this course? Were those expectations met? If not, how do you feel about the progress you made in this course (if any)?
+- What specific things (moments, techniques, conversations) did you feel were most useful to learning in this course?
+- What do you wish we'd spent more time on? Anything you felt we should add?
+- What's one thing you'd suggest we change or remove?
+- Please share anything else you'd like us to know!
+
+Participants: you can quote some or all of these questions to structure your replies below.
+
+## Sharing the Retro
+
+Replace with: how the info from this retrospective will be used to improve the course. For example:
+
+The maintainers of this course will review all feedback collected in this retrospective process. We'll think hard about how we can improve the course structure, specific processes, even particular assignments, questions, or readings.
+
+We may follow up if we want to get more detail on anything mentioned below. 
+
+Thanks so much for taking the time to help us improve this course — we really appreciate it!

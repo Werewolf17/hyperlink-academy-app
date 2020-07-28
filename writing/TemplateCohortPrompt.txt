@@ -1,0 +1,7 @@
+This is a template for a prompt — a question or discussion topic you'd like participants to discuss or respond to.
+
+Please edit this topic to include any details necessary to spark this discussion!
+
+## [Prompt Title]
+
+Replace with: the prompt itself, with as much detail as you need, and how you'd like participants to respond below.

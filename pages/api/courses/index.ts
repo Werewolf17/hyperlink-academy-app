@@ -5,6 +5,11 @@ import {getToken} from '../../../src/token'
 import { ResultType, Request, APIHandler} from '../../../src/apiHelpers'
 import TemplateCohortGettingStarted from 'writing/TemplateCohortGettingStarted.txt'
 import TemplateCohortNotes from 'writing/TemplateCohortNotes.txt'
+import TemplateCohortArtifact from 'writing/TemplateCohortArtifact.txt'
+import TemplateCohortAssignment from 'writing/TemplateCohortAssignment.txt'
+import TemplateCohortEvent from 'writing/TemplateCohortEvent.txt'
+import TemplateCohortPrompt from 'writing/TemplateCohortPrompt.txt'
+import TemplateCohortRetrospective from 'writing/TemplateCohortRetrospective.txt'
 import {slugify} from 'src/utils'
 
 let prisma = new PrismaClient()
@@ -99,6 +104,36 @@ async function createCourse(req: Request) {
           title: "Notes",
           type: 'prepopulated',
           required: true
+        }, {
+          content: TemplateCohortArtifact,
+          name: "Artifact",
+          title: "Artifact",
+          type: 'triggered',
+          required: true
+        }, {
+          content: TemplateCohortAssignment,
+          name: "Assignment",
+          title: "Assignment",
+          type: 'triggered',
+          required: false
+        }, {
+          content: TemplateCohortEvent,
+          name: "Event",
+          title: "Event",
+          type: 'triggered',
+          required: false
+        }, {
+          content: TemplateCohortPrompt,
+          name: "Prompt",
+          title: "Prompt",
+          type: 'triggered',
+          required: false
+        }, {
+          content: TemplateCohortRetrospective,
+          name: "Retrospective",
+          title: "Retrospective",
+          type: 'triggered',
+          required: false
         }]
       }
     },

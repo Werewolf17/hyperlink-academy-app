@@ -1,0 +1,21 @@
+This is a template for an assignment you want to give participants in this cohort.
+
+Please edit this topic with description, instructions, or anything else that makes sense for the assignment you'd like to share. The text below is just a starting point.
+
+## [Assignment Title]
+
+Replace with: summary description of the assignment. What are participants creating? What's the learning goal in the context of this course?
+
+## Instructions
+
+Replace with: details on the expected format or process for completing the assignment.
+
+Example (for a final writeup):
+
+- Please post a link to a Google Doc with 500 words on what you learned
+- Make sure that sharing is turned on so others can comment
+
+Example (for a photography workshop)
+
+- Select your three favorite photos from the week's theme
+- Upload them to a post here, each preceded with a one-paragraph description

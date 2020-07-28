@@ -1,0 +1,13 @@
+This is a template for collecting the artifact resulting from this cohort — a final, publicly viewable summary of what participants learned or created during the course.
+
+❗️**Important:** The contents of this post will appear on the cohort page, visible to everyone. Don't post anything you don't want to be publicly shared.
+
+Please edit this topic with an artifact that makes sense for your course.
+
+## [Artifact Title]
+
+Replace with: summary description of what the cohort created or learned together.
+
+This may be a final writeup, a summary of each participant's project, a link roundup to externally hosted  assignments — whatever makes sense for your course.
+
+Note that participants can reply to this post, but only this initial post of the topic will be published to the cohort page as its public artifact.

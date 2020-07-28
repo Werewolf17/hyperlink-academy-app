@@ -17,7 +17,7 @@ export default APIHandler({POST: updateTemplate, DELETE: deleteTemplate})
 async function deleteTemplate(req: Request) {
   let courseId = parseInt(req.query.id as string)
   if(courseId === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
-  let tempalteId = req.query.templateId as string
+  let templateId = req.query.templateId as string
   let user = getToken(req)
   if(!user) return {status: 401, result: "ERROR: no user logged in"} as const
 
@@ -32,7 +32,7 @@ async function deleteTemplate(req: Request) {
   try {
     await prisma.course_templates.delete({
       where: {name_course: {
-        name: tempalteId,
+        name: templateId,
         course: courseId
       }}
     })
