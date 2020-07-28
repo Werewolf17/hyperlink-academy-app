@@ -43,7 +43,7 @@ export const APIHandler = (handler: Handler | Partial<{POST: Handler, GET: Handl
     }
     catch(e) {
       if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-        Sentry.captureException(e)
+        Sentry.captureException(e, {contexts: {...req.headers}})
         await Sentry.flush(2000)
       }
       console.log(e)
