@@ -27,12 +27,12 @@ async function postTopic(req:Request) {
     select:{
       facilitator: true,
       id: true,
-      courses: {select: {id: true}}}
+      courses: {select: {id: true, slug: true}}}
   })
   if(!cohort) return {status:404, result: `ERROR: Cannot find cohort ${cohortNum} in course ${courseId}`} as const
 
   if(cohort.facilitator !== user.id) return {status:401, result:`ERROR: User is not facilitator of cohort`} as const
-  let category = await getCategory(cohort.courses.id + '/' + cohort.id)
+  let category = await getCategory(cohort.courses.slug + '/' + cohort.id)
 
   let topic = await createTopic({
     title: msg.title,
