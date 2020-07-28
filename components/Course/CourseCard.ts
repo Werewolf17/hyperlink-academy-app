@@ -11,7 +11,7 @@ import { prettyDate } from '../../src/utils'
 type Props = {
   name:string,
   description: string
-  id: string,
+  id: number,
   href?:string,
   start_date: string
   cohort?: boolean

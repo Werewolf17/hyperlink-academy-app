@@ -129,7 +129,7 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
   ])
 }
 
-const InvitePerson = (props:{id: string})=> {
+const InvitePerson = (props:{id: number})=> {
   let [emailOrUsername, setEmailOrUsername] = useState('')
   let [valid, setValid] = useState<null | boolean>(null)
   let [status, callInviteToCourse] = useApi<InviteToCourseMsg, InviteToCourseResponse>([emailOrUsername], ()=>setEmailOrUsername(''))
@@ -316,7 +316,8 @@ grid-gap: 16px;
 `
 
 export const getStaticProps = async (ctx:any) => {
-  let id = (ctx.params?.id || '' )as string
+  let id = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+  if(id === NaN) return {props: {notFound: true}} as const
 
   let data = await courseDataQuery(id)
   if(!data) return {props:{notFound: true}} as const

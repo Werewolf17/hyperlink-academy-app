@@ -44,6 +44,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       include: {
         courses: {
           select: {
+            category_id: true,
             name: true
           }
         }
@@ -70,7 +71,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       course_start_date: prettyDate(cohort.start_date),
       course_name: cohort.courses.name,
       cohort_page_url: `https://hyperlink.academy/courses/${cohort.course}/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.course}/${cohort.id}`,
+      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/${cohort.id}`,
       get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
     })
 

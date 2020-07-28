@@ -20,7 +20,8 @@ export default APIHandler({POST: updateCourse, GET:getCourseData})
 
 async function updateCourse(req: Request) {
   let msg = req.body as Partial<UpdateCourseMsg>
-  let courseId = req.query.id as string
+  let courseId = parseInt(req.query.id as string)
+  if(courseId === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
   let user = getToken(req)
   if(!user) return {status: 403, result: "ERROR: No user logged in"} as const
   let course = await prisma.courses.findOne({
@@ -56,8 +57,8 @@ async function updateCourse(req: Request) {
   return {status: 200, result: {prerequisites: newData.prerequisites, duration: newData.duration}} as const
 }
 
-export const courseDataQuery = (id:string) => prisma.courses.findOne({
-  where: {id },
+export const courseDataQuery = (id:number) => prisma.courses.findOne({
+  where: {id},
   include: {
     course_maintainers: {
       include: {
@@ -93,7 +94,8 @@ export const courseDataQuery = (id:string) => prisma.courses.findOne({
 })
 
 async function getCourseData(req: Request) {
-  let id = req.query.id as string
+  let id = parseInt(req.query.id as string)
+  if(id === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
   let data = await courseDataQuery(id)
 
   if(!data) return {status: 403, result: `ERROR: no course with id ${id} found`} as const

@@ -8,12 +8,12 @@ datasource db {
 }
 
 model activation_keys {
-  created_time  String
-  email         String
   key_hash      String  @id
-  newsletter    Boolean @default(false)
+  created_time  String
   password_hash String
+  email         String
   username      String
+  newsletter    Boolean @default(false)
 }
 
 model admins {
@@ -22,28 +22,28 @@ model admins {
 }
 
 model course_cohorts {
-  completed         String?
-  course            String
-  facilitator       String
   id                String              @id
-  live              Boolean             @default(false)
   start_date        String
+  facilitator       String
+  completed         String?
+  live              Boolean             @default(false)
+  course            Int
   courses           courses             @relation(fields: [course], references: [id])
   people            people              @relation(fields: [facilitator], references: [id])
   people_in_cohorts people_in_cohorts[]
 }
 
 model course_invites {
-  course  String
   email   String
+  course  Int
   courses courses @relation(fields: [course], references: [id])
 
   @@id([course, email])
 }
 
 model course_maintainers {
-  course     String
   maintainer String
+  course     Int
   courses    courses @relation(fields: [course], references: [id])
   people     people  @relation(fields: [maintainer], references: [id])
 
@@ -51,15 +51,16 @@ model course_maintainers {
 }
 
 model courses {
-  category_id        Int
-  cost               Float
   description        String
-  duration           String
-  id                 String               @id
-  invite_only        Boolean              @default(false)
+  cost               Float
   name               String
+  duration           String
+  category_id        Int
   prerequisites      String
+  invite_only        Boolean              @default(false)
   status             course_status        @default(draft)
+  slug               String               @unique
+  id                 Int                  @default(autoincrement()) @id
   course_cohorts     course_cohorts[]
   course_invites     course_invites[]
   course_maintainers course_maintainers[]
@@ -68,30 +69,30 @@ model courses {
 
 model course_templates {
   content  String
-  course   String
   name     String
-  required Boolean?       @default(false)
-  title    String
   type     template_types @default(prepopulated)
+  title    String
+  required Boolean?       @default(false)
+  course   Int
   courses  courses        @relation(fields: [course], references: [id])
 
   @@id([name, course])
 }
 
 model password_reset_keys {
+  key_hash     String @id
   created_time String
   email        String
-  key_hash     String @id
 }
 
 model people {
-  bio                String?
-  display_name       String?
-  email              String               @unique
   id                 String               @id
-  link               String?
+  email              String               @unique
+  display_name       String?
   password_hash      String               @unique
   username           String               @unique
+  bio                String?
+  link               String?
   admins             admins[]
   course_cohorts     course_cohorts[]
   course_maintainers course_maintainers[]
@@ -99,8 +100,8 @@ model people {
 }
 
 model people_in_cohorts {
-  cohort         String
   person         String
+  cohort         String
   course_cohorts course_cohorts @relation(fields: [cohort], references: [id])
   people         people         @relation(fields: [person], references: [id])
 
