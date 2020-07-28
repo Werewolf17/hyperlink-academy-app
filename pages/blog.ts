@@ -37,7 +37,6 @@ export const getStaticProps = async () =>{
   let posts = fs.readdirSync('./pages/blog').map((file)=>{
     let content = fs.readFileSync('./pages/blog/'+file)
     let {data} = matter(content)
-    console.log(data)
     return {...data, path: '/blog/'+file.slice(0, -4)} as Blog
   })
 

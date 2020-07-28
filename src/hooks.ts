@@ -22,7 +22,6 @@ export const useMediaQuery = (query: string) => {
     let mediaQuery = window.matchMedia(query)
     setMatch(mediaQuery.matches)
     let listener = ()=>{
-      console.log('yoo')
       setMatch(mediaQuery.matches)
     }
     mediaQuery.addListener(listener)
