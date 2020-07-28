@@ -44,7 +44,7 @@ You can create new templates in the `,
     ]),
     h(Box, {}, props.templates
       ?.filter(t=>t.type === 'triggered')
-      .sort((a, b)=>  a.name > b.name ? -1 : 1)
+      .sort((a, b)=>  a.name > b.name ? 1 : -1)
       .flatMap(template => {
         return [
           h(Box, {h: true, style: {gridAutoColumns: 'auto'}},[

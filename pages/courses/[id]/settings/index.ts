@@ -260,7 +260,7 @@ pre-populated with topics.`),
       }, h(Primary, "+ Add A New Template")),
     ]),
     h(Box, {}, props.course.course_templates
-      .sort((a, b)=>  a.name > b.name ? -1 : 1)
+      .sort((a, b)=>  a.name > b.name ? 1 : -1)
       .sort((a)=> a.required ? -1 : 1)
       .flatMap(template => {
         return [
