@@ -19,7 +19,7 @@ async function createTemplate(req:Request) {
   if(!msg.name || !msg.title || !msg.content || (msg.type !== 'prepopulated' && msg.type !== 'triggered')) return {status: 400, result: "ERROR: Invalid message"} as const
 
   let courseID = parseInt(req.query.id as string)
-  if(courseID === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  if(Number.isNaN(courseID)) return {status: 400, result: "ERROR: Course id is not a number"} as const
 
   let course = await prisma.courses.findOne({where: {id: courseID}, select: {
     course_maintainers: true,
@@ -48,7 +48,7 @@ export const getTemplatesQuery = (courseId:number) => prisma.course_templates.fi
 
 async function getTemplates(req:Request) {
   let courseID = parseInt(req.query.id as string)
-  if(courseID === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  if(Number.isNaN(courseID)) return {status: 400, result: "ERROR: Course id is not a number"} as const
 
   let user = getToken(req)
   if(!user) return {status:400, result: "ERROR: No user logged in!"} as const

@@ -228,7 +228,7 @@ up. You can read `,
 
 export const getStaticProps = async (ctx:any) => {
   let id = parseInt((ctx.params?.id as string || '' ).split('-')[0])
-  if(id === NaN) return {props: {notFound: true}} as const
+  if(Number.isNaN(id)) return {props: {notFound: true}} as const
 
   let data = await courseDataQuery(id)
   if(!data) return {props:{notFound: true}} as const

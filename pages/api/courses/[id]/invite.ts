@@ -10,7 +10,7 @@ export default APIHandler(inviteToCourse)
 async function inviteToCourse(req:Request) {
   let msg = req.body as Partial<InviteToCourseMsg>
   let courseID = parseInt(req.query.id as string)
-  if(courseID === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  if(Number.isNaN(courseID)) return {status: 400, result: "ERROR: Course id is not a number"} as const
 
   if(!msg.email && !msg.username) return {status: 400, result: "ERROR: Must include username or email"} as const
 

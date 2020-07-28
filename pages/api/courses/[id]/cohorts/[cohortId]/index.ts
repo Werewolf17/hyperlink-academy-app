@@ -71,7 +71,7 @@ export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
 
 async function getCohortData(req: Request) {
   let courseId = parseInt(req.query.id as string)
-  if(courseId === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  if(Number.isNaN(courseId)) return {status: 400, result: "ERROR: Course id is not a number"} as const
 
   let course = await prisma.courses.findOne({where:{id: courseId}})
   if(!course) return {status: 404, result: "ERROR: cannot find course"} as const

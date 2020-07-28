@@ -129,7 +129,7 @@ let Cohort = (props: {
 
 export const getStaticProps = async (ctx: any) =>{
     let courseId = parseInt((ctx.params?.id as string || '' ).split('-')[0])
-    if(courseId === NaN) return {props: {notFound: true}} as const
+    if(Number.isNaN(courseId)) return {props: {notFound: true}} as const
     let prisma = new PrismaClient()
 
     let course = await courseDataQuery(courseId)

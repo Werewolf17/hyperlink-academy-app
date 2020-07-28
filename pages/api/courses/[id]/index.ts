@@ -21,7 +21,7 @@ export default APIHandler({POST: updateCourse, GET:getCourseData})
 async function updateCourse(req: Request) {
   let msg = req.body as Partial<UpdateCourseMsg>
   let courseId = parseInt(req.query.id as string)
-  if(courseId === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  if(Number.isNaN(courseId)) return {status: 400, result: "ERROR: Course id is not a number"} as const
   let user = getToken(req)
   if(!user) return {status: 403, result: "ERROR: No user logged in"} as const
   let course = await prisma.courses.findOne({
@@ -95,7 +95,7 @@ export const courseDataQuery = (id:number) => prisma.courses.findOne({
 
 async function getCourseData(req: Request) {
   let id = parseInt(req.query.id as string)
-  if(id === NaN) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  if(Number.isNaN(id)) return {status: 400, result: "ERROR: Course id is not a number"} as const
   let data = await courseDataQuery(id)
 
   if(!data) return {status: 403, result: `ERROR: no course with id ${id} found`} as const
