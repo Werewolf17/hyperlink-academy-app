@@ -62,7 +62,7 @@ export const courseDataQuery = (id:number) => prisma.courses.findOne({
   include: {
     course_maintainers: {
       include: {
-        people: {select: {display_name: true}}
+        people: {select: {display_name: true, username: true}}
       }
     },
     course_templates: true,
@@ -95,7 +95,7 @@ export const courseDataQuery = (id:number) => prisma.courses.findOne({
 
 async function getCourseData(req: Request) {
   let id = parseInt(req.query.id as string)
-  if(Number.isNaN(id)) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  if(Number.isNaN(id) ) return {status: 400, result: "ERROR: Course id is not a number"} as const
   let data = await courseDataQuery(id)
 
   if(!data) return {status: 403, result: `ERROR: no course with id ${id} found`} as const

@@ -102,14 +102,17 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
     h('h2', 'Add a new Cohort'),
     status === 'error' ? h(Error, 'An error occured') : null,
     status === 'success' ? h(Info, 'Cohort created!') : null,
-    h(Select, {
-      required: true,
-      onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facilitator: e.currentTarget.value})
-    }, [
-      h('option', {value: ''}, "Select a facilitator"),
-      ...(props.course.course_maintainers.map(maintainer => {
-        return h('option', {value: maintainer.maintainer}, maintainer.people.display_name)
-      })||[])
+    h(LabelBox, {gap:8}, [
+      h('h4', "Facilitator"),
+      h(Select, {
+        required: true,
+        onChange: (e:React.ChangeEvent<HTMLSelectElement>)=> setNewCohort({...newCohort, facilitator: e.currentTarget.value})
+      }, [
+        h('option', {value: ''}, "Select a facilitator"),
+        ...(props.course.course_maintainers.map(maintainer => {
+          return h('option', {value: maintainer.maintainer}, maintainer.people.display_name || maintainer.people.username)
+        })||[])
+      ])
     ]),
     h(LabelBox, {gap:8}, [
       h('h4', 'Start Date'),
