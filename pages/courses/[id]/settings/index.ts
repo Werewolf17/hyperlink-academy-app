@@ -254,7 +254,10 @@ function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
       h('p', `To help facilitators get started every new cohort is created with a forum
 pre-populated with topics.`),
       h('p', `You can tweak the ones we provided or add new ones here.`),
-      h(Link, {href: '/courses/[id]/settings/templates/new', as:`/courses/${props.course.id}/settings/templates/new`}, h(Primary, "+ Add A New Template")),
+      h(Link, {
+        href: '/courses/[id]/settings/templates/[templateId]',
+        as:`/courses/${props.course.id}/settings/templates/new`
+      }, h(Primary, "+ Add A New Template")),
     ]),
     h(Box, {}, props.course.course_templates
       .sort((a, b)=>  a.name > b.name ? -1 : 1)

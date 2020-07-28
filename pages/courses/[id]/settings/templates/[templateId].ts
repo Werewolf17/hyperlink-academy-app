@@ -48,7 +48,7 @@ function TemplateSettings() {
     }
     if(res.status === 200) {
       setStatus('success')
-      if(templateId === 'new') router.push(`/courses/[id]/settings/templates/[templateID]`,
+      if(templateId === 'new') router.push(`/courses/[id]/settings/templates/[templateId]`,
                                            `/courses/${courseId}/settings/templates/${res.result.name}`)
     }
   }
