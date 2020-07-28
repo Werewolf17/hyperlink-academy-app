@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse} from 'next'
+import * as Sentry from '@sentry/node'
 import { useState, useEffect} from 'react'
 import useSWR from 'swr'
 
@@ -21,6 +22,7 @@ type Result = {
 type Methods = "POST" | "GET" | "PUT" | "DELETE"
 
 export const APIHandler = (handler: Handler | Partial<{POST: Handler, GET: Handler, PUT: Handler, DELETE: Handler}>) => {
+  Sentry.init({ dsn: process.env.NEXT_PUBLIC_SENTRY_DSN});
   return async (req:NextApiRequest, res: NextApiResponse) => {
     let result
     if(typeof handler === 'object') {
