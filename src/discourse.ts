@@ -175,7 +175,6 @@ export const getTaggedPost = async (c: string | number, tag: string) => {
   })
 
   let category = await res.json() as Category
-  console.log(category)
   let topicID = category.topic_list.topics.find((topic) => topic.tags.includes(tag))?.id
   if(!topicID) return {text: '', id: ''}
   let topicRequest = await fetch('https://forum.hyperlink.academy/raw/' + topicID, {headers})
