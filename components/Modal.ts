@@ -24,7 +24,8 @@ export const Modal:React.SFC<{display:boolean, onExit?: Function}> = (props)=>{
 }
 
 const CloseButton = styled('a')`
-font-family: 'Roboto Mono', monospace;
+font-family: 'Lato', sans-serif;
+font-size: .875rem;
 justify-self: right;
 color: ${colors.textSecondary};
 &:visited {
@@ -41,8 +42,9 @@ color: #00008B;
 export const ModalBox = styled('div')`
 position: fixed;
 border: 2px solid;
-background-color: white;
+background-color: ${colors.appBackground};
 max-width: 400px;
+width: 60%;
 padding: 32px;
 left: 50%;
 top: 50%;

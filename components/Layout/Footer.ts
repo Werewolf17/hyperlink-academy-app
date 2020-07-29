@@ -23,8 +23,8 @@ export default ()=>{
         ]),
         h(Box, {gap: 4}, [
           h('h4', "Technical"),
-          h(FooterLink, {href: 'https://gitlab.com/jaredpereira/hyperlink-academy'}, "Source code"),
-          h(FooterLink, {href: 'https://gitlab.com/jaredpereira/hyperlink-academy/-/issues/new?'}, "Report a bug"),
+          h(FooterLink, {href: 'https://gitlab.com/jaredpereira/hyperlink-academy'}, "Source Code"),
+          h(FooterLink, {href: 'https://gitlab.com/jaredpereira/hyperlink-academy/-/issues/new?'}, "Report a Bug"),
         ]),
       ]),
       h('br'),

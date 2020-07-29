@@ -10,7 +10,7 @@ import Enroll from 'components/Course/Enroll'
 import { TwoColumn, Box, Seperator, Sidebar} from 'components/Layout'
 import { Tabs } from 'components/Tabs'
 import { Pill } from 'components/Pill'
-import { Primary, Destructive, Secondary} from 'components/Button'
+import { Primary, Destructive, Secondary, BackButton} from 'components/Button'
 import Loader, { PageLoader } from 'components/Loader'
 import { Info } from 'components/Form'
 import { Modal } from 'components/Modal'
@@ -32,7 +32,6 @@ const COPY = {
   detailsTab: "Details",
   artifactsTab: "Artifacts",
   curriculumTab: "Curriculum",
-  backToCourse: 'Back to Course',
   details: "Details",
   participants: "Participants",
   updateNotes: (props: {id: string}) => h(Info, [
@@ -62,7 +61,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     h(TwoColumn, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
-          h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
+          h(BackButton, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, 'Course Details'),
           h(Box, {gap:4}, [
             h('h1', cohort?.courses.name),
             h('h3.textSecondary', 'Cohort '+cohort?.name),

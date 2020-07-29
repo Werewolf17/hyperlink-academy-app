@@ -5,6 +5,7 @@ export const colors = {
   grey55: "#8C8C8C",
   grey35: "#595959",
   grey15: "#272727",
+  appBackground : "#FDFCFA",
   textSecondary: '#595959',
   textPrimary: '#272727',
   borderColor: "#8C8C8C",

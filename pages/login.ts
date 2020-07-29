@@ -14,7 +14,7 @@ import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
 
 const COPY = {
-  emailOrUsernameInput: "Your Email or Username",
+  emailOrUsernameInput: "Email or Username",
   passwordInput: "Password",
   resetPassword: "Reset password",
   loginHeader: "Welcome Back!",
@@ -51,30 +51,34 @@ const Login = () => {
   if (typeof reset !== 'undefined') return h(ResetPassword)
 
   return h(FormBox, {onSubmit, width: 400, ma: true}, [
-    h('h1', COPY.loginHeader),
-    status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
-    h(LabelBox, {gap:16}, [
-      h('h4', COPY.emailOrUsernameInput),
-      h(Input, {
-        type: 'text',
-        value: formData.emailOrUsername,
-        required: true,
-        onChange: (e) => setFormData({ ...formData, emailOrUsername: e.currentTarget.value })
-      }),
-    ]),
-    h(LabelBox, {gap:16}, [
-      h('h4', COPY.passwordInput),
-      h(Input, {
-        type: 'password',
-        value: formData.password,
-        required: true,
-        onChange: (e) => setFormData({ ...formData, password: e.currentTarget.value })
-      }),
-      h(Link, { href: '/login?reset' }, h(LinkButton, COPY.resetPassword))
-    ]),
-    h(Box, {gap: 8, style: {justifySelf: 'end', justifyItems: "end"}}, [
-      h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : COPY.loginButton),
-      h(Link, { href: '/signup' }, h(LinkButton, COPY.createAccount))
+    h(Box, {gap:32}, [
+      h('h1', COPY.loginHeader),
+      status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
+
+      h(LabelBox, {gap:8}, [
+        h('h4', COPY.emailOrUsernameInput),
+        h(Input, {
+          type: 'text',
+          value: formData.emailOrUsername,
+          required: true,
+          onChange: (e) => setFormData({ ...formData, emailOrUsername: e.currentTarget.value })
+        }),
+      ]),
+      
+      h(LabelBox, {gap:8}, [
+        h('h4', COPY.passwordInput),
+        h(Input, {
+          type: 'password',
+          value: formData.password,
+          required: true,
+          onChange: (e) => setFormData({ ...formData, password: e.currentTarget.value })
+        }),
+        h(Link, { href: '/login?reset' }, h(LinkButton, COPY.resetPassword))
+      ]),
+      h(Box, {gap: 8, style: {justifySelf: 'end', justifyItems: "end"}}, [
+        h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : COPY.loginButton),
+        h(Link, { href: '/signup' }, h(LinkButton, COPY.createAccount))
+      ])
     ])
   ])
 }

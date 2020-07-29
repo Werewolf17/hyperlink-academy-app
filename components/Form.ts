@@ -9,6 +9,7 @@ display: grid;
 align-items: center;
 grid-template-columns: 16px auto;
 grid-gap: 16px;
+background-color: white;
 
 input[type="checkbox"]:focus {
   border: 1px solid;
@@ -47,8 +48,6 @@ input[type="checkbox"]:checked::before {
 input[type="checkbox"]:checked {
   border: 2px solid;
 }
-
-
 `
 
 export function PasswordInput(props:Exclude<Parameters<typeof Input>[0], 'type'>) {
@@ -67,7 +66,7 @@ export function PasswordInput(props:Exclude<Parameters<typeof Input>[0], 'type'>
 }
 
 let ToggleButton = styled('button')`
-font-family: monospace;
+font-family: 'Roboto Mono', monospace;
 color: ${colors.textSecondary};
 outline: none;
 background-color: inherit;
@@ -85,16 +84,23 @@ export let Input = styled('input')`
 padding: 12px 16px;
 border: 1px solid;
 border-color: ${colors.grey55};
+border-radius: 2px;
 font-size: inherit;
 font-family: inherit;
+
 `
 
 export const Textarea = styled('textarea')`
 resize: vertical;
-font-size: 1rem;
 padding: 12px 16px;
+border: 1px solid;
+border-color: ${colors.grey55};
+border-radius: 2px;
+padding: 12px 16px;
+font-size: 1rem;
 height: 128px;
 font-family: Lato;
+border-radius: 2px;
 `
 
 export const Error = styled('div')`
@@ -130,8 +136,8 @@ export function Radio<T extends readonly {value:string, component:React.ReactEle
       h(RadioButton, {
         key: item.value,
         onChange: (e)=>{
-          e.preventDefault()
-          props.onChange(e.currentTarget.value)
+          if(props.disabled) e.preventDefault()
+          else props.onChange(e.currentTarget.value)
         },
         value: item.value,
         name: props.name,
@@ -193,6 +199,7 @@ background-color: black;
 
 const Container = styled('div')`
 display: grid;
+background-color: white;
 grid-template-columns: 100% auto;
 `
 
