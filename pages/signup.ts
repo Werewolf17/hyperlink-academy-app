@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
@@ -48,6 +48,9 @@ const Signup = () => {
   }
 
   return h(FormBox, {onSubmit, width: 400, ma: true, gap: 32}, [
+    // h(AccentImg, {src: '/img/sailboat-2.gif', alt: "an animated gif of a sailboat, boatin'", style: {marginTop:-132} }),
+
+    h(LoopingImg),
     h('h1', 'Sign Up'),
     status === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
@@ -170,6 +173,23 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
     ]),
     h(Primary, {type: 'submit', status, style:{justifySelf: 'right'}}, "Confirm your email")
   ])
+}
+
+function LoopingImg() {
+  let [looping, setLooping] = useState(false)
+  let imageRef = useRef<HTMLImageElement>(null)
+  useEffect(()=> {
+    if(imageRef.current?.complete && !looping) {
+      setTimeout(()=>setLooping(true), 333)
+    }
+  }, [])
+
+  if(!looping) {
+    return h(AccentImg, {ref: imageRef, onLoad: () => {
+      setTimeout(()=>setLooping(true), 333)
+    }, src: '/img/sailboat-1.gif', alt: "an animated gif of a sailboat, boatin'" })
+  }
+  return h(AccentImg, {src: '/img/sailboat-2.gif', alt: "an animated gif of a sailboat, boatin'" })
 }
 
 export default Signup
