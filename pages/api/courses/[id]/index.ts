@@ -54,7 +54,7 @@ async function updateCourse(req: Request) {
     }
   })
 
-  return {status: 200, result: {prerequisites: newData.prerequisites, duration: newData.duration}} as const
+  return {status: 200, result: newData} as const
 }
 
 export const courseDataQuery = (id:number) => prisma.courses.findOne({

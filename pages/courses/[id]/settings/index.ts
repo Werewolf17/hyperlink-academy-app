@@ -191,6 +191,7 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
   useEffect(()=>setFormData(props.course), [props])
 
   let changed = props.course.duration !== formData.duration
+    || props.course.name !== formData.name
     || props.course.cost !== formData.cost
     || props.course.prerequisites !== formData.prerequisites
     || props.course.description !== formData.description
