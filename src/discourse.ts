@@ -32,7 +32,7 @@ export async function createGroup(group:{name: string, visibility_level: number,
     console.log(await result.text())
     return false
   }
-  return true
+  return await result.json() as {basic_group: {id: number}}
 }
 
 export async function updateTopic(topic:string, input: {category_id: number, title: string, raw: string, tags: string[]}, username?: string) {
@@ -106,7 +106,20 @@ export const createCategory = async (name: string, options?: {slug?: string,perm
   return false
 }
 
-export async function updateCategory (id: string | number, options: {permissions?: {[key:string]: number}, name: string}) {
+export async function updateGroup(id: number, newName: string) {
+  let result = await fetch(`https://forum.hyperlink.academy/g/${id}.json`, {
+    method: "PUT",
+    headers: {
+      ...headers,
+      "Content-Type": 'application/json; charset=utf-8'
+    },
+    body: JSON.stringify({name: newName})
+  })
+  if(result.status !== 200) console.log(await result.text())
+  else return true
+}
+
+export async function updateCategory (id: string | number, options: {permissions?: {[key:string]: number}, name: string, slug?: string}) {
   let result = await fetch(`https://forum.hyperlink.academy/categories/${id}`, {
     method: "PUT",
     headers: {

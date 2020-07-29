@@ -1,7 +1,8 @@
 import { ResultType, APIHandler, Request} from '../../../../src/apiHelpers'
 import { getToken } from '../../../../src/token'
 import { PrismaClient } from '@prisma/client'
-import { updateCategory } from '../../../../src/discourse'
+import { updateCategory, updateGroup } from '../../../../src/discourse'
+import { slugify } from 'src/utils'
 
 const prisma = new PrismaClient()
 
@@ -30,6 +31,7 @@ async function updateCourse(req: Request) {
       status: true,
       name: true,
       category_id: true,
+      maintainer_group: true,
       course_maintainers: {where: {maintainer: user.id}}
     }
   })
@@ -42,9 +44,20 @@ async function updateCourse(req: Request) {
     if(!await updateCategory(course.category_id, {permissions: {everyone: 1}, name: course.name})) return {status:500, result: "ERROR: unable to update course category"} as const
   }
 
+  let slug
+  if(msg.name) {
+    slug = slugify(msg.name)
+    await updateGroup(course.maintainer_group, slug+'-m')
+    await updateCategory(course.category_id, {
+      name: msg.name,
+      slug: slug
+    })
+  }
+
   let newData = await prisma.courses.update({
     where: {id: courseId},
     data: {
+      slug,
       duration: msg.duration,
       status: msg.status,
       prerequisites: msg.prerequisites,
@@ -53,6 +66,8 @@ async function updateCourse(req: Request) {
       name: msg.name
     }
   })
+
+
 
   return {status: 200, result: newData} as const
 }

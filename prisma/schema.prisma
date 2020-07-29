@@ -62,6 +62,7 @@ model courses {
   status             course_status        @default(draft)
   slug               String               @unique
   id                 Int                  @default(autoincrement()) @id
+  maintainer_group   Int                  @unique
   course_cohorts     course_cohorts[]
   course_invites     course_invites[]
   course_maintainers course_maintainers[]

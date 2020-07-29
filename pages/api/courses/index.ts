@@ -62,9 +62,8 @@ async function createCourse(req: Request) {
   let slug = slugify(msg.name)
 
   let groupName = slug +'-m'
-  if(!(await createGroup({name: groupName, visibility_level: 2, owner_usernames: maintainers.map(m=>m.username)}))) {
-    return {status: 500, result: "ERROR: couldn't create course maintainers group"} as const
-  }
+  let group = await createGroup({name: groupName, visibility_level: 2, owner_usernames: maintainers.map(m=>m.username)})
+  if(!group) return {status: 500, result: "ERROR: couldn't create course maintainers group"} as const
 
   let category = await createCategory(msg.name, {slug, permissions: {[groupName]:1}})
   if(!category) return {status: 500, result: "ERROR: couldn't create course category"} as const
@@ -77,6 +76,7 @@ async function createCourse(req: Request) {
 
   await prisma.courses.create({
     data: {
+      maintainer_group: group.basic_group.id,
       category_id: category.id,
       slug: slugify(msg.name),
       name: msg.name,
