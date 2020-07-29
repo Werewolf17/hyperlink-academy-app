@@ -58,19 +58,20 @@ const BlogPost = (props:Blog) => {
     ])
 }
 
-// To add new tag types, add them to this object. Add the tag type and a color the tag should be. 
+// To add new tag types, add them to this object. Add the tag type and a color the tag should be.
 const tagColors:{[key: string]:string | undefined} = {
     'announcement': '#cc2288',
     'book-review': '#cc3322',
     'learning-design': '#11aacc',
+    'hyperlink-meta': '#1d44d6',
     'stargazing': '#6B8648'
 }
 
-// This is a function that creates tags with the appropriate tag type and color based on the list above. 
+// This is a function that creates tags with the appropriate tag type and color based on the list above.
 const Tag = styled(Pill) <{tagType: string}>`
     background-color: ${props => tagColors[props.tagType] || colors.grey35};
     color: white;
     &::after{
         content: "${props => props.tagType}";
-    } 
+    }
 `
