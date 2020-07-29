@@ -17,8 +17,8 @@ import { FeedbackMsg, FeedbackResult } from '../../pages/api/feedback'
 import Loader from '../Loader'
 
 const COPY = {
-  feedbackTitle: "Tell us what's on your mind",
-  feedbackSuccess: "🎉 thank you for your thoughts 🎉"
+  feedbackTitle: "Tell us what's on your mind!",
+  feedbackSuccess: "🎉 Thank you for your thoughts 🎉"
 }
 
 export default () => {

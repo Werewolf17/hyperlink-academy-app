@@ -3,7 +3,7 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 
 import {Box} from './Layout'
-import { Mobile } from './Tokens'
+import { Mobile, colors } from './Tokens'
 
 type Props = {
   tabs: {
@@ -28,7 +28,7 @@ export const Tabs = (props:Props) => {
 export const StickyWrapper = styled('div')`
 position: sticky;
 top: 0px;
-background-color: white;
+background-color: ${colors.appBackground};
 
 padding-top: 48px;
 margin-top: -48px;

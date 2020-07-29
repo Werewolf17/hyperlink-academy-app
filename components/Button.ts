@@ -1,5 +1,7 @@
 import styled from "@emotion/styled";
 import {colors} from  './Tokens'
+import h from "react-hyperscript";
+import Link from 'next/link'
 
 export const Primary = styled('button')<{disabled?: boolean, success?:boolean}>`
 font-family: Roboto Mono;
@@ -64,9 +66,22 @@ color: ${colors.grey55};
 export const LinkButton = styled('a')`
 color: blue;
 text-decoration: underline;
-font-family: monospace;
+font-family: 'Roboto Mono', monospace;
 
 &:hover {
 cursor: pointer;
 }
 `
+
+export const BackButton:React.FC <{href:string, as?:string, shallow?:boolean}> = (props) => {
+    return  h('div.textSecondary', [
+        '⇠ ' , 
+        h(Link, {href: `${props.href}`, as:props.as, shallow:props.shallow}, 
+            h('a.notBlue', [
+                'Back to ',
+                props.children
+            ]) 
+        )
+        //capitalize the first letter of the page name
+    ])
+}

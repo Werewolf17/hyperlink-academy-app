@@ -17,7 +17,7 @@ html {
 }
 
 body {
-  background-color: #FDFCFA;
+  background-color: ${colors.appBackground};
 }
 
 a.notBlue {
@@ -64,22 +64,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-font-size:2.8rem;
-font-weight: bold;
+  font-size:2.8rem;
+  font-weight: bold;
 }
 
 h2 {
   font-size: 2rem;
-font-weight: bold;
+  font-weight: bold;
 }
 
 h3 {
-font-size: 1.375rem;
-font-weight: 900;
+  font-size: 1.375rem;
+  font-weight: 900;
 }
 
 h4 {
-font-weight: 900;
+  font-weight: 900;
 }
 
 p { 
@@ -97,6 +97,9 @@ hr {
 }
 
 small {
-color: ${colors.textSecondary};
+  color: ${colors.textSecondary};
+  display: inline-block;
+  line-height: 1.25rem;
+  font-size: .875rem;
 }
 `

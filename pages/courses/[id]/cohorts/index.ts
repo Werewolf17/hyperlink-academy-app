@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Box, TwoColumn, Sidebar, WhiteContainer } from '../../../../components/Layout'
 import Enroll from '../../../../components/Course/Enroll'
 
-import { Primary } from '../../../../components/Button'
+import { Primary, BackButton } from '../../../../components/Button'
 import { useCourseData, useUserData, useUserCohorts } from '../../../../src/data'
 import { PrismaClient } from '@prisma/client'
 import { getTaggedPost } from '../../../../src/discourse'
@@ -24,11 +24,10 @@ import { courseDataQuery } from '../../../api/courses/[id]'
 const COPY = {
     empty: "There are no upcoming cohorts for this course :(",
     header: "Join a Cohort",
-    backToCourse: 'Back to Course',
     subtitle: 'Pick a cohort with a start date that works for you. Be sure to check the meeting times and any tweaks to the curriculum.',
     seeMore: "See more details",
-  inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
-  invited: h('span.accentSuccess', "You're invited!"),
+    inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
+    invited: h('span.accentSuccess', "You're invited!"),
 }
 
 
@@ -52,7 +51,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
     return h(TwoColumn, {}, [
         //Page Content
         h(Box, {gap:16}, [
-            h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
+            h(BackButton, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, 'Course Details'),
             h('h1', COPY.header),
             h('p.big', COPY.subtitle)
 

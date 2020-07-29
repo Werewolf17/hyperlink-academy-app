@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { getTemplatesQuery } from 'pages/api/courses/[id]/templates'
 import { InferGetStaticPropsType } from 'next'
 import { Box, Seperator, FormBox, LabelBox } from 'components/Layout'
-import { Secondary, Primary } from 'components/Button'
+import { Secondary, Primary, BackButton } from 'components/Button'
 import { useState, Fragment } from 'react'
 import { Input } from 'components/Form'
 import EditorWithPreview from 'components/EditorWithPreview'
@@ -22,24 +22,22 @@ function CohortTemplatesPages(props:Props) {
 
   if(template) return h(Box, {gap: 64}, [
     h(Box, {gap:16}, [
-      h('div.textSecondary', ['<< ' , h(Link, {
-        href: "",
-        shallow: true}, h('a.notBlue', 'back to templates'))]),
+      h(BackButton, {href: "", shallow:true}, 'Templates'),
       h('h1', "Post template")
     ]),
+
+
+
     h(TemplatePage, {template})
   ])
 
   return h(Box, {width: 640, gap: 64},[
     h(Box, {gap:16}, [
-      h('div.textSecondary', ['<< ' , h(Link, {
-        href: "/courses/[id]/cohorts/[cohortId]",
-        as: `/courses/${router.query.id}/cohorts/${router.query.cohortId}`}, h('a.notBlue', 'back to cohort page'))]),
+      h(BackButton, {href: "/courses/[id]/cohorts/[cohortId]", as: `/courses/${router.query.id}/cohorts/${router.query.cohortId}`}, 'Cohort Details'),
       h('h1', "Templates"),
       h('p', [
-        `Use templates to easily post new topcs in your cohort forum!
-You can create new templates in the `,
-        h(Link, {href: '/courses/[id]/settings', as:`/courses/${router.query.id}/settings`}, h('a', 'course settings'))
+        `Use templates to easily post new topcs in your cohort forum! You can create new templates in the `,
+        h(Link, {href: '/courses/[id]/settings', as:`/courses/${router.query.id}/settings`}, h('a', 'course settings')), `.`
       ])
     ]),
     h(Box, {}, props.templates

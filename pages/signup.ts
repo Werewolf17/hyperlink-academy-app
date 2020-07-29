@@ -56,8 +56,8 @@ const Signup = () => {
     ])) : null,
     h(LabelBox, {gap:8},[
       h('div', [
-        h('h4', "Your username"),
-        h('small.textSecondary', "Pick a username unique to you"),
+        h('h4', "Username"),
+        h('small.textSecondary', "Pick a unique username between 3-20 characters."),
       ]),
       h(Input, {type: 'text',
                 name: "username",
@@ -68,7 +68,7 @@ const Signup = () => {
                 onChange: (e)=> {
                   setFormData({...formData, username:e.currentTarget.value})
                   if(/\s/.test(e.currentTarget.value)){
-                    e.currentTarget.setCustomValidity('Your username cannot contain spaces')
+                    e.currentTarget.setCustomValidity('Your username cannot contain spaces.')
                   }
                   else {
                     e.currentTarget.setCustomValidity('')
@@ -76,12 +76,12 @@ const Signup = () => {
                 }}),
       usernameValid === null
         ? ''
-        : usernameValid ? h('span.accentSuccess', 'Great! This username is available') : h('span.accentRed', "Sorry, that username is taken")
+        : usernameValid ? h('span.accentSuccess', 'Great! This username is available.') : h('span.accentRed', "Sorry, that username is taken.")
     ]),
     h(LabelBox, {gap:8}, [
       h('div', [
         h('h4', "Your Email"),
-        h('small.textSecondary', "You'll have to verify this in a moment"),
+        h('small.textSecondary', "You'll have to verify this in a moment."),
       ]),
       h(Input, {type: 'email',
                 name: 'email',
@@ -91,7 +91,7 @@ const Signup = () => {
     ]),
     h(LabelBox, {gap:8}, [
       h("div", [
-        h('h4', "A Password"),
+        h('h4', "Password"),
         h('small.textSecondary', "Minimum length 8 characters"),
       ]),
       h(PasswordInput, {
@@ -103,14 +103,14 @@ const Signup = () => {
     ]),
     h(LabelBox, {gap:8}, [
       h('div', [
-        h('h4', "Want to get email updates"),
-        h('small.textSecondary', "We send out updates on new courses and features. We'll never spam or share your email."),
+        h('h4', "Get email updates?"),
+        h('small.textSecondary', "We send out occasional updates on new courses and features. We'll never spam or share your email."),
       ]),
       h(CheckBox, [
         h(Input, {type: 'checkbox', name: 'newsletter', checked: formData.newsletter, onChange: e=> {
           setFormData({...formData, newsletter: e.currentTarget.checked})
         }}),
-        "Sure! Gimme the updates"
+        "Sure! Gimme the updates."
       ]),
     ]),
     h(Box, {gap: 8}, [
@@ -145,7 +145,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   if(status === 'success') return h(Box, {width: 400, ma:true, gap: 16}, [
       h('h1', "You're verified!"),
       h(Info, "Click the button below if you're not redirected in a couple seconds"),
-      h(Primary, {onClick: ()=> router.push('/dashboard')}, 'Back to hyperlink')
+      h(Primary, {onClick: ()=> router.push('/dashboard')}, 'Back to Hyperlink')
   ])
 
   return h(FormBox, {onSubmit, width: 400, ma: true, gap: 32}, [

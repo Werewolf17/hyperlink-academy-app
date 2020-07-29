@@ -1,6 +1,6 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
-import Text from './BlogText'
+import Text from './Text'
 import {colors} from './Tokens'
 import { useMediaQuery } from 'src/hooks'
 import { useState } from 'react'
@@ -35,8 +35,10 @@ let Editor = styled('textarea')`
 box-sizing: border-box;
 height: 512px;
 padding: 16px;
-font-inherit;
-border-color: ${colors.borderColor};
+font-family: 'Lato', sans-serif;
+border-color: ${colors.grey55} !important;
+border: 1px solid;
+border-radius: 2px 0 0 2px;
 resize: none;
 `
 
@@ -47,4 +49,5 @@ padding: 16px;
 font-size: 16px;
 height: 512px;
 background-color:${colors.grey95};
+border-radius: 0 2px 2px 0;
 `

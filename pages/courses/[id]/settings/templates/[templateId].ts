@@ -1,6 +1,5 @@
 import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
 import { useApiData, callApi } from 'src/apiHelpers'
 import { GetTemplatesResult } from 'pages/api/courses/[id]/templates'
 import Loader, { PageLoader } from 'components/Loader'
@@ -8,7 +7,7 @@ import { useState, useEffect } from 'react'
 import { course_templates } from '@prisma/client'
 import { Box, LabelBox, FormBox } from 'components/Layout'
 import { Input, Radio } from 'components/Form'
-import { Primary, Secondary } from 'components/Button'
+import { Primary, BackButton, Destructive } from 'components/Button'
 import {CreateTemplateMsg, CreateTemplateResult} from 'pages/api/courses/[id]/templates'
 import { UpdateTemplateMsg, UpdateTemplateResult } from 'pages/api/courses/[id]/templates/[templateId]'
 import EditorWithPreview from 'components/EditorWithPreview'
@@ -61,13 +60,15 @@ function TemplateSettings() {
 
   return h(Box, {gap: 64}, [
     h(Box, {width: 640}, [
-      h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]/settings", as: `/courses/${router.query.id}/settings`}, h('a.notBlue', 'Back to settings'))]),
+      h(BackButton, {href: "/courses/[id]/settings", as: `/courses/${router.query.id}/settings`}, 'Setttings'),
       h('h2', router.query.templateId === 'new' ? 'Add a New Template' : "Edit this Template"),
-      h('p', `You can create templates to be included in every cohort's forum, or to be
-triggered by a facilitator at any time`)
+      h('p.big', `You can create templates to be included as a post in every cohort's forum when it's created, or can be
+triggered to post by a facilitator at any time.`)
     ]),
     h(FormBox, {onSubmit, gap: 32}, [
-      h(LabelBox, {width: 400}, [
+
+      // Template Name Input
+      h(LabelBox, {width: 400, gap: 8}, [
         h('h4', "Template Name"),
         h(Input, {
           disabled: template?.required || undefined,
@@ -76,7 +77,9 @@ triggered by a facilitator at any time`)
           onChange: e => setFormState({...formState, name: e.currentTarget.value})
         })
       ]),
-      h(LabelBox, {width: 640}, [
+
+      // Template Type Input
+      h(LabelBox, {width: 640, gap: 8}, [
         h('h4', "Type"),
         h(Radio, {
           disabled: template?.required || undefined,
@@ -88,30 +91,36 @@ triggered by a facilitator at any time`)
           items: [
             {value: "prepopulated", component: h('div', [
               h('h4', 'Prepopulated'),
-              h('span.textSecondary', "This topic will automatically be posted when each new cohort is created")
+              h('span.textSecondary', "This topic will automatically be posted when each new cohort is created.")
             ])},
             {value:"triggered", component: h('div', [
               h('h4', "Triggered"),
-              h('span.textSecondary', "This topic will be posted when the facilitator triggers it from the cohort settings page")
+              h('span.textSecondary', "This topic will be posted when the facilitator triggers it from the cohort settings page.")
             ])}
           ] as const
         })
       ]),
-      h(LabelBox, {width: 400}, [
-        h('h4', "Template Title"),
-        h('p.textSecondary', "Default title of the published template. You'll be able to edit this when publishing to a cohort"),
+
+      // Template Title Input
+      h(LabelBox, {width: 400, gap: 8}, [
+        h(Box, {gap:4}, [
+          h('h4', "Template Title"),
+          h('p.textSecondary', "Default title of the published template. You'll be able to edit this when publishing to a cohort"),
+        ]),
         h(Input, {
           type: "text",
           value: formState.title,
           onChange: e => setFormState({...formState, title: e.currentTarget.value})
         })
       ]),
-      h(LabelBox, [
-        h('div', [
+
+      // Template Body Input
+      h(LabelBox, {gap: 8}, [
+        h(Box, {gap:4}, [
           h('h4', "Template Body"),
           h(Box, {width: 400}, [
             h('p.textSecondary', "This is the default body text of the published topic. You'll be able to edit it when publishing to a cohort."),
-            h('p.textSecondary', ["You can use Markdown to format ", h('a', {href: 'https://commonmark.org/help/'}, "(here's a quick reference)")]),
+            h('p.textSecondary', ["You can use Markdown to format ", h('a', {href: 'https://commonmark.org/help/'}, "(here's a quick reference)"), '.']),
           ]),
         ]),
         h(EditorWithPreview, {
@@ -119,14 +128,16 @@ triggered by a facilitator at any time`)
           onChange: e=>setFormState({...formState, content: e.currentTarget.value})
         }),
       ]),
+
+      // Submit and Discard Changes Button
       h(Box, {h: true, gap: 8, style:{justifySelf: 'end'}}, [
-        h(Secondary, {
+        h(Destructive, {
           disabled,
           onClick: (e) => {
             e.preventDefault()
             if(template) setFormState(template)
           }
-        }, "Discard changes"),
+        }, "Discard Changes"),
         h(Primary, {
           type: 'submit',
           disabled

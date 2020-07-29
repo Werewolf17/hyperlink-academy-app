@@ -11,7 +11,7 @@ import { Course, useCourseData, useUserData } from 'src/data'
 import Loader, { PageLoader } from 'components/Loader'
 import { Box, Seperator, LabelBox, FormBox } from 'components/Layout'
 import { Info, Error, Select, Input, Textarea } from 'components/Form'
-import { Primary, Destructive, Secondary } from 'components/Button'
+import { Primary, Destructive, Secondary, BackButton } from 'components/Button'
 import { Checkmark } from 'components/Icons'
 import ErrorPage from 'pages/404'
 import { useDebouncedEffect } from 'src/hooks'
@@ -23,7 +23,6 @@ import { Modal } from 'components/Modal'
 import { DeleteTemplateResult } from 'pages/api/courses/[id]/templates/[templateId]'
 
 const COPY = {
-  backToCourse: 'Back to Course',
   cancelCohort: h('p.textSecondary', [
     `Contact us at `, h('a', {href:'mailto:contact@hyperlink.academy'}, `contact@hyperlink.academy`), ` to cancel a cohort. Optionally,  let us know the reason you’re cancelling (we’re curious 🤓)`,
   ])
@@ -48,11 +47,10 @@ function CourseSettings(props:Extract<Props, {notFound:false}>){
 
   return h(Box, {gap:64, width: 640}, [
     h(Box, {gap: 16}, [
-      h('div.textSecondary', ['<< ' , h(Link, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, h('a.notBlue', COPY.backToCourse))]),
+      h(BackButton, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, 'Course Details'),
       h('h1', "Course Settings"),
-      h('p',[
-        `We're still new and adding maintainer features! If you'd like to add a new
-maintainer, remove an cohort, or anything else, please email `,
+      h('p.big',[
+        `We're still new and adding maintainer features! If you'd like to add a new maintainer, remove an cohort, or anything else, please email `,
         h('a', {href: 'mailto:contact@hyperlink.academy'}, 'contact@hyperlink.academy')]),
     ]),
     h(Tabs, { tabs: {
