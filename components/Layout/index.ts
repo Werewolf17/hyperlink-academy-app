@@ -94,7 +94,24 @@ export const TwoColumn = styled('div')`
 display: grid;
 grid-template-columns: 2fr 1fr;
 grid-gap: 64px;
+${Tablet} {
+grid-template-columns: auto;
+}
+`
 
+export const ThreeColumn = styled('div')`
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+grid-gap: 32px;
+${Tablet} {
+grid-template-columns: auto;
+}
+`
+
+export const FourColumn = styled('div')`
+display: grid;
+grid-template-columns: 1fr 1fr 1fr 1fr;
+grid-gap: 32px;
 ${Tablet} {
 grid-template-columns: auto;
 }

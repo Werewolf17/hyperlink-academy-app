@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
 import { useEffect } from 'react'
 
-import Intro from '../writing/Intro.mdx'
+import Intro from '../writing/HomepageIntro.mdx'
 import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
 import { colors, Mobile, Tablet} from '../components/Tokens'
 import { Box, Body} from '../components/Layout'
