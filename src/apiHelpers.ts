@@ -86,7 +86,7 @@ export async function callApi<Msg extends object | string | null, R extends Omit
     } as R
 }
 
-type Status = 'normal' | 'error' | 'loading' | 'success'
+export type Status = 'normal' | 'error' | 'loading' | 'success'
 export function useApi<Msg extends object | string | null, R extends Omit<Result, 'headers'>>(deps: any[], successCallback?: (result: Extract<R, {status:200}>['result'])=> any) {
   let [state, setState] = useState<Status>('normal')
   useEffect(()=> setState('normal'), deps)

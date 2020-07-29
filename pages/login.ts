@@ -10,7 +10,6 @@ import {AccentImg} from '../components/Images'
 import { useApi } from '../src/apiHelpers'
 import { Result, Msg } from './api/login'
 import { RequestMsg, RequestResult } from './api/resetPassword/[action]'
-import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
 
 const COPY = {
@@ -76,7 +75,7 @@ const Login = () => {
         h(Link, { href: '/login?reset' }, h(LinkButton, COPY.resetPassword))
       ]),
       h(Box, {gap: 8, style: {justifySelf: 'end', justifyItems: "end"}}, [
-        h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : COPY.loginButton),
+        h(Primary, { type: 'submit',status}, COPY.loginButton),
         h(Link, { href: '/signup' }, h(LinkButton, COPY.createAccount))
       ])
     ])
@@ -113,7 +112,7 @@ const ResetPassword: React.SFC = () => {
           }),
         ]),
         h('div', { style: { display: 'grid', justifyItems: 'end', gridGap: '8px' } }, [
-          h(Primary, { type: 'submit' }, status === 'loading' ? h(Loader) : RESETCOPY.button)
+          h(Primary, { type: 'submit', status}, RESETCOPY.button)
         ])
       ])
     case 'success': return h(Box, { gap: 16, width: 400, ma: true }, [

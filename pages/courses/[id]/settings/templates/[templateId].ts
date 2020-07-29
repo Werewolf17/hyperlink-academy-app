@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import { useApiData, callApi } from 'src/apiHelpers'
 import { GetTemplatesResult } from 'pages/api/courses/[id]/templates'
-import Loader, { PageLoader } from 'components/Loader'
+import { PageLoader } from 'components/Loader'
 import { useState, useEffect } from 'react'
 import { course_templates } from '@prisma/client'
 import { Box, LabelBox, FormBox } from 'components/Layout'
@@ -139,11 +139,10 @@ triggered to post by a facilitator at any time.`)
           }
         }, "Discard Changes"),
         h(Primary, {
+          status,
           type: 'submit',
           disabled
-        }, status === 'loading'
-          ? h(Loader)
-          : templateId === 'new' ? 'Create New Template' : "Update Template")
+        }, templateId === 'new' ? 'Create New Template' : "Update Template")
       ])
     ])
   ])

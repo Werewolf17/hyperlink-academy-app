@@ -143,7 +143,7 @@ const EnrollInCohort = (props:{id:number, course: number}) => {
     await callEnroll('/api/courses/${props.course}/cohorts/${props.id}/enroll')
   }
 
-  return  h(Primary, {onClick}, status === 'loading' ? h(Loader) : ' Join this Cohort')
+  return  h(Primary, {onClick, status}, 'Join this Cohort')
 }
 
 const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {

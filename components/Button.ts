@@ -1,9 +1,22 @@
 import styled from "@emotion/styled";
+import h from 'react-hyperscript'
 import {colors} from  './Tokens'
-import h from "react-hyperscript";
+import {Status} from '../src/apiHelpers'
+import { Checkmark } from "./Icons";
+import Loader from "./Loader";
+import { ReactElement } from "react";
 import Link from 'next/link'
 
-export const Primary = styled('button')<{disabled?: boolean, success?:boolean}>`
+export const Primary:React.SFC<{disabled?:boolean, status?:Status}&Parameters<typeof PrimaryButton>[0]> =  (props)=>{
+  let displayComponent = {
+    success: Checkmark,
+    loading: h(Loader),
+    error: props.children as ReactElement,
+    normal: props.children as ReactElement
+  }
+  return h(PrimaryButton, {...props, success: props.status==='success'}, displayComponent[props.status || 'normal'])
+}
+const PrimaryButton = styled('button')<{disabled?: boolean, success?:boolean}>`
 font-family: Roboto Mono;
 font-size: inherit;
 height: fit-content;

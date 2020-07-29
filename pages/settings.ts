@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import { Box, LabelBox, FormBox} from '../components/Layout'
 import { Input, Textarea, Info } from '../components/Form'
 import { Primary, Destructive} from '../components/Button'
-import Loader from '../components/Loader'
 import { colors } from '../components/Tokens'
 
 import { useUserData } from '../src/data'
@@ -98,8 +97,7 @@ const Settings = () => {
       h(Destructive, {disabled: !changed, onClick: ()=>{
         if(user)setFormData({bio: user.bio ||'', display_name: user.display_name||'', link: user.link || ''})
       }}, "Discard Changes"),
-      h(Primary, {type: 'submit', disabled: !changed},
-        status === 'loading' ? h(Loader) : 'Save Changes')
+      h(Primary, {status, type: 'submit', disabled: !changed}, 'Save Changes')
     ])
   ])
 }
