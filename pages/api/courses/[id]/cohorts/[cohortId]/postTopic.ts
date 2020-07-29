@@ -17,19 +17,21 @@ export default APIHandler(postTopic)
 async function postTopic(req:Request) {
   let msg = req.body as Partial<PostTopicMsg>
   let courseId = req.query.id
-  let cohortNum = req.query.cohortId
+  let cohortId = parseInt(req.query.cohortId as string)
+  if(Number.isNaN(cohortId)) return {status: 400, result: "ERROR: Cohort id is not a number"} as const
+
   if(!msg.title || !msg.body || !msg.tags) return {status:400, result: "ERROR: missing field title, body, or tags"} as const
   let user = getToken(req)
   if(!user) return {status: 400, result: "ERROR: no user logged in"} as const
 
   let cohort = await prisma.course_cohorts.findOne({
-    where: {id: `${courseId}-${cohortNum}`},
+    where: {id: cohortId},
     select:{
       facilitator: true,
       id: true,
       courses: {select: {id: true, slug: true}}}
   })
-  if(!cohort) return {status:404, result: `ERROR: Cannot find cohort ${cohortNum} in course ${courseId}`} as const
+  if(!cohort) return {status:404, result: `ERROR: Cannot find cohort ${cohortId} in course ${courseId}`} as const
 
   if(cohort.facilitator !== user.id) return {status:401, result:`ERROR: User is not facilitator of cohort`} as const
   let category = await getCategory(cohort.courses.slug + '/' + cohort.id)

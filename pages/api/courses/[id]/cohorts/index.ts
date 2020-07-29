@@ -51,7 +51,8 @@ async function handler (req: Request) {
   let id = course.slug + '-' + course.course_cohorts.length
   let admin = await getUsername(msg.facilitator)
   if(!admin) return {status: 404, result: "ERROR: no user found with id: " + msg.facilitator} as const
-  await createGroup({name: id, visibility_level:2, owner_usernames: admin})
+  let group = await createGroup({name: id, visibility_level:2, owner_usernames: admin})
+  if(!group) return {status:500, result: "ERRO: unable to create group"} as const
 
   // If the course is in draft status it's category will be private so we need
   // to explicitly add the cohort group
@@ -96,7 +97,7 @@ async function handler (req: Request) {
     },
     data: {
       category_id: category.id,
-      id,
+      group_id: group.basic_group.id,
       start_date: msg.start,
       courses: {
         connect: {

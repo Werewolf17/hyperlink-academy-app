@@ -22,13 +22,15 @@ model admins {
 }
 
 model course_cohorts {
-  id                String              @id
   start_date        String
   facilitator       String
   completed         String?
   live              Boolean             @default(false)
   course            Int
   category_id       Int                 @unique
+  name              String?
+  id                Int                 @default(autoincrement()) @id
+  group_id          Int
   courses           courses             @relation(fields: [course], references: [id])
   people            people              @relation(fields: [facilitator], references: [id])
   people_in_cohorts people_in_cohorts[]
@@ -103,7 +105,7 @@ model people {
 
 model people_in_cohorts {
   person         String
-  cohort         String
+  cohort         Int
   course_cohorts course_cohorts @relation(fields: [cohort], references: [id])
   people         people         @relation(fields: [person], references: [id])
 

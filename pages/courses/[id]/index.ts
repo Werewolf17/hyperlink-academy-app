@@ -149,7 +149,7 @@ const Cohorts = (props:{cohorts: Course['course_cohorts'] & {facilitating?: bool
 }
 
 const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean}}) => {
-  let id= props.cohort.id.split('-').slice(-1)[0]
+  let id= props.cohort.id
 
   return h(Box, {gap: 16}, [
     h(Box, {gap: 8}, [
@@ -161,7 +161,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
       h('h3', {}, h(Link, {
         href:'/courses/[id]/cohorts/[cohortId]',
         as:  `/courses/${props.cohort.course}/cohorts/${id}`
-      }, h('a', {style: {textDecoration: 'none'}}, `#${id} ${props.cohort.courses.name}`))),
+      }, h('a', {style: {textDecoration: 'none'}}, `#${props.cohort.name} ${props.cohort.courses.name}`))),
     ]),
     h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
       h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
@@ -211,16 +211,25 @@ function MarkCourseLive(props: {id:number}) {
 // Feature to edit course detail (length, prereqs, one line description)
 const Banners = (props:{draft: boolean, id: number, isMaintainer: boolean}) => {
   if(props.draft && props.isMaintainer) {
+    if(props.isMaintainer){
+      return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
+        h(Box, {gap:16}, [
+          h('h3', "This course isn't live yet!"),
+          h('p',[
+            `This course is currently hidden from public view. You can make edits and get set
+up. You can read `,
+            h(Link, {href: '/manual/courses'}, h('a', 'this section')),
+            ' in the manual for some tips and help getting started'])
+        ]),
+        h(MarkCourseLive, {id: props.id})
+      ]))
+    }
     return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
       h(Box, {gap:16}, [
         h('h3', "This course isn't live yet!"),
-        h('p',[
-          `This course is currently hidden from public view. You can make edits and get set
-up. You can read `,
-          h(Link, {href: '/manual/courses'}, h('a', 'this section')),
-          ' in the manual for some tips and help getting started'])
-      ]),
-      h(MarkCourseLive, {id: props.id})
+        h('p',[`The maintainer is still working on getting this course in shape. Let them know
+if you have any feedback!`])
+      ])
     ]))
   }
   return null

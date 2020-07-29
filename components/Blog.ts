@@ -9,17 +9,6 @@ type Props = {
   date: string,
   author: string
 }
-export const Header = (props:Props) =>{
-  return h('div', [
-    h(Box, {gap: 16}, [
-    h('div.textSecondary', ['<< ' , h(Link, {href: "/blog"}, h('a.notBlue', 'Back to blog'))]),
-      h(Box, {gap:8},[
-        h('h2', props.title),
-        h('b', `By ${props.author} | ${props.date}`)
-      ])
-    ])
-  ])
-}
 
 export const BlogLayout:React.FC<Props> = (props) =>{
   return h(Box, {width:640}, [
