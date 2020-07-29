@@ -36,14 +36,14 @@ type Cohort = {
   live: boolean,
   enrolled?:boolean,
   facilitating?: boolean,
-  id: string,
+  id: number,
   course: number,
 }
 export const SmallCohortCard = (props: Cohort) => {
   return h(Link, {
     href: "/courses/[id]/cohorts/[cohortId]",
     passHref: true,
-    as:`/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)}`
+    as:`/courses/${props.course}/cohorts/${props.id}`
   }, [
     h(Card, {style:{border: '1px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 8}, [
@@ -71,7 +71,7 @@ export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
   return h(Link, {
     href: "/courses/[id]/cohorts/[cohortId]",
     passHref: true,
-    as:`/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)}`
+    as:`/courses/${props.course}/cohorts/${props.id}`
   }, [
     h(Card, {style:{border: '2px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 32}, [
@@ -82,7 +82,6 @@ export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
           !props.live ? h(Pill, {red: true, borderOnly: true},'draft') : null
           ]): null,
           h('h3', props.courses.name),
-          h('p.textSecondary', `Cohort #${props.id.split('-').slice(-1)[0]}`)
         ]),
         h('div', [
           h('b', status),

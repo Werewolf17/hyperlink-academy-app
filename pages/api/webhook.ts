@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import Stripe from 'stripe'
 import {PrismaClient} from '@prisma/client'
-import { getUsername, getGroupId, addMember, getTaggedPost} from '../../src/discourse'
+import { getUsername, addMember, getTaggedPost} from '../../src/discourse'
 import { sendCohortEnrollmentEmail } from '../../emails';
 import { prettyDate } from '../../src/utils';
 
@@ -34,7 +34,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
-    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:string, userId:string}} ;
+    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:number, userId:string}} ;
 
     let person = await prisma.people.findOne({where: {id: metadata.userId}})
     if(!person) return {status: 400, result: "ERROR: cannot find user with id: " + metadata.userId} as const
@@ -53,9 +53,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     if(!cohort) return {status: 400, result: "ERROR: no cohort with id: " + metadata.cohortId}
 
     let username = await getUsername(metadata.userId)
-    let groupId = await getGroupId(metadata.cohortId)
 
-    if(!username || !groupId) return res.status(400).send('ERROR: Cannot find user or group id, with metadata: ' + JSON.stringify(metadata))
+    if(!username) return res.status(400).send('ERROR: Cannot find user: ' + metadata.userId)
 
     await prisma.people_in_cohorts.create({data: {
       people: {connect: {id: metadata.userId}},
@@ -65,7 +64,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
-    await addMember(groupId, username)
+    await addMember(cohort.group_id, username)
     await sendCohortEnrollmentEmail(person.email, {
       name: person.display_name || person.username,
       course_start_date: prettyDate(cohort.start_date),

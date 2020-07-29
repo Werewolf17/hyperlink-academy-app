@@ -79,7 +79,7 @@ let Cohort = (props: {
     people: {username: string, display_name: string | null},
     invited: boolean,
     invite_only?: boolean,
-    id: string,
+    id: number,
     course: number
     start_date: string
 })=>{
@@ -87,7 +87,7 @@ let Cohort = (props: {
     let stripe = useStripe()
     let router = useRouter()
     let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res) => {
-        if(res.zeroCost) await router.push('/courses/[id]/[cohortId]?welcome', `/courses/${props.course}/${props.id}?welcome`)
+        if(res.zeroCost) await router.push('/courses/[id]/cohorts/[cohortId]?welcome', `/courses/${props.course}/cohorts/${props.id}?welcome`)
         else stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
@@ -96,7 +96,7 @@ let Cohort = (props: {
         if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
         if(!props.id) return
         if(!stripe) return
-        await callEnroll(`/api/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)}`)
+        await callEnroll(`/api/courses/${props.course}/cohorts/${props.id}`)
     }
 
     return h(Box, {gap:32},[
@@ -117,7 +117,7 @@ let Cohort = (props: {
                 h(Text, {source: props.details.text.slice(0, 400) + (props.details.text.length > 400 ?'...' : '')}),
                 h(Link, {
                     href: '/courses/[id]/cohorts/[cohortId]',
-                    as: `/courses/${props.course}/cohorts/${props.id.split('-').slice(-1)[0]}`
+                    as: `/courses/${props.course}/cohorts/${props.id}`
                 }, h('a', {style: {textDecoration: 'underline'}}, h('b', 'See more details')))
             ]),
         ]),

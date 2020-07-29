@@ -16,9 +16,9 @@ export type CohortResult = ResultType<typeof getCohortData>
 export default APIHandler({POST: updateCohort, GET: getCohortData})
 async function updateCohort(req:Request) {
   let msg = req.body as Partial<UpdateCohortMsg>
-  let cohortNum = req.query.cohortId as string
-  let courseId = req.query.id as string
-  let cohortId = `${courseId}-${cohortNum}`
+  let cohortId = parseInt(req.query.cohortId as string)
+  if(Number.isNaN(cohortId)) return {status: 400, result: "ERROR: Cohort id is not a number"} as const
+
   if(!msg.data) return {status: 400, result: "Error: invalid request, missing data"} as const
 
   let user = getToken(req)
@@ -43,9 +43,10 @@ async function updateCohort(req:Request) {
   return {status: 200, result: newData} as const
 }
 
-export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
+export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
     where: {id},
     select: {
+      name: true,
       category_id: true,
       start_date: true,
       id: true,
@@ -71,15 +72,10 @@ export const cohortDataQuery = (id: string)=>prisma.course_cohorts.findOne({
 })
 
 async function getCohortData(req: Request) {
-  let courseId = parseInt(req.query.id as string)
-  if(Number.isNaN(courseId)) return {status: 400, result: "ERROR: Course id is not a number"} as const
+  let cohortId = parseInt(req.query.cohortId as string)
+  if(Number.isNaN(cohortId)) return {status: 400, result: "ERROR: Cohort id is not a number"} as const
 
-  let course = await prisma.courses.findOne({where:{id: courseId}})
-  if(!course) return {status: 404, result: "ERROR: cannot find course"} as const
-  let cohortId = req.query.cohortId
-  let id = `${course.slug}-${cohortId}`
-
-  let data = await cohortDataQuery(id)
-  if(!data) return {status: 404, result: `Error: no cohort with id ${id} found`} as const
+  let data = await cohortDataQuery(cohortId)
+  if(!data) return {status: 404, result: `Error: no cohort with id ${cohortId} found`} as const
   return {status: 200, result: data} as const
 }

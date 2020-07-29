@@ -3,7 +3,7 @@ import { ResultType, APIHandler, Request } from "../../../../../../src/apiHelper
 import { sendCohortEnrollmentEmail } from '../../../../../../emails'
 import Stripe from 'stripe'
 import { getToken } from "../../../../../../src/token";
-import { addMember, getGroupId, getTaggedPost } from "../../../../../../src/discourse";
+import { addMember, getTaggedPost } from "../../../../../../src/discourse";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
@@ -12,7 +12,8 @@ export type EnrollResponse= ResultType<typeof enroll>
 export default APIHandler(enroll)
 
 async function enroll (req: Request) {
-  let cohortId = req.query.cohortId as string
+  let cohortId = parseInt(req.query.cohortId as string)
+  if(Number.isNaN(cohortId)) return {status: 400, result: "ERROR: Cohort id is not a number"} as const
   let user = getToken(req)
   if(!user) return {status: 403, result: "Error: no user logged in"} as const
 
@@ -32,14 +33,12 @@ async function enroll (req: Request) {
   if(!cohort || cohort.courses.cost === undefined) return {status: 400, result: "Error: no cohort with id " + cohortId + " found"}  as const
 
   if(cohort.courses.cost === 0) {
-    let groupId = await getGroupId(cohortId)
-
     await prisma.people_in_cohorts.create({data: {
       people: {connect: {id: user.id}},
       course_cohorts: {connect: {id: cohortId}}
     }})
 
-    await addMember(groupId, user.username)
+    await addMember(cohort.group_id, user.username)
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
     await sendCohortEnrollmentEmail(user.email, {

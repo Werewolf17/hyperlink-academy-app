@@ -164,7 +164,7 @@ export const getGroupId = async (groupName:string) => {
   return undefined
 }
 
-export const addMember = async (groupId:string, username: string) => {
+export const addMember = async (groupId:number, username: string) => {
       let result = await fetch(`https://forum.hyperlink.academy/groups/${groupId}/members.json`, {
         method: "PUT",
         headers: {
