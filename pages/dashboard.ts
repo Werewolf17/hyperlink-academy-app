@@ -3,18 +3,24 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { InferGetStaticPropsType } from 'next'
 import styled from '@emotion/styled'
-
-
-import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
-import {colors} from '../components/Tokens'
-import { Box, WhiteContainer} from '../components/Layout'
-// import { AccentImg } from '../components/Images'
-import { useUserCohorts, useUserData, useCourses, useUserCourses } from '../src/data'
-import { BigCohortCard } from '../components/Card'
-import {COPY} from './index'
 import { useEffect } from 'react'
-import { PageLoader } from '../components/Loader'
+
+import CourseCard, {FlexGrid} from 'components/Course/CourseCard'
+import {colors} from 'components/Tokens'
+import { Box, WhiteContainer} from 'components/Layout'
+import { BigCohortCard } from 'components/Card'
+import { PageLoader } from 'components/Loader'
+// import { AccentImg } from '../components/Images'
+import { useUserCohorts, useUserData, useCourses, useUserCourses } from 'src/data'
 import { coursesQuery } from './api/courses'
+
+const COPY = {
+  coursesHeader: "All Courses",
+  courseGardenHeader: "Have an idea for a course?",
+  courseGardenDescription: `Hyperlink courses are created by our community. We seed and grow them in the Course
+Garden. Check out some in development, or propose your own!`,
+  courseGardenLink: "Check out the Course Garden"
+}
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Dashboard = (props:Props) => {

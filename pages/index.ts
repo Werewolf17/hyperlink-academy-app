@@ -4,18 +4,18 @@ import { useRouter } from 'next/router'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
 import { useEffect } from 'react'
 
-import Intro from '../writing/Intro.mdx'
-import CourseCard, {FlexGrid} from '../components/Course/CourseCard'
-import { colors, Mobile, Tablet} from '../components/Tokens'
-import { Box, Body} from '../components/Layout'
-import { Primary } from '../components/Button'
+import Intro from 'writing/Intro.mdx'
+import CourseCard, {FlexGrid} from 'components/Course/CourseCard'
+import { colors, Mobile, Tablet} from 'components/Tokens'
+import { Box, Body} from 'components/Layout'
+import { Primary } from 'components/Button'
 // import {TitleImg} from '../components/Images'
-import { useCourses, useUserData } from '../src/data'
-import {getToken} from '../src/token'
-import NewsletterSignup from '../components/NewsletterSignup'
-import { coursesQuery } from './api/courses'
+import { useCourses, useUserData } from 'src/data'
+import {getToken} from 'src/token'
+import NewsletterSignup from 'components/NewsletterSignup'
+import { coursesQuery } from 'pages/api/courses'
 
-export let COPY = {
+let COPY = {
   hyperlinkTagline: "Hyperlink is a course platform and online school built for seriously effective learning.",
   registerHeader: "Calling all superlearners! Join the Hyperlink Alpha to propose a course idea, and (very soon!) enroll one of our first courses.",
   registerButton: "Browse the Courses",

@@ -1,7 +1,8 @@
 import h from 'react-hyperscript'
-import {Box} from '../components/Layout'
 import Link from 'next/link'
-import { useUserData } from '../src/data'
+
+import {Box} from 'components/Layout'
+import { useUserData } from 'src/data'
 
 export default ()=>{
   let {data: user} = useUserData()

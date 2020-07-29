@@ -3,14 +3,14 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
-import { Box, LabelBox, FormBox } from '../components/Layout'
-import { Input, Error, Info } from '../components/Form'
-import { Primary, LinkButton } from '../components/Button'
-import {AccentImg} from '../components/Images'
-import { useApi } from '../src/apiHelpers'
-import { Result, Msg } from './api/login'
-import { RequestMsg, RequestResult } from './api/resetPassword/[action]'
-import { useUserData } from '../src/data'
+import { Box, LabelBox, FormBox } from 'components/Layout'
+import { Input, Error, Info } from 'components/Form'
+import { Primary, LinkButton } from 'components/Button'
+import {AccentImg} from 'components/Images'
+import { useApi } from 'src/apiHelpers'
+import { Result, Msg } from 'pages/api/login'
+import { RequestMsg, RequestResult } from 'pages/api/resetPassword/[action]'
+import { useUserData } from 'src/data'
 
 const COPY = {
   emailOrUsernameInput: "Email or Username",

@@ -23,6 +23,7 @@ import { callApi } from '../../../src/apiHelpers'
 import { cohortPrettyDate } from '../../../components/Card'
 import ErrorPage from '../../404'
 import { courseDataQuery } from '../../api/courses/[id]'
+import { useRouter } from 'next/router'
 
 const COPY = {
   courseForum: "Check out the course forum",
@@ -34,7 +35,7 @@ const COPY = {
   inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested! If you've been invited, please log in."),
   invited: h('span.accentSuccess', "You're invited!"),
   noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
-  noUpcomingMaintainer: (props:{courseId:number})=> h('span.accentRed', [
+  noUpcomingMaintainer: (props:{courseId:string})=> h('span.accentRed', [
     "Looks like there aren't any cohorts of this course planned, maybe ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'create one'))
   ]),
   enrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!"),
@@ -53,6 +54,7 @@ const WrappedCoursePage = (props: Props)=>props.notFound ? h(ErrorPage) : h(Cour
 export default WrappedCoursePage
 
 const CoursePage = (props:Extract<Props, {notFound: false}>) => {
+  let router = useRouter()
   let {data: user} = useUserData()
   let {data:userCohorts} = useUserCohorts()
   let {data: course} = useCourseData(props.id, props.course || undefined)
@@ -112,7 +114,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       h(Sidebar, [
         h(Enroll, {course}, [
           h(Box, {gap: 8}, [
-            h(Link, {href: '/courses/[id]/cohorts', as:`/courses/${props.course?.id}/cohorts` }, [
+            h(Link, {href: '/courses/[id]/cohorts', as:`/courses/${router.query.id}/cohorts` }, [
               h('a', [
                 h(Primary, {
                   disabled: upcomingCohorts.length === 0 || (course.invite_only && !invited)
@@ -121,7 +123,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             ]),
             h('div.textSecondary', {style:{width:232}}, [
               h(Box, {gap:16}, [
-                upcomingCohorts.length === 0 ? isMaintainer ? h(COPY.noUpcomingMaintainer, {courseId: props.id}) : COPY.noUpcoming : null,
+                upcomingCohorts.length === 0 ? isMaintainer ? h(COPY.noUpcomingMaintainer, {courseId: router.query.id as string}) : COPY.noUpcoming : null,
                 enrolled ? COPY.enrolled :
                   course?.invite_only && !invited ? (user ? COPY.inviteOnly : COPY.inviteOnlyLoggedOut) : null,
               ]),
@@ -236,7 +238,7 @@ if you have any feedback!`])
 }
 
 export const getStaticProps = async (ctx:any) => {
-  let id = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+  let id = parseInt((ctx.params?.id as string || '' )?.split('-').slice(-1)[0])
   if(Number.isNaN(id)) return {props: {notFound: true}} as const
 
   let data = await courseDataQuery(id)

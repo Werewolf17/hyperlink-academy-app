@@ -2,10 +2,10 @@ import h from 'react-hyperscript'
 import querystring from 'querystring'
 import crypto from 'crypto'
 import {useRouter} from 'next/router'
-import {getToken} from '../src/token'
 import { GetServerSideProps } from 'next'
 
-import { makeSSOPayload } from '../src/discourse'
+import {getToken} from 'src/token'
+import { makeSSOPayload } from 'src/discourse'
 
 type Props = {error:boolean}
 const SSO = ({error}:Props) => {

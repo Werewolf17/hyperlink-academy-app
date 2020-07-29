@@ -2,12 +2,12 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import fs from 'fs'
 import matter from 'gray-matter'
-
-import { Box } from '../components/Layout'
-import { colors } from '../components/Tokens'
-import {Pill} from '../components/Pill'
 import { InferGetStaticPropsType } from 'next'
 import Link from 'next/link'
+
+import { Box } from 'components/Layout'
+import { colors } from 'components/Tokens'
+import {Pill} from 'components/Pill'
 
 type  Blog = {
   title:string,

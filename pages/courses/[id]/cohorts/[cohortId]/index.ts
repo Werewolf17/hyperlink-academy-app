@@ -284,7 +284,7 @@ const Banners = (props:{
 }
 
 export const getStaticProps = async (ctx:any)=>{
-  let courseId = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+  let courseId = parseInt((ctx.params?.id as string || '' ).split('-').slice(-1)[0])
   if(Number.isNaN(courseId)) return {props: {notFound: true}} as const
 
   let course = await courseDataQuery(courseId)

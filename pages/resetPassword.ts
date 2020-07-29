@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
-import { FormBox, LabelBox} from '../components/Layout'
-import {Primary} from '../components/Button'
-import { Input, Error, Info} from '../components/Form'
-import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
-import { useApi } from '../src/apiHelpers'
+import { FormBox, LabelBox} from 'components/Layout'
+import {Primary} from 'components/Button'
+import { Input, Error, Info} from 'components/Form'
+import {ResetMsg, ResetResult} from 'pages/api/resetPassword/[action]'
+import { useApi } from 'src/apiHelpers'
 
 const COPY = {
   header: "Reset Password",

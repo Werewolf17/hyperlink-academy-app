@@ -2,22 +2,22 @@ import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import {InferGetStaticPropsType} from 'next'
 import Link from 'next/link'
-
-import { Box, TwoColumn, Sidebar, WhiteContainer } from '../../../../components/Layout'
-import Enroll from '../../../../components/Course/Enroll'
-
-import { Primary, BackButton } from '../../../../components/Button'
-import { useCourseData, useUserData, useUserCohorts } from '../../../../src/data'
-import { PrismaClient } from '@prisma/client'
-import { getTaggedPost } from '../../../../src/discourse'
 import { useStripe } from '@stripe/react-stripe-js'
-import { useApi } from '../../../../src/apiHelpers'
-import { EnrollResponse } from '../../../api/courses/[id]/cohorts/[cohortId]/enroll'
-import { Info } from '../../../../components/Form'
-import ErrorPage from '../../../404'
-import Text from '../../../../components/Text'
-import {prettyDate} from '../../../../src/utils'
-import { courseDataQuery } from '../../../api/courses/[id]'
+import { PrismaClient } from '@prisma/client'
+
+import { Box, TwoColumn, Sidebar, WhiteContainer } from 'components/Layout'
+import Enroll from 'components/Course/Enroll'
+import Text from 'components/Text'
+import { Primary, BackButton } from 'components/Button'
+import { Info } from 'components/Form'
+import ErrorPage from 'pages/404'
+
+import { useCourseData, useUserData, useUserCohorts } from 'src/data'
+import { getTaggedPost } from 'src/discourse'
+import { useApi } from 'src/apiHelpers'
+import {prettyDate} from 'src/utils'
+import { EnrollResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]/enroll'
+import { courseDataQuery } from 'pages/api/courses/[id]'
 
 const COPY = {
     empty: "There are no upcoming cohorts for this course :(",
@@ -125,7 +125,7 @@ let Cohort = (props: {
 }
 
 export const getStaticProps = async (ctx: any) =>{
-    let courseId = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+    let courseId = parseInt((ctx.params?.id as string || '' ).split('-').slice(-1)[0])
     if(Number.isNaN(courseId)) return {props: {notFound: true}} as const
     let prisma = new PrismaClient()
 

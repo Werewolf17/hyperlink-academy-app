@@ -3,14 +3,14 @@ import styled from '@emotion/styled'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { Box, LabelBox, FormBox} from '../components/Layout'
-import { Input, Textarea, Info } from '../components/Form'
-import { Primary, Destructive} from '../components/Button'
-import { colors } from '../components/Tokens'
+import { Box, LabelBox, FormBox} from 'components/Layout'
+import { Input, Textarea, Info } from 'components/Form'
+import { Primary, Destructive} from 'components/Button'
+import { colors } from 'components/Tokens'
 
-import { useUserData } from '../src/data'
-import { useApi } from '../src/apiHelpers'
-import { UpdatePersonMsg, UpdatePersonResult } from './api/people/[id]'
+import { useUserData } from 'src/data'
+import { useApi } from 'src/apiHelpers'
+import { UpdatePersonMsg, UpdatePersonResult } from 'pages/api/people/[id]'
 
 const COPY = {
   header: "Your Settings",

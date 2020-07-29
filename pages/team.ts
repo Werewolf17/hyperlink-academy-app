@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import Link from 'next/link'
 import Markdown from 'react-markdown'
 
-import { Box } from '../components/Layout'
+import { Box } from 'components/Layout'
 
 //Note to Self : eventually i should add the hyperlink profile link and the twitter profile link and two separate small links under the name. 
 type TeamProfile = {

@@ -2,15 +2,15 @@ import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import { InferGetStaticPropsType } from 'next'
 
-import { Error } from '../../components/Form'
-import Loader from '../../components/Loader'
-import { Box } from '../../components/Layout'
+import { Error } from 'components/Form'
+import Loader from 'components/Loader'
+import { Box } from 'components/Layout'
 
-import { useProfileData } from '../../src/data'
-import { colors } from '../../components/Tokens'
-import ErrorPage from '../404'
-import Text from '../../components/Text'
-import { profileDataQuery } from '../api/people/[id]'
+import { useProfileData } from 'src/data'
+import { colors } from 'components/Tokens'
+import ErrorPage from 'pages/404'
+import Text from 'components/Text'
+import { profileDataQuery } from 'pages/api/people/[id]'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 

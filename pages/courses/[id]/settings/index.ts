@@ -304,7 +304,7 @@ grid-gap: 16px;
 `
 
 export const getStaticProps = async (ctx:any) => {
-  let id = parseInt((ctx.params?.id as string || '' ).split('-')[0])
+  let id = parseInt((ctx.params?.id as string || '' ).split('-').slice(-1)[0])
   if(Number.isNaN(id)) return {props: {notFound: true}} as const
 
   let data = await courseDataQuery(id)

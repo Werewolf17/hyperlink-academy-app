@@ -2,14 +2,14 @@ import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import {  Input, Error, Info, Textarea} from '../../components/Form'
-import { Primary } from '../../components/Button'
+import {  Input, Error, Info, Textarea} from 'components/Form'
+import { Primary } from 'components/Button'
+import { LabelBox, FormBox } from 'components/Layout'
 
-import { useApi } from '../../src/apiHelpers'
-import { useUserData } from '../../src/data'
-import { LabelBox, FormBox } from '../../components/Layout'
-import { CreateCourseMsg } from '../api/courses'
-import { CreateCohortResponse } from '../api/courses/[id]/cohorts'
+import { useApi } from 'src/apiHelpers'
+import { useUserData } from 'src/data'
+import { CreateCourseMsg } from 'pages/api/courses'
+import { CreateCohortResponse } from 'pages/api/courses/[id]/cohorts'
 
 const CreateCourse = ()=> {
   let {data: user} = useUserData()
