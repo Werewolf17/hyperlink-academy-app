@@ -96,6 +96,7 @@ async function handler (req: Request) {
       people: {select: {display_name: true, username: true}}
     },
     data: {
+      name: course.course_cohorts.length.toString(),
       category_id: category.id,
       group_id: group.basic_group.id,
       start_date: msg.start,

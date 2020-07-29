@@ -28,7 +28,7 @@ model course_cohorts {
   live              Boolean             @default(false)
   course            Int
   category_id       Int                 @unique
-  name              String?
+  name              String
   id                Int                 @default(autoincrement()) @id
   group_id          Int
   courses           courses             @relation(fields: [course], references: [id])
