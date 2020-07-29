@@ -7,7 +7,6 @@ import { FormBox, LabelBox} from '../components/Layout'
 import {Primary} from '../components/Button'
 import { Input, Error, Info} from '../components/Form'
 import {ResetMsg, ResetResult} from './api/resetPassword/[action]'
-import Loader from '../components/Loader'
 import { useApi } from '../src/apiHelpers'
 
 const COPY = {
@@ -63,7 +62,7 @@ const ResetPassword = ()=>{
             onChange: e => setFormData({...formData, confirmPassword:e.target.value})
           })
         ]),
-        h(Primary, {type: 'submit', style: {justifySelf:'end'}}, status === 'loading' ? h(Loader) : 'Submit')
+        h(Primary, {type: 'submit', status, style: {justifySelf:'end'}}, 'Submit')
       ])
     case 'success': return h(Info, [
       'Awesome, we reset your password, go ahead and ',

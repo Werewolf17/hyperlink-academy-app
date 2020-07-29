@@ -8,7 +8,7 @@ import { Secondary, Primary, BackButton } from 'components/Button'
 import { useState, Fragment } from 'react'
 import { Input } from 'components/Form'
 import EditorWithPreview from 'components/EditorWithPreview'
-import Loader, { PageLoader } from 'components/Loader'
+import { PageLoader } from 'components/Loader'
 import { useApi } from 'src/apiHelpers'
 import { PostTopicMsg, PostTopicResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]/postTopic'
 import { Modal } from 'components/Modal'
@@ -108,7 +108,7 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
       ]),
       h(Box, {h:true, style:{justifySelf: 'right'}}, [
         h(Secondary, {disabled: !changed, onClick:()=>setFormState(props.template)}, "Reset Template"),
-        h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : "Post to the forum"),
+        h(Primary, {type: 'submit', status}, "Post to the forum"),
       ])
     ])
   ])

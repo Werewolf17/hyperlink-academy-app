@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import {  Input, Error, Info, Textarea} from '../../components/Form'
 import { Primary } from '../../components/Button'
-import Loader from '../../components/Loader'
 
 import { useApi } from '../../src/apiHelpers'
 import { useUserData } from '../../src/data'
@@ -101,9 +100,8 @@ const CreateCourse = ()=> {
           onChange: e=> setFormData({...formData, maintainers: e.currentTarget.value.split(',')})
         })
       ]),
-      h(Primary, {type: 'submit'}, status === 'loading' ? h(Loader) : 'submit')
+      h(Primary, {status, type: 'submit'}, 'submit')
     ])
-
   ])
 }
 

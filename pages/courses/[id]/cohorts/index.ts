@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import {InferGetStaticPropsType} from 'next'
 import Link from 'next/link'
 
-
 import { Box, TwoColumn, Sidebar, WhiteContainer } from '../../../../components/Layout'
 import Enroll from '../../../../components/Course/Enroll'
 
@@ -14,7 +13,6 @@ import { getTaggedPost } from '../../../../src/discourse'
 import { useStripe } from '@stripe/react-stripe-js'
 import { useApi } from '../../../../src/apiHelpers'
 import { EnrollResponse } from '../../../api/courses/[id]/cohorts/[cohortId]/enroll'
-import Loader from '../../../../components/Loader'
 import { Info } from '../../../../components/Form'
 import ErrorPage from '../../../404'
 import Text from '../../../../components/Text'
@@ -121,7 +119,7 @@ let Cohort = (props: {
             ]),
         ]),
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
-            h(Primary, {onClick, disabled: props.invite_only && !props.invited}, status === 'loading' ? h(Loader) : ' Join this Cohort'),
+            h(Primary, {onClick, disabled: props.invite_only && !props.invited, status}, 'Join this Cohort'),
         ]),
     ])
 }

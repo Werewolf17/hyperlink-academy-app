@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useState, Fragment, useEffect } from 'react'
 
 import {colors, Mobile} from '../Tokens'
-import { Logo, Checkmark} from '../Icons'
+import { Logo } from '../Icons'
 import { Box, Seperator, FormBox} from './index'
 import { useUserData } from '../../src/data'
 import { useMediaQuery } from '../../src/hooks'
@@ -14,7 +14,6 @@ import { Secondary } from '../Button'
 import { Modal } from '../Modal'
 import { useApi } from '../../src/apiHelpers'
 import { FeedbackMsg, FeedbackResult } from '../../pages/api/feedback'
-import Loader from '../Loader'
 
 const COPY = {
   feedbackTitle: "Tell us what's on your mind!",
@@ -91,12 +90,6 @@ const Feedback = ()=> {
     callFeedback('/api/feedback', {feedback, page: router.pathname, username: user ? user.username : undefined})
   }
 
-  let ButtonText = {
-    normal: 'Submit',
-    loading: h(Loader),
-    success: Checkmark,
-    error: "Something went wrong!"
-  }
   return h(FormBox, {onSubmit, gap: 16}, [
       h('h4', COPY.feedbackTitle),
       status === 'success'
@@ -106,8 +99,8 @@ const Feedback = ()=> {
         type: 'submit',
         success:status==='success',
         style:{justifySelf:'right'}
-      }, ButtonText[status])
-  ])
+      }, "Submit")
+    ])
 }
 
 const FeedbackModal = ()=>{

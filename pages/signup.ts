@@ -8,7 +8,6 @@ import { Input, Error, Info, CheckBox, PasswordInput} from '../components/Form'
 import { Primary, LinkButton} from '../components/Button'
 import {AccentImg} from '../components/Images'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from './api/signup/[action]'
-import Loader from '../components/Loader'
 import { useUserData } from '../src/data'
 import { callApi, useApi } from '../src/apiHelpers'
 import { useDebouncedEffect} from '../src/hooks'
@@ -114,7 +113,7 @@ const Signup = () => {
       ]),
     ]),
     h(Box, {gap: 8}, [
-      h(Primary, {style: {justifySelf: 'end'}, type: 'submit'}, status === 'loading' ? h(Loader) : COPY.submitButton),
+      h(Primary, {status, style: {justifySelf: 'end'}, type: 'submit'}, COPY.submitButton),
       h(Link, {href:"/login"}, h(LinkButton, {style:{justifySelf: 'end'}}, 'Log in with an existing account'))
     ])
   ])
@@ -169,7 +168,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
         })
       ]),
     ]),
-    h(Primary, {type: 'submit', style:{justifySelf: 'right'}}, status  === 'loading' ? h(Loader) : "Confirm your email")
+    h(Primary, {type: 'submit', status, style:{justifySelf: 'right'}}, "Confirm your email")
   ])
 }
 

@@ -8,11 +8,10 @@ import styled from '@emotion/styled'
 import { Tabs } from 'components/Tabs'
 import { useApi, callApi } from 'src/apiHelpers'
 import { Course, useCourseData, useUserData } from 'src/data'
-import Loader, { PageLoader } from 'components/Loader'
+import { PageLoader } from 'components/Loader'
 import { Box, Seperator, LabelBox, FormBox } from 'components/Layout'
 import { Info, Error, Select, Input, Textarea } from 'components/Form'
 import { Primary, Destructive, Secondary, BackButton } from 'components/Button'
-import { Checkmark } from 'components/Icons'
 import ErrorPage from 'pages/404'
 import { useDebouncedEffect } from 'src/hooks'
 import { courseDataQuery, UpdateCourseMsg, UpdateCourseResponse } from 'pages/api/courses/[id]'
@@ -89,13 +88,6 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
       })
   }
 
-  let ButtonState = {
-    normal:  'Add a new Cohort',
-    loading: h(Loader),
-    error: 'An error occured!',
-    success: Checkmark
-  }
-
   return h(FormBox, {onSubmit, gap: 32, style: {width: 400}}, [
     h('h2', 'Add a new Cohort'),
     status === 'error' ? h(Error, 'An error occured') : null,
@@ -123,10 +115,11 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
     ]),
     h(Primary, {
       style: {justifySelf: 'right'},
+      status,
       type: 'submit',
       success: status === 'success',
       disabled: !newCohort.start || !newCohort.facilitator
-    }, ButtonState[status]),
+    }, 'Add a new Cohort'),
   ])
 }
 
@@ -134,13 +127,6 @@ const InvitePerson = (props:{id: number})=> {
   let [emailOrUsername, setEmailOrUsername] = useState('')
   let [valid, setValid] = useState<null | boolean>(null)
   let [status, callInviteToCourse] = useApi<InviteToCourseMsg, InviteToCourseResponse>([emailOrUsername], ()=>setEmailOrUsername(''))
-
-  const ButtonState = {
-    normal: "Invite",
-    loading: h(Loader),
-    success: Checkmark,
-    error: "An error occured!"
-  }
 
   useDebouncedEffect(async ()=>{
     if(emailOrUsername.includes('@') || emailOrUsername === '') return setValid(null)
@@ -170,9 +156,10 @@ const InvitePerson = (props:{id: number})=> {
     ]),
     h(Primary, {
       style: {justifySelf: 'right'},
+      status,
       type: 'submit',
       disabled: (!emailOrUsername.includes('@') && valid !== true)
-    }, ButtonState[status]),
+    }, "Invite"),
   ])
 }
 
@@ -244,8 +231,7 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
         e.preventDefault()
         setFormData(props.course)
       }}, "Discard Changes"),
-      h(Primary, {type: 'submit', disabled: !changed},
-        status === 'loading' ? h(Loader) : 'Save Changes')
+        h(Primary, {type: 'submit', disabled: !changed, status}, 'Save Changes')
     ])
   ])
 }
@@ -292,7 +278,7 @@ function DeleteTemplate(props:{templateName:string, course:Course, mutate:(c:Cou
     h(Modal, {display: state !== 'normal', onExit: ()=>setState('normal')}, [
       h(Box, {style: {textAlign: 'center'}}, [
         h('h3', "Are you sure?"),
-        h(Primary, {onClick:async ()=>{
+        h(Primary, {status, onClick:async ()=>{
           let res = await callDelete(`/api/courses/${props.course.id}/templates/${props.templateName}`, null, "DELETE")
           if(res.status ===200) {
             props.mutate({
@@ -302,8 +288,8 @@ function DeleteTemplate(props:{templateName:string, course:Course, mutate:(c:Cou
             })
             setState('normal')
           }
-        }}, status === 'loading'? h(Loader) : "Yup delete it"),
-        h(Secondary, {}, 'Nope, nevermind')
+        }}, "Yup delete it"),
+        h(Secondary, {onClick: ()=>setState('normal')}, 'Nope, nevermind')
       ])
     ])
   ])
