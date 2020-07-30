@@ -116,7 +116,7 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
 
 export const getStaticProps = async (ctx:any)=>{
   let cohortNum = (ctx.params?.cohortId || '' )as string
-  let courseId = parseInt(ctx.params?.id as string || '')
+  let courseId = parseInt((ctx.params?.id as string || '').split('-').slice(-1)[0])
 
   let templates = await getTemplatesQuery(courseId)
   return {props: {templates, courseId, cohortNum}}
