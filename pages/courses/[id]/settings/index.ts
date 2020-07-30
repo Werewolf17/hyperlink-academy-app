@@ -48,9 +48,10 @@ function CourseSettings(props:Extract<Props, {notFound:false}>){
     h(Box, {gap: 16}, [
       h(BackButton, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, 'Course Details'),
       h('h1', "Course Settings"),
-      h('p.big',[
-        `We're still new and adding maintainer features! If you'd like to add a new maintainer, remove an cohort, or anything else, please email `,
+      h('p.big', [
+        `Hyperlink is new and some things can only be done manually for now! To add a new maintainer, remove a cohort, or anything else you don't see here, please email `,
         h('a', {href: 'mailto:contact@hyperlink.academy'}, 'contact@hyperlink.academy')]),
+      h('p.big', "Changes will only apply to future cohorts, not existing ones.")
     ]),
     h(Tabs, { tabs: {
       Cohorts: h(CohortSettings, {course, mutate}),
@@ -142,9 +143,10 @@ const InvitePerson = (props:{id: number})=> {
     callInviteToCourse(`/api/courses/${props.id}/invite`, {...x})
   }
   return h(FormBox, {onSubmit, gap:32, width: 400}, [
-    h('h2', "Invite someone to this course"),
+    h('h2', "Invite Someone to Enroll"),
     h(LabelBox, {gap:8}, [
       h('h4', "Username or Email"),
+      h('small.textSecondary', `We'll send them an email. Invitee does not need a Hyperlink account to be invited, but they will need an account to enroll.`),
       h(Input, {
         type: emailOrUsername.includes('@') ? 'email' : 'text',
         required: true,
@@ -239,9 +241,18 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
 function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
   return h(Box, {gap: 32}, [
     h(Box, [
-      h('p', `To help facilitators get started every new cohort is created with a forum
-pre-populated with topics.`),
-      h('p', `You can tweak the ones we provided or add new ones here.`),
+      h('p', `Each cohort comes with its own community space, and templates to help you populate its structure with topics.`),
+      h('ul', {style: {'margin': 'auto 0'}}, [
+        h('li', [
+          h('b', 'Prepopulated'), 
+          h('span', ' topics are automatically posted when each new cohort is created')
+        ]),
+        h('li', [
+          h('b', 'Triggered'), 
+          h('span', ' topics can be posted by the facilitator from the cohort settings (editable before publishing, so useful for creating multiple topics from one template)')
+        ])
+      ]),
+      h('p', `You can edit the default templates we've provided below, or add new ones!`),
       h(Link, {
         href: '/courses/[id]/settings/templates/[templateId]',
         as:`/courses/${props.course.id}/settings/templates/new`

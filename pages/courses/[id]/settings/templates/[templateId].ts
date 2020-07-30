@@ -58,12 +58,11 @@ function TemplateSettings() {
       formState.content !== template.content ||
       formState.type !== template.type)
 
-  return h(Box, {gap: 64}, [
+  return h(Box, {gap: 32}, [
     h(Box, {width: 640}, [
       h(BackButton, {href: "/courses/[id]/settings", as: `/courses/${courseId}/settings`}, 'Setttings'),
-      h('h2', router.query.templateId === 'new' ? 'Add a New Template' : "Edit this Template"),
-      h('p.big', `You can create templates to be included as a post in every cohort's forum when it's created, or can be
-triggered to post by a facilitator at any time.`)
+      h('h2', router.query.templateId === 'new' ? 'Add New Template' : "Edit Template"),
+      h('p.big', `Create templates for topics to either be included in every new cohort's forum, or to be triggered by a facilitator at any time.`)
     ]),
     h(FormBox, {onSubmit, gap: 32}, [
 
@@ -104,8 +103,8 @@ triggered to post by a facilitator at any time.`)
       // Template Title Input
       h(LabelBox, {width: 400, gap: 8}, [
         h(Box, {gap:4}, [
-          h('h4', "Template Title"),
-          h('p.textSecondary', "Default title of the published template. You'll be able to edit this when publishing to a cohort"),
+          h('h4', "Default Topic Title"),
+          h('p.textSecondary', "Default title of the published topic. For a triggered template, you'll be able to edit before publishing."),
         ]),
         h(Input, {
           type: "text",
@@ -117,10 +116,10 @@ triggered to post by a facilitator at any time.`)
       // Template Body Input
       h(LabelBox, {gap: 8}, [
         h(Box, {gap:4}, [
-          h('h4', "Template Body"),
+          h('h4', "Default Topic Body"),
           h(Box, {width: 400}, [
-            h('p.textSecondary', "This is the default body text of the published topic. You'll be able to edit it when publishing to a cohort."),
-            h('p.textSecondary', ["You can use Markdown to format ", h('a', {href: 'https://commonmark.org/help/'}, "(here's a quick reference)"), '.']),
+            h('p.textSecondary', "Default body text of the published topic. For a triggered template, you'll be able to edit before publishing."),
+            h('p.textSecondary', ["You can use Markdown to format ", h('a', {href: 'https://commonmark.org/help/'}, "(quick reference)"), '.']),
           ]),
         ]),
         h(EditorWithPreview, {

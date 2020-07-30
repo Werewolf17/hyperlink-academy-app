@@ -40,6 +40,8 @@ border-color: ${colors.grey55} !important;
 border: 1px solid;
 border-radius: 2px 0 0 2px;
 resize: none;
+font-size: inherit;
+line-height: inherit;
 `
 
 let Preview = styled('div')`
