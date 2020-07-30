@@ -47,15 +47,16 @@ export default Blog
 
 // This defines the layout for a single blog post (tags, title, author, publish date, description)
 const BlogPost = (props:Blog) => {
-    return h(Box, {gap: 16, style: {width: 640}} , [
-        h(Box, {h:true}, props.tags.map(tag => h(Tag, {tagType: tag}))),
-        h(Box, {gap:8}, [
-          h(Link, {href: props.path}, h('a.notBlue', {style: {textDecoration:'none'}},h('h2', props.title))),
-          h('p.textSecondary', {}, h('b', `by ${props.author}  |  ${props.date}`)),
-        ]),
-
-        h('p.big', props.description)
+  return h(Box, {gap: 16, style: {maxWidth: 640}} , [
+    h(Box, {h:true}, props.tags.map(tag => h(Tag, {tagType: tag}))),
+    h(Box, {gap:8}, [
+      h(Link, {href: props.path}, h('a.notBlue', {style: {textDecoration:'none'}},h('h2', props.title))),
+      h('p.textSecondary', {}, h('b', `by ${props.author}  |  ${props.date}`)),
+    ]),
+    h('div', [
+      h('p.big', props.description)
     ])
+  ])
 }
 
 // To add new tag types, add them to this object. Add the tag type and a color the tag should be.
