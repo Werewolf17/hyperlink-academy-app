@@ -15,8 +15,8 @@ import EditorWithPreview from 'components/EditorWithPreview'
 function TemplateSettings() {
   let router = useRouter()
   let templateId = router.query.templateId
-  let courseId = router.query.id
-  let {data: templates, mutate }= useApiData<GetTemplatesResult>(courseId ? `/api/courses/${router.query.id}/templates` : undefined)
+  let courseId = (router.query.id as string)?.split('-').slice(-1)[0]
+  let {data: templates, mutate }= useApiData<GetTemplatesResult>(courseId ? `/api/courses/${courseId}/templates` : undefined)
   let template = templates ? templates.find(t=> t.name === templateId) : undefined
 
   let [formState, setFormState] = useState<Omit<course_templates, 'course' | 'required'>>(template || {name: '', content:'', type: 'prepopulated', title: ''})
@@ -60,7 +60,7 @@ function TemplateSettings() {
 
   return h(Box, {gap: 64}, [
     h(Box, {width: 640}, [
-      h(BackButton, {href: "/courses/[id]/settings", as: `/courses/${router.query.id}/settings`}, 'Setttings'),
+      h(BackButton, {href: "/courses/[id]/settings", as: `/courses/${courseId}/settings`}, 'Setttings'),
       h('h2', router.query.templateId === 'new' ? 'Add a New Template' : "Edit this Template"),
       h('p.big', `You can create templates to be included as a post in every cohort's forum when it's created, or can be
 triggered to post by a facilitator at any time.`)
