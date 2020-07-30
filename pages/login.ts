@@ -60,7 +60,7 @@ const Login = () => {
         src1: '/img/door-1.gif',
         src2: '/img/door-2.gif',
         alt: "an animated gif of a entrance to the sparkle void",
-        startLoop: 2500,
+        startLoop: 1200,
       }),
     ]),
     

@@ -32,13 +32,13 @@ export function HalfLoopImg(props:
     let imageRef = useRef<HTMLImageElement>(null)
     useEffect(()=> {
       if(imageRef.current?.complete && !looping) {
-        setTimeout(()=>setLooping(true), props.loopStart)
+        setTimeout(()=>setLooping(true), props.startLoop)
       }
     }, [])
   
     if(!looping) {
       return h(AccentImg, {ref: imageRef, onLoad: () => {
-        setTimeout(()=>setLooping(true), props.loopStart)
+        setTimeout(()=>setLooping(true), props.startLoop)
       }, src: props.src1, alt: props.alt })
     }
     return h(AccentImg, {src: props.src2, alt: props.alt })
