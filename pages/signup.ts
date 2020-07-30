@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
