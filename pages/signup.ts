@@ -6,15 +6,17 @@ import Link from 'next/link'
 import { Box, LabelBox, FormBox} from 'components/Layout'
 import { Input, Error, Info, CheckBox, PasswordInput} from 'components/Form'
 import { Primary, LinkButton} from 'components/Button'
-import {AccentImg} from 'components/Images'
+import {AccentImg, HalfLoopImg} from 'components/Images'
 import { useUserData } from 'src/data'
 import { callApi, useApi } from 'src/apiHelpers'
 import { useDebouncedEffect} from 'src/hooks'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from 'pages/api/signup/[action]'
 import { CheckUsernameResult } from 'pages/api/get/[...item]'
+import styled from '@emotion/styled'
 
 const COPY = {
-   submitButton: "Create your account"
+   submitButton: "Create your account",
+   headerDescription: "We're hyped for you to join the Hyperlink community! Let's learn together."
 }
 
 const Signup = () => {
@@ -48,7 +50,29 @@ const Signup = () => {
   }
 
   return h(FormBox, {onSubmit, width: 400, ma: true, gap: 32}, [
-    h('h1', 'Sign Up'),
+    h(Box, {gap:8}, [
+      h(SignUpHeader, [
+        h('h1', 'Sign Up'),
+        h(HalfLoopImg, {
+          src1: '/img/sailboat-1.gif',
+          src2: '/img/sailboat-2.gif',
+          alt: "an animated gif of a sailboat, boatin'",
+          startLoop: 333,
+        }),
+      ]),
+      h('p.big', COPY.headerDescription),
+    ]),
+
+    // h(Box, {gap:16}, [
+    //   h(HalfLoopImg, {
+    //     src1: '/img/sailboat-1.gif',
+    //     src2: '/img/sailboat-2.gif',
+    //     alt: "an animated gif of a sailboat, boatin'",
+    //     startLoop: 333,
+    //   }),
+    //   h('h1', 'Sign Up'),
+    // ]),
+
     status === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
       '.'
@@ -171,5 +195,12 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
     h(Primary, {type: 'submit', status, style:{justifySelf: 'right'}}, "Confirm your email")
   ])
 }
+
+export const SignUpHeader = styled('div') `
+  display:grid;
+  grid-gap:16px;
+  grid-template-columns:  auto min-content;
+  align-items: end;
+`
 
 export default Signup

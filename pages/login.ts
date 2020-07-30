@@ -6,17 +6,18 @@ import Link from 'next/link'
 import { Box, LabelBox, FormBox } from 'components/Layout'
 import { Input, Error, Info } from 'components/Form'
 import { Primary, LinkButton } from 'components/Button'
-import {AccentImg} from 'components/Images'
+import {AccentImg, HalfLoopImg} from 'components/Images'
 import { useApi } from 'src/apiHelpers'
 import { Result, Msg } from 'pages/api/login'
 import { RequestMsg, RequestResult } from 'pages/api/resetPassword/[action]'
 import { useUserData } from 'src/data'
+import styled from '@emotion/styled'
 
 const COPY = {
   emailOrUsernameInput: "Email or Username",
   passwordInput: "Password",
   resetPassword: "Reset password",
-  loginHeader: "Welcome Back!",
+  loginHeader: "Log In",
   createAccount: "Create a new account",
   wrongLogin: h('div', [
     "Heck! The email or username didn't match the password. ", h('br'), "If you want, you can ",
@@ -51,7 +52,28 @@ const Login = () => {
 
   return h(FormBox, {onSubmit, width: 400, ma: true}, [
     h(Box, {gap:32}, [
+
+    h(LoginHeader, [
       h('h1', COPY.loginHeader),
+
+      h(HalfLoopImg, {
+        src1: '/img/door-1.gif',
+        src2: '/img/door-2.gif',
+        alt: "an animated gif of a entrance to the sparkle void",
+        startLoop: 1200,
+      }),
+    ]),
+    
+      // h(Box, {gap:16}, [
+      //   h(HalfLoopImg, {
+      //     src1: '/img/door-1.gif',
+      //     src2: '/img/door-2.gif',
+      //     alt: "an animated gif of a entrance to the sparkle void",
+      //     startLoop: 2500,
+      //   }),
+      //   h('h1', COPY.loginHeader),
+      // ]),
+
       status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
 
       h(LabelBox, {gap:8}, [
@@ -130,5 +152,10 @@ const ResetPassword: React.SFC = () => {
     case 'error': return h(Box, {width: 400, ma: true}, [h(Error, 'something went wrong, please refresh and try again')])
   }
 }
-
+export const LoginHeader = styled('div') `
+  display:grid;
+  grid-gap:16px;
+  grid-template-columns: auto min-content;
+  align-items: end;
+`
 export default Login
