@@ -49,7 +49,7 @@ export const BlogLayout:React.FC<Props> = (props) =>{
           ]),
         ]),
         h(Box, {gap: 32, style:{justifySelf: 'center', textAlign: 'center'}}, [
-          props.topic ?  h('a', {href:props.topic, }, h(Primary, "Discuss this on the forum")) : null,
+          props.topic ?  h('a', {href:props.topic, target:"_blank"}, h(Primary, "Discuss this on the forum")) : null,
           h(Newsletter)
         ])
       ]),
