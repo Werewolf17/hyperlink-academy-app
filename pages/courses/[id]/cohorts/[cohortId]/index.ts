@@ -221,7 +221,7 @@ const WelcomeModal = (props: {display:boolean, cohort:Cohort}) => {
 you'll be doing on your first day`),
       h('a', {
         style: {margin: 'auto'},
-        href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.category_id}/${props.cohort.id}`
+        href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`
       }, h(Primary, "Get started")),
       h(Link, {
         href:'/courses/[id]/cohorts/[cohortId]',
@@ -238,7 +238,7 @@ const Banners = (props:{
   enrolled?: boolean,
 })=>{
   let isStarted = (new Date(props.cohort.start_date)).getTime() - (new Date()).getTime()
-  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.courses.category_id}/${props.cohort.id}`
+  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`
 
   if(props.facilitating && !props.cohort.live) return h(TwoColumnBanner, {red: true}, h(Box, {gap:16}, [
     h(Box, {gap: 8, className: "textSecondary"}, [
