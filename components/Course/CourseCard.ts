@@ -12,15 +12,16 @@ type Props = {
   name:string,
   description: string
   id: number,
-  href?:string,
-  start_date: string
-  cohort?: boolean
   status?:  'draft' | 'live' | null
+  course_cohorts:{start_date: string}[]
 }
+
 export default (props:Props) => {
+  let upcomingCohort = props.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
+
   return h(Link, {
-    href: props.href ? props.href : '/courses/[id]',
-    as: props.href ? props.href : '/courses/' + props.id,
+    href: '/courses/[id]',
+    as: '/courses/' + props.id,
     passHref: true}, h(CourseCard, {
   }, [
     h(ImageContainer, [
@@ -32,7 +33,7 @@ export default (props:Props) => {
         h('p', props.description),
       ]),
       props.status === 'draft' ? h(Pill, {red: true, borderOnly: true}, 'draft') : null,
-      !props.start_date ? null : h(DateContainer, (props.cohort ? 'starts ' : 'Next cohort starts ') + prettyDate(props.start_date))
+      !upcomingCohort ? null : h(DateContainer, ('Next cohort starts ') + prettyDate(upcomingCohort.start_date))
     ])
   ]))
 }

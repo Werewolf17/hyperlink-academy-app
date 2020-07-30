@@ -77,7 +77,7 @@ const Dashboard = (props:Props) => {
     userCourses.maintaining_courses.length === 0 ? null :  h(Box, {}, [
       h('h2', 'Courses you maintain'),
       h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.map(course=>{
-        return h(CourseCard,{...course, start_date: ''})
+        return h(CourseCard, course)
       }))
     ]),
 
@@ -90,13 +90,7 @@ const Dashboard = (props:Props) => {
       h(FlexGrid, {min: 328, mobileMin: 200},
         courses?.courses
         .map(course => {
-          return h(CourseCard, {
-            key: course.id,
-            id: course.id,
-            description: course.description,
-            start_date: course.course_cohorts[0]?.start_date,
-            name: course.name,
-          }, [])
+          return h(CourseCard, course)
         })),
     ]),
     h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [

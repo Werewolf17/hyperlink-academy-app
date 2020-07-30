@@ -60,6 +60,11 @@ async function getUserCourses(req: Request) {
           maintainer: token.id
         }
       }
+    },
+    include: {
+      course_cohorts: {
+        select: {start_date: true}
+      }
     }
   })
   return {status: 200, result: {maintaining_courses}} as const
