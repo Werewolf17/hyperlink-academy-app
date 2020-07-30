@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { Children, useState} from 'react'
 import styled from '@emotion/styled'
 
-import { Box, FormBox, LabelBox, Seperator} from './Layout'
+import { Box, FormBox, LabelBox } from './Layout'
 import { BlogTextStyles } from './BlogText'
 import { Tablet, colors } from './Tokens'
 import { BackButton, Secondary, Primary } from './Button'
