@@ -1,11 +1,14 @@
 import h from 'react-hyperscript'
-import {Children} from 'react'
+import { Children, useState} from 'react'
 import styled from '@emotion/styled'
 
-import {Box} from './Layout'
+import { Box, FormBox, LabelBox, Seperator} from './Layout'
 import { BlogTextStyles } from './BlogText'
 import { Tablet, colors } from './Tokens'
-import { BackButton } from './Button'
+import { BackButton, Secondary, Primary } from './Button'
+import { useApi } from 'src/apiHelpers'
+import { NewsletterSignupMsg, NewsletterSignupResponse } from 'pages/api/signup/[action]'
+import { Input } from './Form'
 
 type Props = {
   title: string,
@@ -13,6 +16,7 @@ type Props = {
   date: string,
   author: string
   toc?: boolean
+  topic?: string
 }
 
 export const BlogLayout:React.FC<Props> = (props) =>{
@@ -34,19 +38,49 @@ export const BlogLayout:React.FC<Props> = (props) =>{
   return h('div', [
     h(BackButton, {href:'/blog'}, "Blog"),
     h(Container, [
-      h(Box, {width:640}, [
-        h(Box, {gap:8},[
-          h('h1', props.title),
-          h('b.textSecondary', `By ${props.author} | ${props.date}`)
+      h(Box, {gap: 32, width:640}, [
+        h(Box, [
+          h(Box, {gap:8},[
+            h('h1', props.title),
+            h('b.textSecondary', `By ${props.author} | ${props.date}`)
+          ]),
+          h(BlogTextStyles, [
+            props.children as React.ReactElement
+          ]),
         ]),
-        h(BlogTextStyles, [
-          props.children as React.ReactElement
+        h(Box, {gap: 32, style:{justifySelf: 'center', textAlign: 'center'}}, [
+          props.topic ?  h('a', {href:props.topic, }, h(Primary, "Discuss this on the forum")) : null,
+          h(Newsletter)
         ])
       ]),
       !props.toc ? null : h('div', [
         h(TOCContainer, {}, TOC)
-      ])
+      ]),
     ])
+  ])
+}
+
+function Newsletter() {
+	let [email, setEmail] = useState('')
+  let [status, callNewsletterSignup] = useApi<NewsletterSignupMsg, NewsletterSignupResponse>([])
+
+  let onSubmit = (e: React.FormEvent)=>{
+    e.preventDefault()
+    callNewsletterSignup('/api/signup/newsletter',{email})
+  }
+
+  return h(FormBox, {onSubmit, gap: 16, style:{maxWidth: 320, textAlign: 'center'}}, [
+    h(LabelBox, {gap:8},[
+      h('div', [
+        h('h4', "Subscribe to our newsletter for updates"),
+      ]),
+      h(Input, {
+        type: "email",
+        value: email,
+        onChange: e => setEmail(e.currentTarget.value)
+      }),
+    ]),
+    h(Secondary, {type: "submit", status, style:{justifySelf: 'center'}}, 'Get Updates'),
   ])
 }
 
