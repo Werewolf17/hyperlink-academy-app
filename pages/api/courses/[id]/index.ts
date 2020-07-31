@@ -8,6 +8,7 @@ const prisma = new PrismaClient()
 
 export type UpdateCourseMsg = Partial<{
   cost: number,
+  cohort_max_size: number,
   name: string,
   status: "live",
   prerequisites?: string
@@ -58,6 +59,7 @@ async function updateCourse(req: Request) {
     where: {id: courseId},
     data: {
       slug,
+      cohort_max_size: msg.cohort_max_size,
       duration: msg.duration,
       status: msg.status,
       prerequisites: msg.prerequisites,

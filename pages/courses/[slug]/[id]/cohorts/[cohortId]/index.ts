@@ -20,7 +20,7 @@ import Text from 'components/Text'
 import {prettyDate} from 'src/utils'
 import { getTaggedPost } from 'src/discourse'
 import { callApi, useApi } from 'src/apiHelpers'
-import { useCohortData, useUserData, useCourseData, Cohort } from 'src/data'
+import { useCohortData, useUserData, useCourseData, Cohort, useUserCohorts } from 'src/data'
 import { cohortPrettyDate } from 'components/Card'
 import ErrorPage from 'pages/404'
 import { useStripe } from '@stripe/react-stripe-js'
@@ -47,10 +47,12 @@ export default WrappedCohortPage
 const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let router = useRouter()
   let {data: user} = useUserData()
+  let {data:userCohorts} = useUserCohorts()
   let {data: cohort, mutate} = useCohortData(props.cohortId, props.cohort)
   let {data: course} = useCourseData(props.courseId, props.course)
-  if(!cohort) return h(PageLoader)
+  if(!cohort || !course) return h(PageLoader)
 
+  let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course?.id )
   let inCohort = cohort.people_in_cohorts.find(p => p.person === (user ? user.id : undefined))
   let isFacilitator  = !!user && cohort.people.username === user.username
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
@@ -71,6 +73,13 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             `Facilitated by ${cohort.people.display_name}`
           ]),
         ]),
+        invited && !inCohort && !isFacilitator ? h(EnrollInCohort, {
+          invited,
+          max_size: course.cohort_max_size,
+          learners: cohort.people_in_cohorts.length,
+          id: cohort.id,
+          course: course.id
+        }) : null,
         !inCohort && !isFacilitator ? null : h(Box, [
           h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/${cohort.id}`}
             , h(Primary, 'Go to the forum')),
@@ -115,7 +124,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           }
       })),
       inCohort || isFacilitator || cohort.completed ? null
-        : h(Sidebar, {} ,h(Enroll, {course}, h(EnrollInCohort, {id: props.cohort.id, course: props.course.id})))
+        : h(Sidebar, {} ,h(Enroll, {course}))
     ])
   ])
 }
@@ -126,7 +135,7 @@ grid-template-columns: max-content min-content;
 grid-gap: 16px;
 `
 
-const EnrollInCohort = (props:{id:number, course: number}) => {
+const EnrollInCohort = (props:{id:number, course: number, max_size: number, learners: number, invited: boolean}) => {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
@@ -143,7 +152,13 @@ const EnrollInCohort = (props:{id:number, course: number}) => {
     await callEnroll(`/api/cohorts/${props.id}/enroll`)
   }
 
-  return  h(Primary, {onClick, status}, 'Join this Cohort')
+  return  h(Box, {h: true, style:{alignItems: 'center'}}, [
+    h(Primary, {onClick, status, disabled: !props.invited || (props.max_size !==0 && props.max_size === props.learners)},
+      'Join this Cohort'),
+    props.max_size === 0 ? null : props.max_size > props.learners
+      ? h('span.accentSuccess', `${props.max_size - props.learners} spots left!`)
+      : h('span.accentRed', `Sorry! This cohort is full.`)
+  ])
 }
 
 const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
