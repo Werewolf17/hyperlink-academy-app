@@ -29,6 +29,7 @@ box-shadow: 4px 4px ${colors.grey15};
 export default Card
 
 type Cohort = {
+  name: string,
   start_date: string,
   people: {display_name?:string | null,
            username:string},
@@ -81,7 +82,7 @@ export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
             props.enrolled ? h(Pill, 'enrolled') : null,
           !props.live ? h(Pill, {red: true, borderOnly: true},'draft') : null
           ]): null,
-          h('h3', props.courses.name),
+          h('h3', props.courses.name+' '+props.name),
         ]),
         h('div', [
           h('b', status),
