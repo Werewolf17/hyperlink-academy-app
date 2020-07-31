@@ -36,21 +36,6 @@ const COPY = {
     h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
     ` in the forum`
   ]),
-
-  //ENROLL STATUS MESSAGES
-  draftMaintainer: h('span.accentRed', "Learners can't enroll in this course until you publish it!"),
-  draft: h('span.accentRed', "This course is still a draft. You can enroll once the creator publishes it!"),
-  inviteOnly: h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested!"),
-  inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested! If you've been invited, please log in."),
-  inviteOnlyMaintainer: (props:{courseId:number})=> h('span.accentRed', [
-    "Learners need to be invited to enroll. Invite someone", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.']),
-  invited: h('span.accentSuccess', "You're invited!"),
-  noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
-  noUpcomingMaintainer: (props:{courseId:number})=> h('span.accentRed', [
-    "Looks like there aren't any cohorts of this course planned. Create one ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.'
-  ]),
-  noUpcomingEnrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course."),
-  enrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!"),
   enrollButton: "See Upcoming Cohorts",
 }
 
@@ -129,6 +114,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             ]),
 
             h(EnrollStatus, {
+              courseId: course.id,
               draft:course.status==='draft',
               maintainer, 
               inviteOnly:course.invite_only, 
@@ -258,90 +244,31 @@ const EnrollStatus = (props: {
   upcoming:boolean;
   courseId:number;
 }) => {
-
-
-  //if DRAFT, 
-  if (props.draft){
-
-    //check to see if MAINTAINER, throw message
-    if (props.maintainer){
-      return h('div', {}, COPY.draftMaintainer)
-    }
-    else {
-      return h('div', {}, COPY.draft)
-    }
+  if (props.draft) {
+    if (props.maintainer) return h('span.accentRed', "Learners can't enroll in this course until you publish it!")
+    return h('span.accentRed', "This course is still a draft. You can enroll once the creator publishes it!")
   }
 
-  //if ENROLLED
-  else if (props.enrolled){
-    
-    //if MAINTAINER 
-    if (props.maintainer) {
-
-      //if INVITE ONLY
-      if (props.inviteOnly) {
-        // check if there are UPCOMING cohorts, throw message
-        if (props.upcoming) {
-          return h('div', {}, h(COPY.inviteOnlyMaintainer, {courseId:props.courseId}))
-        }
-        else {
-          return h('div', {}, h(COPY.noUpcomingMaintainer, {courseId:props.courseId}))
-        }
-      }
-
-      //if NOT INVITE ONLY
-      else {
-        // check if there are UPCOMING cohorts, throw message
-        if (props.upcoming) {
-          return null
-        }
-        else {
-          return h('div', {}, h(COPY.noUpcomingMaintainer, {courseId:props.courseId}))        }
-      }
-    }
-
-    //if NOT MAINTAINER
-    else {
-      // check if there are UPCOMING cohorts, throw message
-      if (props.upcoming) {
-        return h('div', {}, COPY.enrolled)
-      }
-      else {
-        return h('div', {}, COPY.noUpcomingEnrolled)
-      }
-    }
+  if (props.enrolled){
+    if (props.upcoming) return h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!")
+    return  h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course.")
   }
 
-  // if INVITE ONLY
-  else if (props.inviteOnly){
-
-    //if INVITED, throw message
-    if (props.invited) {
-      return h('div', {}, COPY.invited)
-    }
-
-    // if NOT INVITED
-    else { 
-      // check to see if LOGGED IN, thow message
-      if (props.loggedIn) {
-        return h('div', {}, COPY.inviteOnly)
-      }
-      else {
-        return h('div', {}, COPY.inviteOnlyLoggedOut)
-      }
-    }
-  
+  if (!props.upcoming) {
+    if(props.maintainer) return h('span.accentRed', [
+      "Looks like there aren't any cohorts of this course planned. Create one ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.'
+    ])
+    return h('span.accentRed', "Looks like there aren't any cohorts of this course planned :(")
   }
 
-  // if NO UPCOMING, throw message 
-  else if (props.upcoming=false){
-    return h('div', {}, COPY.noUpcoming)
+  if (props.inviteOnly) {
+    if (props.maintainer) return h('span.accentRed', [
+      "Learners need to be invited to enroll. Invite someone", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.'])
+    if(props.invited) return h('span.accentSuccess', "You're invited!")
+    if(props.loggedIn) return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested!"))
+    return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested! If you've been invited, please log in."))
   }
-
-  // otherwise show nothing 
-  else {
-    return null
-  }
+  return null
 }
 
 export const getStaticProps = async (ctx:any) => {
