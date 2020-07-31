@@ -93,7 +93,7 @@ let Cohort = (props: {
         if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
         if(!props.id) return
         if(!stripe) return
-        await callEnroll(`/api/cohorts/${props.id}`)
+        await callEnroll(`/api/cohorts/${props.id}/enroll`)
     }
 
     return h(Box, {gap:32},[
