@@ -15,7 +15,7 @@ import EditorWithPreview from 'components/EditorWithPreview'
 function TemplateSettings() {
   let router = useRouter()
   let templateId = router.query.templateId
-  let courseId = (router.query.id as string)?.split('-').slice(-1)[0]
+  let courseId = router.query.id as string
   let {data: templates, mutate }= useApiData<GetTemplatesResult>(courseId ? `/api/courses/${courseId}/templates` : undefined)
   let template = templates ? templates.find(t=> t.name === templateId) : undefined
 
@@ -47,8 +47,8 @@ function TemplateSettings() {
     }
     if(res.status === 200) {
       setStatus('success')
-      if(templateId === 'new') router.push(`/courses/[id]/settings/templates/[templateId]`,
-                                           `/courses/${courseId}/settings/templates/${res.result.name}`)
+      if(templateId === 'new') router.push(`/courses/[slug]/[id]/settings/templates/[templateId]`,
+                                           `/courses/${router.query.slug}${router.query.id}/settings/templates/${res.result.name}`)
     }
   }
 
@@ -60,7 +60,7 @@ function TemplateSettings() {
 
   return h(Box, {gap: 32}, [
     h(Box, {width: 640}, [
-      h(BackButton, {href: "/courses/[id]/settings", as: `/courses/${courseId}/settings`}, 'Setttings'),
+      h(BackButton, {href: "/courses/[slug]/[id]/settings", as: `/courses/${router.query.slug}/${courseId}/settings`}, 'Setttings'),
       h('h2', router.query.templateId === 'new' ? 'Add New Template' : "Edit Template"),
       h('p.big', `Create templates for topics to either be included in every new cohort's forum, or to be triggered by a facilitator at any time.`)
     ]),

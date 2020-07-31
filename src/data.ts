@@ -29,8 +29,8 @@ export const useCourseData = (id?: number | string, initialData?:Success<CourseD
 }
 
 export type Cohort = Success<CohortResult>
-export const useCohortData = (cohort: number, initialData?:Success<CohortResult>) => {
-  return useSWR(`/api/cohorts/${cohort}`, async api => {
+export const useCohortData = (cohort?: number, initialData?:Success<CohortResult>) => {
+  return useSWR(cohort ? `/api/cohorts/${cohort}`:null, async api => {
     let res = await callApi<null, CohortResult>(api)
     if(res.status === 200) return res.result
     else return false

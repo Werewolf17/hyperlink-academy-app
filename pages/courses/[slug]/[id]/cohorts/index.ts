@@ -49,7 +49,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
     return h(TwoColumn, {}, [
         //Page Content
         h(Box, {gap:16}, [
-            h(BackButton, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, 'Course Details'),
+            h(BackButton, {href: "/courses/[slug]/[id]", as: `/courses/${router.query.slug}/${router.query.id}`}, 'Course Details'),
             h('h1', COPY.header),
             h('p.big', COPY.subtitle)
 
@@ -84,7 +84,7 @@ let Cohort = (props: {
     let stripe = useStripe()
     let router = useRouter()
     let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res) => {
-        if(res.zeroCost) await router.push('/courses/[id]/cohorts/[cohortId]?welcome', `/courses/${props.course}/cohorts/${props.id}?welcome`)
+        if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]?welcome', `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}?welcome`)
         else stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
@@ -113,8 +113,8 @@ let Cohort = (props: {
             h(WhiteContainer, [
                 h(Text, {source: props.details.text.slice(0, 400) + (props.details.text.length > 400 ?'...' : '')}),
                 h(Link, {
-                    href: '/courses/[id]/cohorts/[cohortId]',
-                    as: `/courses/${props.course}/cohorts/${props.id}`
+                    href: '/courses/[slug]/[id]/cohorts/[cohortId]',
+                    as: `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}`
                 }, h('a', {style: {textDecoration: 'underline'}}, h('b', 'See more details')))
             ]),
         ]),
@@ -125,7 +125,7 @@ let Cohort = (props: {
 }
 
 export const getStaticProps = async (ctx: any) =>{
-    let courseId = parseInt((ctx.params?.id as string || '' ).split('-').slice(-1)[0])
+    let courseId = parseInt(ctx.params?.id as string || '' )
     if(Number.isNaN(courseId)) return {props: {notFound: true}} as const
     let prisma = new PrismaClient()
 

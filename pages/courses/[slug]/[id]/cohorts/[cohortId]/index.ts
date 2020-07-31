@@ -61,7 +61,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     h(TwoColumn, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
-          h(BackButton, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, 'Course Details'),
+          h(BackButton, {href: "/courses/[slug]/[id]", as: `/courses/${cohort.courses.slug}/${cohort.courses.id}`}, 'Course Details'),
           h(Box, {gap:4}, [
             h('h1', cohort?.courses.name),
             h('h3.textSecondary', 'Cohort '+cohort?.name),
@@ -75,8 +75,8 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/${cohort.id}`}
             , h(Primary, 'Go to the forum')),
           !isFacilitator ? null : h(Link, {
-            href: "/courses/[id]/cohorts/[cohortId]/templates",
-            as: `/courses/${cohort.courses.id}/cohorts/${router.query.cohortId}/templates`
+            href: "/courses/[slug]/[id]/cohorts/[cohortId]/templates",
+            as: `/courses/${cohort.courses.slug}/${cohort.courses.id}/cohorts/${cohort.id}/templates`
           }, h(Secondary, 'New Forum Topic from Template')),
           !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {cohort, mutate}) : null,
         ]),
@@ -131,7 +131,7 @@ const EnrollInCohort = (props:{id:number, course: number}) => {
     let stripe = useStripe()
     let router = useRouter()
     let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res)=>{
-        if(res.zeroCost) await router.push('/courses/[id]/cohorts/[cohortId]', `/courses/${props.course}/${props.id}?welcome`)
+        if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]', `/courses/${router.query.slug}/${props.course}/${props.id}?welcome`)
         else await stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
@@ -224,8 +224,8 @@ you'll be doing on your first day`),
         href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`
       }, h(Primary, "Get started")),
       h(Link, {
-        href:'/courses/[id]/cohorts/[cohortId]',
-        as: `/courses/${props.cohort.courses.id}/cohorts/${props.cohort.id}`
+        href:'/courses/[slug/]/[id]/cohorts/[cohortId]',
+        as: `/courses/${props.cohort.courses.slug}/${props.cohort.courses.id}/cohorts/${props.cohort.id}`
       }, h('a', 'Back to the cohort page'))
     ])
   ])
@@ -284,7 +284,7 @@ const Banners = (props:{
 }
 
 export const getStaticProps = async (ctx:any)=>{
-  let courseId = parseInt((ctx.params?.id as string || '' ).split('-').slice(-1)[0])
+  let courseId = parseInt(ctx.params?.id as string || '' )
   if(Number.isNaN(courseId)) return {props: {notFound: true}} as const
 
   let course = await courseDataQuery(courseId)

@@ -3,27 +3,26 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { InferGetStaticPropsType } from 'next'
 
-import { Box, Seperator, TwoColumn, Sidebar } from '../../../components/Layout'
-import {Tabs} from '../../../components/Tabs'
-import { colors } from '../../../components/Tokens'
-import Loader, { PageLoader } from '../../../components/Loader'
-import { Info} from '../../../components/Form'
-import {Pill} from '../../../components/Pill'
-import Enroll from '../../../components/Course/Enroll'
-import Text from '../../../components/Text'
-import {SmallCohortCard} from '../../../components/Card'
-import {TwoColumnBanner} from '../../../components/Banner'
-import {Modal} from '../../../components/Modal'
-import { Primary, Destructive, Secondary} from '../../../components/Button'
+import { Box, Seperator, TwoColumn, Sidebar } from 'components/Layout'
+import {Tabs} from 'components/Tabs'
+import { colors } from 'components/Tokens'
+import Loader, { PageLoader } from 'components/Loader'
+import { Info} from 'components/Form'
+import {Pill} from 'components/Pill'
+import Enroll from 'components/Course/Enroll'
+import Text from 'components/Text'
+import {SmallCohortCard} from 'components/Card'
+import {TwoColumnBanner} from 'components/Banner'
+import {Modal} from 'components/Modal'
+import { Primary, Destructive, Secondary} from 'components/Button'
 
-import { getTaggedPost } from '../../../src/discourse'
-import { useUserData, useUserCohorts, useCourseData, Course } from '../../../src/data'
-import { UpdateCourseMsg, UpdateCourseResponse} from '../../api/courses/[id]'
-import { callApi } from '../../../src/apiHelpers'
-import { cohortPrettyDate } from '../../../components/Card'
-import ErrorPage from '../../404'
-import { courseDataQuery } from '../../api/courses/[id]'
-import { useRouter } from 'next/router'
+import { getTaggedPost } from 'src/discourse'
+import { useUserData, useUserCohorts, useCourseData, Course } from 'src/data'
+import { UpdateCourseMsg, UpdateCourseResponse} from 'pages/api/courses/[id]'
+import { callApi } from 'src/apiHelpers'
+import { cohortPrettyDate } from 'components/Card'
+import ErrorPage from 'pages/404'
+import { courseDataQuery } from 'pages/api/courses/[id]'
 
 const COPY = {
   courseForum: "Check out the course forum",
@@ -35,8 +34,8 @@ const COPY = {
   inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested! If you've been invited, please log in."),
   invited: h('span.accentSuccess', "You're invited!"),
   noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
-  noUpcomingMaintainer: (props:{courseId:string})=> h('span.accentRed', [
-    "Looks like there aren't any cohorts of this course planned, maybe ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'create one'))
+  noUpcomingMaintainer: (props:{courseId:number, slug: string})=> h('span.accentRed', [
+    "Looks like there aren't any cohorts of this course planned, maybe ", h(Link, {href: "/courses/[slug]/[id]/settings", as: `/courses/${props.slug}/${props.courseId}/settings`}, h('a', 'create one'))
   ]),
   enrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!"),
   enrollButton: "See Upcoming Cohorts",
@@ -54,7 +53,6 @@ const WrappedCoursePage = (props: Props)=>props.notFound ? h(ErrorPage) : h(Cour
 export default WrappedCoursePage
 
 const CoursePage = (props:Extract<Props, {notFound: false}>) => {
-  let router = useRouter()
   let {data: user} = useUserData()
   let {data:userCohorts} = useUserCohorts()
   let {data: course} = useCourseData(props.id, props.course || undefined)
@@ -99,6 +97,10 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h('h3', COPY.activeCohorts),
           ...activeCohorts.map(cohort=> h(SmallCohortCard, {
             ...cohort,
+            courses: {
+              name: course?.name || '',
+              slug: course?.slug || '',
+            },
             facilitating: cohort.facilitator === (user ? user?.id : undefined),
             enrolled: !(cohort.facilitator === (user ? user?.id : undefined))
           }))
@@ -109,12 +111,13 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           isMaintainer ? h(COPY.updateCurriculum, {id: props.content.id}) : null,
           h(Text, {source: props.content.text})
         ]),
-        [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts}) : null,
+        [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts, slug: course.slug}) : null,
       }}),
       h(Sidebar, [
         h(Enroll, {course}, [
           h(Box, {gap: 8}, [
-            h(Link, {href: '/courses/[id]/cohorts', as:`/courses/${router.query.id}/cohorts` }, [
+            h(Link, {href: '/courses/[slug]/[id]/cohorts',
+                     as:`/courses/${course.slug}/${course.id}/cohorts` }, [
               h('a', [
                 h(Primary, {
                   disabled: upcomingCohorts.length === 0 || (course.invite_only && !invited)
@@ -123,7 +126,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             ]),
             h('div.textSecondary', {style:{width:232}}, [
               h(Box, {gap:16}, [
-                upcomingCohorts.length === 0 ? isMaintainer ? h(COPY.noUpcomingMaintainer, {courseId: router.query.id as string}) : COPY.noUpcoming : null,
+                upcomingCohorts.length === 0 ? isMaintainer ? h(COPY.noUpcomingMaintainer, {courseId: course.id, slug: course.slug}) : COPY.noUpcoming : null,
                 enrolled ? COPY.enrolled :
                   course?.invite_only && !invited ? (user ? COPY.inviteOnly : COPY.inviteOnlyLoggedOut) : null,
               ]),
@@ -132,7 +135,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             !isMaintainer ? null : h(Box, [
               h('h3', "You maintain this course"),
               h('p.textSecondary', COPY.settings),
-              h(Link, {href:'/courses/[id]/settings', as:`/courses/${props.course.id}/settings`}, h(Destructive, 'Edit Course Settings'))
+              h(Link, {href:'/courses/[slug]/[id]/settings', as:`/courses/${course.slug}/${course.id}/settings`}, h(Destructive, 'Edit Course Settings'))
             ])
           ])
         ])]),
@@ -140,17 +143,17 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   ])
 }
 
-const Cohorts = (props:{cohorts: Course['course_cohorts'] & {facilitating?: boolean, enrolled?: boolean}}) => {
+const Cohorts = (props:{cohorts: Course['course_cohorts'] & {facilitating?: boolean, enrolled?: boolean}, slug: string}) => {
   return h(Box, {gap:32}, [
     h('h2', 'Past Cohorts'),
     ...props.cohorts
       .filter(i => i.completed)
       .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
-      .map(cohort => h(Cohort, {cohort}))
+      .map(cohort => h(Cohort, {cohort, slug: props.slug}))
     ])
 }
 
-const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean}}) => {
+const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean},slug:string}) => {
   let id= props.cohort.id
 
   return h(Box, {gap: 16}, [
@@ -161,8 +164,8 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
         props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
       ]),
       h('h3', {}, h(Link, {
-        href:'/courses/[id]/cohorts/[cohortId]',
-        as:  `/courses/${props.cohort.course}/cohorts/${id}`
+        href:'/courses/[slug]/[id]/cohorts/[cohortId]',
+        as:  `/courses/${props.slug}/${props.cohort.course}/cohorts/${id}`
       }, h('a', {style: {textDecoration: 'none'}}, `#${props.cohort.name} ${props.cohort.courses.name}`))),
     ]),
     h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
@@ -238,7 +241,7 @@ if you have any feedback!`])
 }
 
 export const getStaticProps = async (ctx:any) => {
-  let id = parseInt((ctx.params?.id as string || '' )?.split('-').slice(-1)[0])
+  let id = parseInt(ctx.params?.id as string || '' )
   if(Number.isNaN(id)) return {props: {notFound: true}} as const
 
   let data = await courseDataQuery(id)

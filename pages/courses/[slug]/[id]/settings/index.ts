@@ -46,7 +46,7 @@ function CourseSettings(props:Extract<Props, {notFound:false}>){
 
   return h(Box, {gap:64, width: 640}, [
     h(Box, {gap: 16}, [
-      h(BackButton, {href: "/courses/[id]", as: `/courses/${router.query.id}`}, 'Course Details'),
+      h(BackButton, {href: "/courses/[slug]/[id]", as: `/courses/${router.query.slug}/${router.query.id}`}, 'Course Details'),
       h('h1', "Course Settings"),
       h('p.big', [
         `Hyperlink is new and some things can only be done manually for now! To add a new maintainer, remove a cohort, or anything else you don't see here, please email `,
@@ -254,8 +254,8 @@ function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
       ]),
       h('p', `You can edit the default templates we've provided below, or add new ones!`),
       h(Link, {
-        href: '/courses/[id]/settings/templates/[templateId]',
-        as:`/courses/${props.course.id}/settings/templates/new`
+        href: '/courses/[slug]/[id]/settings/templates/[templateId]',
+        as:`/courses/{props.course.slug}/${props.course.id}/settings/templates/new`
       }, h(Primary, "+ Add A New Template")),
     ]),
     h(Box, {}, props.course.course_templates
@@ -271,8 +271,8 @@ function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
             h(Box, {h: true, style:{justifySelf: 'end', alignItems: 'center'}}, [
               template.required ? null : h(DeleteTemplate, {course: props.course, mutate: props.mutate, templateName: template.name}),
               h(Link, {
-                href: '/courses/[id]/settings/templates/[templateId]',
-                as: `/courses/${props.course.id}/settings/templates/${template.name}`
+                href: '/courses/[slug]/[id]/settings/templates/[templateId]',
+                as: `/courses/${props.course.slug}/${props.course.id}/settings/templates/${template.name}`
               }, h(Secondary, 'Edit'))
             ])
           ]),
@@ -315,7 +315,7 @@ grid-gap: 16px;
 `
 
 export const getStaticProps = async (ctx:any) => {
-  let id = parseInt((ctx.params?.id as string || '' ).split('-').slice(-1)[0])
+  let id = parseInt(ctx.params?.id as string || '' )
   if(Number.isNaN(id)) return {props: {notFound: true}} as const
 
   let data = await courseDataQuery(id)

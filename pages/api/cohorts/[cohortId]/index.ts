@@ -56,7 +56,7 @@ export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
         select: {display_name: true, username: true}
       },
       courses: {
-        select: {name: true, id: true, cost: true, duration: true, description: true, category_id: true}
+        select: {name: true, id: true, slug: true, cost: true, duration: true, description: true, category_id: true}
       },
       people_in_cohorts: {
         include: {
