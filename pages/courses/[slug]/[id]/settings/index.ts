@@ -10,7 +10,7 @@ import { useApi, callApi } from 'src/apiHelpers'
 import { Course, useCourseData, useUserData } from 'src/data'
 import { PageLoader } from 'components/Loader'
 import { Box, Seperator, LabelBox, FormBox } from 'components/Layout'
-import { Info, Error, Select, Input, Textarea } from 'components/Form'
+import { Info, Error, Select, Input, Textarea, CheckBox } from 'components/Form'
 import { Primary, Destructive, Secondary, BackButton } from 'components/Button'
 import ErrorPage from 'pages/404'
 import { useDebouncedEffect } from 'src/hooks'
@@ -56,7 +56,7 @@ function CourseSettings(props:Extract<Props, {notFound:false}>){
     h(Tabs, { tabs: {
       Cohorts: h(CohortSettings, {course, mutate}),
       Details: h(EditDetails, {course, mutate}),
-      Invites: course.invite_only ? h(InvitePerson, {id: course.id}) : null,
+      Invites: h(Invites, {course, mutate}),
       Templates: h(CourseTemplates, {course, mutate})
     } })
   ])
@@ -124,10 +124,12 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
   ])
 }
 
-const InvitePerson = (props:{id: number})=> {
+const Invites = (props:{course:Course, mutate: (c:Course) => void})=> {
   let [emailOrUsername, setEmailOrUsername] = useState('')
+  let [invite_only, setInviteOnly] = useState(props.course.invite_only)
   let [valid, setValid] = useState<null | boolean>(null)
   let [status, callInviteToCourse] = useApi<InviteToCourseMsg, InviteToCourseResponse>([emailOrUsername], ()=>setEmailOrUsername(''))
+  let [updateStatus, callUpdateCourse] = useApi<UpdateCourseMsg, UpdateCourseResponse>([])
 
   useDebouncedEffect(async ()=>{
     if(emailOrUsername.includes('@') || emailOrUsername === '') return setValid(null)
@@ -137,31 +139,65 @@ const InvitePerson = (props:{id: number})=> {
   }, 500, [emailOrUsername])
   useEffect(()=>setValid(null),[emailOrUsername])
 
-  let onSubmit = async (e: React.FormEvent)=>{
+  let onSubmitInvite = async (e: React.FormEvent)=>{
     e.preventDefault()
     let x = emailOrUsername.includes('@') ? {email: emailOrUsername} : {username: emailOrUsername}
-    callInviteToCourse(`/api/courses/${props.id}/invite`, {...x})
+    callInviteToCourse(`/api/courses/${props.course.id}/invite`, {...x})
   }
-  return h(FormBox, {onSubmit, gap:32, width: 400}, [
-    h('h2', "Invite Someone to Enroll"),
-    h(LabelBox, {gap:8}, [
-      h('h4', "Username or Email"),
-      h('small.textSecondary', `We'll send them an email. Invitee does not need a Hyperlink account to be invited, but they will need an account to enroll.`),
-      h(Input, {
-        type: emailOrUsername.includes('@') ? 'email' : 'text',
-        required: true,
-        value: emailOrUsername,
-        onChange: e=> setEmailOrUsername(e.currentTarget.value)
-      }),
-      valid === null ? null :
-        valid ? h('span.accentSuccess', "Great, found @"+emailOrUsername): h('span.accentRed', "We can't find a user with that username")
-    ]),
-    h(Primary, {
-      style: {justifySelf: 'right'},
-      status,
-      type: 'submit',
-      disabled: (!emailOrUsername.includes('@') && valid !== true)
-    }, "Invite"),
+
+  let onSubmitToggleInviteOnly = async (e:React.FormEvent)=>{
+    e.preventDefault()
+    let res = await callUpdateCourse(`/api/courses/${props.course.id}`, {invite_only})
+    if(res.status === 200) props.mutate({...props.course, ...res.result})
+  }
+
+  return h(Box, {gap: 16, width: 400}, [
+    h('h1', "Invites"),
+    h(Box, {gap:32}, [
+      h(FormBox, {onSubmit: onSubmitToggleInviteOnly}, [
+        h(LabelBox, { gap:8, width: 400}, [
+          h('div', [
+            h('h4', "Invite Only"),
+            h('small.textSecondary', `Learners cannot enroll in an invite only course unless you have sent them an
+invite. The invite allows them enroll in any cohort and does not expire.`)
+          ]),
+          h(CheckBox, [
+            h(Input, {
+              type: 'checkbox',
+              checked: invite_only,
+              onChange: e => setInviteOnly(e.currentTarget.checked)
+            }),
+            "Make this course invite only"
+          ])
+        ]),
+        h(Primary, {
+          style: {justifySelf: 'right'},
+          status: updateStatus,
+          type: 'submit',
+          disabled: props.course.invite_only === invite_only
+        }, "Change"),
+      ]),
+      !props.course.invite_only ? null : h(FormBox, {onSubmit: onSubmitInvite, gap:32, width: 400}, [
+        h(LabelBox, {gap:8}, [
+          h('h4', "Invite someone to enroll"),
+          h('small.textSecondary', `Invite someone with their username or email. Invitee does not need a Hyperlink account to be invited, but they will need an account to enroll.`),
+          h(Input, {
+            type: emailOrUsername.includes('@') ? 'email' : 'text',
+            required: true,
+            value: emailOrUsername,
+            onChange: e=> setEmailOrUsername(e.currentTarget.value)
+          }),
+          valid === null ? null :
+            valid ? h('span.accentSuccess', "Great, found @"+emailOrUsername): h('span.accentRed', "We can't find a user with that username")
+        ]),
+        h(Primary, {
+          style: {justifySelf: 'right'},
+          status,
+          type: 'submit',
+          disabled: (!emailOrUsername.includes('@') && valid !== true)
+        }, "Invite"),
+      ])
+    ])
   ])
 }
 

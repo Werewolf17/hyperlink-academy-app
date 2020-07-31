@@ -7,6 +7,7 @@ import { slugify } from 'src/utils'
 const prisma = new PrismaClient()
 
 export type UpdateCourseMsg = Partial<{
+  invite_only: boolean,
   cost: number,
   cohort_max_size: number,
   name: string,
@@ -59,6 +60,7 @@ async function updateCourse(req: Request) {
     where: {id: courseId},
     data: {
       slug,
+      invite_only: msg.invite_only,
       cohort_max_size: msg.cohort_max_size,
       duration: msg.duration,
       status: msg.status,
@@ -68,8 +70,6 @@ async function updateCourse(req: Request) {
       name: msg.name
     }
   })
-
-
 
   return {status: 200, result: newData} as const
 }
