@@ -44,7 +44,8 @@ color: ${colors.grey55};
 
 ${props => {
 if(props.success) return `
-background-color: ${colors.accentSuccess};
+background-color: ${colors.grey15};
+border-color: ${colors.accentSuccess};
 `}}
 `
 
