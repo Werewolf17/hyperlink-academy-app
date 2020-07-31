@@ -140,7 +140,7 @@ const EnrollInCohort = (props:{id:number, course: number}) => {
     if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
     if(!props.id) return
     if(!stripe) return
-    await callEnroll('/api/cohorts/${props.id}/enroll')
+    await callEnroll(`/api/cohorts/${props.id}/enroll`)
   }
 
   return  h(Primary, {onClick, status}, 'Join this Cohort')
