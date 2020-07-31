@@ -44,6 +44,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
                 if(cohort.completed) return false
                 if(userCohorts?.course_cohorts.find(i=> i.id ===cohort.id)) return false
                 if(new Date(cohort.start_date)< new Date()) return false
+                if(course?.cohort_max_size === 0 && cohort.people_in_cohorts.length >= course.cohort_max_size) return false
                 return true
             })
     return h(TwoColumn, {}, [
@@ -59,7 +60,13 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
             //Upcoming Cohort List
             ...(cohorts.length === 0
                 ? [h(Info, COPY.empty)]
-                : cohorts.map(cohort => h(Cohort, {...cohort, invited, invite_only: course?.invite_only})))
+                : cohorts.map(cohort => h(Cohort, {
+                    ...cohort,
+                    invited,
+                    invite_only: course?.invite_only,
+                    cohort_max_size: course?.cohort_max_size || 0,
+                    learners: cohort.people_in_cohorts.length
+                })))
         ]),
         //Course Details Panel
         h(Sidebar, [h(Enroll, {course}, [
@@ -74,6 +81,8 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
 let Cohort = (props: {
     details: {text: string, id: string},
     people: {username: string, display_name: string | null},
+    learners: number,
+    cohort_max_size: number,
     invited: boolean,
     invite_only?: boolean,
     id: number,
@@ -118,8 +127,9 @@ let Cohort = (props: {
                 }, h('a', {style: {textDecoration: 'underline'}}, h('b', 'See more details')))
             ]),
         ]),
-        h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right'}}, [
+        h(Box, {gap:8, h: true, style: {justifyContent: 'right', textAlign: 'right', alignItems: 'center'}}, [
             h(Primary, {onClick, disabled: props.invite_only && !props.invited, status}, 'Join this Cohort'),
+            h('span.accentSuccess', `${props.cohort_max_size - props.learners} spots left!`)
         ]),
     ])
 }
@@ -143,7 +153,8 @@ export const getStaticProps = async (ctx: any) =>{
                     display_name: true,
                     username: true
                 }
-            }
+            },
+            people_in_cohorts: {}
         }
     })
 

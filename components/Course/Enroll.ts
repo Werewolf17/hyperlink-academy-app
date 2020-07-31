@@ -18,6 +18,7 @@ const Enroll:React.SFC<Props> = (props) => {
       h(Cost, '$' + props.course?.cost),
       h(Box, {gap: 8, style:{color: colors.textSecondary}}, [
         h('b', props.course?.duration),
+        props.course?.cohort_max_size === 0 ? null : h('b', `Up to ${props.course?.cohort_max_size} learners`),
         h(Box, {gap: 4}, [
           h('b', 'Prerequisites'),
           h('p', props.course?.prerequisites)

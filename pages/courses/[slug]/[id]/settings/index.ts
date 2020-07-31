@@ -168,6 +168,7 @@ const InvitePerson = (props:{id: number})=> {
 const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
   let [formData, setFormData] = useState({
     name: props.course.name,
+    cohort_max_size: props.course.cohort_max_size,
     description: props.course.description,
     prerequisites: props.course.prerequisites,
     cost: props.course.cost,
@@ -182,7 +183,7 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
     || props.course.cost !== formData.cost
     || props.course.prerequisites !== formData.prerequisites
     || props.course.description !== formData.description
-
+    || props.course.cohort_max_size !== formData.cohort_max_size
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     let res = await callUpdateCourse(`/api/courses/${props.course.id}`, {...formData})
@@ -205,6 +206,18 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
         type: 'number',
         value: formData.cost,
         onChange: e => setFormData({...formData, cost: parseInt(e.currentTarget.value)})
+      })
+    ]),
+    h(LabelBox, {gap:8}, [
+      h('div', [
+        h('h4', "Cohort Size"),
+        h('small.textSecondary', "How many learners can enroll in a cohort. Set to 0 for no limit.")
+      ]),
+      h(Input, {
+        type: 'number',
+        required: true,
+        value: formData.cohort_max_size,
+        onChange: (e)=> setFormData({...formData, cohort_max_size: parseInt(e.currentTarget.value)})
       })
     ]),
     h(LabelBox, {gap:8}, [

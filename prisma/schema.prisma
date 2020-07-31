@@ -65,6 +65,7 @@ model courses {
   slug               String               @unique
   id                 Int                  @default(autoincrement()) @id
   maintainer_group   Int                  @unique
+  cohort_max_size    Int                  @default(0)
   course_cohorts     course_cohorts[]
   course_invites     course_invites[]
   course_maintainers course_maintainers[]
