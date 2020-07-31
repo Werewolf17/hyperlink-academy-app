@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
-import { ResultType, APIHandler, Request } from "../../../../../../src/apiHelpers"
-import { getToken } from "../../../../../../src/token"
+import { ResultType, APIHandler, Request } from "src/apiHelpers"
+import { getToken } from "src/token"
 
 let prisma = new PrismaClient()
 export type UpdateCohortMsg = {

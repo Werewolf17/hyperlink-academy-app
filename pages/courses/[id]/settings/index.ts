@@ -16,7 +16,7 @@ import ErrorPage from 'pages/404'
 import { useDebouncedEffect } from 'src/hooks'
 import { courseDataQuery, UpdateCourseMsg, UpdateCourseResponse } from 'pages/api/courses/[id]'
 import { CheckUsernameResult } from 'pages/api/get/[...item]'
-import { CreateCohortMsg, CreateCohortResponse } from 'pages/api/courses/[id]/cohorts'
+import { CreateCohortMsg, CreateCohortResponse } from 'pages/api/cohorts'
 import { InviteToCourseMsg, InviteToCourseResponse } from 'pages/api/courses/[id]/invite'
 import { Modal } from 'components/Modal'
 import { DeleteTemplateResult } from 'pages/api/courses/[id]/templates/[templateId]'
@@ -81,7 +81,7 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    let res = await callCreateCohort(`/api/courses/${props.course.id}/cohorts`, {courseId: props.course.id, ...newCohort})
+    let res = await callCreateCohort(`/api/cohorts`, {courseId: props.course.id, ...newCohort})
     if(res.status === 200) props.mutate({
         ...props.course,
         course_cohorts: [...props.course.course_cohorts, {...res.result, people_in_cohorts:[], courses: {name: props.course.name}}]

@@ -8,8 +8,7 @@ import { LabelBox, FormBox } from 'components/Layout'
 
 import { useApi } from 'src/apiHelpers'
 import { useUserData } from 'src/data'
-import { CreateCourseMsg } from 'pages/api/courses'
-import { CreateCohortResponse } from 'pages/api/courses/[id]/cohorts'
+import { CreateCourseMsg, CreateCourseResponse } from 'pages/api/courses'
 
 const CreateCourse = ()=> {
   let {data: user} = useUserData()
@@ -24,7 +23,7 @@ const CreateCourse = ()=> {
     maintainers: [] as string[]
   })
 
-  let [status, callCreateCourse] = useApi<CreateCourseMsg, CreateCohortResponse>([formData])
+  let [status, callCreateCourse] = useApi<CreateCourseMsg, CreateCourseResponse>([formData])
 
   if(user === false) router.push('/')
   if(user &&  user.admin === false) router.push('/dashboard')
