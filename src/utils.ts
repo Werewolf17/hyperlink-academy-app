@@ -5,4 +5,5 @@ export const slugify = (str:string) => {
   return str.trim()
     .replace(specials, '')
     .replace(/\s/g, '-')
+    .toLowerCase()
 }
