@@ -38,13 +38,17 @@ type Cohort = {
   enrolled?:boolean,
   facilitating?: boolean,
   id: number,
+  courses: {
+    name: string,
+    slug: string
+  }
   course: number,
 }
 export const SmallCohortCard = (props: Cohort) => {
   return h(Link, {
-    href: "/courses/[id]/cohorts/[cohortId]",
+    href: "/courses/[slug]/[id]/cohorts/[cohortId]",
+    as:`/courses/${props.courses.slug}/${props.course}/cohorts/${props.id}`,
     passHref: true,
-    as:`/courses/${props.course}/cohorts/${props.id}`
   }, [
     h(Card, {style:{border: '1px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 8}, [
@@ -63,16 +67,16 @@ export const SmallCohortCard = (props: Cohort) => {
   ])
 }
 
-export const BigCohortCard = (props: Cohort & {courses: {name: string}}) =>{
+export const BigCohortCard = (props: Cohort & {courses: {name: string, slug: string}}) =>{
   let now = new Date()
   let status: "Completed" | "Upcoming" | "Ongoing" = "Upcoming"
   if(now > new Date(props.start_date)) status = "Ongoing"
   if(props.completed) status = "Completed"
 
   return h(Link, {
-    href: "/courses/[id]/cohorts/[cohortId]",
+    href: "/courses/[slug]/[id]/cohorts/[cohortId]",
+    as:`/courses/${props.courses.slug}/${props.course}/cohorts/${props.id}`,
     passHref: true,
-    as:`/courses/${props.course}/cohorts/${props.id}`
   }, [
     h(Card, {style:{border: '2px solid', borderTop: '4px solid', borderRadius: '2px'}}, [
       h(Box, {gap: 32}, [

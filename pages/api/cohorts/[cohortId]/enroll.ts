@@ -24,6 +24,7 @@ async function enroll (req: Request) {
         select: {
           category_id: true,
           cost: true,
+          slug: true,
           name: true
         }
       }
@@ -45,8 +46,8 @@ async function enroll (req: Request) {
       name: user.display_name || user.username,
       course_start_date: cohort.start_date,
       course_name: cohort.courses.name,
-      cohort_page_url: `https://hyperlink.academy/courses/${cohort.course}/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/${cohort.id}`,
+      cohort_page_url: `https://hyperlink.academy/courses/${cohort.course}/${cohort.courses.slug}/cohorts/${cohort.id}`,
+      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/cohorts/${cohort.id}`,
       get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
     })
     return {
@@ -64,8 +65,8 @@ async function enroll (req: Request) {
         currency: 'usd',
         quantity: 1,
       }],
-      cancel_url: `${req.headers.origin}/courses/${cohort.course}/${cohort.id}`,
-      success_url: `${req.headers.origin}/courses/${cohort.course}/${cohort.id}?welcome`,
+      cancel_url: `${req.headers.origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+      success_url: `${req.headers.origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}?welcome`,
       customer_email: user.email,
       metadata: {
         cohortId: cohort.id,

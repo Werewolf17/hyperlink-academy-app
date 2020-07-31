@@ -11,6 +11,7 @@ import { prettyDate } from '../../src/utils'
 type Props = {
   name:string,
   description: string
+  slug: string,
   id: number,
   status?:  'draft' | 'live' | null
   course_cohorts:{start_date: string}[]
@@ -20,8 +21,8 @@ export default (props:Props) => {
   let upcomingCohort = props.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
 
   return h(Link, {
-    href: '/courses/[id]',
-    as: '/courses/' + props.id,
+    href: '/courses/[slug]/[id]',
+    as: `/courses/${props.slug}/${props.id}`,
     passHref: true}, h(CourseCard, {
   }, [
     h(ImageContainer, [

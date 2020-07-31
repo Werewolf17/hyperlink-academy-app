@@ -30,11 +30,11 @@ function CohortTemplatesPages(props:Props) {
 
   return h(Box, {width: 640, gap: 64},[
     h(Box, {gap:16}, [
-      h(BackButton, {href: "/courses/[id]/cohorts/[cohortId]", as: `/courses/${router.query.id}/cohorts/${router.query.cohortId}`}, 'Cohort Details'),
+      h(BackButton, {href: "/courses/[slug]/[id]/cohorts/[cohortId]", as: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}`}, 'Cohort Details'),
       h('h1', "Templates"),
       h('p', [
         `Use templates to easily post new topcs in your cohort forum! You can create new templates in the `,
-        h(Link, {href: '/courses/[id]/settings', as:`/courses/${router.query.id}/settings`}, h('a', 'course settings')), `.`
+        h(Link, {href: '/courses/[slug]/[id]/settings', as:`/courses/${router.query.slug}/${router.query.id}/settings`}, h('a', 'course settings')), `.`
       ])
     ]),
     h(Box, {}, props.templates
@@ -68,7 +68,6 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
   let onSubmit = async (e:React.FormEvent)=>{
     e.preventDefault()
     let res = await callPost(`/api/cohorts/${router.query.cohortId}/postTopic`, {title: formState.title, body: formState.content, tags:[]})
-    console.log(res)
     if(res.status===200) setPost(res.result.topic.topic_id)
   }
 
@@ -84,8 +83,8 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
       h(Box, [
         h('a', {href: 'https://forum.hyperlink.academy/t/'+post}, h(Primary, {style:{width:'100%'}}, "View it here")),
       h(Link, {
-        href: '/courses/[id]/cohorts/[cohortId]/templates',
-        as: `/courses/${router.query.id}/cohorts/${router.query.cohortId}/templates`
+        href: '/courses/[slug]/[id]/cohorts/[cohortId]/templates',
+        as: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`
       }, h('a', {}, h(Secondary, {style:{width:'100%'}}, 'Back to Templates')))
       ])
     ])) : null,
@@ -113,7 +112,7 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
 
 export const getStaticProps = async (ctx:any)=>{
   let cohortNum = (ctx.params?.cohortId || '' )as string
-  let courseId = parseInt((ctx.params?.id as string || '').split('-').slice(-1)[0])
+  let courseId = parseInt(ctx.params?.id as string || '')
 
   let templates = await getTemplatesQuery(courseId)
   return {props: {templates, courseId, cohortNum}}
