@@ -24,9 +24,9 @@ import { useCohortData, useUserData, useCourseData, Cohort } from 'src/data'
 import { cohortPrettyDate } from 'components/Card'
 import ErrorPage from 'pages/404'
 import { useStripe } from '@stripe/react-stripe-js'
-import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]'
+import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/api/cohorts/[cohortId]'
 import { courseDataQuery } from 'pages/api/courses/[id]'
-import { EnrollResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]/enroll'
+import { EnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
 
 const COPY = {
   detailsTab: "Details",
@@ -47,7 +47,7 @@ export default WrappedCohortPage
 const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let router = useRouter()
   let {data: user} = useUserData()
-  let {data: cohort, mutate} = useCohortData(props.courseId, props.cohortId, props.cohort)
+  let {data: cohort, mutate} = useCohortData(props.cohortId, props.cohort)
   let {data: course} = useCourseData(props.courseId, props.course)
   if(!cohort) return h(PageLoader)
 
@@ -140,7 +140,7 @@ const EnrollInCohort = (props:{id:number, course: number}) => {
     if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
     if(!props.id) return
     if(!stripe) return
-    await callEnroll('/api/courses/${props.course}/cohorts/${props.id}/enroll')
+    await callEnroll('/api/cohorts/${props.id}/enroll')
   }
 
   return  h(Primary, {onClick, status}, 'Join this Cohort')
@@ -163,7 +163,7 @@ const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
           h(Primary, {onClick: async e => {
             e.preventDefault()
             setState('loading')
-            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/courses/${props.cohort.courses.id}/cohorts/${props.cohort.id}`, {data: {live: true}})
+            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data: {live: true}})
             if(res.status === 200) props.mutate({...props.cohort, live: res.result.live})
             setState('complete')
           }}, state === 'loading' ? h(Loader) : 'Go Live'),

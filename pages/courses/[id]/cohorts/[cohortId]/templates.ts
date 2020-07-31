@@ -10,7 +10,7 @@ import { Input } from 'components/Form'
 import EditorWithPreview from 'components/EditorWithPreview'
 import { PageLoader } from 'components/Loader'
 import { useApi } from 'src/apiHelpers'
-import { PostTopicMsg, PostTopicResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]/postTopic'
+import { PostTopicMsg, PostTopicResponse } from 'pages/api/cohorts/[cohortId]/postTopic'
 import { Modal } from 'components/Modal'
 
 export default CohortTemplatesPages
@@ -25,9 +25,6 @@ function CohortTemplatesPages(props:Props) {
       h(BackButton, {href: "", shallow:true}, 'Templates'),
       h('h1', "Post template")
     ]),
-
-
-
     h(TemplatePage, {template})
   ])
 
@@ -70,7 +67,7 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
 
   let onSubmit = async (e:React.FormEvent)=>{
     e.preventDefault()
-    let res = await callPost(`/api/courses/${router.query.id}/cohorts/${router.query.cohortId}/postTopic`, {title: formState.title, body: formState.content, tags:[]})
+    let res = await callPost(`/api/cohorts/${router.query.cohortId}/postTopic`, {title: formState.title, body: formState.content, tags:[]})
     console.log(res)
     if(res.status===200) setPost(res.result.topic.topic_id)
   }

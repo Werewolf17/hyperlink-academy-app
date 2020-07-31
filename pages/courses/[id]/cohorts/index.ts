@@ -16,7 +16,7 @@ import { useCourseData, useUserData, useUserCohorts } from 'src/data'
 import { getTaggedPost } from 'src/discourse'
 import { useApi } from 'src/apiHelpers'
 import {prettyDate} from 'src/utils'
-import { EnrollResponse } from 'pages/api/courses/[id]/cohorts/[cohortId]/enroll'
+import { EnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
 import { courseDataQuery } from 'pages/api/courses/[id]'
 
 const COPY = {
@@ -93,7 +93,7 @@ let Cohort = (props: {
         if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
         if(!props.id) return
         if(!stripe) return
-        await callEnroll(`/api/courses/${props.course}/cohorts/${props.id}`)
+        await callEnroll(`/api/cohorts/${props.id}`)
     }
 
     return h(Box, {gap:32},[

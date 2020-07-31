@@ -1,7 +1,7 @@
-import {APIHandler, Request, ResultType} from '../../../../../src/apiHelpers'
+import {APIHandler, Request, ResultType} from 'src/apiHelpers'
 import { PrismaClient } from '@prisma/client'
-import { getToken } from '../../../../../src/token'
-import { getUsername, createGroup, createCategory, updateTopic, createTopic, updateCategory } from '../../../../../src/discourse'
+import { getToken } from 'src/token'
+import { getUsername, createGroup, createCategory, updateTopic, createTopic, updateCategory } from 'src/discourse'
 
 let prisma = new PrismaClient()
 

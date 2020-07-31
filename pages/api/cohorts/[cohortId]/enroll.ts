@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client"
-import { ResultType, APIHandler, Request } from "../../../../../../src/apiHelpers"
-import { sendCohortEnrollmentEmail } from '../../../../../../emails'
+import { ResultType, APIHandler, Request } from "src/apiHelpers"
+import { sendCohortEnrollmentEmail } from 'emails'
 import Stripe from 'stripe'
-import { getToken } from "../../../../../../src/token";
-import { addMember, getTaggedPost } from "../../../../../../src/discourse";
+import { getToken } from "src/token";
+import { addMember, getTaggedPost } from "src/discourse";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
