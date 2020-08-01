@@ -17,13 +17,13 @@ async function inviteToCourse(req:Request) {
   let email = msg.email || ''
   let name = ''
   if(msg.username) {
-    let person = await prisma.people.findOne({where: {username: msg.username}, select:{email: true, display_name: true}})
+    let person = await prisma.people.findOne({where: {username: msg.username.toLowerCase()}, select:{email: true, display_name: true}})
     if(!person) return {status: 404, result: `no user with username ${msg.username} found`} as const
     email = person.email
     name = person.display_name || ''
   }
 
-  let courseData = await prisma.courses.findOne({where: {id: courseID}, select:{name: true}})
+  let courseData = await prisma.courses.findOne({where: {id: courseID}, select:{name: true, slug}})
   if(!courseData) return {status:404, result: `ERROR: no course found with id ${courseID}`}
 
   await prisma.course_invites.create({data: {
@@ -36,7 +36,7 @@ async function inviteToCourse(req:Request) {
   }})
 
   await sendInviteToCourseEmail(email, {
-    course_url: `https://hyperlink.academy/courses/${courseID}`,
+    course_url: `https://hyperlink.academy/courses/${courseData.slug}/${courseID}`,
     course_name: courseData.name,
     name
   })
