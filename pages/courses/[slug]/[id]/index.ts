@@ -30,16 +30,7 @@ const COPY = {
   cohortTab: "Past Cohorts",
   activeCohorts: "Your Current Cohorts",
   settings: "You can edit course details, create new cohorts, and more.",
-  inviteOnly: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested!"),
-  inviteOnlyLoggedOut: h('span.accentRed', "This course is invite only right now. Reach out on the forum if you're interested! If you've been invited, please log in."),
-  invited: h('span.accentSuccess', "You're invited!"),
-  noUpcoming: h('span.accentRed', "Looks like there aren't any cohorts of this course planned :("),
-  noUpcomingMaintainer: (props:{courseId:number, slug: string})=> h('span.accentRed', [
-    "Looks like there aren't any cohorts of this course planned, maybe ", h(Link, {href: "/courses/[slug]/[id]/settings", as: `/courses/${props.slug}/${props.courseId}/settings`}, h('a', 'create one'))
-  ]),
-  enrolled: h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!"),
   enrollButton: "See Upcoming Cohorts",
-
   updateCurriculum: (props: {id: string}) => h(Info, [
     `💡 You can make changes to the curriculum by editing `,
     h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
@@ -124,13 +115,17 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
                 }, COPY.enrollButton),
               ])
             ]),
-            h('div.textSecondary', {style:{width:232}}, [
-              h(Box, {gap:16}, [
-                upcomingCohorts.length === 0 ? isMaintainer ? h(COPY.noUpcomingMaintainer, {courseId: course.id, slug: course.slug}) : COPY.noUpcoming : null,
-                enrolled ? COPY.enrolled :
-                  course?.invite_only && !invited ? (user ? COPY.inviteOnly : COPY.inviteOnlyLoggedOut) : null,
-              ]),
-            ]),
+            h(EnrollStatus, {
+              courseId: course.id,
+              draft:course.status==='draft',
+              maintainer: isMaintainer,
+              inviteOnly:course.invite_only,
+              invited,
+              loggedIn: !!user,
+              enrolled,
+              upcoming:upcomingCohorts.length !== 0,
+
+            }),
             h(Seperator),
             !isMaintainer ? null : h(Box, [
               h('h3', "You maintain this course"),
@@ -142,6 +137,43 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
     ])
   ])
 }
+function EnrollStatus (props: {
+  draft:boolean,
+  maintainer:boolean,
+  inviteOnly:boolean,
+  invited:boolean,
+  loggedIn:boolean,
+  enrolled:boolean;
+  upcoming:boolean;
+  courseId:number;
+}) {
+  if (props.draft) {
+    if (props.maintainer) return h('span.accentRed', "Learners can't enroll in this course until you publish it!")
+    return h('span.accentRed', "This course is still a draft. You can enroll once the creator publishes it!")
+  }
+
+  if (props.enrolled){
+    if (props.upcoming) return h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course. Feel free to enroll in another one though!")
+    return  h('span.accentSuccess', "You're enrolled in an upcoming cohort of this course.")
+  }
+
+  if (!props.upcoming) {
+    if(props.maintainer) return h('span.accentRed', [
+      "Looks like there aren't any cohorts of this course planned. Create one ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.'
+    ])
+    return h('span.accentRed', "Looks like there aren't any cohorts of this course planned :(")
+  }
+
+  if (props.inviteOnly) {
+    if (props.maintainer) return h('span.accentRed', [
+      "Learners need to be invited to enroll. Invite someone ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.'])
+    if(props.invited) return h('span.accentSuccess', "You're invited!")
+    if(props.loggedIn) return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested!"))
+    return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested! If you've been invited, please log in."))
+  }
+  return null
+}
+
 
 const Cohorts = (props:{cohorts: Course['course_cohorts'] & {facilitating?: boolean, enrolled?: boolean}, slug: string}) => {
   return h(Box, {gap:32}, [
