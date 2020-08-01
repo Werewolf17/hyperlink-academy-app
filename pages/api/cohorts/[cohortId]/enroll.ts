@@ -46,8 +46,8 @@ async function enroll (req: Request) {
       name: user.display_name || user.username,
       course_start_date: cohort.start_date,
       course_name: cohort.courses.name,
-      cohort_page_url: `https://hyperlink.academy/courses/${cohort.course}/${cohort.courses.slug}/cohorts/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/cohorts/${cohort.id}`,
+      cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
       get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
     })
     return {
