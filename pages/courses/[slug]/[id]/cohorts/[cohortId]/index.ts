@@ -81,7 +81,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           course: course.id
         }) : null,
         !inCohort && !isFacilitator ? null : h(Box, [
-          h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}/${cohort.id}`}
+          h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`}
             , h(Primary, 'Go to the forum')),
           !isFacilitator ? null : h(Link, {
             href: "/courses/[slug]/[id]/cohorts/[cohortId]/templates",
