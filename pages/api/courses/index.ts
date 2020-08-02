@@ -65,7 +65,12 @@ async function createCourse(req: Request) {
   let group = await createGroup({name: groupName, visibility_level: 2, owner_usernames: maintainers.map(m=>m.username)})
   if(!group) return {status: 500, result: "ERROR: couldn't create course maintainers group"} as const
 
-  let category = await createCategory(msg.name, {slug, permissions: {[groupName]:1}})
+  let category = await createCategory(msg.name, {
+    slug, permissions: {[groupName]:1},
+    show_subcategory_list: true,
+    subcategory_list_style: "rows_with_featured_topics",
+    default_list_filter: "none"
+  })
   if(!category) return {status: 500, result: "ERROR: couldn't create course category"} as const
   await updateTopic(category.topic_url, {
     category_id: category.id,

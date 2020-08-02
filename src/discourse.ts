@@ -92,7 +92,14 @@ export async function createTopic(input:{title: string, category: number | strin
   if(result.status === 200)  return await result.json() as {id: string, topic_id: number}
 }
 
-export const createCategory = async (name: string, options?: {slug?: string,permissions?: {[key:string]:number}, parent_category_id?: number}) => {
+export const createCategory = async (name: string, options?: {
+  slug?: string,
+  permissions?: {[key:string]:number},
+  parent_category_id?: number,
+  show_subcategory_list?: boolean,
+  subcategory_list_style?: "rows_with_featured_topics",
+  default_list_filter?:"none"
+}) => {
   let result = await fetch('https://forum.hyperlink.academy/categories.json', {
     method: 'POST',
     headers: {
