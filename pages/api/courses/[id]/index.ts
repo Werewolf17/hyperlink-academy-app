@@ -34,7 +34,13 @@ async function updateCourse(req: Request) {
       name: true,
       category_id: true,
       maintainer_group: true,
-      course_maintainers: {where: {maintainer: user.id}}
+      course_maintainers: {where: {maintainer: user.id}},
+      course_cohorts: {
+        select: {
+          group_id: true,
+          name: true,
+        }
+      }
     }
   })
   if(!course || course.course_maintainers.length === 0) return {
@@ -46,14 +52,19 @@ async function updateCourse(req: Request) {
     if(!await updateCategory(course.category_id, {permissions: {everyone: 1}, name: course.name})) return {status:500, result: "ERROR: unable to update course category"} as const
   }
 
-  let slug
+  let slug: string | undefined
   if(msg.name) {
     slug = slugify(msg.name)
-    await updateGroup(course.maintainer_group, slug+'-m')
-    await updateCategory(course.category_id, {
-      name: msg.name,
-      slug: slug
-    })
+    await Promise.all([
+      updateGroup(course.maintainer_group, slug+'-m'),
+      updateCategory(course.category_id, {
+        name: msg.name,
+        slug: slug
+      }),
+      course.course_cohorts.map(cohort => {
+        updateGroup(cohort.group_id, slug+'-'+cohort.name)
+      })
+    ])
   }
 
   let newData = await prisma.courses.update({
