@@ -64,7 +64,7 @@ async function handler (req: Request) {
         return acc
       }, {} as {[i:string]:number}),
       [id]: 1,
-      [course.id + '-m']: 1
+      [course.slug + '-m']: 1
     }})
   }
   let category = await createCategory(id, {permissions: {[id]:1}, parent_category_id: course.category_id})
