@@ -86,7 +86,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         learner: person.display_name || person.username,
         course: cohort.courses.name,
         cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
       })
     ])
 

@@ -57,7 +57,7 @@ async function enroll (req: Request) {
         learner: user.display_name || user.username,
         course: cohort.courses.name,
         cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
       })
     ])
     return {
