@@ -2,7 +2,6 @@ import styled from '@emotion/styled'
 import h from 'react-hyperscript'
 import Link from 'next/link'
 
-import { Box} from '../Layout'
 import {Pill} from '../Pill'
 import { colors, Mobile} from '../Tokens'
 import Card  from '../Card'
@@ -13,6 +12,7 @@ type Props = {
   description: string
   slug: string,
   id: number,
+  card_image: string,
   status?:  'draft' | 'live' | null
   course_cohorts:{start_date: string}[]
 }
@@ -26,18 +26,25 @@ export default (props:Props) => {
     passHref: true}, h(CourseCard, {
   }, [
     h(ImageContainer, [
-      props.status === 'draft' ? null : h(Image, {src: `/img/courses/${props.id}.png`}),
+      props.status === 'draft' ? null : h(Image, {src: props.card_image}),
     ]),
-    h(Box, {padding: 16, gap:32}, [
-      h(Box, {gap: 16, style: {minHeight: 152}}, [
-        h('h3', props.name),
-        h('p', props.description),
-      ]),
+    h(CardContent, [
+      h('h3', props.name),
+      h('p', {style: {overflow: 'hidden', height: '100%'}}, props.description),
       props.status === 'draft' ? h(Pill, {red: true, borderOnly: true}, 'draft') : null,
-      !upcomingCohort ? null : h(DateContainer, ('Next cohort starts ') + prettyDate(upcomingCohort.start_date))
+      !upcomingCohort && props.status !== 'draft' ? null : h(DateContainer, ('Next cohort starts ') + prettyDate(upcomingCohort.start_date))
     ])
   ]))
 }
+
+const CardContent = styled('div')`
+display: grid;
+padding: 16px;
+grid-gap: 16px;
+grid-template-rows: min-content auto 22px;
+height: 100%;
+box-sizing: border-box;
+`
 
 const Image = styled('img')`
 image-rendering: pixelated;
@@ -46,8 +53,8 @@ height: 100%;
 `
 
 const ImageContainer = styled('div')`
-width: 120px;
-height: auto;
+width: auto;
+height: 272px;
 overflow: hidden;
 max-height: 272px;
 object-fit: none;
