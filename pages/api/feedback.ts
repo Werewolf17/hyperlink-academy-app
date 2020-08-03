@@ -14,7 +14,7 @@ async function handler(req:Request) {
   if(!msg.page || !msg.page) return {status:400, result: "ERROR: fields missing, expected feedback and string"} as const
   await createPost({topic_id: 231, raw: `
 ${msg.username ? "username: @"+msg.username : ""}
-page: [${msg.page}](${req.headers.origin + msg.page})
+page: ${req.headers.referer}
 
 ${msg.feedback}
 `})

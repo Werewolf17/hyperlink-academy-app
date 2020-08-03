@@ -52,7 +52,8 @@ async function Signup(req: Request) {
   let key = await createActivationKey({email: msg.email.toLowerCase(), username:msg.username, password_hash, newsletter:msg.newsletter})
   await prisma.disconnect()
 
-  let activation_url = `${req.headers.origin}/signup?verifyEmail=${key}`
+  let origin = (new URL(req.headers.referer || '')).origin
+  let activation_url = `${origin}/signup?verifyEmail=${key}`
 
   await sendVerificationEmail(msg.email, {activation_code: key, name:msg.username, activation_url})
   return {status: 200, result: ''} as const

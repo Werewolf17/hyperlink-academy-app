@@ -33,6 +33,7 @@ async function enroll (req: Request) {
   await prisma.disconnect()
   if(!cohort || cohort.courses.cost === undefined) return {status: 400, result: "Error: no cohort with id " + cohortId + " found"}  as const
 
+  let origin = (new URL(req.headers.referer || '')).origin
   if(cohort.courses.cost === 0) {
     await prisma.people_in_cohorts.create({data: {
       people: {connect: {id: user.id}},
@@ -46,7 +47,7 @@ async function enroll (req: Request) {
       name: user.display_name || user.username,
       course_start_date: cohort.start_date,
       course_name: cohort.courses.name,
-      cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+      cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
       cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
       get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
     })
@@ -55,7 +56,6 @@ async function enroll (req: Request) {
       result: {zeroCost: true} as const
     }
   }
-
   else {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -65,8 +65,8 @@ async function enroll (req: Request) {
         currency: 'usd',
         quantity: 1,
       }],
-      cancel_url: `${req.headers.origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-      success_url: `${req.headers.origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}?welcome`,
+      cancel_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+      success_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}?welcome`,
       customer_email: user.email,
       metadata: {
         cohortId: cohort.id,
