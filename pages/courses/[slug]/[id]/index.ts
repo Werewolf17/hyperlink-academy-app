@@ -33,7 +33,7 @@ const COPY = {
   enrollButton: "See Upcoming Cohorts",
   updateCurriculum: (props: {id: string}) => h(Info, [
     `💡 You can make changes to the curriculum by editing `,
-    h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
+    h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.id}`}, `this topic`),
     ` in the forum`
   ])
 }
