@@ -12,8 +12,8 @@ export default ()=>{
         h(Box, {gap: 4}, [
           h('h4', "More Info"),
           h(Link, {href: '/team', passHref: true}, h(FooterLink, 'About the Team')),
-          h(Link, {href: '/manual', passHref: true}, h(FooterLink, 'The Hyperlink Manual')),
-          h(Link, {href: '/blog', passHref: true}, h(FooterLink, 'Blog')),
+          h(Link, {href: '/manual', passHref: true}, h(FooterLink, 'Hyperlink Manual')),
+          h(Link, {href: '/blog', passHref: true}, h(FooterLink, 'Hyperlink Blog')),
           // h(Link, {href: '/faq', passHref: true}, h(FooterLink, 'FAQ')),
         ]),
         h(Box, {gap: 4}, [
@@ -25,6 +25,11 @@ export default ()=>{
           h('h4', "Technical"),
           h(FooterLink, {href: 'https://gitlab.com/jaredpereira/hyperlink-academy'}, "Source Code"),
           h(FooterLink, {href: 'https://gitlab.com/jaredpereira/hyperlink-academy/-/issues/new?'}, "Report a Bug"),
+        ]),
+        h(Box, {gap: 4}, [
+          h('h4', "Policies"),
+          h(FooterLink, {href: '/terms'}, "Terms and Conditions"),
+          h(FooterLink, {href: '/privacy'}, "Privacy Policy"),
         ]),
       ]),
       h('br'),
@@ -51,7 +56,7 @@ margin-top: 32px;
 `
 
 const Columns = styled('div')`
-max-width: 640px;
+// max-width: 640px;
 display: grid;
 grid-gap: 32px;
 grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
