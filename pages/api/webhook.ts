@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse} from 'next'
 import Stripe from 'stripe'
 import {PrismaClient} from '@prisma/client'
 import { getUsername, addMember, getTaggedPost} from '../../src/discourse'
-import { sendCohortEnrollmentEmail } from '../../emails';
+import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from '../../emails';
 import { prettyDate } from '../../src/utils';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
@@ -42,6 +42,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let cohort = await prisma.course_cohorts.findOne({
       where: {id: metadata.cohortId},
       include: {
+        people: {select:{email:true}},
         courses: {
           select: {
             category_id: true,
@@ -57,23 +58,31 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     if(!username) return res.status(400).send('ERROR: Cannot find user: ' + metadata.userId)
 
-    await prisma.people_in_cohorts.create({data: {
-      people: {connect: {id: metadata.userId}},
-      course_cohorts: {connect: {id: metadata.cohortId}}
-    }})
-    await prisma.disconnect()
-
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
-    await addMember(cohort.group_id, username)
-    await sendCohortEnrollmentEmail(person.email, {
-      name: person.display_name || person.username,
-      course_start_date: prettyDate(cohort.start_date),
-      course_name: cohort.courses.name,
-      cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
-      get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
-    })
+    let origin = (new URL(req.headers.referer || '')).origin
+    await Promise.all([
+      prisma.people_in_cohorts.create({data: {
+        people: {connect: {id: metadata.userId}},
+        course_cohorts: {connect: {id: metadata.cohortId}}
+      }}),
+
+      addMember(cohort.group_id, username),
+      sendCohortEnrollmentEmail(person.email, {
+        name: person.display_name || person.username,
+        course_start_date: prettyDate(cohort.start_date),
+        course_name: cohort.courses.name,
+        cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
+        get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
+      }),
+      sendEnrollNotificationEmaill(cohort.people.email, {
+        learner: person.display_name || person.username,
+        course: cohort.courses.name,
+        cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
+      })
+    ])
 
   }
 

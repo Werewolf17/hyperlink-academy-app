@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { ResultType, APIHandler, Request } from "src/apiHelpers"
-import { sendCohortEnrollmentEmail } from 'emails'
+import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from 'emails'
 import Stripe from 'stripe'
 import { getToken } from "src/token";
 import { addMember, getTaggedPost } from "src/discourse";
@@ -20,6 +20,9 @@ async function enroll (req: Request) {
   let cohort = await prisma.course_cohorts.findOne({
     where: {id: cohortId},
     include: {
+      people: {
+        select:{email: true}
+      },
       courses: {
         select: {
           category_id: true,
@@ -35,22 +38,28 @@ async function enroll (req: Request) {
 
   let origin = (new URL(req.headers.referer || '')).origin
   if(cohort.courses.cost === 0) {
-    await prisma.people_in_cohorts.create({data: {
-      people: {connect: {id: user.id}},
-      course_cohorts: {connect: {id: cohortId}}
-    }})
-
-    await addMember(cohort.group_id, user.username)
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
-
-    await sendCohortEnrollmentEmail(user.email, {
-      name: user.display_name || user.username,
-      course_start_date: cohort.start_date,
-      course_name: cohort.courses.name,
-      cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
-      get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
-    })
+    await Promise.all([
+      prisma.people_in_cohorts.create({data: {
+        people: {connect: {id: user.id}},
+        course_cohorts: {connect: {id: cohortId}}
+      }}),
+      addMember(cohort.group_id, user.username),
+      sendCohortEnrollmentEmail(user.email, {
+        name: user.display_name || user.username,
+        course_start_date: cohort.start_date,
+        course_name: cohort.courses.name,
+        cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
+        get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
+      }),
+      sendEnrollNotificationEmaill(cohort.people.email, {
+        learner: user.display_name || user.username,
+        course: cohort.courses.name,
+        cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
+      })
+    ])
     return {
       status: 200,
       result: {zeroCost: true} as const
