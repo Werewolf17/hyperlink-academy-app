@@ -44,7 +44,7 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
                 if(cohort.completed) return false
                 if(userCohorts?.course_cohorts.find(i=> i.id ===cohort.id)) return false
                 if(new Date(cohort.start_date)< new Date()) return false
-                if(course?.cohort_max_size === 0 && cohort.people_in_cohorts.length >= course.cohort_max_size) return false
+                if(course?.cohort_max_size && course.cohort_max_size !== 0 && cohort.people_in_cohorts.length >= course.cohort_max_size) return false
                 return true
             })
     return h(TwoColumn, {}, [
@@ -129,7 +129,7 @@ let Cohort = (props: {
         ]),
         h(Box, {gap:8, h: true, style: {justifyContent: 'right', textAlign: 'right', alignItems: 'center'}}, [
             h(Primary, {onClick, disabled: props.invite_only && !props.invited, status}, 'Join this Cohort'),
-            h('span.accentSuccess', `${props.cohort_max_size - props.learners} spots left!`)
+            props.cohort_max_size === 0 ? null : h('span.accentSuccess', `${props.cohort_max_size - props.learners} spots left!`)
         ]),
     ])
 }
