@@ -52,7 +52,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let {data: course} = useCourseData(props.courseId, props.course)
   if(!cohort || !course) return h(PageLoader)
 
-  let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course?.id )
+  let invited = !course.invite_only ? true : !!userCohorts?.invited_courses.find(course=>course.id === props.course?.id )
   let inCohort = cohort.people_in_cohorts.find(p => p.person === (user ? user.id : undefined))
   let isFacilitator  = !!user && cohort.people.username === user.username
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
