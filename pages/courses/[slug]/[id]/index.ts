@@ -106,30 +106,34 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       }}),
       h(Sidebar, [
         h(Enroll, {course}, [
-          h(Box, {gap: 8}, [
-            h(Link, {href: '/courses/[slug]/[id]/cohorts',
-                     as:`/courses/${course.slug}/${course.id}/cohorts` }, [
-              h('a', [
-                h(Primary, {
-                  disabled: upcomingCohorts.length === 0 || (course.invite_only && !invited)
-                }, COPY.enrollButton),
-              ])
-            ]),
-            h(EnrollStatus, {
-              courseId: course.id,
-              draft:course.status==='draft',
-              maintainer: isMaintainer,
-              inviteOnly:course.invite_only,
-              invited,
-              loggedIn: !!user,
-              enrolled,
-              upcoming:upcomingCohorts.length !== 0,
+          h(Box, {gap: 32}, [
+            h(Box, {gap:8}, [
+              h(Link, {href: '/courses/[slug]/[id]/cohorts',
+                       as:`/courses/${course.slug}/${course.id}/cohorts` }, [
+                         h('a', [
+                           h(Primary, {
+                             disabled: upcomingCohorts.length === 0 || (course.invite_only && !invited)
+                           }, COPY.enrollButton),
+                         ])
+                       ]),
+              h(EnrollStatus, {
+                courseId: course.id,
+                draft:course.status==='draft',
+                maintainer: isMaintainer,
+                inviteOnly:course.invite_only,
+                invited,
+                loggedIn: !!user,
+                enrolled,
+                upcoming:upcomingCohorts.length !== 0,
 
-            }),
-            h(Seperator),
+              }),
+            ]),
+            !isMaintainer ? null : h(Seperator),
             !isMaintainer ? null : h(Box, [
-              h('h3', "You maintain this course"),
-              h('p.textSecondary', COPY.settings),
+              h(Box, {gap:8}, [
+                h('h3', "You maintain this course"),
+                h('p.textSecondary', COPY.settings),
+              ]),
               h(Link, {href:'/courses/[slug]/[id]/settings', as:`/courses/${course.slug}/${course.id}/settings`}, h(Destructive, 'Edit Course Settings'))
             ])
           ])

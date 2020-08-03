@@ -279,7 +279,7 @@ const Banners = (props:{
             h('p', [
               `Check out the `,
               h('a', {href: forum}, 'forum'),
-              ` and meet the learners. You can also read our `, h('a', {href: "/manual/facilitators"}, 'facilitator guide'), `in the Hyperlink Manual`
+              ` and meet the learners. You can also read our `, h('a', {href: "/manual/facilitators"}, 'facilitator guide'), ` in the Hyperlink Manual`
             ])
           ])
       ])
