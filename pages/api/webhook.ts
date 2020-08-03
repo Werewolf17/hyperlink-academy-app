@@ -34,13 +34,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
-    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:number, userId:string}} ;
+    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:string, userId:string}} ;
 
+    let cohortId = parseInt(metadata.cohortId)
     let person = await prisma.people.findOne({where: {id: metadata.userId}})
     if(!person) return {status: 400, result: "ERROR: cannot find user with id: " + metadata.userId} as const
 
     let cohort = await prisma.course_cohorts.findOne({
-      where: {id: metadata.cohortId},
+      where: {id: cohortId},
       include: {
         people: {select:{email:true}},
         courses: {
@@ -64,7 +65,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     await Promise.all([
       prisma.people_in_cohorts.create({data: {
         people: {connect: {id: metadata.userId}},
-        course_cohorts: {connect: {id: metadata.cohortId}}
+        course_cohorts: {connect: {id: cohortId}}
       }}),
 
       addMember(cohort.group_id, username),
