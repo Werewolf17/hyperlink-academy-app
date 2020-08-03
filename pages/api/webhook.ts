@@ -50,10 +50,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             slug: true,
             name: true
           }
+        },
+        people_in_cohorts: {
+          where: {
+            person: person.id
+          }
         }
       }
     })
     if(!cohort) return {status: 400, result: "ERROR: no cohort with id: " + metadata.cohortId}
+    if(cohort.people_in_cohorts.length > 0) return {status:200, result: "User is already enrolled"}
 
     let username = await getUsername(metadata.userId)
 
@@ -61,7 +67,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
-    let origin = (new URL(req.headers.referer || '')).origin
     await Promise.all([
       prisma.people_in_cohorts.create({data: {
         people: {connect: {id: metadata.userId}},
@@ -80,7 +85,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       sendEnrollNotificationEmaill(cohort.people.email, {
         learner: person.display_name || person.username,
         course: cohort.courses.name,
-        cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+        cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
         cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
       })
     ])
