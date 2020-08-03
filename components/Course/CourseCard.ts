@@ -31,8 +31,8 @@ export default (props:Props) => {
     h(CardContent, [
       h('h3', props.name),
       h('p', {style: {overflow: 'hidden', height: '100%'}}, props.description),
-      props.status === 'draft' ? h(Pill, {red: true, borderOnly: true}, 'draft') : null,
-      !upcomingCohort && props.status !== 'draft' ? null : h(DateContainer, ('Next cohort starts ') + prettyDate(upcomingCohort.start_date))
+      props.status === 'draft' ? h(Pill, {red: true, borderOnly: true}, 'draft')
+        : !upcomingCohort ? null : h(DateContainer, ('Next cohort starts ') + prettyDate(upcomingCohort?.start_date))
     ])
   ]))
 }
