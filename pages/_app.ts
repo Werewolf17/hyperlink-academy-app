@@ -24,7 +24,7 @@ const App = ({ Component, pageProps}:Props) => {
     h(Head, {children: [
       h('title', 'hyperlink.academy'),
       h('meta', {property:"og:title", content:'hyperlink.academy', key:"title"}),
-      h('meta', {property:"og:description", content:'a course platform and online school built for seriously effective learning', key:"title"}),
+      h('meta', {property:"og:description", content:'a course platform and online school built for seriously effective learning', key:"description"}),
       h('meta', {property: "og:image", content: 'https://hyperlink.academy/img/social-logo.png', key: "image"}),
     ]}, ),
     h(Layout, {}, [h(Component, {...pageProps})])
