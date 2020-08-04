@@ -35,16 +35,16 @@ export default WrappedEnrollCohortPage
 
 const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
     let router = useRouter()
+    let {data: user} = useUserData()
     let {data:userCohorts} = useUserCohorts()
     let {data: course} = useCourseData(props.courseId, props.course)
-    let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course?.id )
+    let invited = !course?.invite_only ? true : !!userCohorts?.invited_courses.find(course=>course.id === props.course?.id )
 
     let cohorts = (props.cohorts || [])
             .filter(cohort=>{
                 if(cohort.completed) return false
-                if(userCohorts?.course_cohorts.find(i=> i.id ===cohort.id)) return false
                 if(new Date(cohort.start_date)< new Date()) return false
-                if(course?.cohort_max_size === 0 && cohort.people_in_cohorts.length >= course.cohort_max_size) return false
+                if(course?.cohort_max_size && course.cohort_max_size !== 0 && cohort.people_in_cohorts.length >= course.cohort_max_size) return false
                 return true
             })
     return h(TwoColumn, {}, [
@@ -63,6 +63,8 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
                 : cohorts.map(cohort => h(Cohort, {
                     ...cohort,
                     invited,
+                    enrolled: !!userCohorts?.course_cohorts.find(i=> i.id === cohort.id && user && i.facilitator !== user?.id),
+                    facilitating : !!userCohorts?.course_cohorts.find(i=> i.id === cohort.id && user && i.facilitator === user?.id),
                     invite_only: course?.invite_only,
                     cohort_max_size: course?.cohort_max_size || 0,
                     learners: cohort.people_in_cohorts.length
@@ -81,6 +83,8 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
 let Cohort = (props: {
     details: {text: string, id: string},
     people: {username: string, display_name: string | null},
+    enrolled: boolean,
+    facilitating: boolean,
     learners: number,
     cohort_max_size: number,
     invited: boolean,
@@ -105,6 +109,15 @@ let Cohort = (props: {
         await callEnroll(`/api/cohorts/${props.id}/enroll`)
     }
 
+    let statusMessage = (function(){
+        switch(true) {
+            case props.facilitating: return "You're facilitating this cohort"
+            case props.enrolled: return "You're enrolled in this cohort"
+            case props.cohort_max_size > 0: return `${props.cohort_max_size - props.learners} spots left!`
+            default: return ''
+        }
+    })()
+
     return h(Box, {gap:32},[
         //Individual cohort details
         h (Box, {gap:16}, [
@@ -127,9 +140,13 @@ let Cohort = (props: {
                 }, h('a', {style: {textDecoration: 'underline'}}, h('b', 'See more details')))
             ]),
         ]),
-        h(Box, {gap:8, h: true, style: {justifyContent: 'right', textAlign: 'right', alignItems: 'center'}}, [
-            h(Primary, {onClick, disabled: props.invite_only && !props.invited, status}, 'Join this Cohort'),
-            h('span.accentSuccess', `${props.cohort_max_size - props.learners} spots left!`)
+        h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right', alignItems: 'center'}}, [
+            h(Primary, {
+                onClick,
+                disabled: (props.invite_only && !props.invited) || props.enrolled || props.facilitating,
+                status
+            }, 'Join this Cohort'),
+            h('span.accentSuccess', statusMessage)
         ]),
     ])
 }

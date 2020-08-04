@@ -1,0 +1,11 @@
+{{learner}} enrolled in {{course}}
+
+Woo! New learner incoming! 🚀
+
+You can welcome them in your cohort forum:
+
+{{cohort_forum_url}}
+
+See the Cohort Page for everyone enrolled in this cohort:
+
+{{cohort_page_url}}

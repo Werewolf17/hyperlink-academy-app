@@ -86,7 +86,7 @@ async function handler (req: Request) {
           title: template.title,
           category: category.id,
           raw: template.content,
-          tags: template.title === "Getting Stated" ? ['getting-started'] : undefined,
+          tags: template.title === "Getting Started" ? ['getting-started'] : undefined,
         }, admin)
       }
     }

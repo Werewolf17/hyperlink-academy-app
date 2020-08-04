@@ -52,6 +52,9 @@ async function updateCourse(req: Request) {
     if(!await updateCategory(course.category_id, {permissions: {everyone: 1}, name: course.name})) return {status:500, result: "ERROR: unable to update course category"} as const
   }
 
+  if(msg.description && msg.description.length > 200) return {status: 400, result: "ERROR: description must be less than 200 characters"}
+  if(msg.name && msg.name.length > 50) return {status: 400, result: "ERROR: name must be less than 50 characters"}
+
   let slug: string | undefined
   if(msg.name) {
     slug = slugify(msg.name)

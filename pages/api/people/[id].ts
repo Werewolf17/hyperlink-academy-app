@@ -95,7 +95,7 @@ export const profileDataQuery = (username: string)=>{
 }
 
 async function getProfileData(req:Request) {
-  let username = req.query.item[1]
+  let username = req.query.id as string
   if(!username) return {status: 400, result: 'ERROR: no user id provided'} as const
   let data = await profileDataQuery(username)
   if(!data) return {status: 404, result: `Error: no user with id ${username} found`} as const

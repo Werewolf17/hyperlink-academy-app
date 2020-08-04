@@ -230,11 +230,15 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
     h('h2', 'Edit Course Details'),
     h(LabelBox, {gap:8}, [
       h('h4', 'Name'),
-      h(Input, {
-        type: 'text',
-        value: formData.name,
-        onChange: e => setFormData({...formData, name: e.currentTarget.value})
-      })
+      h(Box, {gap: 4}, [
+        h(Input, {
+          type: 'text',
+          maxLength: 50,
+          value: formData.name,
+          onChange: e => setFormData({...formData, name: e.currentTarget.value})
+        }),
+        h('small.textSecondary', {style:{justifySelf: 'right'}}, `${formData.name.length}/50`)
+      ])
     ]),
     h(LabelBox, {gap:8}, [
       h('h4', 'Cost (USD)'),
@@ -258,10 +262,14 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
     ]),
     h(LabelBox, {gap:8}, [
       h('h4', 'Description'),
-      h(Textarea, {
-        value: formData.description,
-        onChange: e => setFormData({...formData, description: e.currentTarget.value})
-      })
+      h(Box, {gap: 4}, [
+        h(Textarea, {
+          maxLength: 200,
+          value: formData.description,
+          onChange: e => setFormData({...formData, description: e.currentTarget.value})
+        }),
+        h('small.textSecondary', {style:{justifySelf: 'right'}}, `${formData.description.length}/200`)
+      ])
     ]),
     h(LabelBox, {gap:8}, [
       h('h4', 'Prerequisites'),

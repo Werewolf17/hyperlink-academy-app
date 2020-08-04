@@ -1,0 +1,13 @@
+{
+  "Name": "Enroll notification",
+  "Alias": "enroll-notification",
+  "Subject": "{{learner}} enrolled in {{course}}",
+  "TemplateType": "Standard",
+  "LayoutTemplate": "Hyperlink",
+  "TestRenderModel": {
+    "learner": "learner_Value",
+    "course": "course_Value",
+    "cohort_page_url": "cohort_page_Value",
+    "cohort_forum_url": "cohort_name_Value"
+  }
+}

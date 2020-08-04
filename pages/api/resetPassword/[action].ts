@@ -39,7 +39,8 @@ async function requestResetPassword (req:Request) {
     let key = await createResetKey(msg.email)
     await prisma.disconnect()
 
-    let url = `${req.headers.origin}/resetPassword?&key=${key}`
+    let origin = (new URL(req.headers.referer || '')).origin
+    let url = `${origin}/resetPassword?&key=${key}`
 
     await sendResetPasswordEmail(msg.email, {
       action_url: url,

@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse} from 'next'
 import Stripe from 'stripe'
 import {PrismaClient} from '@prisma/client'
 import { getUsername, addMember, getTaggedPost} from '../../src/discourse'
-import { sendCohortEnrollmentEmail } from '../../emails';
+import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from '../../emails';
 import { prettyDate } from '../../src/utils';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
@@ -34,46 +34,61 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
-    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:number, userId:string}} ;
+    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:string, userId:string}} ;
 
+    let cohortId = parseInt(metadata.cohortId)
     let person = await prisma.people.findOne({where: {id: metadata.userId}})
     if(!person) return {status: 400, result: "ERROR: cannot find user with id: " + metadata.userId} as const
 
     let cohort = await prisma.course_cohorts.findOne({
-      where: {id: metadata.cohortId},
+      where: {id: cohortId},
       include: {
+        people: {select:{email:true}},
         courses: {
           select: {
             category_id: true,
             slug: true,
             name: true
           }
+        },
+        people_in_cohorts: {
+          where: {
+            person: person.id
+          }
         }
       }
     })
     if(!cohort) return {status: 400, result: "ERROR: no cohort with id: " + metadata.cohortId}
+    if(cohort.people_in_cohorts.length > 0) return {status:200, result: "User is already enrolled"}
 
     let username = await getUsername(metadata.userId)
 
     if(!username) return res.status(400).send('ERROR: Cannot find user: ' + metadata.userId)
 
-    await prisma.people_in_cohorts.create({data: {
-      people: {connect: {id: metadata.userId}},
-      course_cohorts: {connect: {id: metadata.cohortId}}
-    }})
-    await prisma.disconnect()
-
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
-    await addMember(cohort.group_id, username)
-    await sendCohortEnrollmentEmail(person.email, {
-      name: person.display_name || person.username,
-      course_start_date: prettyDate(cohort.start_date),
-      course_name: cohort.courses.name,
-      cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-      cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
-      get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
-    })
+    await Promise.all([
+      prisma.people_in_cohorts.create({data: {
+        people: {connect: {id: metadata.userId}},
+        course_cohorts: {connect: {id: cohortId}}
+      }}),
+
+      addMember(cohort.group_id, username),
+      sendCohortEnrollmentEmail(person.email, {
+        name: person.display_name || person.username,
+        course_start_date: prettyDate(cohort.start_date),
+        course_name: cohort.courses.name,
+        cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
+        get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
+      }),
+      sendEnrollNotificationEmaill(cohort.people.email, {
+        learner: person.display_name || person.username,
+        course: cohort.courses.name,
+        cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
+      })
+    ])
 
   }
 
