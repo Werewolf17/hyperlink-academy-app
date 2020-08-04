@@ -17,7 +17,7 @@ export function WatchCourse(props:{id: number}) {
 
   // Should probably throttle toggles to this at some point!
   return h(WatchCourseBox, [
-    h('img', {src: watching ? '/img/watching.png' : '/img/not-watching.png', style: {imageRendering: "crisp-edges"}}),
+    h(Icon, {src: watching ? '/img/watching.png' : '/img/not-watching.png'}),
     h("div", [
       h('p', [watching ? "You're watching this course" : "Want emails on new cohorts? "]),
       !user ?
@@ -36,6 +36,12 @@ export function WatchCourse(props:{id: number}) {
     ])
   ])
 }
+
+const Icon = styled('img')`
+image-rendering: pixelated;
+image-rendering: -moz-crisp-edges;
+image-rendering: crisp-edges;
+`
 
 const WatchCourseBox = styled('div')`
 padding: 16px;
