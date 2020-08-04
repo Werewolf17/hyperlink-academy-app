@@ -53,21 +53,28 @@ async function getUserCourses(req: Request) {
   let token = getToken(req)
   if(!token) return {status: 403 as const, result: "Error: no user logged in"}
 
-  let maintaining_courses = await prisma.courses.findMany({
-    where: {
-      course_maintainers: {
-        some: {
-          maintainer: token.id
+  let [maintaining_courses, watching_courses] = await Promise.all([
+    prisma.courses.findMany({
+      where: {
+        course_maintainers: {
+          some: {
+            maintainer: token.id
+          }
+        }
+      },
+      include: {
+        course_cohorts: {
+          select: {start_date: true}
         }
       }
-    },
-    include: {
-      course_cohorts: {
-        select: {start_date: true}
+    }),
+    prisma.people_watching_courses.findMany({
+      where: {
+        person: token.id
       }
-    }
-  })
-  return {status: 200, result: {maintaining_courses}} as const
+    })
+  ])
+  return {status: 200, result: {maintaining_courses, watching_courses}} as const
 }
 
 async function whoami(req:Request) {

@@ -1,0 +1,13 @@
+Hey {{name}}, a course you're watching on Hyperlink has just scheduled a new cohort!
+
+{{course_name}}
+
+{{course_short_description}}
+
+This cohort starts on {{cohort_start_date}}"
+
+Check it out here!
+
+{{cohort_page_url}
+
+If you're no longer interested in this course, visit the course page above and click "stop watching" to turn off notifications.

@@ -15,6 +15,7 @@ import {SmallCohortCard} from 'components/Card'
 import {TwoColumnBanner} from 'components/Banner'
 import {Modal} from 'components/Modal'
 import { Primary, Destructive, Secondary} from 'components/Button'
+import {WatchCourse} from 'components/Course/WatchCourse'
 
 import { getTaggedPost } from 'src/discourse'
 import { useUserData, useUserCohorts, useCourseData, Course } from 'src/data'
@@ -129,7 +130,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
               }),
             ]),
             !isMaintainer ? null : h(Seperator),
-            !isMaintainer ? null : h(Box, [
+            !isMaintainer ? h(WatchCourse, {id: course.id}) : h(Box, [
               h(Box, {gap:8}, [
                 h('h3', "You maintain this course"),
                 h('p.textSecondary', COPY.settings),
@@ -141,6 +142,8 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
     ])
   ])
 }
+
+
 function EnrollStatus (props: {
   draft:boolean,
   maintainer:boolean,
