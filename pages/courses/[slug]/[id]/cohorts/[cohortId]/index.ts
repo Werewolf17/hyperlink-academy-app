@@ -70,7 +70,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           ]),
           h('span', [
             cohortPrettyDate(cohort.start_date, cohort.completed), h('span', ' | '),
-            `Facilitated by ${cohort.people.display_name}`
+            `Facilitated by ${cohort.people.display_name || cohort.people.username}`
           ]),
         ]),
         invited && !inCohort && !isFacilitator ? h(EnrollInCohort, {
