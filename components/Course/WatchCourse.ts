@@ -7,6 +7,7 @@ import { colors } from 'components/Tokens'
 import { WatchCourseMsg, WatchCourseResult } from 'pages/api/courses/[id]/watch'
 import { callApi } from 'src/apiHelpers'
 import Loader  from 'components/Loader'
+import Link from 'next/link'
 
 export function WatchCourse(props:{id: number}) {
   let {data: userCourses, mutate} = useUserCourses()
@@ -16,10 +17,12 @@ export function WatchCourse(props:{id: number}) {
 
   // Should probably throttle toggles to this at some point!
   return h(WatchCourseBox, [
-    h('img', {src: watching ? '/img/watching.png' : '/img/not-watching.png'}),
+    h('img', {src: watching ? '/img/watching.png' : '/img/not-watching.png', style: {imageRendering: "crisp-edges"}}),
     h("div", [
       h('p', [watching ? "You're watching this course" : "Want emails on new cohorts? "]),
-      h('div', {}, h('a', {href: '', onClick:async (e: React.MouseEvent)=>{
+      !user ?
+        h('div', [h(Link, {href:'/login'}, h('a', 'Log in')), ' or ', h(Link, {href: '/signup'}, h('a', "Sign up"))])
+        : h('div', {}, h('a', {href: '', onClick:async (e: React.MouseEvent)=>{
         e.preventDefault()
         if(!userCourses || !user || loading) return
         setLoading(true)
