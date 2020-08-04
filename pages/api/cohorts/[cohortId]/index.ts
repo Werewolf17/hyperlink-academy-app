@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client"
 import { ResultType, APIHandler, Request } from "src/apiHelpers"
 import { getToken } from "src/token"
+import { sendWatchingNotificationEmail } from "emails"
+import { prettyDate } from "src/utils"
 
 let prisma = new PrismaClient()
 export type UpdateCohortMsg = {
@@ -23,13 +25,46 @@ async function updateCohort(req:Request) {
 
   let user = getToken(req)
   if(!user) return {status: 400, result: "ERROR: no user logged in'"} as const
-  let cohort = await prisma.course_cohorts.findOne({where:{id:cohortId}, select: {facilitator: true, completed: true}})
+  let cohort = await prisma.course_cohorts.findOne({
+    where:{id:cohortId},
+    select: {
+      facilitator: true,
+      completed: true,
+      live: true,
+      start_date: true,
+      course: true,
+      courses: {
+        select: {
+          name: true,
+          slug: true,
+          description: true
+        }
+      }
+    }})
   if(!cohort) return {status: 404, result: `No cohort with id ${cohortId} found`} as const
   if(cohort.facilitator !== user.id) return {status: 401, result: "ERROR: user is not a facilitator of this course"} as const
 
   let completed
   if(msg.data.completed && !cohort.completed) {
     completed = (new Date()).toISOString()
+  }
+
+  if(cohort.live === false && msg.data.live === true) {
+    // If we're toggling a cohort live, notify those watching
+    let watchers = await prisma.people_watching_courses.findMany({
+      where: {course: cohort.course},
+      select: {people: {select: {email: true, username: true, display_name: true}}}
+    })
+    await Promise.all(watchers.map(async watcher => {
+      if(!cohort) return
+      return sendWatchingNotificationEmail(watcher.people.email, {
+        course_name: cohort.courses.name,
+        cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohortId}`,
+        cohort_start_date: prettyDate(cohort.start_date),
+        name: watcher.people.display_name || watcher.people.username,
+        course_description: cohort.courses.description
+      })
+    }))
   }
 
   let newData = await prisma.course_cohorts.update({

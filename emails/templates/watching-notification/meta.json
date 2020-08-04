@@ -1,0 +1,14 @@
+{
+  "Name": "Watching Course Notification",
+  "Alias": "watching-notification",
+  "Subject": "{{course_name}} - new cohort scheduled!",
+  "TemplateType": "Standard",
+  "LayoutTemplate": "Hyperlink",
+  "TestRenderModel": {
+    "name": "name_Value",
+    "course_name": "course_name_Value",
+    "course_description": "course_description_Value",
+    "cohort_page_url": "cohort_page_url_Value",
+    "cohort_start_date": "cohort_start_date_Value"
+  }
+}

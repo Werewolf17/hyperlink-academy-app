@@ -54,23 +54,24 @@ model course_maintainers {
 }
 
 model courses {
-  description        String
-  cost               Float
-  name               String
-  duration           String
-  category_id        Int
-  prerequisites      String
-  invite_only        Boolean              @default(false)
-  status             course_status        @default(draft)
-  slug               String               @unique
-  id                 Int                  @default(autoincrement()) @id
-  maintainer_group   Int                  @unique
-  cohort_max_size    Int                  @default(0)
-  card_image         String               @default("/img/new_course.png")
-  course_cohorts     course_cohorts[]
-  course_invites     course_invites[]
-  course_maintainers course_maintainers[]
-  course_templates   course_templates[]
+  description             String
+  cost                    Float
+  name                    String
+  duration                String
+  category_id             Int
+  prerequisites           String
+  invite_only             Boolean                   @default(false)
+  status                  course_status             @default(draft)
+  slug                    String                    @unique
+  id                      Int                       @default(autoincrement()) @id
+  maintainer_group        Int                       @unique
+  cohort_max_size         Int                       @default(0)
+  card_image              String                    @default("/img/new_course.png")
+  course_cohorts          course_cohorts[]
+  course_invites          course_invites[]
+  course_maintainers      course_maintainers[]
+  course_templates        course_templates[]
+  people_watching_courses people_watching_courses[]
 }
 
 model course_templates {
@@ -92,17 +93,18 @@ model password_reset_keys {
 }
 
 model people {
-  id                 String               @id
-  email              String               @unique
-  display_name       String?
-  password_hash      String               @unique
-  username           String               @unique
-  bio                String?
-  link               String?
-  admins             admins[]
-  course_cohorts     course_cohorts[]
-  course_maintainers course_maintainers[]
-  people_in_cohorts  people_in_cohorts[]
+  id                      String                    @id
+  email                   String                    @unique
+  display_name            String?
+  password_hash           String                    @unique
+  username                String                    @unique
+  bio                     String?
+  link                    String?
+  admins                  admins[]
+  course_cohorts          course_cohorts[]
+  course_maintainers      course_maintainers[]
+  people_in_cohorts       people_in_cohorts[]
+  people_watching_courses people_watching_courses[]
 }
 
 model people_in_cohorts {
@@ -112,6 +114,15 @@ model people_in_cohorts {
   people         people         @relation(fields: [person], references: [id])
 
   @@id([person, cohort])
+}
+
+model people_watching_courses {
+  person  String
+  course  Int
+  courses courses @relation(fields: [course], references: [id])
+  people  people  @relation(fields: [person], references: [id])
+
+  @@id([course, person])
 }
 
 enum course_status {

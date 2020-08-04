@@ -62,20 +62,26 @@ CREATE TABLE IF NOT EXISTS admins (
 CREATE TABLE IF NOT EXISTS course_cohorts (
     id            integer UNIQUE PRIMARY KEY,
     start_date    text NOT NULL,
-    facilitator  text REFERENCES people(id) NOT NULL,
+    facilitator   text REFERENCES people(id) NOT NULL,
     course        text REFERENCES courses(id) NOT NULL,
     live          boolean NOT NULL DEFAULT(false),
     completed     text
 );
 
 CREATE TABLE IF NOT EXISTS people_in_cohorts (
-    person     text REFERENCES people(id) NOT NULL,
-    cohort     integer REFERENCES course_cohorts(id) NOT NULL,
-    PRIMARY KEY (person_id, cohort_id)
+    person        text REFERENCES people(id) NOT NULL,
+    cohort        integer REFERENCES course_cohorts(id) NOT NULL,
+    PRIMARY KEY   (person_id, cohort_id)
 );
 
 CREATE TABLE IF NOT EXISTS course_invites (
     course        text REFERENCES courses(id) NOT NULL,
     email         text NOT NULL,
     PRIMARY KEY (course, email)
+);
+
+CREATE TABLE IF NOT EXISTS people_watching_courses (
+    person        text REFERENCES people(id) NOT NULL,
+    course        integer REFERENCES courses(id) NOT NULL,
+    PRIMARY KEY (course, person)
 );
