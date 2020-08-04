@@ -24,6 +24,8 @@ import { callApi } from 'src/apiHelpers'
 import { cohortPrettyDate } from 'components/Card'
 import ErrorPage from 'pages/404'
 import { courseDataQuery } from 'pages/api/courses/[id]'
+import Head from 'next/head'
+import { PrismaClient } from '@prisma/client'
 
 const COPY = {
   courseForum: "Check out the course forum",
@@ -77,6 +79,12 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
 
   //Setting up the layout for the course page
   return h('div', [
+    h(Head, {children: [
+      h('meta', {property:"og:title", content:course.name, key:"title"}),
+      h('meta', {property: "og:description", content: course.description, key: "description"}),
+      h('meta', {property: "og:image", content: 'https://hyperlink.academy' + course.card_image, key: "image"}),
+      h('meta', {property: "twitter:card", content: "summary"})
+    ]}),
     h(Banners, {draft: course.status === 'draft', id: props.id, isMaintainer}),
     h(TwoColumn, [
       h(Box, {gap: 32}, [
@@ -290,6 +298,10 @@ export const getStaticProps = async (ctx:any) => {
   return {props: {notFound: false, content, id, course: data}, unstable_revalidate: 1} as const
 }
 
-export const getStaticPaths = () => {
-  return {paths:[], fallback: true}
+export const getStaticPaths = async () => {
+  let prisma = new PrismaClient()
+  let courses = await prisma.courses.findMany({select:{id: true, slug: true}})
+  return {paths:courses.map(course=>{
+    return {params: {id: course.id.toString(), slug: course.slug}}
+  }), fallback: true}
 }
