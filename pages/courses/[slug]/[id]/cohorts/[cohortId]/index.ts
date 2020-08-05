@@ -239,7 +239,7 @@ you'll be doing on your first day`),
         href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`
       }, h(Primary, "Get started")),
       h(Link, {
-        href:'/courses/[slug/]/[id]/cohorts/[cohortId]',
+        href:'/courses/[slug]/[id]/cohorts/[cohortId]',
         as: `/courses/${props.cohort.courses.slug}/${props.cohort.courses.id}/cohorts/${props.cohort.id}`
       }, h('a', 'Back to the cohort page'))
     ])
