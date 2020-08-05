@@ -23,11 +23,14 @@ const Profile= (props: Extract<Props, {notFound: false}>)=>{
   if(person === undefined) return h(Loader)
   if(person === false) return h(Error, 'No user found :(')
 
+  let link = person.link
+  if(!link?.startsWith('http')) link = '//'+link
+
   return h(Box, {gap: 32}, [
     h(Box, {gap: 8}, [
       h('h1', person.display_name || username),
       h('b', {style: {color: colors.textSecondary}}, `@${username}`),
-      !person.link ? null : h('a', {href: person.link}, h('b', person.link)),
+      !person.link ? null : h('a', {href: link}, h('b', person.link)),
     ]),
     !person.bio ? null : h(Box, {width: 640}, h(Text, {source: person.bio}))
   ])
