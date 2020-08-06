@@ -73,6 +73,10 @@ ol li::before {
   text-align: right; 
 }
 
+ul li::before {
+content: '';
+}
+
 li {
   margin-bottom: .333rem;
   margin-top: .333rem;
