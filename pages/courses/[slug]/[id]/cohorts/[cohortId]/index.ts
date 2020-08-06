@@ -140,7 +140,7 @@ const EnrollInCohort = (props:{id:number, course: number, max_size: number, lear
     let stripe = useStripe()
     let router = useRouter()
     let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res)=>{
-        if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]', `/courses/${router.query.slug}/${props.course}/${props.id}?welcome`)
+        if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]', `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}?welcome`)
         else await stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
 
