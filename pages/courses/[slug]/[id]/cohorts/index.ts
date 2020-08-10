@@ -44,7 +44,6 @@ const EnrollCohort = (props:Extract<Props, {notFound: false}>) => {
             .filter(cohort=>{
                 if(cohort.completed) return false
                 if(new Date(cohort.start_date)< new Date()) return false
-                if(course?.cohort_max_size && course.cohort_max_size !== 0 && cohort.people_in_cohorts.length >= course.cohort_max_size) return false
                 return true
             })
     return h(TwoColumn, {}, [
@@ -113,7 +112,10 @@ let Cohort = (props: {
         switch(true) {
             case props.facilitating: return "You're facilitating this cohort"
             case props.enrolled: return "You're enrolled in this cohort"
-            case props.cohort_max_size > 0: return `${props.cohort_max_size - props.learners} spots left!`
+            case props.cohort_max_size > 0: {
+                if(props.cohort_max_size === props.learners) return 'This cohort is full :('
+                return `${props.cohort_max_size - props.learners} spots left!`
+            }
             default: return ''
         }
     })()
@@ -143,7 +145,10 @@ let Cohort = (props: {
         h(Box, {gap:8, style: {justifyContent: 'right', textAlign: 'right', alignItems: 'center'}}, [
             h(Primary, {
                 onClick,
-                disabled: (props.invite_only && !props.invited) || props.enrolled || props.facilitating,
+                disabled: (props.invite_only && !props.invited)
+                    || props.enrolled
+                    || props.facilitating
+                    || (props.cohort_max_size !==0 && props.cohort_max_size <= props.learners),
                 status
             }, 'Join this Cohort'),
             h('span.accentSuccess', statusMessage)
