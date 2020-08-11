@@ -18,14 +18,19 @@ import { Primary, Destructive, Secondary} from 'components/Button'
 import {WatchCourse} from 'components/Course/WatchCourse'
 
 import { getTaggedPost } from 'src/discourse'
-import { useUserData, useUserCohorts, useCourseData, Course } from 'src/data'
+import { useUserData, useUserCohorts, useCourseData, Course, User} from 'src/data'
 import { UpdateCourseMsg, UpdateCourseResponse} from 'pages/api/courses/[id]'
-import { callApi } from 'src/apiHelpers'
+import { callApi, useApi } from 'src/apiHelpers'
 import { cohortPrettyDate } from 'components/Card'
 import ErrorPage from 'pages/404'
 import { courseDataQuery } from 'pages/api/courses/[id]'
 import Head from 'next/head'
 import { PrismaClient } from '@prisma/client'
+import { prettyDate } from 'src/utils'
+import { useStripe } from '@stripe/react-stripe-js'
+import { useRouter } from 'next/router'
+import { EnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
+import { useMediaQuery } from 'src/hooks'
 
 const COPY = {
   courseForum: "Check out the course forum",
@@ -33,7 +38,7 @@ const COPY = {
   cohortTab: "Past Cohorts",
   activeCohorts: "Your Current Cohorts",
   settings: "You can edit course details, create new cohorts, and more.",
-  enrollButton: "See Upcoming Cohorts",
+  enrollButton: "Enroll in a cohort",
   updateCurriculum: (props: {id: string}) => h(Info, [
     `💡 You can make changes to the curriculum by editing `,
     h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.id}`}, `this topic`),
@@ -93,18 +98,34 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h('span', {style:{color: 'blue'}}, [h('a.mono',{href:forum},  COPY.courseForum), ' ➭'])
         ]),
         h('p.big', course?.description || ''),
-        activeCohorts.length > 0 ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [
-          h('h3', COPY.activeCohorts),
-          ...activeCohorts.map(cohort=> h(SmallCohortCard, {
-            ...cohort,
-            courses: {
-              name: course?.name || '',
-              slug: course?.slug || '',
-            },
-            facilitating: cohort.facilitator === (user ? user?.id : undefined),
-            enrolled: !(cohort.facilitator === (user ? user?.id : undefined))
-          }))
-        ]) : null,
+
+        upcomingCohorts.length > 0 && (activeCohorts.length === 0)
+          ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}},[
+            ...upcomingCohorts.flatMap(cohort=>{
+              return [
+                h(UpcomingCohort, {
+                  ...cohort,
+                  invite_only: course?.invite_only || false,
+                  invited,
+                  user,
+                  learners_enrolled: cohort.people_in_cohorts.length,
+                  cohort_max_size: course?.cohort_max_size || 0
+                }),
+                h(Seperator)]
+            }).slice(0, -1)
+          ])
+          : activeCohorts.length === 0 ? null : h(Box, {padding: 32, style: {backgroundColor: colors.grey95}}, [
+            h('h3', COPY.activeCohorts),
+            ...activeCohorts.map(cohort=> h(SmallCohortCard, {
+              ...cohort,
+              courses: {
+                name: course?.name || '',
+                slug: course?.slug || '',
+              },
+              facilitating: cohort.facilitator === (user ? user?.id : undefined),
+              enrolled: !(cohort.facilitator === (user ? user?.id : undefined))
+            }))
+          ]),
       ]),
       h(Tabs, {tabs: {
         [COPY.curriculumTab]:  h(Box, [
@@ -116,27 +137,16 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       h(Sidebar, [
         h(Enroll, {course}, [
           h(Box, {gap: 32}, [
-            h(Box, {gap:8}, [
-              h(Link, {href: '/courses/[slug]/[id]/cohorts',
-                       as:`/courses/${course.slug}/${course.id}/cohorts` }, [
-                         h('a', [
-                           h(Primary, {
-                             disabled: upcomingCohorts.length === 0 || (course.invite_only && !invited)
-                           }, COPY.enrollButton),
-                         ])
-                       ]),
-              h(EnrollStatus, {
-                courseId: course.id,
-                draft:course.status==='draft',
-                maintainer: isMaintainer,
-                inviteOnly:course.invite_only,
-                invited,
-                loggedIn: !!user,
-                enrolled,
-                upcoming:upcomingCohorts.length !== 0,
-
-              }),
-            ]),
+            h(EnrollStatus, {
+              courseId: course.id,
+              draft:course.status==='draft',
+              maintainer: isMaintainer,
+              inviteOnly:course.invite_only,
+              invited,
+              loggedIn: !!user,
+              enrolled,
+              upcoming:upcomingCohorts.length !== 0,
+            }),
             !isMaintainer ? null : h(Seperator),
             !isMaintainer ? h(WatchCourse, {id: course.id}) : h(Box, [
               h(Box, {gap:8}, [
@@ -147,6 +157,62 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
             ])
           ])
         ])]),
+    ])
+  ])
+}
+
+function UpcomingCohort(props: {
+  people:{username: string, display_name: string | null},
+  cohort_max_size: number,
+  invite_only: boolean,
+  learners_enrolled: number,
+  course: number,
+  id: number,
+  invited: boolean,
+  start_date: string,
+  user?: User
+}) {
+  let stripe = useStripe()
+  let router = useRouter()
+  let mobile = useMediaQuery('(max-width:420px)')
+  let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res) => {
+    if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]?welcome', `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}?welcome`)
+    else stripe?.redirectToCheckout({sessionId: res.sessionId})
+  })
+
+  let onClick= async (e:React.MouseEvent)=> {
+    e.preventDefault()
+    if(props.user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
+    if(!props.id) return
+    if(!stripe) return
+    await callEnroll(`/api/cohorts/${props.id}/enroll`)
+  }
+  return h(Box, {h: !mobile, style:{gridAutoColumns: 'auto'}}, [
+    h(Box, {gap: 8}, [
+      h('h3', 'Starts ' + prettyDate(props.start_date)),
+      h('span', [
+        'Facilitated by ',
+        h(Link, {
+          href:'/people/[username]',
+          as:`/people/${props.people.username}`
+        }, h('a.notBlue', {style: {textDecoration: 'underline'}},
+             props.people.display_name || props.people.username)),
+      ]),
+    ]),
+    h(Box, {gap:8, style: {justifySelf: mobile ? 'left' : 'right', textAlign: mobile ? 'left' : 'right', alignItems: 'center'}}, [
+      h(Primary, {
+        style: {justifySelf: mobile ? 'left' : 'right'},
+        onClick,
+        disabled: (props.invite_only && !props.invited)
+          || (props.cohort_max_size !==0 && props.cohort_max_size <= props.learners_enrolled),
+        status
+      }, 'Enroll'),
+      (props.cohort_max_size !== 0 && props.cohort_max_size  === props.learners_enrolled)
+        ? h('span.accentRed', {}, 'Sorry, this cohort is full')
+        : h(Link, {
+          href: '/courses/[slug]/[id]/cohorts/[cohortId]',
+          as: `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}`
+        }, h('a', {}, h('b', 'See schedule')))
     ])
   ])
 }

@@ -59,7 +59,7 @@ export const Box = styled('div')<{
   padding?: Spacing,
   mt?: Spacing,
   as?: string,
-  h?:true,
+  h?:boolean,
   ma?: true,
   height?: number,
   width?:Widths
@@ -69,7 +69,7 @@ ${props=> props.width ? 'max-width:' + props.width + 'px;' : ''}
 padding: ${props=> props.padding? props.padding : '0'}px;
 
 ${props => !props.h
-? 'grid-auto-rows: min-content'
+? 'grid-auto-rows: min-content;'
 : `
 grid-auto-columns: max-content;
 grid-auto-flow: column;
