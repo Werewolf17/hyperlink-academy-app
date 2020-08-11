@@ -70,11 +70,11 @@ async function handler (req: Request) {
   let category = await createCategory(id, {permissions: {[id]:1}, parent_category_id: course.category_id})
   if(!category) return {status: 500, result: "ERROR: Could not create cohort category"} as const
 
-
-  for(let template of course.course_templates) {
+  await Promise.all(course.course_templates.map( async template => {
+    if(!category) return
     if(template.type === 'prepopulated') {
       if(template.name === 'Notes') {
-        await updateTopic(category.topic_url, {
+        return updateTopic(category.topic_url, {
           category_id: category.id,
           title: id + " Notes",
           raw: template.content,
@@ -82,15 +82,15 @@ async function handler (req: Request) {
         }, admin)
       }
       else {
-        await createTopic({
+        return createTopic({
           title: template.title,
           category: category.id,
           raw: template.content,
-          tags: template.title === "Getting Started" ? ['getting-started'] : undefined,
+          tags: template.name === "Getting Started" ? ['getting-started'] : undefined,
         }, admin)
       }
     }
-  }
+  }))
 
   let cohort = await prisma.course_cohorts.create({
     include: {
