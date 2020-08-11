@@ -50,7 +50,7 @@ async function enroll (req: Request) {
         course_start_date: cohort.start_date,
         course_name: cohort.courses.name,
         cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.courses.category_id}`,
+        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
         get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
       }),
       sendEnrollNotificationEmaill(cohort.people.email, {
