@@ -27,6 +27,7 @@ import { useStripe } from '@stripe/react-stripe-js'
 import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/api/cohorts/[cohortId]'
 import { courseDataQuery } from 'pages/api/courses/[id]'
 import { EnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
+import Head from 'next/head'
 
 const COPY = {
   detailsTab: "Details",
@@ -58,6 +59,12 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
 
   return h('div', {}, [
+    h(Head, {children: [
+      h('meta', {property:"og:title", content:course.name, key:"title"}),
+      h('meta', {property: "og:description", content: "Starting " + prettyDate(cohort.start_date), key: "description"}),
+      h('meta', {property: "og:image", content: 'https://hyperlink.academy' + course.card_image, key: "image"}),
+      h('meta', {property: "twitter:card", content: "summary"})
+    ]}),
     h(WelcomeModal, {display:router.query.welcome !== undefined, cohort}),
     h(Banners, {cohort, mutate, enrolled: !!inCohort, facilitating: isFacilitator}),
     h(TwoColumn, [
