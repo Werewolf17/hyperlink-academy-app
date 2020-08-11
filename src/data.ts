@@ -5,6 +5,8 @@ import { CohortResult } from '../pages/api/cohorts/[cohortId]'
 import { CourseDataResult } from '../pages/api/courses/[id]'
 import { ProfileResult } from '../pages/api/people/[id]'
 import { CourseResult } from '../pages/api/courses'
+
+export type User = Success<WhoAmIResult>
 export const useUserData = ()=>{
   return useSWR('/api/get/whoami', async (api) => {
     let res = await callApi<null, WhoAmIResult>(api)
