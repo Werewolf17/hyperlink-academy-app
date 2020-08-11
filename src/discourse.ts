@@ -110,7 +110,7 @@ export const createCategory = async (name: string, options?: {
   })
   if(result.status === 200) return (await result.json()).category as {id: number, topic_url: string}
   console.log(await result.text())
-  return false
+  return false as const
 }
 
 export async function updateGroup(id: number, newName: string) {
