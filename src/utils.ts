@@ -7,3 +7,5 @@ export const slugify = (str:string) => {
     .replace(/\s/g, '-')
     .toLowerCase()
 }
+
+export const usernameValidate = (s:string) => /^[a-zA-Z0-9_.\-]{3,15}$/.test(s)

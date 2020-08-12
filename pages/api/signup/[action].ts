@@ -7,6 +7,7 @@ import {setTokenHeader} from '../../../src/token'
 import {multiRouteHandler, ResultType, Request} from '../../../src/apiHelpers'
 import {syncSSO} from '../../../src/discourse'
 import {sendVerificationEmail} from '../../../emails'
+import { usernameValidate } from 'src/utils';
 
 const prisma = new PrismaClient()
 
@@ -38,8 +39,7 @@ async function Signup(req: Request) {
   if(!msg.email || !msg.password || !msg.username || msg.newsletter === undefined) {
     return {status: 400, result: 'Error: invalid message, missing email, password, newsletter, or display_name'} as const
   }
-  if(msg.username.length < 3 || msg.username.length > 20) return {status: 400, result: "Error: username must be between 3 and 20 characters"}
-  if(/\s/.test(msg.username)) return {status:400, result: "Error: username cannot contain spaces"} as const
+  if(!usernameValidate(msg.username)) return {status: 400, result: "Error: Username must be between 3 and 15 characters, and contain only numbers, letters, dots, dashes, and underscores"}
 
   if(!(await checkUser(msg.email))) {
     await prisma.disconnect()

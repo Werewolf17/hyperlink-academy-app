@@ -13,6 +13,7 @@ import { useDebouncedEffect} from 'src/hooks'
 import { VerifyEmailMsg, SignupMsg, VerifyEmailResponse, SignupResponse} from 'pages/api/signup/[action]'
 import { CheckUsernameResult } from 'pages/api/get/[...item]'
 import styled from '@emotion/styled'
+import { usernameValidate } from 'src/utils'
 
 const COPY = {
    submitButton: "Create your account",
@@ -35,6 +36,7 @@ const Signup = () => {
   useEffect(()=>{if(user) router.push('/dashboard')}, [user])
   useDebouncedEffect(async ()=>{
     if(!formData.username) return setUsernameValid(null)
+    if(!usernameValidate(formData.username)) return setUsernameValid(null)
     let res = await callApi<null, CheckUsernameResult>('/api/get/username/'+formData.username)
     if(res.status===404) setUsernameValid(true)
     else setUsernameValid(false)
@@ -62,17 +64,6 @@ const Signup = () => {
       ]),
       h('p.big', COPY.headerDescription),
     ]),
-
-    // h(Box, {gap:16}, [
-    //   h(HalfLoopImg, {
-    //     src1: '/img/sailboat-1.gif',
-    //     src2: '/img/sailboat-2.gif',
-    //     alt: "an animated gif of a sailboat, boatin'",
-    //     startLoop: 333,
-    //   }),
-    //   h('h1', 'Sign Up'),
-    // ]),
-
     status === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
       '.'
@@ -86,18 +77,20 @@ const Signup = () => {
                 name: "username",
                 required: true,
                 minLength: 3,
-                maxLength: 20,
+                maxLength: 15,
                 value: formData.username,
                 onChange: (e)=> {
                   setFormData({...formData, username:e.currentTarget.value})
-                  if(/\s/.test(e.currentTarget.value)){
-                    e.currentTarget.setCustomValidity('Your username cannot contain spaces.')
+                  if(usernameValidate(e.currentTarget.value || '')){
+                    e.currentTarget.setCustomValidity('Your username must contain only letters, numbers, underscores, periods or dashes')
                   }
                   else {
                     e.currentTarget.setCustomValidity('')
                   }
                 }}),
-      usernameValid === null
+      formData.username.length < 3 ? null :
+        !usernameValidate(formData.username) ? h('span.accentRed', 'Your username must contain only letters, numbers, underscores, periods or dashes') :
+        usernameValid === null
         ? ''
         : usernameValid ? h('span.accentSuccess', 'Great! This username is available.') : h('span.accentRed', "Sorry, that username is taken.")
     ]),
