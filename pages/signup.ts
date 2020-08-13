@@ -81,7 +81,7 @@ const Signup = () => {
                 value: formData.username,
                 onChange: (e)=> {
                   setFormData({...formData, username:e.currentTarget.value})
-                  if(usernameValidate(e.currentTarget.value || '')){
+                  if(!usernameValidate(e.currentTarget.value || '')){
                     e.currentTarget.setCustomValidity('Your username must contain only letters, numbers, underscores, periods or dashes')
                   }
                   else {
