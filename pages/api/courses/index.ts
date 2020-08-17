@@ -63,7 +63,13 @@ async function createCourse(req: Request) {
   let slug = slugify(msg.name)
 
   let groupName = slug +'-m'
-  let group = await createGroup({name: groupName, visibility_level: 2, owner_usernames: maintainers.map(m=>m.username)})
+  let group = await createGroup({
+    name: groupName,
+    visibility_level: 2,
+    owner_usernames: maintainers.map(m=>m.username),
+    messageable_level: 3,
+    mentionable_level: 3
+  })
   if(!group) return {status: 500, result: "ERROR: couldn't create course maintainers group"} as const
 
   let category = await createCategory(msg.name, {

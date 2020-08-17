@@ -17,7 +17,13 @@ export type Category = {
   }
 }
 
-export async function createGroup(group:{name: string, visibility_level: number, owner_usernames: string | string[]}) {
+export async function createGroup(group:{
+  name: string,
+  visibility_level: number,
+  owner_usernames: string | string[],
+  mentionable_level?: number,
+  messageable_level?: number
+}) {
   if(typeof group.owner_usernames !== 'string') group.owner_usernames = group.owner_usernames.join(',')
   let result = await fetch('https://forum.hyperlink.academy/admin/groups', {
     method: 'POST',
