@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 export default ()=>{
   let router= useRouter()
-  let [state, setState] = useState<'loading' | 'not found'>('loading')
+  let [state, setState] = useState<'loading' | 'not found' | 'used'>('loading')
   useEffect(()=>{
     (async function(){
       if(!router.query.discount) return
@@ -18,6 +18,11 @@ export default ()=>{
       let res = await callApi<null, GetDiscountResult>('/api/discounts/'+code)
       if(res.status !== 200) { return setState('not found')}
       let discount  = res.result
+      console.log(discount)
+      if(discount.max_redeems !== 0 && discount.max_redeems <= discount.redeems) {
+        return setState('used')
+      }
+
       let discounts = getDiscounts()
       setDiscounts([...discounts.filter(d=> d.course !== discount.course), {
         ...discount,
@@ -27,6 +32,12 @@ export default ()=>{
     })()
   }, [router.query.discount])
   if(state === 'loading') return h(PageLoader)
+  if(state === 'used') return h(Box, {style: {textAlign: "center"}}, [
+    h('h2', "Sorry"),
+    h('p.big', 'That discount code has been fully used up'),
+    h(Link, {href: '/'}, h('a', "take me to the homepage"))
+  ])
+
   return  h(Box, {style:{textAlign: 'center'}}, [
     h('h2', "Sorry "),
     h('p.big', 'That discount code is invalid'),
