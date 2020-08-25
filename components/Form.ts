@@ -8,8 +8,7 @@ export let CheckBox = styled('label')`
 display: grid;
 align-items: center;
 grid-template-columns: 16px auto;
-grid-gap: 16px;
-background-color: white;
+grid-gap: 8px;
 
 input[type="checkbox"]:focus {
   border: 1px solid;
@@ -21,6 +20,7 @@ input[type="checkbox"]:hover {
 }
 
 input[type="checkbox"] {
+  background-color: white;
   appearance: none;
   position: relative;
   padding: 0;
@@ -123,13 +123,14 @@ export const Select = (props: Parameters<typeof SelectEl>[0])=>{
 }
 
 export function Radio<T extends readonly {value:string, component:React.ReactElement, }[]> (props: {
+  h?: boolean,
   name: string,
   disabled?: boolean
   items: T,
   selected: T[number]['value'],
   onChange: (v: T[number]['value']) => void
 }) {
-  return h(Box, {gap: 8}, props.items.map((item) => {
+  return h(Box, {h: props.h, gap: 16}, props.items.map((item) => {
     return h(Item,{
         disabled: props.selected !== item.value && props.disabled,
     }, [
@@ -153,7 +154,7 @@ export function Radio<T extends readonly {value:string, component:React.ReactEle
 export const Item = styled('label')<{disabled?: boolean}>`
 display: grid;
 grid-template-columns: min-content auto;
-grid-gap: 16px;
+grid-gap: 8px;
 &:hover {
   cursor: pointer;
   input {
@@ -180,6 +181,9 @@ input {
 
 export const RadioButton = styled('input')`
 appearance: none;
+padding: 0px;
+margin-left: 0px;
+margin-right: 0px;
 border-radius: 50%;
 border: 1px solid;
 width: 16px;

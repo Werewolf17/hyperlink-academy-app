@@ -12,6 +12,7 @@ import { PageLoader } from 'components/Loader'
 import { Box, Seperator, LabelBox, FormBox } from 'components/Layout'
 import { Info, Error, Select, Input, Textarea, CheckBox } from 'components/Form'
 import { Primary, Destructive, Secondary, BackButton } from 'components/Button'
+import {Discounts} from 'components/pages/courses/settings/Discounts'
 import ErrorPage from 'pages/404'
 import { useDebouncedEffect } from 'src/hooks'
 import { courseDataQuery, UpdateCourseMsg, UpdateCourseResponse } from 'pages/api/courses/[id]'
@@ -57,12 +58,14 @@ function CourseSettings(props:Extract<Props, {notFound:false}>){
       Cohorts: h(CohortSettings, {course, mutate}),
       Details: h(EditDetails, {course, mutate}),
       Invites: h(Invites, {course, mutate}),
-      Templates: h(CourseTemplates, {course, mutate})
+      Templates: h(CourseTemplates, {course, mutate}),
+      Discounts: h(Discounts, {course:course.id})
     } })
   ])
 }
 
 export default WrappedCourseSettingsPage
+
 
 function CohortSettings(props:{course:Course, mutate: (course:Course)=>void}) {
   return h(Box, {gap: 32}, [

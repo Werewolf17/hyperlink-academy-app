@@ -16,17 +16,16 @@ import { Info } from 'components/Form'
 import { Modal } from 'components/Modal'
 import {TwoColumnBanner} from 'components/Banner'
 import Text from 'components/Text'
+import {EnrollButton} from 'components/Course/EnrollButton'
 
 import {prettyDate} from 'src/utils'
 import { getTaggedPost } from 'src/discourse'
-import { callApi, useApi } from 'src/apiHelpers'
+import { callApi } from 'src/apiHelpers'
 import { useCohortData, useUserData, useCourseData, Cohort, useUserCohorts } from 'src/data'
 import { cohortPrettyDate } from 'components/Card'
 import ErrorPage from 'pages/404'
-import { useStripe } from '@stripe/react-stripe-js'
 import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/api/cohorts/[cohortId]'
 import { courseDataQuery } from 'pages/api/courses/[id]'
-import { EnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
 import Head from 'next/head'
 
 const COPY = {
@@ -80,13 +79,13 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             `Facilitated by ${cohort.people.display_name || cohort.people.username}`
           ]),
         ]),
-        invited && !inCohort && !isFacilitator ? h(EnrollInCohort, {
+        invited && !inCohort && !isFacilitator ? h(EnrollButton, {
           invited,
           max_size: course.cohort_max_size,
           learners: cohort.people_in_cohorts.length,
           id: cohort.id,
           course: course.id
-        }) : null,
+        }, "Enroll in this cohort") : null,
         !inCohort && !isFacilitator ? null : h(Box, [
           h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`}
             , h(Primary, 'Go to the forum')),
@@ -141,32 +140,6 @@ display: grid;
 grid-template-columns: max-content min-content;
 grid-gap: 16px;
 `
-
-const EnrollInCohort = (props:{id:number, course: number, max_size: number, learners: number, invited: boolean}) => {
-    let {data: user} = useUserData()
-    let stripe = useStripe()
-    let router = useRouter()
-    let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res)=>{
-        if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]', `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}?welcome`)
-        else await stripe?.redirectToCheckout({sessionId: res.sessionId})
-    })
-
-  let onClick= async (e:React.MouseEvent)=> {
-    e.preventDefault()
-    if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
-    if(!props.id) return
-    if(!stripe) return
-    await callEnroll(`/api/cohorts/${props.id}/enroll`)
-  }
-
-  return  h(Box, {h: true, style:{alignItems: 'center'}}, [
-    h(Primary, {onClick, status, disabled: !props.invited || (props.max_size !==0 && props.max_size === props.learners)},
-      'Join this Cohort'),
-    props.max_size === 0 ? null : props.max_size > props.learners
-      ? h('span.accentSuccess', `${props.max_size - props.learners} spots left!`)
-      : h('span.accentRed', `Sorry! This cohort is full.`)
-  ])
-}
 
 const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')

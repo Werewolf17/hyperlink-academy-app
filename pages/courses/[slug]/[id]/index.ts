@@ -20,17 +20,16 @@ import {WatchCourse} from 'components/Course/WatchCourse'
 import { getTaggedPost } from 'src/discourse'
 import { useUserData, useUserCohorts, useCourseData, Course, User} from 'src/data'
 import { UpdateCourseMsg, UpdateCourseResponse} from 'pages/api/courses/[id]'
-import { callApi, useApi } from 'src/apiHelpers'
+import { callApi } from 'src/apiHelpers'
 import { cohortPrettyDate } from 'components/Card'
 import ErrorPage from 'pages/404'
 import { courseDataQuery } from 'pages/api/courses/[id]'
 import Head from 'next/head'
 import { PrismaClient } from '@prisma/client'
 import { prettyDate } from 'src/utils'
-import { useStripe } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/router'
-import { EnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
 import { useMediaQuery } from 'src/hooks'
+import { EnrollButton } from 'components/Course/EnrollButton'
 
 const COPY = {
   courseForum: "Check out the course forum",
@@ -172,21 +171,9 @@ function UpcomingCohort(props: {
   start_date: string,
   user?: User
 }) {
-  let stripe = useStripe()
   let router = useRouter()
   let mobile = useMediaQuery('(max-width:420px)')
-  let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res) => {
-    if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]?welcome', `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}?welcome`)
-    else stripe?.redirectToCheckout({sessionId: res.sessionId})
-  })
 
-  let onClick= async (e:React.MouseEvent)=> {
-    e.preventDefault()
-    if(props.user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
-    if(!props.id) return
-    if(!stripe) return
-    await callEnroll(`/api/cohorts/${props.id}/enroll`)
-  }
   return h(Box, {h: !mobile, style:{gridAutoColumns: 'auto'}}, [
     h(Box, {gap: 8}, [
       h('h3', 'Starts ' + prettyDate(props.start_date)),
@@ -200,19 +187,17 @@ function UpcomingCohort(props: {
       ]),
     ]),
     h(Box, {gap:8, style: {justifySelf: mobile ? 'left' : 'right', textAlign: mobile ? 'left' : 'right', alignItems: 'center'}}, [
-      h(Primary, {
-        style: {justifySelf: mobile ? 'left' : 'right'},
-        onClick,
-        disabled: (props.invite_only && !props.invited)
-          || (props.cohort_max_size !==0 && props.cohort_max_size <= props.learners_enrolled),
-        status
+      h(EnrollButton, {
+        id: props.id,
+        course: props.course,
+        max_size: props.cohort_max_size,
+        learners: props.learners_enrolled,
+        invited: !props.invite_only || props.invited
       }, 'Enroll'),
-      (props.cohort_max_size !== 0 && props.cohort_max_size  === props.learners_enrolled)
-        ? h('span.accentRed', {}, 'Sorry, this cohort is full')
-        : h(Link, {
-          href: '/courses/[slug]/[id]/cohorts/[cohortId]',
-          as: `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}`
-        }, h('a', {}, h('b', 'See schedule')))
+      (props.cohort_max_size !== 0 && props.cohort_max_size  === props.learners_enrolled) ? null : h(Link, {
+        href: '/courses/[slug]/[id]/cohorts/[cohortId]',
+        as: `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}`
+      }, h('a', {}, h('b', 'See schedule')))
     ])
   ])
 }
