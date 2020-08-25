@@ -36,6 +36,21 @@ model course_cohorts {
   people_in_cohorts people_in_cohorts[]
 }
 
+model course_discounts {
+  name              String
+  type              discount_types
+  course            Int
+  code              String              @unique
+  max_redeems       Int                 @default(0)
+  redeems           Int                 @default(0)
+  amount            Int
+  deleted           Boolean             @default(false)
+  courses           courses             @relation(fields: [course], references: [id])
+  people_in_cohorts people_in_cohorts[]
+
+  @@id([course, code])
+}
+
 model course_invites {
   email   String
   course  Int
@@ -68,6 +83,7 @@ model courses {
   cohort_max_size         Int                       @default(0)
   card_image              String                    @default("/img/new_course.png")
   course_cohorts          course_cohorts[]
+  course_discounts        course_discounts[]
   course_invites          course_invites[]
   course_maintainers      course_maintainers[]
   course_templates        course_templates[]
@@ -108,10 +124,12 @@ model people {
 }
 
 model people_in_cohorts {
-  person         String
-  cohort         Int
-  course_cohorts course_cohorts @relation(fields: [cohort], references: [id])
-  people         people         @relation(fields: [person], references: [id])
+  person           String
+  cohort           Int
+  discount_used    String?
+  course_cohorts   course_cohorts    @relation(fields: [cohort], references: [id])
+  course_discounts course_discounts? @relation(fields: [discount_used], references: [code])
+  people           people            @relation(fields: [person], references: [id])
 
   @@id([person, cohort])
 }
@@ -128,6 +146,11 @@ model people_watching_courses {
 enum course_status {
   draft
   live
+}
+
+enum discount_types {
+  absolute
+  percentage
 }
 
 enum template_types {

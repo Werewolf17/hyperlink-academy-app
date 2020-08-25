@@ -5,6 +5,7 @@ import { CohortResult } from '../pages/api/cohorts/[cohortId]'
 import { CourseDataResult } from '../pages/api/courses/[id]'
 import { ProfileResult } from '../pages/api/people/[id]'
 import { CourseResult } from '../pages/api/courses'
+import { GetDiscountsResult } from 'pages/api/courses/[id]/discounts'
 
 export type User = Success<WhoAmIResult>
 export const useUserData = ()=>{
@@ -58,4 +59,11 @@ export const useCourses = (initialData?:Success<CourseResult>) => {
     let res = await callApi<null, CourseResult>(api)
     return res.result
   }, {initialData})
+}
+
+export const useDiscounts = (id: number) => {
+  return useSWR(`/api/courses/${id}/discounts`, async (api)=>{
+    let res = await callApi<null, GetDiscountsResult>(api)
+    if(res.status===200) return res.result
+  })
 }

@@ -16,8 +16,9 @@ import { useCourseData, useUserData, useUserCohorts } from 'src/data'
 import { getTaggedPost } from 'src/discourse'
 import { useApi } from 'src/apiHelpers'
 import {prettyDate} from 'src/utils'
-import { EnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
+import { EnrollResponse, EnrollMsg } from 'pages/api/cohorts/[cohortId]/enroll'
 import { courseDataQuery } from 'pages/api/courses/[id]'
+import { getDiscounts } from 'src/clientData'
 
 const COPY = {
     empty: "There are no upcoming cohorts for this course :(",
@@ -95,7 +96,7 @@ let Cohort = (props: {
     let {data: user} = useUserData()
     let stripe = useStripe()
     let router = useRouter()
-    let [status, callEnroll] = useApi<null, EnrollResponse>([stripe], async (res) => {
+    let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], async (res) => {
         if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]?welcome', `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}?welcome`)
         else stripe?.redirectToCheckout({sessionId: res.sessionId})
     })
@@ -105,7 +106,8 @@ let Cohort = (props: {
         if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
         if(!props.id) return
         if(!stripe) return
-        await callEnroll(`/api/cohorts/${props.id}/enroll`)
+        let discount = getDiscounts().find(d=>d.course === props.course)
+        await callEnroll(`/api/cohorts/${props.id}/enroll`, {discount: discount?.code})
     }
 
     let statusMessage = (function(){

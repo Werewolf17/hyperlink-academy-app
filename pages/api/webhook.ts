@@ -4,6 +4,7 @@ import {PrismaClient} from '@prisma/client'
 import { getUsername, addMember, getTaggedPost} from '../../src/discourse'
 import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from '../../emails';
 import { prettyDate } from '../../src/utils';
+import { StripeMetaData } from './cohorts/[cohortId]/enroll';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 const prisma = new PrismaClient()
@@ -34,30 +35,34 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
-    const {metadata} = event.data.object as {customer_email:string, metadata: {cohortId:string, userId:string}} ;
+    const {metadata} = event.data.object as {customer_email:string, metadata: StripeMetaData} ;
 
     let cohortId = parseInt(metadata.cohortId)
     let person = await prisma.people.findOne({where: {id: metadata.userId}})
     if(!person) return {status: 400, result: "ERROR: cannot find user with id: " + metadata.userId} as const
 
-    let cohort = await prisma.course_cohorts.findOne({
-      where: {id: cohortId},
-      include: {
-        people: {select:{email:true}},
-        courses: {
-          select: {
-            category_id: true,
-            slug: true,
-            name: true
-          }
-        },
-        people_in_cohorts: {
-          where: {
-            person: person.id
+    let [cohort, discount] = await Promise.all([
+      prisma.course_cohorts.findOne({
+        where: {id: cohortId},
+        include: {
+          people: {select:{email:true}},
+          courses: {
+            select: {
+              category_id: true,
+              slug: true,
+              name: true
+            }
+          },
+          people_in_cohorts: {
+            where: {
+              person: person.id
+            }
           }
         }
-      }
-    })
+      }),
+      metadata.discount ? prisma.course_discounts.findOne({where:{code:metadata.discount}}) : null
+    ])
+
     if(!cohort) return {status: 400, result: "ERROR: no cohort with id: " + metadata.cohortId}
     if(cohort.people_in_cohorts.length > 0) return {status:200, result: "User is already enrolled"}
 
@@ -68,9 +73,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
     await Promise.all([
+      //Potential race condition! Use prisma increment api when available
+      discount ? prisma.course_discounts.update({
+        where: {code: discount.code},
+        data: {
+          redeems: (discount.redeems || 0) + 1
+        }}) : null,
       prisma.people_in_cohorts.create({data: {
         people: {connect: {id: metadata.userId}},
-        course_cohorts: {connect: {id: cohortId}}
+        course_cohorts: {connect: {id: cohortId}},
+        course_discounts: discount ? {connect:{code: discount.code}} : undefined
       }}),
 
       addMember(cohort.group_id, username),

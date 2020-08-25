@@ -85,3 +85,15 @@ CREATE TABLE IF NOT EXISTS people_watching_courses (
     course        integer REFERENCES courses(id) NOT NULL,
     PRIMARY KEY (course, person)
 );
+
+CREATE TYPE discount_types AS ENUM ('percentage', 'absolute');
+CREATE TABLE IF NOT EXISTS course_discounts (
+    name text not null,
+    type discount_types not null,
+    course integer REFERENCES courses(id) NOT NULL,
+    code text NOT NULL UNIQUE,
+    max_redeems integer NOT NULL default (0),
+    redeems integer NOT NULL default (0),
+    amount integer not null,
+    PRIMARY KEY (course, code)
+);
