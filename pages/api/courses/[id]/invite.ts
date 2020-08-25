@@ -14,7 +14,7 @@ async function inviteToCourse(req:Request) {
 
   if(!msg.email && !msg.username) return {status: 400, result: "ERROR: Must include username or email"} as const
 
-  let email = msg.email || ''
+  let email = msg.email?.toLowerCase() || ''
   let name = ''
   if(msg.username) {
     let person = await prisma.people.findOne({where: {username: msg.username.toLowerCase()}, select:{email: true, display_name: true}})
