@@ -119,6 +119,7 @@ function DiscountItem(props: {discount: course_discounts, delete: ()=>void}) {
         ref: ref
       }),
       h(Secondary, {
+        disabled: props.discount.max_redeems !== 0 && props.discount.max_redeems <= props.discount.redeems,
         onClick: e =>{
           e.preventDefault()
           if(!ref.current) return
