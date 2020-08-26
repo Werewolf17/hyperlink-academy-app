@@ -4,8 +4,10 @@ import styled from '@emotion/styled'
 import { Box } from '../Layout'
 import {colors} from '../Tokens'
 import { Course } from '../../src/data'
-import { ReactElement } from 'react'
-import { useLocalDiscounts } from 'src/clientData'
+import { ReactElement, useEffect } from 'react'
+import { useLocalDiscounts, setDiscounts } from 'src/clientData'
+import { callApi } from 'src/apiHelpers'
+import { GetDiscountResult } from 'pages/api/discounts/[code]'
 
 type Props = {
   course?: Course
@@ -15,6 +17,18 @@ const Enroll:React.SFC<Props> = (props) => {
   let {data: discounts} = useLocalDiscounts()
   let price = props.course?.cost || 0
   let discount = discounts?.find(d=>d.course == props.course?.id)
+  useEffect(()=>{
+    (async function(){
+      if(!discount || !discounts) return
+      let res = await callApi<null, GetDiscountResult>('/api/discounts/'+discount.code)
+      if(res.status !== 200 ||
+        res.result.deleted ||
+        (res.result.max_redeems !== 0
+          && res.result.max_redeems <= res.result.redeems)) {
+        setDiscounts(discounts.filter(d=>d.code!==discount?.code))
+      }
+    })()
+  }, [discount, discounts])
   if(discount) {
     if(discount.type === 'absolute') price = price - discount.amount
     else price = price - (Math.floor((discount.amount/100)*price))
