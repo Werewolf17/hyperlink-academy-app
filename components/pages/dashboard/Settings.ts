@@ -13,7 +13,6 @@ import { useApi } from 'src/apiHelpers'
 import { UpdatePersonMsg, UpdatePersonResult } from 'pages/api/people/[id]'
 
 const COPY = {
-  header: "Your Settings",
   usernameField: "Username",
   emailField: "Email",
   displayNameField: "Nickname",
@@ -57,9 +56,8 @@ const Settings = () => {
     }
   }
 
-  return h(FormBox, {onSubmit, width: 400, gap: 64, ma: true}, [
+  return h(FormBox, {onSubmit, width: 400, gap: 64}, [
     h(Box, {gap: 32}, [
-      h('h2', COPY.header),
       h(Box, {gap:8}, [h('h4', 'Username'), h(Info, user.username)]),
       h(Box, {gap:8}, [h('h4', 'Email'), h(Info, user.email)]),
       h(LabelBox, {gap:8}, [

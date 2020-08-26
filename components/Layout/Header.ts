@@ -10,7 +10,7 @@ import { Box, Seperator, FormBox} from './index'
 import { useUserData } from '../../src/data'
 import { useMediaQuery } from '../../src/hooks'
 import { Textarea } from '../Form'
-import { Secondary } from '../Button'
+import { Secondary, Primary } from '../Button'
 import { Modal } from '../Modal'
 import { useApi } from '../../src/apiHelpers'
 import { FeedbackMsg, FeedbackResult } from '../../pages/api/feedback'
@@ -28,8 +28,8 @@ export default () => {
     mobile ? h(MobileMenu, {user, mutateUser}) : h(Container, {}, [
       h(FeedbackModal),
       h(Link, {href: "/blog"}, h(NavLink, 'blog')),
-      h(Seperator),
-      h(LoginButtons, {user, mutateUser})
+      h(LoginButtons, {user, mutateUser}),
+      h(Link, {href: '/courses'}, h(CoursesButton, 'courses'))
     ]),
   ])
 }
@@ -47,6 +47,7 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
       h(Link, {href: props.user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
       h(NavLink, {style: {justifySelf: 'right'}, onClick: ()=> {setOpen(false)}}, 'close')
     ]),
+    h(Link, {href: '/courses'}, h(CoursesButton, 'courses')),
     h(Box, {gap: 16, style: {textAlign: 'right'}}, [
       h(LoginButtons, props),
     ]),
@@ -67,7 +68,6 @@ const LoginButtons = (props:{user:any, mutateUser:any}) => {
   ])
   else {
     return h(Fragment, [
-      h(Link, {href: '/settings', passHref:true}, h(NavLink, 'settings')),
       h(NavLink, {onClick: async (e)=>{
         e.preventDefault()
         let res = await fetch('/api/logout')
@@ -111,6 +111,13 @@ const FeedbackModal = ()=>{
   ])
 }
 
+const CoursesButton = styled(Primary)`
+color: blue;
+background-color: white;
+border-color: blue;
+padding: 7px 16px;
+`
+
 const FullPageOverlay = styled('div')`
 display: block;
 position: fixed;
@@ -125,6 +132,7 @@ background-color: white;
 const Container = styled('div')`
 justify-self: right;
 align-self: center;
+align-items: center;
 display: grid;
 grid-gap: 32px;
 grid-auto-flow: column;
