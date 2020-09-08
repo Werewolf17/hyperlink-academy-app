@@ -77,7 +77,7 @@ const Dashboard = () => {
               return h(CourseCard, course)
             }))
           ]),
-        ["Account Settings"]: h(Settings)
+        Profile: h(Settings)
       }}),
 
   ])
