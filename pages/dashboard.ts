@@ -1,7 +1,6 @@
 import h from 'react-hyperscript'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { InferGetStaticPropsType } from 'next'
 import styled from '@emotion/styled'
 import { useEffect } from 'react'
 
@@ -11,21 +10,23 @@ import { Box, WhiteContainer} from 'components/Layout'
 import { BigCohortCard } from 'components/Card'
 import { PageLoader } from 'components/Loader'
 // import { AccentImg } from '../components/Images'
-import { useUserCohorts, useUserData, useCourses, useUserCourses } from 'src/data'
-import { coursesQuery } from './api/courses'
+import { useUserCohorts, useUserData, useUserCourses } from 'src/data'
+import { Tabs } from 'components/Tabs'
+import Settings from 'components/pages/dashboard/Settings'
+import {Primary} from 'components/Button'
 
 const COPY = {
   coursesHeader: "All Courses",
+  courseListHeader: "There’s always something new to learn!",
+  courseListButton: "Find New Courses!",
   courseGardenHeader: "Have an idea for a course?",
   courseGardenDescription: `Hyperlink courses are created by our community. We seed and grow them in the Course
 Garden. Check out some in development, or propose your own!`,
   courseGardenLink: "Check out the Course Garden"
 }
 
-type Props = InferGetStaticPropsType<typeof getStaticProps>
-const Dashboard = (props:Props) => {
+const Dashboard = () => {
   let {data: user} = useUserData()
-  let {data: courses} = useCourses(props)
   let {data: cohorts} = useUserCohorts()
   let {data: userCourses} = useUserCourses()
   let router = useRouter()
@@ -38,71 +39,47 @@ const Dashboard = (props:Props) => {
     return h(PageLoader)
   }
 
-  return h(Box, {gap:48}, [
-    h(Box, [
-      h('h1', `Hello ${user.display_name || user.username}!`),
-      h(Box, [
-        h('span', {style:{color: 'blue'}}, [
-          h(Link,{href: '/manual'}, h('a.mono', 'Read the manual')),
-          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+  let completedCohorts = cohorts.course_cohorts.filter(c=> c.completed)
+  let activeCohorts = cohorts.course_cohorts.filter(c=>!c.completed)
+
+  return h(Box, {gap:64}, [
+    h('h1', `Hello ${user.display_name || user.username}!`),
+    h(Tabs, {
+      tabs: {
+        Enrolled: h(Box, {}, [
+          activeCohorts.length === 0
+            ? h (WhiteContainer, [
+              h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
+                h( EmptyImg, {src: 'img/empty.png'}),
+                h('small.textSecondary', "Hmmm... Looks like you haven't enolled in anything yet. Check out some available courses in the Course List below!" ),
+              ]),
+            ])
+          // if enrolled, show grid of enrolled cohorts
+            : h(FlexGrid, {min: 250, mobileMin:250}, activeCohorts.map(cohort => {
+              let facilitating = cohort.facilitator === (user ? user.id: '')
+              return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
+            })),
+          h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
+            h(Box, {ma: true, style:{textAlign:"center", justifyItems:"center"}}, [
+              h('h2', COPY.courseListHeader),
+              h(Link, {href: '/courses'}, h(Primary, COPY.courseListButton))
+            ])
+          ]),
         ]),
-        h('span', {style:{color: 'blue'}}, [
-          h('a.mono', {href: 'https://forum.hyperlink.academy'}, 'Check out the forum'),
-          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
+        Completed: completedCohorts.length === 0 ? null : h(Box, [
+          h(FlexGrid, {min: 250, mobileMin:250}, completedCohorts.map(cohort => {
+              let facilitating = cohort.facilitator === (user ? user.id: '')
+              return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
+            }))
         ]),
-      ])
-    ]),
+        Maintaining: userCourses.maintaining_courses.length === 0 ? null : h(Box, {}, [
+            h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.map(course=>{
+              return h(CourseCard, course)
+            }))
+          ]),
+        ["Account Settings"]: h(Settings)
+      }}),
 
-
-    //Your cohorts section 
-    !cohorts ? null : h(Box, [
-      h('h2', "Your Cohorts"),
-      //if not enrolled in anything, throw empty
-      cohorts.course_cohorts.length === 0 
-      ? h (WhiteContainer, [
-        h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
-          h( EmptyImg, {src: 'img/empty.png'}),
-          h('small.textSecondary', "Hmmm... Looks like you haven't enolled in anything yet. Check out some available courses in the Course List below!" ),
-        ]),
-      ])
-      // if enrolled, show grid of enrolled cohorts
-      : h(FlexGrid, {min: 250, mobileMin:250}, cohorts.course_cohorts.map(cohort => {
-        let facilitating = cohort.facilitator === (user ? user.id: '')
-        return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
-      }))
-    ]),
-    h('hr'),
-
-    // Courses you maintain
-    userCourses.maintaining_courses.length === 0 ? null :  h(Box, {}, [
-      h('h2', 'Courses you maintain'),
-      h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.map(course=>{
-        return h(CourseCard, course)
-      }))
-    ]),
-
-    !courses ? null : h(Box, {gap: 16}, [
-      h('h2', COPY.coursesHeader),
-      user.admin ? h('span', {style:{color: 'blue'}}, [
-        h(Link,{href: '/courses/create'},  h('a.mono', 'Publish a New Course')),
-        h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
-      ]) : null,
-      h(FlexGrid, {min: 328, mobileMin: 200},
-        courses?.courses
-        .map(course => {
-          return h(CourseCard, course)
-        })),
-    ]),
-    h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
-      h(Box, {width: 640, ma: true}, [
-        h('h2', COPY.courseGardenHeader),
-        COPY.courseGardenDescription,
-        h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
-          h('a.mono',{href: 'https://forum.hyperlink.academy/session/sso?return_path=/c/course-kindergarten/'},  COPY.courseGardenLink),
-          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
-        ])
-      ])
-    ]),
   ])
 }
 
@@ -116,12 +93,5 @@ border: none;
 height: 200px;
 width: 200px;
 `
-
-
-export const getStaticProps = async () => {
-  let courses = await coursesQuery()
-  return {props: {courses}, unstable_revalidate: 1} as const
-}
-
 
 export default Dashboard
