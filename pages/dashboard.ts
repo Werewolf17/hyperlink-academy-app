@@ -46,7 +46,7 @@ const Dashboard = () => {
     h('h1', `Hello ${user.display_name || user.username}!`),
     h(Tabs, {
       tabs: {
-        Enrolled: h(Box, {}, [
+        Enrolled: h(Box, {gap:64}, [
           activeCohorts.length === 0
             ? h (WhiteContainer, [
               h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
@@ -79,7 +79,6 @@ const Dashboard = () => {
           ]),
         Profile: h(Settings)
       }}),
-
   ])
 }
 
