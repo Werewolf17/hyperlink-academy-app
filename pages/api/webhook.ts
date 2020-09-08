@@ -73,11 +73,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
     await Promise.all([
-      //Potential race condition! Use prisma increment api when available
       discount ? prisma.course_discounts.update({
         where: {code: discount.code},
         data: {
-          redeems: (discount.redeems || 0) + 1
+          redeems: {
+            increment: 1
+          }
         }}) : null,
       prisma.people_in_cohorts.create({data: {
         people: {connect: {id: metadata.userId}},
