@@ -46,7 +46,7 @@ export const EnrollButton:React.FC<{
     h(Primary, {onClick, status, disabled: !props.invited || (props.max_size !==0 && props.max_size === props.learners)},
       props.children as React.ReactElement),
     props.max_size === 0 ? null : props.max_size > props.learners
-      ? h('span.accentSuccess', `${props.max_size - props.learners} spots left!`)
+      ? h('span.accentSuccess', `${props.max_size - props.learners} ${props.max_size - props.learners === 1 ? 'spot' : 'spots'} left!`)
       : h('span.accentRed', `Sorry! This cohort is full.`)
   ])
 }

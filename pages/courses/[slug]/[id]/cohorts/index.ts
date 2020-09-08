@@ -115,8 +115,10 @@ let Cohort = (props: {
             case props.facilitating: return "You're facilitating this cohort"
             case props.enrolled: return "You're enrolled in this cohort"
             case props.cohort_max_size > 0: {
-                if(props.cohort_max_size === props.learners) return 'This cohort is full :('
-                return `${props.cohort_max_size - props.learners} spots left!`
+                let spots = props.cohort_max_size - props.learners
+                if(spots === 0) return 'This cohort is full :('
+                if(spots === 1) return `1 spot left`
+                return `${spots} spots left!`
             }
             default: return ''
         }
