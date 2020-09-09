@@ -85,7 +85,7 @@ let prisma = new PrismaClient()
 
 export const profileDataQuery = (username: string)=>{
   return prisma.people.findOne({
-    where: {username: username.toLowerCase()},
+    where: {username: username},
     select: {
       display_name: true,
       bio: true,
