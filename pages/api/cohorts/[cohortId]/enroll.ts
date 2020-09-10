@@ -64,7 +64,12 @@ async function enroll (req: Request) {
   } as const
 
   let origin = (new URL(req.headers.referer || '')).origin
-  if(cohort.courses.cost === 0) {
+  let price = cohort.courses.cost
+  if(discount) {
+    if(discount.type === 'absolute') price = price - discount.amount
+    else price = price - (Math.floor((discount.amount/100)*price))
+  }
+  if(price === 0) {
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
     await Promise.all([
       prisma.people_in_cohorts.create({data: {
@@ -91,12 +96,6 @@ async function enroll (req: Request) {
       status: 200,
       result: {zeroCost: true} as const
     }
-  }
-
-  let price = cohort.courses.cost
-  if(discount) {
-    if(discount.type === 'absolute') price = price - discount.amount
-    else price = price - (Math.floor((discount.amount/100)*price))
   }
 
   let metadata: StripeMetaData = {
