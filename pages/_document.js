@@ -14,6 +14,11 @@ export default class MyDocument extends Document {
               }}>
           <Main />
           <NextScript />
+        <script dangerouslySetInnerHTML={{
+          __html: `if (window.location.host !== 'hyperlink.academy') window.goatcounter = {no_onload: true}
+        `}}></script>
+        <script data-goatcounter="https://hyperlink.goatcounter.com/count"
+      async src="//gc.zgo.at/count.js"></script>
         </body>
       </html>
     )
