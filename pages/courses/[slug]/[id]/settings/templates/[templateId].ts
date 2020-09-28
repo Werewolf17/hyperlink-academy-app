@@ -60,7 +60,7 @@ function TemplateSettings() {
 
   return h(Box, {gap: 32}, [
     h(Box, {width: 640}, [
-      h(BackButton, {href: "/courses/[slug]/[id]/settings", as: `/courses/${router.query.slug}/${courseId}/settings`}, 'Setttings'),
+      h(BackButton, {href: "/courses/[slug]/[id]/settings", as: `/courses/${router.query.slug}/${courseId}/settings`}, 'Settings'),
       h('h2', router.query.templateId === 'new' ? 'Add New Template' : "Edit Template"),
       h('p.big', `Create templates for topics to either be included in every new cohort's forum, or to be triggered by a facilitator at any time.`)
     ]),
