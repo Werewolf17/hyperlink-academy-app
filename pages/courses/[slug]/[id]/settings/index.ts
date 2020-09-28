@@ -315,7 +315,7 @@ function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
       h('p', `You can edit the default templates we've provided below, or add new ones!`),
       h(Link, {
         href: '/courses/[slug]/[id]/settings/templates/[templateId]',
-        as:`/courses/{props.course.slug}/${props.course.id}/settings/templates/new`
+        as:`/courses/${props.course.slug}/${props.course.id}/settings/templates/new`
       }, h(Primary, "+ Add A New Template")),
     ]),
     h(Box, {}, props.course.course_templates
