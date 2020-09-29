@@ -1,8 +1,6 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
-import { useRouter } from 'next/router'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
-import { useEffect } from 'react'
 
 import Intro from 'writing/Intro.mdx'
 import CourseCard, {FlexGrid} from 'components/Course/CourseCard'
@@ -10,7 +8,7 @@ import { colors, Mobile, Tablet} from 'components/Tokens'
 import { Box, Body} from 'components/Layout'
 import { Primary } from 'components/Button'
 // import {TitleImg} from '../components/Images'
-import { useCourses, useUserData } from 'src/data'
+import { useCourses } from 'src/data'
 import {getToken} from 'src/token'
 import NewsletterSignup from 'components/NewsletterSignup'
 import { coursesQuery } from 'pages/api/courses'
@@ -32,11 +30,6 @@ Garden. Check out some in development, or propose your own!`,
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const Landing = (props:Props) => {
   let {data: courses} = useCourses(props)
-  let {data: user} = useUserData()
-  let router = useRouter()
-  useEffect(()=>{
-    if(user) router.push('/dashboard')
-  }, [user])
 
   return h(Box, {gap:48}, [
     h(Welcome),
