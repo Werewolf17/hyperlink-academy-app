@@ -20,10 +20,10 @@ const COPY = {
   feedbackSuccess: "🎉 Thank you for your thoughts 🎉"
 }
 
-export default () => {
+export default function Header() {
   const {data: user, mutate:mutateUser}= useUserData()
   let mobile = useMediaQuery('(max-width:420px)')
-  return h(Header, [
+  return h(HeaderContainer, [
     h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
     mobile ? h(MobileMenu, {user, mutateUser}) : h(Container, {}, [
       h(FeedbackModal),
@@ -43,7 +43,7 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
     return ()=>{ router.events.off('routeChangeComplete', handleRouteChange)}
   },[router])
   if(open) return h(FullPageOverlay, {}, h(Box, {gap: 32, padding: 24}, [
-    h(Header, [
+    h(HeaderContainer, [
       h(Link, {href: props.user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
       h(NavLink, {style: {justifySelf: 'right'}, onClick: ()=> {setOpen(false)}}, 'close')
     ]),
@@ -153,7 +153,7 @@ color: #00008B;
 }
 `
 
-const Header = styled('div')`
+const HeaderContainer = styled('div')`
 display: grid;
 grid-template-columns: auto auto;
 height: 32px;

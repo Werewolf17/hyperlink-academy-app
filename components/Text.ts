@@ -3,7 +3,9 @@ import h from 'react-hyperscript'
 import Markdown from 'react-markdown'
 import {colors} from './Tokens'
 
-export default (props:{source:string}) => h(TextStyles, {}, h(Markdown, props))
+export default function Text(props:{source:string}) {
+  return h(TextStyles, {}, h(Markdown, props))
+}
 export const TextStyles = styled('div')`
 
 h1:first-of-type { margin-top: 0 !important; margin-left: 0 !important; }

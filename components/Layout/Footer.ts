@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { colors } from '../Tokens'
 import { Body, Box, Seperator} from './index'
 
-export default ()=>{
-  return h(Footer, [
+export default function Footer(){
+  return h(FooterContainer, [
     h(Body, [
       h(Columns, [
         h(Box, {gap: 4}, [
@@ -47,7 +47,7 @@ color: ${colors.textSecondary};
 text-decoration: none;
 `
 
-const Footer = styled('footer')`
+const FooterContainer = styled('footer')`
 background-color: ${colors.grey95};
 width: 100vw;
 color: ${colors.textSecondary};

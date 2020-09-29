@@ -17,13 +17,13 @@ type Props = {
   course_cohorts:{start_date: string}[]
 }
 
-export default (props:Props) => {
+export default function CourseCard(props:Props) {
   let upcomingCohort = props.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
 
   return h(Link, {
     href: '/courses/[slug]/[id]',
     as: `/courses/${props.slug}/${props.id}`,
-    passHref: true}, h(CourseCard, {
+    passHref: true}, h(CourseCardContainer, {
   }, [
     h(ImageContainer, [
       props.status === 'draft' ? null : h(Image, {src: props.card_image}),
@@ -69,7 +69,7 @@ color: ${colors.textSecondary};
 font-size: 12px;
 `
 
-let CourseCard = styled(Card)`
+let CourseCardContainer = styled(Card)`
 padding: 0px;
 display: grid;
 border: 2px solid;

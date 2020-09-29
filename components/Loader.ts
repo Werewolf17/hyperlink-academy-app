@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import {useState, useEffect } from 'react'
 import styled from '@emotion/styled'
 
-export default  () => {
+export default  function Loader(){
   let [dots, setDots] = useState(1)
   useEffect(() => {
     let id = setInterval(()=> {
