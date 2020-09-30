@@ -43,7 +43,7 @@ export const ModalBox = styled('div')`
 position: fixed;
 border: 2px solid;
 background-color: ${colors.appBackground};
-max-width: 400px;
+max-width: 480px;
 width: 60%;
 padding: 32px;
 left: 50%;

@@ -80,14 +80,22 @@ left: -16px;
 float: right;
 `
 
-export let Input = styled('input')`
+export let Input = styled('input')<{readOnly?:boolean}>`
+min-width: 0;
 padding: 12px 16px;
 border: 1px solid;
 border-color: ${colors.grey55};
 border-radius: 2px;
 font-size: inherit;
 font-family: inherit;
+${p=>p.readOnly ? `
+border: none;
+background-color: ${colors.grey95};
 
+&:focus {
+outline: none;
+}
+`: ''}
 `
 
 export const Textarea = styled('textarea')`

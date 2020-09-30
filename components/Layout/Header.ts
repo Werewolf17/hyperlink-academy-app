@@ -9,7 +9,7 @@ import { Logo } from '../Icons'
 import { Box, Seperator, FormBox} from './index'
 import { useUserData } from '../../src/data'
 import { useMediaQuery } from '../../src/hooks'
-import { Textarea, Input } from '../Form'
+import { Textarea } from '../Form'
 import { Secondary, Primary } from '../Button'
 import { Modal } from '../Modal'
 import { useApi } from '../../src/apiHelpers'
@@ -26,11 +26,10 @@ export default () => {
   return h(Header, [
     h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
     mobile ? h(MobileMenu, {user, mutateUser}) : h(Container, {}, [
-      h(LoginButtons, {user, mutateUser}),
       h(FeedbackModal),
-      h(Seperator, {style:{alignSelf: "normal"}}),
       h(Link, {href: "/blog"}, h(NavLink, 'blog')),
-      h(Link, {href: '/courses'}, h(CoursesButton, 'courses'))
+      h(LoginButtons, {user, mutateUser}),
+      h(Link, {href: '/courses'}, h('a', {}, h(CoursesButton, 'courses')))
     ]),
   ])
 }
@@ -48,7 +47,7 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
       h(Link, {href: props.user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
       h(NavLink, {style: {justifySelf: 'right'}, onClick: ()=> {setOpen(false)}}, 'close')
     ]),
-    h(Link, {href: '/courses'}, h(CoursesButton, 'courses')),
+    h(Link, {href: '/courses'}, h('a', {}, h(CoursesButton, 'courses'))),
     h(Box, {gap: 16, style: {textAlign: 'right'}}, [
       h(LoginButtons, props),
     ]),
@@ -84,22 +83,18 @@ const Feedback = ()=> {
   let router = useRouter()
   let {data:user}= useUserData()
   let [feedback, setFeedback] = useState('')
-  let [email, setEmail] = useState('')
   let [status, callFeedback] = useApi<FeedbackMsg, FeedbackResult>([feedback])
   let onSubmit = (e:React.FormEvent)=>{
     e.preventDefault()
     if(status==='success') return
-    callFeedback('/api/feedback', {feedback, page: router.pathname, username: user ? user.username : email})
+    callFeedback('/api/feedback', {feedback, page: router.pathname, username: user ? user.username : undefined})
   }
 
   return h(FormBox, {onSubmit, gap: 16}, [
       h('h4', COPY.feedbackTitle),
       status === 'success'
         ? h('div', {style: {textAlign: 'center'}}, COPY.feedbackSuccess)
-        : h(Box, [
-          h(Textarea, {value: feedback, onChange: e=>setFeedback(e.currentTarget.value)}),
-          user ? null : h(Input, {value: email, onChange: e=>setEmail(e.currentTarget.value), placeholder: "Drop your email if you want us to get back to you!"})
-        ]),
+        : h(Textarea, {value: feedback, onChange: e=>setFeedback(e.currentTarget.value)}),
       h(Secondary, {
         type: 'submit',
         success:status==='success',
@@ -121,9 +116,6 @@ color: blue;
 background-color: white;
 border-color: blue;
 padding: 7px 16px;
-&:focus {
-outline: none;
-}
 `
 
 const FullPageOverlay = styled('div')`
@@ -173,3 +165,4 @@ ${Mobile} {
   padding-top: 16px ;
 }
 `
+

@@ -1,14 +1,13 @@
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
 
 import { Box, LabelBox, FormBox} from 'components/Layout'
 import { Input, Textarea, Info } from 'components/Form'
-import { Primary, Destructive} from 'components/Button'
+import { Primary, Destructive } from 'components/Button'
 import { colors } from 'components/Tokens'
 
-import { useUserData } from 'src/data'
+import { useUserData, useProfileData } from 'src/data'
 import { useApi } from 'src/apiHelpers'
 import { UpdatePersonMsg, UpdatePersonResult } from 'pages/api/people/[id]'
 
@@ -24,8 +23,8 @@ const COPY = {
 }
 
 const Settings = () => {
-  let router = useRouter()
   let {data: user, mutate} = useUserData()
+  let {data: profile} = useProfileData(user ? user.username : undefined)
   let [formData, setFormData] = useState({
     bio: '',
     display_name: '',
@@ -36,10 +35,8 @@ const Settings = () => {
   useEffect(()=> {
     if(user) setFormData({bio:user.bio || '', display_name:user.display_name || '', link: user.link || ''})
   }, [user])
-  useEffect(()=> {if(user === false) router.push('/')})
 
-
-  if(!user) return null
+  if(!user || !profile) return null
 
   const changed =
     formData.bio !== user.bio ||

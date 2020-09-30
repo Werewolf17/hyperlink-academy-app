@@ -83,10 +83,11 @@ async function updatePassword(email: string, newPassword: string) {
 }
 let prisma = new PrismaClient()
 
-export const profileDataQuery = (username: string)=>{
+export const profileDataQuery = (username: string, loggedIn: boolean)=>{
   return prisma.people.findOne({
     where: {username: username},
     select: {
+      calendar_id: loggedIn,
       display_name: true,
       bio: true,
       link: true,
@@ -96,8 +97,9 @@ export const profileDataQuery = (username: string)=>{
 
 async function getProfileData(req:Request) {
   let username = req.query.id as string
+  let user = getToken(req)
   if(!username) return {status: 400, result: 'ERROR: no user id provided'} as const
-  let data = await profileDataQuery(username)
+  let data = await profileDataQuery(username, user?.username === username)
   if(!data) return {status: 404, result: `Error: no user with id ${username} found`} as const
   return {status: 200, result: data} as const
 }

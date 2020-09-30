@@ -13,7 +13,8 @@ import { PageLoader } from 'components/Loader'
 import { useUserCohorts, useUserData, useUserCourses } from 'src/data'
 import { Tabs } from 'components/Tabs'
 import Settings from 'components/pages/dashboard/Settings'
-import {Primary} from 'components/Button'
+import {Primary, LinkButton} from 'components/Button'
+import { EnrolledCohort } from 'components/pages/dashboard/EnrolledCohort'
 
 const COPY = {
   coursesHeader: "All Courses",
@@ -40,7 +41,12 @@ const Dashboard = () => {
   }
 
   let completedCohorts = cohorts.course_cohorts.filter(c=> c.completed)
-  let activeCohorts = cohorts.course_cohorts.filter(c=>!c.completed)
+  let activeCohorts = cohorts.course_cohorts
+    .filter(c=>!c.completed)
+    .sort((a, b)=>{
+      if(new Date(a.start_date) < new Date(b.start_date)) return -1
+      return 1
+    })
 
   return h(Box, {gap:64}, [
     h('h1', `Hello ${user.display_name || user.username}!`),
@@ -55,14 +61,21 @@ const Dashboard = () => {
               ]),
             ])
           // if enrolled, show grid of enrolled cohorts
-            : h(FlexGrid, {min: 250, mobileMin:250}, activeCohorts.map(cohort => {
-              let facilitating = cohort.facilitator === (user ? user.id: '')
-              return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
-            })),
-          h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
+            : h(Box, {gap:32}, [
+              h(Link, {href: "/calendar"}, h(LinkButton, {
+                textSecondary: true,
+              }, 'add events to your calendar')),
+              h(Box, {gap: 64},
+                activeCohorts.map(cohort => {
+                  console.log(cohort)
+                  let facilitating = cohort.facilitator === (user ? user.id: '')
+                  return h(EnrolledCohort, {cohort, facilitating})
+                }))
+            ]),
+          h(Box, {padding: 32, style:{backgroundColor: colors.grey95}}, [
             h(Box, {ma: true, style:{textAlign:"center", justifyItems:"center"}}, [
               h('h2', COPY.courseListHeader),
-              h(Link, {href: '/courses'}, h(Primary, COPY.courseListButton))
+              h(Link, {href: '/courses'}, h('a', {}, h(Primary, COPY.courseListButton)))
             ])
           ]),
         ]),

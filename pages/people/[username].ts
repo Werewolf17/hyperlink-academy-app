@@ -38,7 +38,7 @@ const Profile= (props: Extract<Props, {notFound: false}>)=>{
 
 export const getStaticProps = async (ctx:any)=>{
   let username = ctx.params?.username as string
-  let data = await profileDataQuery(username)
+  let data = await profileDataQuery(username, false)
 
   if(!data) return {props: {notFound: true}} as const
 
