@@ -29,7 +29,7 @@ CREATE UNIQUE INDEX people_email_index on people (lower(email));
 
 CREATE TYPE course_status AS ENUM ('draft', 'live');
 CREATE TABLE IF NOT EXISTS courses (
-    id            text NOT NULL UNIQUE PRIMARY KEY,
+    id            text NOT NULL UNIQUE PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name          text NOT NULL,
     status        course_status NOT NULL DEFAULT 'draft',
     category_id   integer NULL,
@@ -96,4 +96,19 @@ CREATE TABLE IF NOT EXISTS course_discounts (
     redeems integer NOT NULL default (0),
     amount integer not null,
     PRIMARY KEY (course, code)
+);
+
+CREATE TABLE IF NOT EXISTS events (
+   id integer GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
+   start_date text NOT NULL,
+   end_date text NOT NULL,
+   name text NOT NULL,
+   location text NOT NULL,
+   description text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cohort_events (
+  cohort integer REFERENCES course_cohorts(id) NOT NULL,
+  event integer REFERENCES events(id) NOT NULL,
+  PRIMARY KEY (cohort, event)
 );

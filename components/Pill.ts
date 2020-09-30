@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import {colors} from './Tokens'
 export const Pill = styled('span')<{borderOnly?: boolean, red?: boolean}>`
+height: min-content;
 width: fit-content;
 font-weight: bold;
 font-family: Roboto Mono;

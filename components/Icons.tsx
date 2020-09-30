@@ -13,3 +13,7 @@ export const Logo = <svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
 </svg>
 
 
+export const Pencil = <svg width="14" height="20" viewBox="0 0 14 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.8598 5.87614L8.12118 3.30232L0.681445 14.7784L0 20L4.42009 17.3522L11.8598 5.87614Z" fill="#595959"/>
+<path d="M14 2.57382L10.2614 0L8.47734 2.75192L12.216 5.32574L14 2.57382Z" fill="#595959"/>
+</svg>

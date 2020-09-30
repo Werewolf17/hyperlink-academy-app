@@ -77,8 +77,8 @@ color: ${colors.grey55};
 `}}
 `
 
-export const LinkButton = styled('a')`
-color: blue;
+export const LinkButton = styled('a')<{textSecondary?: boolean}>`
+color: ${props=>props.textSecondary ? colors.textSecondary : 'blue'};
 text-decoration: underline;
 font-family: 'Roboto Mono', monospace;
 
@@ -99,3 +99,12 @@ export const BackButton:React.FC <{href:string, as?:string, shallow?:boolean}> =
         //capitalize the first letter of the page name
     ])
 }
+
+export const IconButton = styled('button')`
+background-color: inherit;
+border: none;
+padding: 0;
+&:hover {
+cursor: pointer;
+}
+`

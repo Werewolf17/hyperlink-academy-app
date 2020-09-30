@@ -152,8 +152,11 @@ export async function getCategory(path: string){
       "Content-Type": 'application/json; charset=utf-8',
     },
   })
-  let category = await res.json() as Category
-  return category
+  if(res.status === 200){
+    let category = await res.json() as Category
+    return category
+  }
+  else console.log(await res.text())
 }
 
 export const getUsername = async (userId:string):Promise<string | undefined> => {
@@ -200,6 +203,7 @@ export const getTaggedPost = async (c: string | number, tag: string) => {
     },
   })
 
+  if(res.status !== 200) console.log(await res.text())
   let category = await res.json() as Category
   let topicID = category.topic_list.topics.find((topic) => topic.tags.includes(tag))?.id
   if(!topicID) return {text: '', id: ''}

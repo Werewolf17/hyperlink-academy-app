@@ -39,7 +39,7 @@ async function postTopic(req:Request) {
   let topic = await createTopic({
     title: msg.title,
     raw: msg.body,
-    category: category.topic_list.topics[0].category_id,
+    category: category?.topic_list.topics[0].category_id || '',
     tags: msg.tags
   }, user.username)
   if(!topic)  return {status:500, result: "ERROR: Unable to create topic"} as const

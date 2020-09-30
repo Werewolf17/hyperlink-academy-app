@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["atomicNumberOperations"]
 }
 
@@ -34,6 +34,7 @@ model course_cohorts {
   group_id          Int
   courses           courses             @relation(fields: [course], references: [id])
   people            people              @relation(fields: [facilitator], references: [id])
+  cohort_events     cohort_events[]
   people_in_cohorts people_in_cohorts[]
 }
 
@@ -117,6 +118,7 @@ model people {
   username                String                    @unique
   bio                     String?
   link                    String?
+  calendar_id             String                    @default(dbgenerated()) @unique
   admins                  admins[]
   course_cohorts          course_cohorts[]
   course_maintainers      course_maintainers[]
@@ -142,6 +144,25 @@ model people_watching_courses {
   people  people  @relation(fields: [person], references: [id])
 
   @@id([course, person])
+}
+
+model cohort_events {
+  cohort         Int
+  event          Int
+  course_cohorts course_cohorts @relation(fields: [cohort], references: [id])
+  events         events         @relation(fields: [event], references: [id])
+
+  @@id([cohort, event])
+}
+
+model events {
+  id            Int             @default(autoincrement()) @unique
+  start_date    String
+  end_date      String
+  name          String
+  location      String
+  description   String
+  cohort_events cohort_events[]
 }
 
 enum course_status {

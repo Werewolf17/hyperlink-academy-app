@@ -27,7 +27,12 @@ async function getUserCohorts(req:Request) {
       ]
     },
     include:{
-      courses: {select: {name: true, slug: true}},
+      courses: {select: {name: true, slug: true, card_image: true, id: true}},
+      cohort_events: {
+        select: {
+          events: true
+        }
+      },
       people: {
         select: {
           display_name: true,
@@ -46,7 +51,6 @@ async function getUserCohorts(req:Request) {
     }
   })
 
-  await prisma.disconnect()
   return {status: 200, result: {course_cohorts, invited_courses}} as const
 }
 async function getUserCourses(req: Request) {

@@ -15,8 +15,8 @@ export const useUserData = ()=>{
   })
 }
 
-export const useProfileData = (username:string, initialData?:Success<ProfileResult>)=>{
-  return useSWR('/api/people/'+username, async api =>{
+export const useProfileData = (username?:string, initialData?:Success<ProfileResult>)=>{
+  return useSWR(username ? '/api/people/'+username : null, async api =>{
     let res = await callApi<null, ProfileResult>(api)
     if(res.status===200) return res.result
     else return false
@@ -37,7 +37,7 @@ export const useCohortData = (cohort?: number, initialData?:Success<CohortResult
     let res = await callApi<null, CohortResult>(api)
     if(res.status === 200) return res.result
     else return false
-  }, {initialData})
+  }, {initialData, revalidateOnMount: true})
 }
 
 export const useUserCohorts = () => {

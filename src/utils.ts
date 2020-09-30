@@ -9,3 +9,7 @@ export const slugify = (str:string) => {
 }
 
 export const usernameValidate = (s:string) => /^[a-zA-Z0-9_.\-]{3,15}$/.test(s)
+
+export function getTimeBetween(d1: Date, d2:Date) {
+  return ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60)).toFixed(1)
+}
