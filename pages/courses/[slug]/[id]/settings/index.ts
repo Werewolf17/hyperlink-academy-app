@@ -316,7 +316,7 @@ function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
       h(Link, {
         href: '/courses/[slug]/[id]/settings/templates/[templateId]',
         as:`/courses/${props.course.slug}/${props.course.id}/settings/templates/new`
-      }, h(Primary, "+ Add A New Template")),
+      }, h('a', {}, h(Primary, "+ Add A New Template"))),
     ]),
     h(Box, {}, props.course.course_templates
       .sort((a, b)=>  a.name > b.name ? 1 : -1)
@@ -333,7 +333,7 @@ function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
               h(Link, {
                 href: '/courses/[slug]/[id]/settings/templates/[templateId]',
                 as: `/courses/${props.course.slug}/${props.course.id}/settings/templates/${template.name}`
-              }, h(Secondary, 'Edit'))
+              }, h('a', {}, h(Secondary, 'Edit')))
             ])
           ]),
           h(Seperator)
