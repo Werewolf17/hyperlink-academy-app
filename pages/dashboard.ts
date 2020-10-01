@@ -67,7 +67,6 @@ const Dashboard = () => {
               }, 'add events to your calendar')),
               h(Box, {gap: 64},
                 activeCohorts.map(cohort => {
-                  console.log(cohort)
                   let facilitating = cohort.facilitator === (user ? user.id: '')
                   return h(EnrolledCohort, {cohort, facilitating})
                 }))

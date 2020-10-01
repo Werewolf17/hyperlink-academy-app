@@ -18,7 +18,6 @@ export default ()=>{
       let res = await callApi<null, GetDiscountResult>('/api/discounts/'+code)
       if(res.status !== 200) { return setState('not found')}
       let discount  = res.result
-      console.log(discount)
       if(discount.max_redeems !== 0 && discount.max_redeems <= discount.redeems) {
         return setState('used')
       }

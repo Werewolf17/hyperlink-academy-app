@@ -74,8 +74,6 @@ const Event = (props: {
   let end_date = new Date(event.end_date)
   let past = end_date < new Date()
 
-  if(expanded) console.log(props)
-
   let [formState, setFormState] = useState({
     name: event.name,
     location: event.location || '',

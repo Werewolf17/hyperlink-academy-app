@@ -43,6 +43,5 @@ async function postTopic(req:Request) {
     tags: msg.tags
   }, user.username)
   if(!topic)  return {status:500, result: "ERROR: Unable to create topic"} as const
-  console.log(topic)
   return {status:200, result: {topic}} as const
 }

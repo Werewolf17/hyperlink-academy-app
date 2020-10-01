@@ -69,7 +69,6 @@ export const CreateEvent = (props: {cohort:number, mutate: (e:{events:events})=>
 }
 
 export const EventForm = (props:{onChange: (e: Event)=>void, state: Event}) => {
-  console.log(props.state)
   return h(Box, {width: 640, padding: 32, gap: 32, style: {backgroundColor: colors.grey95}}, [
       h(LabelBox, {gap:8}, [
         h('h4', "Event Name"),
