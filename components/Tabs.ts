@@ -55,7 +55,7 @@ grid-template-rows: auto;
 border-bottom: 3px solid;
 `
 
-const VerticalTab = styled('div')<{selected: boolean}>`
+const VerticalTab = styled('a')<{selected: boolean}>`
 padding-left: 12px;
 box-sizing: border-box;
 &:hover {
