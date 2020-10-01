@@ -9,34 +9,62 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
   let calendar = new ICAL.Component(['vcalendar',[],[]])
   calendar.updatePropertyWithValue('prodid', 'hyperlink.academy');
 
-  let user_cohorts= await prisma.people_in_cohorts.findMany({
-    where: {
-      people: {calendar_id: calendar_ID}
-    },
-    select: {
-      course_cohorts: {
-        select: {
-          id: true,
-          courses: {
-            select: {
-              name: true
-            }
-          },
-          cohort_events: {
-            select: {
-              events: true
+  let [user_cohorts, facilitator_cohorts] = await Promise.all([
+    prisma.people_in_cohorts.findMany({
+      where: {
+        people: {calendar_id: calendar_ID}
+      },
+      select: {
+        course_cohorts: {
+          select: {
+            id: true,
+            courses: {
+              select: {
+                name: true
+              }
+            },
+            cohort_events: {
+              select: {
+                events: true
+              }
             }
           }
         }
       }
-    }
-  })
+    }),
+    prisma.course_cohorts.findMany({
+      where:{
+        people:{
+          calendar_id: calendar_ID
+        }
+      },
+      select: {
+        id: true,
+        courses: {
+          select: {
+            name: true
+          }
+        },
+        cohort_events: {
+          select: {
+            events: true
+          }
+        }
+      }
+    })
+  ])
 
-  let events = user_cohorts.flatMap(cohort => {
+  let enrolled_events = user_cohorts.flatMap(cohort => {
     let course = cohort.course_cohorts.courses.name
     let cohort_id = cohort.course_cohorts.id
     return cohort.course_cohorts.cohort_events.map(ev => {return {...ev.events, course, cohort_id}})
   })
+  let facilitating_events = facilitator_cohorts.flatMap(cohort=>{
+    let course = cohort.courses.name
+    let cohort_id = cohort.id
+    return cohort.cohort_events.map(ev => {return {...ev.events, course, cohort_id}})
+  })
+  let events = enrolled_events.concat(facilitating_events)
 
   for(let event of events) {
     let vevent = new ICAL.Component('vevent')
