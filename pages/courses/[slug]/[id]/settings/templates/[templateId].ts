@@ -40,15 +40,21 @@ function TemplateSettings() {
       }
     } else {
       res = await callApi<UpdateTemplateMsg, UpdateTemplateResult>(`/api/courses/${courseId}/templates/${templateId}`, formState)
-      if(res.status === 200 && templates) mutate(templates?.map(t=>{
+      if(res.status === 200 && templates) {
+        if(res.result.name !== templateId) {
+          router.replace(`/courses/[slug]/[id]/settings/templates/[templateId]`,
+                      `/courses/${router.query.slug}/${router.query.id}/settings/templates/${res.result.name}`, {shallow: true})
+        }
+        mutate(templates?.map(t=>{
           if(res.status === 200 && template && t.name===template.name) return res.result
           return t
         }))
+      }
     }
     if(res.status === 200) {
       setStatus('success')
       if(templateId === 'new') router.push(`/courses/[slug]/[id]/settings/templates/[templateId]`,
-                                           `/courses/${router.query.slug}${router.query.id}/settings/templates/${res.result.name}`)
+                                           `/courses/${router.query.slug}/${router.query.id}/settings/templates/${res.result.name}`)
     }
   }
 
