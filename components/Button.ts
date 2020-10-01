@@ -23,12 +23,13 @@ height: fit-content;
 width: fit-content;
 background-color: ${colors.grey15};
 color: white;
+box-sizing: border-box;
 
 border: 2px solid;
 border-color: ${colors.grey15};
 border-radius: 2px;
 
-padding: 6px 14px;
+padding: 8px 16px;
 text-decoration:none;
 &:visited {color: white;}
 &:hover {
@@ -44,8 +45,8 @@ color: ${colors.grey55};
 
 ${props => {
 if(props.success) return `
-background-color: ${colors.grey15};
-border-color: ${colors.accentSuccess};
+background-color: ${colors.accentSuccess};
+border: none;
 `}}
 `
 
