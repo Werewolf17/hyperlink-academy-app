@@ -138,6 +138,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h(Box, {gap: 32}, [
             h(EnrollStatus, {
               courseId: course.id,
+              courseSlug: course.slug,
               draft:course.status==='draft',
               maintainer: isMaintainer,
               inviteOnly:course.invite_only,
@@ -212,6 +213,7 @@ function EnrollStatus (props: {
   enrolled:boolean;
   upcoming:boolean;
   courseId:number;
+  courseSlug:string
 }) {
   if (props.draft) {
     if (props.maintainer) return h('span.accentRed', "Learners can't enroll in this course until you publish it!")
@@ -225,7 +227,7 @@ function EnrollStatus (props: {
 
   if (!props.upcoming) {
     if(props.maintainer) return h('span.accentRed', [
-      "Looks like there aren't any cohorts of this course planned. Create one ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.'
+      "Looks like there aren't any cohorts of this course planned. Create one ", h(Link, {href: "/courses/[slug]/[id]/settings", as: `/courses/${props.courseSlug}/${props.courseId}/settings`}, h('a', 'here')), '.'
     ])
     return h('span.accentRed', "Looks like there aren't any cohorts of this course planned :(")
   }
