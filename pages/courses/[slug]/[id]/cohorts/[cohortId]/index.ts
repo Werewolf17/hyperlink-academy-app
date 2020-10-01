@@ -235,7 +235,7 @@ const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
           h(Primary, {onClick: async e => {
             e.preventDefault()
             setState('loading')
-            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/courses/${props.cohort.courses.id}/cohorts/${props.cohort.id}`, {data:{completed:true}})
+            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data:{completed:true}})
             if(res.status === 200) props.mutate({...props.cohort, completed: res.result.completed})
             setState('complete')
           }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
