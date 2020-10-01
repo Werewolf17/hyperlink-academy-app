@@ -73,8 +73,9 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
     calEvent.description = event.description
     calEvent.summary = event.course + ' - ' + event.name
     calEvent.location = event.location
-    calEvent.startDate = ICAL.Time.fromJSDate(new Date(event.start_date))
-    calEvent.endDate = ICAL.Time.fromJSDate(new Date(event.end_date))
+    console.log(event.start_date)
+    calEvent.startDate = ICAL.Time.fromJSDate(new Date(event.start_date), true)
+    calEvent.endDate = ICAL.Time.fromJSDate(new Date(event.end_date), true)
 
     calendar.addSubcomponent(vevent)
   }

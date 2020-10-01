@@ -31,7 +31,7 @@ declare module "ical.js" {
   }
   class Time {
     static now():Time
-    static fromJSDate(d: Date):Time
+    static fromJSDate(d: Date, useUTC?: boolean):Time
   }
   class Duration {
     constructor(data:Partial<{
