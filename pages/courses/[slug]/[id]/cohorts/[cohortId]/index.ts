@@ -77,7 +77,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
         mutate({...cohort, cohort_events: [...cohort.cohort_events, c]})
       }}) : null,
       h(Box, {gap: 8}, [
-        inCohort || isFacilitator ? h(Link, {href: "/calendar"}, h(LinkButton, {
+        (inCohort || isFacilitator) && cohort.cohort_events.length > 0 ? h(Link, {href: "/calendar"}, h(LinkButton, {
           textSecondary: true,
         }, 'add to your calendar')) : null,
         cohort.cohort_events.length === 0 ? h(WhiteContainer, [
