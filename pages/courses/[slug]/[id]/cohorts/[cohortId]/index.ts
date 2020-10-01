@@ -64,6 +64,13 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
 
   let Tabs = {
+    Artifacts: !props.artifacts ? null : h(Box, {gap: 64}, [
+      h(Box, {gap: 32},[
+        h(Box, [
+          h(Text, {source: props.artifacts?.text})
+        ]),
+      ])
+    ]),
     Schedule: cohort.cohort_events.length === 0 && !isFacilitator ? null : h(Box, {gap: 32}, [
       isFacilitator ? h(CreateEvent, {cohort: cohort.id, mutate: (c)=>{
         if(!cohort) return
@@ -92,7 +99,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
         !props.notes ? null : h(Box, [
           h(Text, {source: props.notes?.text})
         ]),
-      ] )
+      ])
     ]),
     Curriculum: h(Text, {source:props.curriculum?.text}),
     Members: h(Box, {gap:16}, !cohort ? [] : [
