@@ -45,6 +45,7 @@ type Cohort = {
   course: number,
 }
 export const SmallCohortCard = (props: Cohort) => {
+  let started = new Date(props.start_date) < new Date()
   return h(Link, {
     href: "/courses/[slug]/[id]/cohorts/[cohortId]",
     as:`/courses/${props.courses.slug}/${props.course}/cohorts/${props.id}`,
@@ -58,7 +59,7 @@ export const SmallCohortCard = (props: Cohort) => {
           !props.live ? h(Pill, {red: true, borderOnly: true},'draft') : null
         ]): null,
         h('div', [
-          h('h4', `Starts ${prettyDate(props.start_date)}`),
+          h('h4', `${started ? "Started" : "Starts"} ${prettyDate(props.start_date)}`),
           h('p', {style:{color: colors.textSecondary}},
             `Facilitated by ${props.people.display_name || props.people.username}`)
         ])
