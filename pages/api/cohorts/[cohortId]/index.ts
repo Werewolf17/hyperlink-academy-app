@@ -55,15 +55,18 @@ async function updateCohort(req:Request) {
       where: {course: cohort.course},
       select: {people: {select: {email: true, username: true, display_name: true}}}
     })
-    await Promise.all(watchers.map(async watcher => {
+    await sendWatchingNotificationEmail(watchers.map(watcher => {
       if(!cohort) return
-      return sendWatchingNotificationEmail(watcher.people.email, {
-        course_name: cohort.courses.name,
-        cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohortId}`,
-        cohort_start_date: prettyDate(cohort.start_date),
-        name: watcher.people.display_name || watcher.people.username,
-        course_description: cohort.courses.description
-      })
+      return {
+        email: watcher.people.email,
+        vars: {
+          course_name: cohort.courses.name,
+          cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohortId}`,
+          cohort_start_date: prettyDate(cohort.start_date),
+          name: watcher.people.display_name || watcher.people.username,
+          course_description: cohort.courses.description
+        }
+      }
     }))
   }
 

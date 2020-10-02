@@ -42,7 +42,6 @@ async function Signup(req: Request) {
   if(!usernameValidate(msg.username)) return {status: 400, result: "Error: Username must be between 3 and 15 characters, and contain only numbers, letters, dots, dashes, and underscores"}
 
   if(!(await checkUser(msg.email))) {
-    await prisma.disconnect()
     return {status:401, result: "Error: A user exists with that email"} as const
   }
 
@@ -50,7 +49,6 @@ async function Signup(req: Request) {
   let password_hash = await bcrypt.hash(msg.password, salt)
 
   let key = await createActivationKey({email: msg.email.toLowerCase(), username:msg.username, password_hash, newsletter:msg.newsletter})
-  await prisma.disconnect()
 
   let origin = (new URL(req.headers.referer || '')).origin
   let activation_url = `${origin}/signup?verifyEmail=${key}`
@@ -70,7 +68,6 @@ async function VerifyEmail (req: Request) {
   let date = new Date(token.created_time)
 
   if((Date.now() - date.getTime())/(1000 * 60) > 30)  {
-    await prisma.disconnect()
     return {status: 403, result: "Error: activation_key is out of date"}
   }
 
@@ -93,7 +90,6 @@ async function VerifyEmail (req: Request) {
     })
   }
 
-  await prisma.disconnect()
   if(!id) return {status: 403, result: "Error: Couldn't create user. May already exist"}
 
   await syncSSO({

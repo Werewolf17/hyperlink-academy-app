@@ -11,6 +11,7 @@ import { colors } from 'components/Tokens'
 
 type Props = {
   cohort: {
+    live: boolean,
     courses:{
       name: string,
       slug: string,
@@ -45,7 +46,8 @@ export function EnrolledCohort(props: Props) {
       //cohort number
       h(Box, {h: true, gap:16, style:{alignItems: 'center'}}, [
         h('h3.textSecondary', `Cohort #${props.cohort.name}`),
-        props.facilitating ? h(Pill, {borderOnly: true}, 'facilitator') : null
+        props.facilitating ? h(Pill, {borderOnly: true}, 'facilitator') : null,
+        !props.cohort.live ? h(Pill, {red: true, borderOnly: true}, "draft") : null
       ])
     ]),
     !first_event ? null :  h(Container, [

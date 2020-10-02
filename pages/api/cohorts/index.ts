@@ -28,7 +28,6 @@ async function handler (req: Request) {
     }
   }})
   if(!isUserMainter) {
-    await prisma.disconnect()
     return {status: 403, result: "ERROR: user is not maintainer of course"} as const
   }
 

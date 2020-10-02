@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import { useState } from 'react'
+import { useState, ReactElement } from 'react'
 import Link from 'next/link'
 import { InferGetStaticPropsType } from 'next'
 
@@ -34,7 +34,7 @@ import { EnrollButton } from 'components/Course/EnrollButton'
 const COPY = {
   courseForum: "Check out the course forum",
   curriculumTab: "Curriculum",
-  cohortTab: "Past Cohorts",
+  cohortTab: "All Cohorts",
   activeCohorts: "Your Current Cohorts",
   settings: "You can edit course details, create new cohorts, and more.",
   enrollButton: "Enroll in a cohort",
@@ -63,15 +63,6 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       || i.people_in_cohorts
         .find(p => p.people.id === (user ? user.id : undefined)))
   }) || []
-
-  let pastCohorts = course.course_cohorts
-    .filter(c=>c.completed)
-    .map(i=>{
-      if(!user) return i
-      let enrolled = i.people_in_cohorts.find(p => p.people.id === (user ? user.id : undefined))
-      let facilitating = i.facilitator=== user.id
-      return {...i, enrolled, facilitating}
-    })
 
   let enrolled = activeCohorts.filter(i=>i.facilitator !== (user ? user.id : '')).length > 0
   let upcomingCohorts = course.course_cohorts.filter(c=> (new Date(c.start_date) > new Date()) && c.live)
@@ -131,7 +122,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           isMaintainer ? h(COPY.updateCurriculum, {id: props.content.id}) : null,
           h(Text, {source: props.content.text})
         ]),
-        [COPY.cohortTab]:  (pastCohorts.length > 0) ? h(Cohorts,{cohorts: pastCohorts, slug: course.slug}) : null,
+        [COPY.cohortTab]: h(Cohorts,{cohorts: course.course_cohorts, slug: course.slug, user: user ? user.id : '', invited, cohort_max_size: course?.cohort_max_size || 0}),
       }}),
       h(Sidebar, [
         h(Enroll, {course}, [
@@ -243,34 +234,61 @@ function EnrollStatus (props: {
 }
 
 
-const Cohorts = (props:{cohorts: Course['course_cohorts'] & {facilitating?: boolean, enrolled?: boolean}, slug: string}) => {
+const Cohorts = (props:{cohorts: Course['course_cohorts'], user: string, slug: string, cohort_max_size: number}) => {
+  let [pastCohorts, upcomingCohorts] = props.cohorts
+    .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
+    .reduce((acc, cohort)=>{
+      let enrolled = !!cohort.people_in_cohorts.find(p => p.people.id === props.user)
+      let facilitating = cohort.facilitator=== props.user
+      acc[new Date(cohort.start_date)< new Date() ? 0 : 1].push(
+        h(Cohort, {cohort: {...cohort, enrolled, facilitating}, slug: props.slug, cohort_max_size: props.cohort_max_size})
+      )
+      return acc
+    },[[],[]] as Array<Array<ReactElement>>)
+
   return h(Box, {gap:32}, [
-    h('h2', 'Past Cohorts'),
-    ...props.cohorts
-      .filter(i => i.completed)
-      .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
-      .map(cohort => h(Cohort, {cohort, slug: props.slug}))
+    h('h2', "Upcoming Cohorts"),
+    ...upcomingCohorts,
+    h(Seperator),
+    h('h2', 'Ongoing and Past Cohorts'),
+    ...pastCohorts
     ])
 }
 
-const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean},slug:string}) => {
+const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean},slug:string, cohort_max_size: number}) => {
   let id= props.cohort.id
+  let router = useRouter()
+  let past = new Date(props.cohort.start_date) < new Date()
 
-  return h(Box, {gap: 16}, [
-    h(Box, {gap: 8}, [
-      !props.cohort.enrolled && !props.cohort.facilitating ? null : h('div', [
-        props.cohort.enrolled ? h(Pill, 'enrolled') : null,
-        ' ',
-        props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
+  return h(Box, {h: true, style:{gridAutoColumns:'auto'}}, [
+    h(Box, {gap: 16}, [
+      h(Box, {gap: 8}, [
+        !props.cohort.enrolled && !props.cohort.facilitating ? null : h('div', [
+          props.cohort.enrolled ? h(Pill, 'enrolled') : null,
+          ' ',
+          props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
+        ]),
+        h('h3', {}, h(Link, {
+          href:'/courses/[slug]/[id]/cohorts/[cohortId]',
+          as:  `/courses/${props.slug}/${props.cohort.course}/cohorts/${id}`
+        }, h('a', {style: {textDecoration: 'none'}}, `#${props.cohort.name} ${props.cohort.courses.name}`))),
       ]),
-      h('h3', {}, h(Link, {
-        href:'/courses/[slug]/[id]/cohorts/[cohortId]',
-        as:  `/courses/${props.slug}/${props.cohort.course}/cohorts/${id}`
-      }, h('a', {style: {textDecoration: 'none'}}, `#${props.cohort.name} ${props.cohort.courses.name}`))),
+      h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
+        h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
+        h('div', `Facilitated by ${props.cohort.people.display_name}`)
+      ])
     ]),
-    h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
-      h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
-      h('div', `Facilitated by ${props.cohort.people.display_name}`)
+    past || props.cohort.enrolled || props.cohort.facilitating ? null : h(Box, {gap:8, style: {alignItems: 'center', alignSelf: 'end', justifySelf: 'right', textAlign: 'right'}}, [
+      h(EnrollButton, {
+        id: props.cohort.id,
+        course: props.cohort.course,
+        max_size: props.cohort_max_size,
+        learners: props.cohort.people_in_cohorts.length,
+        invited: true,
+      }, 'Enroll'),
+      (props.cohort_max_size !== 0 && props.cohort_max_size  === props.cohort.people_in_cohorts.length) ? null : h(Link, {
+        href: `/courses/${router.query.slug}/${props.cohort.course}/cohorts/${props.cohort.id}`
+      }, h('a', {}, h('b', 'See schedule')))
     ])
   ])
 }
