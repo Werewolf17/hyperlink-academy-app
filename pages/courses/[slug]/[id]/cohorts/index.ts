@@ -190,7 +190,7 @@ export const getStaticProps = async (ctx: any) =>{
         return {...cohort, details}
     }))
 
-    return {props:{cohorts:cohortsWithContent, notFound: false, course, courseId}, unstable_revalidate: 1} as const
+    return {props:{cohorts:cohortsWithContent, notFound: false, course, courseId}, revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {

@@ -42,7 +42,7 @@ export const getStaticProps = async (ctx:any)=>{
 
   if(!data) return {props: {notFound: true}} as const
 
-  return {props: {notFound: false, ...data}, unstable_revalidate:1} as const
+  return {props: {notFound: false, ...data}, revalidate:1} as const
 }
 
 export const getStaticPaths = async ()=>{

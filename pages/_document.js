@@ -1,9 +1,9 @@
-import Document, { Head, Main, NextScript } from 'next/document'
+import Document, {Html, Head, Main, NextScript } from 'next/document'
 
 export default class MyDocument extends Document {
   render () {
     return (
-      <html lang="en">
+      <Html lang="en">
         <Head>
           <link rel="icon" href="/img/favicon.png"/>
           <link rel="canonical" href="https://hyperlink.academy/"/>
@@ -20,7 +20,7 @@ export default class MyDocument extends Document {
         <script data-goatcounter="https://hyperlink.goatcounter.com/count"
       async src="//gc.zgo.at/count.js"></script>
         </body>
-      </html>
+      </Html>
     )
   }
 }

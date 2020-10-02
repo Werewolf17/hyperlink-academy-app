@@ -381,7 +381,7 @@ export const getStaticProps = async (ctx:any) => {
   let data = await courseDataQuery(id)
   if(!data) return {props:{notFound: true}} as const
 
-  return {props: {notFound: false, id, course: data}, unstable_revalidate: 1} as const
+  return {props: {notFound: false, id, course: data}, revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {

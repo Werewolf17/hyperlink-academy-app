@@ -20,5 +20,5 @@ export default function Courses(props:Props) {
 
 export const getStaticProps = async () => {
   let courses = await coursesQuery()
-  return {props: {courses}, unstable_revalidate: 1} as const
+  return {props: {courses}, revalidate: 1} as const
 }

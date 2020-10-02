@@ -348,7 +348,7 @@ export const getStaticProps = async (ctx:any) => {
   if(!data) return {props:{notFound: true}} as const
   let content = await getTaggedPost(data.category_id, 'curriculum')
 
-  return {props: {notFound: false, content, id, course: data}, unstable_revalidate: 1} as const
+  return {props: {notFound: false, content, id, course: data}, revalidate: 1} as const
 }
 
 export const getStaticPaths = async () => {

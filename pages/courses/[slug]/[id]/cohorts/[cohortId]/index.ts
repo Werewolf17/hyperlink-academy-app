@@ -324,7 +324,7 @@ export const getStaticProps = async (ctx:any)=>{
   let notes = await getTaggedPost(cohort.category_id, 'note')
   let artifacts = await getTaggedPost(cohort.category_id, 'artifact')
   let curriculum = await getTaggedPost(cohort.courses.category_id, 'curriculum')
-  return {props: {notFound: false, courseId, cohortId, cohort, course, notes, curriculum, artifacts}, unstable_revalidate: 1} as const
+  return {props: {notFound: false, courseId, cohortId, cohort, course, notes, curriculum, artifacts}, revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
