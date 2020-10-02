@@ -38,7 +38,6 @@ background-color: ${colors.appBackground};
 z-index: 8;
 
 padding-top: 48px;
-margin-top: -48px;
 
 ${Mobile} {
   padding-top: 16px;

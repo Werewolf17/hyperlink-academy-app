@@ -133,38 +133,40 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     h(WelcomeModal, {display:router.query.welcome !== undefined, cohort, user_calendar: profile ? profile.calendar_id : ''}),
     h(Banners, {cohort, mutate, enrolled: !!inCohort, facilitating: isFacilitator}),
     h(Box, {gap: 32}, [
-      h(Box, {gap: 8}, [
-        h(BackButton, {href: "/courses/[slug]/[id]", as: `/courses/${cohort.courses.slug}/${cohort.courses.id}`}, 'Course Details'),
-          h('h1', cohort?.courses.name),
-          h('h2.textSecondary', 'Cohort '+cohort?.name),
-      ]),
       h(TwoColumn, [
-        h('div', {style: {gridColumn: 1}}, Tabs[tabKeys[tab]]),
-      h(Sidebar, {} , [
-        h(StickyWrapper, [
-          h(Box, {gap: 32}, [
-            inCohort || isFacilitator || cohort.completed ? h(Box, {}, [
-              !inCohort && !isFacilitator ? null : h(Box, [
-                h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`}
-                  , h(Primary, 'Go to the forum')),
-                !isFacilitator ? null : h(Link, {
-                  href: "/courses/[slug]/[id]/cohorts/[cohortId]/templates",
-                  as: `/courses/${cohort.courses.slug}/${cohort.courses.id}/cohorts/${cohort.id}/templates`
-                }, h(Secondary, 'Forum Post from Template')),
-                !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {cohort, mutate}) : null,
+        h('div', {style: {gridColumn: 1}}, [
+          h(Box, {gap: 8}, [
+            h(BackButton, {href: "/courses/[slug]/[id]", as: `/courses/${cohort.courses.slug}/${cohort.courses.id}`}, 'Course Details'),
+            h('h1', cohort?.courses.name),
+            h('h2.textSecondary', 'Cohort '+cohort?.name),
+          ]),
+          Tabs[tabKeys[tab]]
+        ]),
+        h(Sidebar, {} , [
+          h(StickyWrapper, [
+            h(Box, {gap: 32}, [
+              inCohort || isFacilitator || cohort.completed ? h(Box, {}, [
+                !inCohort && !isFacilitator ? null : h(Box, [
+                  h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`}
+                    , h(Primary, 'Go to the forum')),
+                  !isFacilitator ? null : h(Link, {
+                    href: "/courses/[slug]/[id]/cohorts/[cohortId]/templates",
+                    as: `/courses/${cohort.courses.slug}/${cohort.courses.id}/cohorts/${cohort.id}/templates`
+                  }, h(Secondary, 'Forum Post from Template')),
+                  !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {cohort, mutate}) : null,
+                ])
+              ]) :  h(Enroll, {course}),
+              h(Box, [
+                h('h3', "Information"),
+                h(VerticalTabs, {
+                  selected: tab,
+                  tabs: tabKeys,
+                  onChange: (t)=>setTab(t)
+                })
               ])
-            ]) :  h(Enroll, {course}),
-            h(Box, [
-              h('h3', "Information"),
-              h(VerticalTabs, {
-                selected: tab,
-                tabs: tabKeys,
-                onChange: (t)=>setTab(t)
-              })
             ])
           ])
         ])
-      ])
       ])
     ])
   ])

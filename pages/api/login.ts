@@ -56,7 +56,6 @@ async function validateLogin(emailOrUsername: string, password: string){
         {username: emailOrUsername.toLowerCase()}
       ]}, include: {admins: true}
     })
-    await prisma.disconnect()
     if(!people[0]) return false
     if(!await bcrypt.compare(password, people[0].password_hash)) return false
     return people[0]

@@ -37,7 +37,6 @@ async function requestResetPassword (req:Request) {
 
   else {
     let key = await createResetKey(msg.email)
-    await prisma.disconnect()
 
     let origin = (new URL(req.headers.referer || '')).origin
     let url = `${origin}/resetPassword?&key=${key}`
@@ -62,7 +61,6 @@ async function resetPassword (req:Request) {
   let hash = hmac(msg.key)
   let resetKey = await getResetKey(hash)
   if(!resetKey) {
-    await prisma.disconnect()
     return {
       status: 403,
       result: "Error: invalid reset key"
@@ -79,7 +77,6 @@ async function resetPassword (req:Request) {
   }
 
   await updatePassword(resetKey.email, msg.password, hash)
-  await prisma.disconnect()
   return {status: 200, result:''}
 }
 
