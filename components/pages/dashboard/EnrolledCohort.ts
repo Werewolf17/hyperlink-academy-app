@@ -63,11 +63,13 @@ export function EnrolledCohort(props: Props) {
             h(DateBox, {date: new Date(first_event.start_date)}),
           ]),
           //event header
-          h(Box, {gap: 4, style: {paddingTop:4, gridTemplateRows: "min-content minmax(1.875rem, 3.75rem) min-content"}}, [
-            h('b.textSecondary',
-              (new Date(first_event.start_date)).toLocaleDateString([], {weekday: 'long'}).toUpperCase() +
-              ` | ` + getTimeBetween(new Date(first_event.start_date), new Date(first_event.end_date)) + 'hrs'),
-            h('h3', {style: {overflow:"hidden"}}, first_event.name),
+          h(Box, {gap: 4, style: {paddingTop:4, alignContent: "space-between"}}, [
+            h('div', [
+              h('b.textSecondary',
+                (new Date(first_event.start_date)).toLocaleDateString([], {weekday: 'long'}).toUpperCase() +
+                ` | ` + getTimeBetween(new Date(first_event.start_date), new Date(first_event.end_date)) + 'hrs'),
+              h('h3', {style: {overflow:"hidden"}}, first_event.name)
+            ]),
             h('a', {href: first_event.location}, h(Secondary, "Join Event"))
           ])
         ]),
