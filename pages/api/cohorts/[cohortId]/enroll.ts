@@ -42,10 +42,16 @@ async function enroll (req: Request) {
         },
         courses: {
           select: {
+            invite_only: true,
             category_id: true,
             cost: true,
             slug: true,
-            name: true
+            name: true,
+            course_invites:{
+              where: {
+                email: user.email
+              }
+            }
           }
         }
       }
@@ -62,6 +68,10 @@ async function enroll (req: Request) {
       discount: msg.discount
     }
   } as const
+
+  if(cohort.courses.invite_only && cohort.courses.course_invites.length === 0){
+    return {status: 401, result: "ERROR: Course is invite_only and user is not invited"} as const
+  }
 
   let origin = (new URL(req.headers.referer || '')).origin
   let price = cohort.courses.cost

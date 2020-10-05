@@ -234,14 +234,14 @@ function EnrollStatus (props: {
 }
 
 
-const Cohorts = (props:{cohorts: Course['course_cohorts'], user: string, slug: string, cohort_max_size: number}) => {
+const Cohorts = (props:{cohorts: Course['course_cohorts'], user: string, slug: string, cohort_max_size: number, invited:boolean}) => {
   let [pastCohorts, upcomingCohorts] = props.cohorts
     .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
     .reduce((acc, cohort)=>{
       let enrolled = !!cohort.people_in_cohorts.find(p => p.people.id === props.user)
       let facilitating = cohort.facilitator=== props.user
       acc[new Date(cohort.start_date)< new Date() ? 0 : 1].push(
-        h(Cohort, {cohort: {...cohort, enrolled, facilitating}, slug: props.slug, cohort_max_size: props.cohort_max_size})
+        h(Cohort, {cohort: {...cohort, enrolled, facilitating}, slug: props.slug, cohort_max_size: props.cohort_max_size, invited: props.invited})
       )
       return acc
     },[[],[]] as Array<Array<ReactElement>>)
@@ -255,7 +255,7 @@ const Cohorts = (props:{cohorts: Course['course_cohorts'], user: string, slug: s
     ])
 }
 
-const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean},slug:string, cohort_max_size: number}) => {
+const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: boolean, enrolled?: boolean},slug:string, cohort_max_size: number, invited: boolean}) => {
   let id= props.cohort.id
   let router = useRouter()
   let past = new Date(props.cohort.start_date) < new Date()
@@ -284,7 +284,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
         course: props.cohort.course,
         max_size: props.cohort_max_size,
         learners: props.cohort.people_in_cohorts.length,
-        invited: true,
+        invited: props.invited,
       }, 'Enroll'),
       (props.cohort_max_size !== 0 && props.cohort_max_size  === props.cohort.people_in_cohorts.length) ? null : h(Link, {
         href: `/courses/${router.query.slug}/${props.cohort.course}/cohorts/${props.cohort.id}`
