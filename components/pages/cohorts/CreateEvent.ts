@@ -43,8 +43,11 @@ export const CreateEvent = (props: {cohort:number, mutate: (e:{events:events})=>
   let onSubmit = (e: React.FormEvent) =>{
     e.preventDefault()
 
-    let start_date = new Date(event.start_date+' '+event.start_time)
-    let end_date = new Date(event.start_date+' '+event.end_time)
+    let d1 = event.start_date.split('-').map(x=>parseInt(x))
+    let t1 = event.start_time.split(':').map(x=>parseInt(x))
+    let t2 = event.end_time.split(':').map(x=>parseInt(x))
+    let start_date = new Date(d1[0], d1[1] -1, d1[2], t1[0], t1[1])
+    let end_date = new Date(d1[0], d1[1] - 1, d1[2], t2[0], t2[1])
 
     callCreateEvent('/api/events', {
       cohort: props.cohort,
