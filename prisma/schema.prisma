@@ -84,6 +84,7 @@ model courses {
   maintainer_group        Int                       @unique
   cohort_max_size         Int                       @default(0)
   card_image              String                    @default("/img/new_course.png")
+  archived                Boolean                   @default(false)
   course_cohorts          course_cohorts[]
   course_discounts        course_discounts[]
   course_invites          course_invites[]
