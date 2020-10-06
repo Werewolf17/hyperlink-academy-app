@@ -104,14 +104,6 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     Curriculum: h(Text, {source:props.curriculum?.text}),
     Members: h(Box, {gap:16}, !cohort ? [] : [
       h('h3', COPY.participants),
-      h(LearnerEntry, [
-        h(Link, {
-          href: '/people/[id]',
-          as: `/people/${cohort.people.username}`
-        }, h('a', {className: 'notBlue'}, cohort.people.display_name || cohort.people.username)),
-        h(Pill, {borderOnly: true}, 'facilitator')
-      ]),
-      h(Seperator),
       ...cohort.people_in_cohorts
                     .map((person)=>{
                       return h(LearnerEntry, [
@@ -119,8 +111,18 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
                           href: '/people/[id]',
                           as: `/people/${person.people.username}`
                         }, h('a', {className: 'notBlue'},person.people.display_name || person.people.username))])
-                    })
-          ])
+                    }),
+      h(Seperator),
+      h(LearnerEntry, [
+        h(Link, {
+          href: '/people/[id]',
+          as: `/people/${cohort.people.username}`
+        }, h('a', {className: 'notBlue'}, cohort.people.display_name || cohort.people.username)),
+        h(Pill, {borderOnly: true}, 'facilitator')
+      ]),
+      isFacilitator ? h(Info, [`💡 You can edit your bio in the profile tab on your `, h(Link, {href: '/dashboard'}, h('a', 'dashboard'))]) : null,
+      h(Text, {source: cohort.people.bio || ''})
+    ])
       } as {[k:string]:React.ReactElement}
   let tabKeys = Object.keys(Tabs).filter(t=>!!Tabs[t])
   return h('div', {}, [
