@@ -21,6 +21,7 @@ ${Tablet} {
 `
 
 const Banner = styled('div')<{red?: boolean}>`
+z-index: 8;
 background-color: ${props => props.red ? colors.backgroundRed: colors.grey95};
 position: relative;
 width: 100vw;

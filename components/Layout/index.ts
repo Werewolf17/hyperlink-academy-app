@@ -93,7 +93,8 @@ color: ${colors.borderColor}
 export const TwoColumn = styled('div')`
 display: grid;
 grid-template-columns: 2fr 1fr;
-grid-gap: 64px;
+grid-column-gap: 64px;
+grid-row-gap: 32px;
 
 ${Tablet} {
 grid-template-columns: auto;

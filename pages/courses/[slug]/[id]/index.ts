@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { InferGetStaticPropsType } from 'next'
 
 import { Box, Seperator, TwoColumn, Sidebar } from 'components/Layout'
-import {Tabs} from 'components/Tabs'
+import {Tabs, StickyWrapper} from 'components/Tabs'
 import { colors } from 'components/Tokens'
 import Loader, { PageLoader } from 'components/Loader'
 import { Info} from 'components/Form'
@@ -125,29 +125,31 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
         [COPY.cohortTab]: h(Cohorts,{cohorts: course.course_cohorts, slug: course.slug, user: user ? user.id : '', invited, cohort_max_size: course?.cohort_max_size || 0}),
       }}),
       h(Sidebar, [
-        h(Enroll, {course}, [
-          h(Box, {gap: 32}, [
-            h(EnrollStatus, {
-              courseId: course.id,
-              courseSlug: course.slug,
-              draft:course.status==='draft',
-              maintainer: isMaintainer,
-              inviteOnly:course.invite_only,
-              invited,
-              loggedIn: !!user,
-              enrolled,
-              upcoming:upcomingCohorts.length !== 0,
-            }),
-            !isMaintainer ? null : h(Seperator),
-            !isMaintainer ? h(WatchCourse, {id: course.id}) : h(Box, [
-              h(Box, {gap:8}, [
-                h('h3', "You maintain this course"),
-                h('p.textSecondary', COPY.settings),
-              ]),
-              h(Link, {href:'/courses/[slug]/[id]/settings', as:`/courses/${course.slug}/${course.id}/settings`}, h(Destructive, 'Edit Course Settings'))
+        h(StickyWrapper, [
+          h(Enroll, {course}, [
+            h(Box, {gap: 32}, [
+              h(EnrollStatus, {
+                courseId: course.id,
+                courseSlug: course.slug,
+                draft:course.status==='draft',
+                maintainer: isMaintainer,
+                inviteOnly:course.invite_only,
+                invited,
+                loggedIn: !!user,
+                enrolled,
+                upcoming:upcomingCohorts.length !== 0,
+              }),
+              !isMaintainer ? null : h(Seperator),
+              !isMaintainer ? h(WatchCourse, {id: course.id}) : h(Box, [
+                h(Box, {gap:8}, [
+                  h('h3', "You maintain this course"),
+                  h('p.textSecondary', COPY.settings),
+                ]),
+                h(Link, {href:'/courses/[slug]/[id]/settings', as:`/courses/${course.slug}/${course.id}/settings`}, h(Destructive, 'Edit Course Settings'))
+              ])
             ])
-          ])
-        ])]),
+          ])]),
+      ])
     ])
   ])
 }

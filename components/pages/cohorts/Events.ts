@@ -65,10 +65,7 @@ const Event = (props: {
   mutateDelete: ()=>void,
 })=>{
   let [editting, setEditing] = useState(false)
-  let [expanded, setExpanded] = useState(false)
-  useEffect(()=>{
-    if(props.first) setExpanded(true)
-  },[props.first])
+  let [expanded, setExpanded] = useState(props.first)
   let event = props.event
   let start_date = new Date(event.start_date)
   let end_date = new Date(event.end_date)
@@ -121,7 +118,7 @@ const Event = (props: {
     })
   }
 
-  return h(EventContainer, {last: props.last, selected: expanded}, [
+  return h(EventContainer, {last: props.last, selected: expanded && event.description !== ''}, [
     h(Dot, {selected: expanded, onClick: ()=>setExpanded(!expanded), past}),
     editting ? h(FormBox, {onSubmit}, [
       h(EventForm, {onChange: setFormState, state:formState}),
@@ -152,7 +149,7 @@ const Event = (props: {
         ]),
         event.location && expanded ? h('a', {href: event.location}, h(Primary,  "Join Event")) : null,
       ]),
-      !expanded ? null
+      !expanded || event.description === '' ? null
         : h('div', {style: {padding: '32px', backgroundColor: 'white', border: 'dotted 1px'}}, h(Text, {source: event.description}))
     ])
   ])

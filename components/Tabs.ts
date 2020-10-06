@@ -35,9 +35,10 @@ export const StickyWrapper = styled('div')`
 position: sticky;
 top: 0px;
 background-color: ${colors.appBackground};
-z-index: 8;
+z-index: 1;
 
-padding-top: 48px;
+margin-top: -32px;
+padding-top: 32px;
 
 ${Mobile} {
   padding-top: 16px;

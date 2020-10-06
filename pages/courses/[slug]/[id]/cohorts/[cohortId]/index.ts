@@ -103,7 +103,6 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     ]),
     Curriculum: h(Text, {source:props.curriculum?.text}),
     Members: h(Box, {gap:16}, !cohort ? [] : [
-      h('h3', COPY.participants),
       ...cohort.people_in_cohorts
                     .map((person)=>{
                       return h(LearnerEntry, [
@@ -142,8 +141,8 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             h('h1', cohort?.courses.name),
             h('h2.textSecondary', 'Cohort '+cohort?.name),
           ]),
-          Tabs[tabKeys[tab]]
         ]),
+        Tabs[tabKeys[tab]],
         h(Sidebar, {} , [
           h(StickyWrapper, [
             h(Box, {gap: 32}, [

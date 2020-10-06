@@ -34,23 +34,20 @@ const Enroll:React.SFC<Props> = (props) => {
     else price = price - (Math.floor((discount.amount/100)*price))
   }
   //Laying out the Enroll Panel
-  return h(StickyWrapper, [
-    //Enroll Details (cost, length, prereqs)
-    h(Box, {gap:16}, [
-      h(Box, {gap:8}, [
-        discount ? h(Cost, {green: true}, '$'+price) : null,
-        h(Cost, {discounted: !!discount}, '$' + props.course?.cost),
+  return h(Box, {gap:16}, [
+    h(Box, {gap:8}, [
+      discount ? h(Cost, {green: true}, '$'+price) : null,
+      h(Cost, {discounted: !!discount}, '$' + props.course?.cost),
+    ]),
+    h(Box, {gap: 8, style:{color: colors.textSecondary}}, [
+      h('b', props.course?.duration),
+      props.course?.cohort_max_size === 0 ? null : h('b', `Up to ${props.course?.cohort_max_size} learners`),
+      h(Box, {gap: 4}, [
+        h('b', 'Prerequisites'),
+        h('p', props.course?.prerequisites)
       ]),
-      h(Box, {gap: 8, style:{color: colors.textSecondary}}, [
-        h('b', props.course?.duration),
-        props.course?.cohort_max_size === 0 ? null : h('b', `Up to ${props.course?.cohort_max_size} learners`),
-        h(Box, {gap: 4}, [
-          h('b', 'Prerequisites'),
-          h('p', props.course?.prerequisites)
-        ]),
-      ]),
-      props.children as ReactElement ,
-    ])
+    ]),
+    props.children as ReactElement ,
   ])
 }
 
