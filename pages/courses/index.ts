@@ -10,7 +10,7 @@ export default function Courses(props:Props) {
   let {data: courses} = useCourses(props)
   return h(Box, {gap: 64}, [
     h('h1', "The Course List"),
-    h(FlexGrid, {min: 328, mobileMin: 200},
+    h(FlexGrid, {min: 400, mobileMin: 200},
       courses?.courses
         .sort((a, b)=>{
           let upcomingCohortA = a.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]

@@ -49,14 +49,12 @@ box-sizing: border-box;
 const Image = styled('img')`
 image-rendering: pixelated;
 image-rendering: crisp-edges;
-height: 100%;
 `
 
 const ImageContainer = styled('div')`
 width: auto;
-height: 272px;
+height: 300px;
 overflow: hidden;
-max-height: 272px;
 object-fit: none;
 border-right: 2px solid;
 ${Mobile} {
@@ -74,8 +72,8 @@ padding: 0px;
 display: grid;
 border: 2px solid;
 border-radius: 2px;
-grid-template-columns: 120px auto;
-max-height: 280px;
+grid-template-columns: 132px auto;
+max-height: 304px;
 ${Mobile} {
 grid-template-columns: auto;
 }
