@@ -121,8 +121,8 @@ const Event = (props: {
     })
   }
 
-  return h(EventContainer, {last: props.last, selected: expanded && event.description !== ''}, [
-    h(Dot, {selected: expanded, onClick: ()=>setExpanded(!expanded), past}),
+  return h(EventContainer, {last: props.last, selected: expanded}, [
+    h(Dot, {selected: expanded, onClick: ()=>setExpanded(event.description === '' ? false : !expanded), past}),
     editting ? h(FormBox, {onSubmit}, [
       h(EventForm, {onChange: setFormState, state:formState}),
       h(Box, {h: true, style:{justifySelf: "right", alignItems: "center"}}, [
