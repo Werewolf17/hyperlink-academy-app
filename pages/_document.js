@@ -7,6 +7,7 @@ export default class MyDocument extends Document {
         <Head>
           <link rel="icon" href="/img/favicon.png"/>
           <link rel="canonical" href="https://hyperlink.academy/"/>
+          <link rel="dns-prefetch" href="//hyperlink-data.nyc3.cdn.digitaloceanspaces.com/"/>
           {this.props.styleTags}
         </Head>
         <body style={{
