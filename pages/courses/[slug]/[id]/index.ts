@@ -227,7 +227,7 @@ function EnrollStatus (props: {
 
   if (props.inviteOnly) {
     if (props.maintainer) return h('span.accentRed', [
-      "Learners need to be invited to enroll. Invite someone ", h(Link, {href: "/courses/[id]/settings", as: `/courses/${props.courseId}/settings`}, h('a', 'here')), '.'])
+      "Learners need to be invited to enroll. Invite someone ", h(Link, {href: `/courses/${props.courseSlug}/${props.courseId}/settings`}, h('a', 'here')), '.'])
     if(props.invited) return h('span.accentSuccess', "You're invited!")
     if(props.loggedIn) return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested!"))
     return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested! If you've been invited, please log in."))

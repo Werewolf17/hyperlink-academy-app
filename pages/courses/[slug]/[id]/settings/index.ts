@@ -186,7 +186,6 @@ invite. The invite allows them enroll in any cohort and does not expire.`)
           h('small.textSecondary', `Invite someone with their username or email. Invitee does not need a Hyperlink account to be invited, but they will need an account to enroll.`),
           h(Input, {
             type: emailOrUsername.includes('@') ? 'email' : 'text',
-            required: true,
             value: emailOrUsername,
             onChange: e=> setEmailOrUsername(e.currentTarget.value)
           }),
