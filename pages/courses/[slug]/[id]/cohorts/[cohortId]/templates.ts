@@ -22,7 +22,7 @@ function CohortTemplatesPages(props:Props) {
 
   if(template) return h(Box, {gap: 64}, [
     h(Box, {gap:16}, [
-      h(BackButton, {href: "", shallow:true}, 'Templates'),
+      h(BackButton, {href: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`, shallow:true}, 'Templates'),
       h('h1', "Post template")
     ]),
     h(TemplatePage, {template})
@@ -33,7 +33,7 @@ function CohortTemplatesPages(props:Props) {
       h(BackButton, {href: "/courses/[slug]/[id]/cohorts/[cohortId]", as: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}`}, 'Cohort Details'),
       h('h1', "Templates"),
       h('p', [
-        `Use templates to easily post new topcs in your cohort forum! You can create new templates in the `,
+        `Use templates to easily post new topics in your cohort forum! You can create new templates in the `,
         h(Link, {href: '/courses/[slug]/[id]/settings', as:`/courses/${router.query.slug}/${router.query.id}/settings`}, h('a', 'course settings')), `.`
       ])
     ]),
@@ -49,7 +49,7 @@ function CohortTemplatesPages(props:Props) {
             ]),
             h(Box, {h: true, style:{justifySelf: 'end', alignItems: 'center'}}, [
               h(Link, {
-                href: '?template='+template.name,
+                href: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`+'?template='+template.name,
                 shallow: true,
               }, h(Secondary, 'Use'))
             ])
@@ -74,6 +74,8 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
   let changed = props.template.title !== formState.title ||
     props.template.content !== formState.content
 
+  console.log(router.query.id)
+
   return h(Fragment, [
     post && status === 'success' ? h(Modal, {display: !!post, onExit: ()=>{setPost(undefined)}}, h(Box, {gap:32},[
       h(Box, {gap:16, style:{textAlign: 'center'}}, [
@@ -83,8 +85,7 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
       h(Box, [
         h('a', {href: 'https://forum.hyperlink.academy/t/'+post}, h(Primary, {style:{width:'100%'}}, "View it here")),
       h(Link, {
-        href: '/courses/[slug]/[id]/cohorts/[cohortId]/templates',
-        as: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`
+        href: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`
       }, h('a', {}, h(Secondary, {style:{width:'100%'}}, 'Back to Templates')))
       ])
     ])) : null,
