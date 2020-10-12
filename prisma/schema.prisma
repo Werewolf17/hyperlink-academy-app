@@ -30,7 +30,7 @@ model course_cohorts {
   course            Int
   category_id       Int                 @unique
   name              String
-  id                Int                 @default(autoincrement()) @id
+  id                Int                 @id @default(autoincrement())
   group_id          Int
   courses           courses             @relation(fields: [course], references: [id])
   people            people              @relation(fields: [facilitator], references: [id])
@@ -80,7 +80,7 @@ model courses {
   invite_only             Boolean                   @default(false)
   status                  course_status             @default(draft)
   slug                    String                    @unique
-  id                      Int                       @default(autoincrement()) @id
+  id                      Int                       @id @default(autoincrement())
   maintainer_group        Int                       @unique
   cohort_max_size         Int                       @default(0)
   card_image              String                    @default("/img/new_course.png")
@@ -119,7 +119,7 @@ model people {
   username                String                    @unique
   bio                     String?
   link                    String?
-  calendar_id             String                    @default(dbgenerated()) @unique
+  calendar_id             String                    @unique @default(dbgenerated())
   admins                  admins[]
   course_cohorts          course_cohorts[]
   course_maintainers      course_maintainers[]
@@ -157,7 +157,7 @@ model cohort_events {
 }
 
 model events {
-  id            Int             @default(autoincrement()) @unique
+  id            Int             @unique @default(autoincrement())
   start_date    String
   end_date      String
   name          String

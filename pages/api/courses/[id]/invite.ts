@@ -17,7 +17,7 @@ async function inviteToCourse(req:Request) {
   let email = msg.email?.toLowerCase() || ''
   let name = ''
   if(msg.username) {
-    let person = await prisma.people.findOne({where: {username: msg.username.toLowerCase()}, select:{email: true, display_name: true}})
+    let person = await prisma.people.findFirst({where: {username: {equals: msg.username, mode: 'insensitive'}}, select:{email: true, display_name: true}})
     if(!person) return {status: 404, result: `no user with username ${msg.username} found`} as const
     email = person.email
     name = person.display_name || ''
