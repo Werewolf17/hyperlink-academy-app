@@ -1,9 +1,10 @@
-import { useState, ReactElement} from 'react'
+import { ReactElement} from 'react'
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 
 import {Box} from './Layout'
 import { Mobile, colors } from './Tokens'
+import { useRouter } from 'next/router'
 
 type Props = {
   tabs: {
@@ -11,23 +12,28 @@ type Props = {
   }
 }
 export const Tabs = (props:Props) => {
+  let router = useRouter()
   let tabs = Object.keys(props.tabs).filter(tab => props.tabs[tab] !== null)
-  let [nav, setNav] = useState(tabs[0])
+  let selectedTab = router.query.tab as string || tabs[0]
 
   return h(Box, {gap: 32}, [
     h(StickyWrapper, [
       h(Nav, tabs.map(tab => h(Tab, {
-        active: nav === tab,
-        onClick: ()=> setNav(tab)
+        active: selectedTab === tab,
+        onClick: ()=> {
+          let route = new URL(window.location.href)
+          route.searchParams.set('tab', tab)
+          router.replace(route, undefined, {shallow: true})
+        }
       }, tab))),
     ]),
-    props.tabs[nav]
+    props.tabs[selectedTab]
   ])
 }
 
-export function VerticalTabs(props:{tabs: string[], selected: number, onChange: (tab: number)=>void}){
-  return h(Box, {}, props.tabs.map((tab, index) => {
-    return h(VerticalTab, {selected: index === props.selected, onClick: ()=>props.onChange(index)}, tab)
+export function VerticalTabs(props:{tabs: string[], selected: string, onChange: (tab: string)=>void}){
+  return h(Box, {}, props.tabs.map((tab) => {
+    return h(VerticalTab, {selected: props.selected === tab, onClick: ()=>props.onChange(tab)}, tab)
   }))
 }
 
