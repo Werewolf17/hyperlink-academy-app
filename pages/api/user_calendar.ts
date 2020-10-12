@@ -8,6 +8,8 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
   let calendar_ID = req.query.id as string
   let calendar = new ICAL.Component(['vcalendar',[],[]])
   calendar.updatePropertyWithValue('prodid', 'hyperlink.academy');
+  calendar.updatePropertyWithValue('name', 'Hyperlink Calendar')
+  calendar.updatePropertyWithValue('x-wr-calname', 'Hyperlink Calendar')
 
   let [user_cohorts, facilitator_cohorts] = await Promise.all([
     prisma.people_in_cohorts.findMany({
