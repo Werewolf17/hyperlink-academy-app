@@ -181,7 +181,7 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
         h(Input, {
           type: 'text',
           value: key,
-          onChange: e=>setKey(e.currentTarget.value)
+          onChange: e=>setKey(e.currentTarget.value.trim())
         })
       ]),
     ]),
