@@ -118,7 +118,7 @@ const createActivationKey = async (person:{email: string, password_hash: string,
 }
 
 const checkUser = async (email:string):Promise<boolean> => {
-  return !(await prisma.people.findOne({where: {email: email.toLowerCase()}}))
+  return !(await prisma.people.findFirst({where: {email: {equals: email, mode: 'insensitive'}}}))
 }
 
 

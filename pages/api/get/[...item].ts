@@ -89,7 +89,11 @@ async function whoami(req:Request) {
 async function checkUsername(req:Request){
   let username = req.query.item[1]
   let headers = {"Cache-Control": 's-maxage=60000, stale-while-revalidate'}
-  return !!await prisma.people.findOne({where:{username: username.toLowerCase()}, select:{username: true}})
+  let people = await prisma.people.findFirst({where:{username: {
+    equals: username,
+    mode: "insensitive",
+  }}, select:{username: true}})
+  return !!people
     ? {status: 200, result: '', headers} as const
     : {status: 404, result: '', headers} as const
 }

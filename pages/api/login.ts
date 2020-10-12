@@ -50,15 +50,15 @@ export default APIHandler(handler)
 
 async function validateLogin(emailOrUsername: string, password: string){
   try {
-    let people = await prisma.people.findMany({
+    let person = await prisma.people.findFirst({
       where:{OR: [
-        {email: emailOrUsername.toLowerCase()},
-        {username: emailOrUsername.toLowerCase()}
+        {email: {equals: emailOrUsername, mode: 'insensitive'}},
+        {username: {equals: emailOrUsername, mode: 'insensitive'}}
       ]}, include: {admins: true}
     })
-    if(!people[0]) return false
-    if(!await bcrypt.compare(password, people[0].password_hash)) return false
-    return people[0]
+    if(!person) return false
+    if(!await bcrypt.compare(password, person.password_hash)) return false
+    return person
   } catch (e) {
     console.log(e)
     return false
