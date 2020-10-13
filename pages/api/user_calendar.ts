@@ -7,6 +7,7 @@ let prisma = new PrismaClient()
 export default async function getUserEvents(req: NextApiRequest, res: NextApiResponse) {
   let calendar_ID = req.query.id as string
   let calendar = new ICAL.Component(['vcalendar',[],[]])
+  calendar.updatePropertyWithValue('version', '2.0');
   calendar.updatePropertyWithValue('prodid', 'hyperlink.academy');
   calendar.updatePropertyWithValue('name', 'Hyperlink Calendar')
   calendar.updatePropertyWithValue('x-wr-calname', 'Hyperlink Calendar')
