@@ -123,6 +123,13 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
           h(Text, {source: props.content.text})
         ]),
         [COPY.cohortTab]: h(Cohorts,{cohorts: course.course_cohorts, slug: course.slug, user: user ? user.id : '', invited, cohort_max_size: course?.cohort_max_size || 0}),
+        Facilitators: h(Box, {gap:32}, course.course_maintainers.map(maintainer=>{
+          return h(Box, {}, [
+            h('h3', maintainer.people.display_name || maintainer.people.username),
+            !maintainer.people.link ? null : h('a', {href: maintainer.people.link}, h('b', maintainer.people.link)),
+            !maintainer.people.bio ? null : h(Box, {width: 640}, h(Text, {source: maintainer.people.bio}))
+          ])
+        }))
       }}),
       h(Sidebar, [
         h(StickyWrapper, [
