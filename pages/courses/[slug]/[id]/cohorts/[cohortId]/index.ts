@@ -50,7 +50,8 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let {data:profile} = useProfileData(user ? user.username : undefined)
   let {data: cohort, mutate} = useCohortData(props.cohortId, props.cohort)
   let {data: course} = useCourseData(props.courseId, props.course)
-  let [tab, setTab] = useState(0)
+  let selectedTab = router.query.tab as string | undefined
+
   useEffect(()=>{
     mutate(undefined, true)
   }, [!!cohort])
@@ -142,7 +143,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             h('h2.textSecondary', 'Cohort '+cohort?.name),
           ]),
         ]),
-        Tabs[tabKeys[tab]],
+        Tabs[selectedTab ? selectedTab : tabKeys[0]],
         h(Sidebar, {} , [
           h(StickyWrapper, [
             h(Box, {gap: 32}, [
@@ -160,9 +161,13 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
               h(Box, [
                 h('h3', "Information"),
                 h(VerticalTabs, {
-                  selected: tab,
+                  selected: selectedTab ? selectedTab : tabKeys[0],
                   tabs: tabKeys,
-                  onChange: (t)=>setTab(t)
+                  onChange: (tab)=>{
+                    let route = new URL(window.location.href)
+                    route.searchParams.set('tab', tab)
+                    router.replace(route, undefined, {shallow: true})
+                  }
                 })
               ])
             ])
