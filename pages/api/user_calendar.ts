@@ -10,8 +10,8 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
   calendar.updatePropertyWithValue('version', '2.0');
   calendar.updatePropertyWithValue('prodid', 'hyperlink.academy');
   calendar.updatePropertyWithValue('method', "PUBLISH")
-  calendar.updatePropertyWithValue('name', 'Hyperlink Calendar')
-  calendar.updatePropertyWithValue('x-wr-calname', 'Hyperlink Calendar')
+  calendar.updatePropertyWithValue('name', 'Personal Hyperlink Calendar')
+  calendar.updatePropertyWithValue('x-wr-calname', 'Personal Hyperlink Calendar')
 
   let [user_cohorts, facilitator_cohorts] = await Promise.all([
     prisma.people_in_cohorts.findMany({
