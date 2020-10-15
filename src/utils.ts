@@ -1,4 +1,11 @@
-export const prettyDate = (str: string) =>  ( new Date(str) ).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
+export const prettyDate = (str: string) =>  {
+  let date = new Date(str)
+  let today = new Date()
+  if(date.getDate()===today.getDate() &&
+    date.getMonth()===today.getMonth() &&
+    date.getFullYear()===today.getFullYear()) return "today"
+  return date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
+}
 
 export const slugify = (str:string) => {
   var specials = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~’]/g
