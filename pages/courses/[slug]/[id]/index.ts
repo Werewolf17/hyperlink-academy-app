@@ -284,7 +284,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
       ]),
       h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
         h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
-        h('div', `Facilitated by ${props.cohort.people.display_name}`)
+        h('div', `Facilitated by ${props.cohort.people.display_name || props.cohort.people.username}`)
       ])
     ]),
     past || props.cohort.enrolled || props.cohort.facilitating ? null : h(Box, {gap:8, style: {alignItems: 'center', alignSelf: 'end', justifySelf: 'right', textAlign: 'right'}}, [
