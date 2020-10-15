@@ -8,7 +8,8 @@ export let CheckBox = styled('label')`
 display: grid;
 align-items: center;
 grid-template-columns: 16px auto;
-grid-gap: 8px;
+grid-gap: 16px;
+
 
 input[type="checkbox"]:focus {
   border: 1px solid;
@@ -24,11 +25,13 @@ input[type="checkbox"] {
   appearance: none;
   position: relative;
   padding: 0;
-  margin: 0;
+  /* margin: 0; */
   height: 16px;
   width: 16px;
   border: 1px solid;
-  border-radius: 2px
+  border-radius: 2px;
+  align-self: first baseline;
+
 }
 input[type="checkbox"]::before {
   position: absolute;

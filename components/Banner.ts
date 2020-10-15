@@ -4,7 +4,15 @@ import { Tablet, Mobile, colors } from './Tokens'
 
 export const TwoColumnBanner:React.SFC<{red?:boolean}> = (props) => {
   return h(Banner, props, [
-    h('div', {style:{maxWidth: 960, padding: 16, margin: 'auto'}}, h(BannerInner, [
+    h('div', {style:{
+      maxWidth: 960, 
+      padding: 32, 
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      marginTop: 'auto',
+      marginBottom: 32
+    }}, 
+    h(BannerInner, [
       props.children as React.ReactElement
     ]))
   ])
