@@ -138,7 +138,7 @@ const Event = (props: {
         h(Box, {gap: 8}, [
           h('p.textSecondary', {style: {color: past ? colors.grey55 : undefined}}, [
           h('b', {style:{fontWeight:"900"}}, start_date.toLocaleDateString([], {weekday: 'short', month: "short", day: "numeric"}).toUpperCase()),
-          ' ' + start_date.toLocaleTimeString([], {hour: "numeric", minute: "2-digit", hour12: true}) +
+          ' ' + start_date.toLocaleTimeString([], {hour: "numeric", minute: "2-digit", hour12: true, timeZoneName: 'short'}) +
           ` | ` + getTimeBetween(start_date, end_date) + ' hrs',
         ]
          ),
