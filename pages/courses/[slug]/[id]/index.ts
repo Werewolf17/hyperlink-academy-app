@@ -2,19 +2,20 @@ import h from 'react-hyperscript'
 import { useState, ReactElement } from 'react'
 import Link from 'next/link'
 import { InferGetStaticPropsType } from 'next'
+import styled from '@emotion/styled'
 
 import { Box, Seperator, TwoColumn, Sidebar } from 'components/Layout'
 import {Tabs, StickyWrapper} from 'components/Tabs'
 import { colors } from 'components/Tokens'
 import Loader, { PageLoader } from 'components/Loader'
-import { Info} from 'components/Form'
+import { Info } from 'components/Form'
 import {Pill} from 'components/Pill'
 import Enroll from 'components/Course/Enroll'
 import Text from 'components/Text'
 import {SmallCohortCard} from 'components/Card'
 import {TwoColumnBanner} from 'components/Banner'
 import {Modal} from 'components/Modal'
-import { Primary, Destructive, Secondary} from 'components/Button'
+import { Primary, Destructive, Secondary, LinkButton} from 'components/Button'
 import {WatchCourse} from 'components/Course/WatchCourse'
 
 import { getTaggedPost } from 'src/discourse'
@@ -30,6 +31,8 @@ import { prettyDate } from 'src/utils'
 import { useRouter } from 'next/router'
 import { useMediaQuery } from 'src/hooks'
 import { EnrollButton } from 'components/Course/EnrollButton'
+import { AccentImg } from 'components/Images'
+import { TodoList } from 'components/TodoList'
 
 const COPY = {
   courseForum: "Check out the course forum",
@@ -80,7 +83,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       h('meta', {property: "og:image", content: course.card_image, key: "image"}),
       h('meta', {property: "twitter:card", content: "summary"})
     ]}),
-    h(Banners, {draft: course.status === 'draft', id: props.id, isMaintainer}),
+    h(Banners, {draft: course.status === 'draft', id: props.id, isMaintainer, slug: course.slug}),
     h(TwoColumn, [
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
@@ -334,27 +337,21 @@ function MarkCourseLive(props: {id:number}) {
     ])
   ])
 
-  return h(Destructive, {onClick: async e => {
+  return h(Primary, {onClick: async e => {
     e.preventDefault()
     setState('confirm')
-  }}, "I'm Ready. Go Live!")
+  }}, "Publish!")
 }
 
 // Feature to edit course detail (length, prereqs, one line description)
-const Banners = (props:{draft: boolean, id: number, isMaintainer: boolean}) => {
+
+
+
+// Define Banners
+const Banners = (props:{draft: boolean, id: number, slug:string, isMaintainer: boolean}) => {
   if(props.draft && props.isMaintainer) {
     if(props.isMaintainer){
-      return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
-        h(Box, {gap:16}, [
-          h('h3', "This course isn't live yet!"),
-          h('p',[
-            `This course is currently hidden from public view. You can make edits and get set
-up. You can read `,
-            h(Link, {href: '/manual/courses'}, h('a', 'this section')),
-            ' in the manual for some tips and help getting started'])
-        ]),
-        h(MarkCourseLive, {id: props.id})
-      ]))
+      return h(TODOBanner, props)
     }
     return h(TwoColumnBanner, {red: true}, h(Box, {gap:16},[
       h(Box, {gap:16}, [
@@ -365,6 +362,53 @@ if you have any feedback!`])
     ]))
   }
   return null
+}
+
+// Draft Course ToDo Banner
+const TODOBanner = (props:{
+  id:number
+  slug:string
+}) => {
+  let [expanded, setExpanded] = useState(false)
+
+  return h(TwoColumnBanner, {red: true}, [
+    h(BannerContent, [
+      h(AccentImg, {height:32, width:36, src:"https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/Seedling.png"}),
+      h(Box, {gap:8}, [
+        h('h4', "This course is still a draft"),
+        h('p', 'It’s hidden from public view. People can’t see this page until you publish it.')
+      ]),
+      ... !expanded ? [] : [
+        h(AccentImg, {height:32, width:36, src:"https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/Bud.png"}),
+        h(Box, {gap:16}, [
+          h('h4', "Before you publish this course make sure that you ...  "),
+          h(TodoList, {
+            persistKey: "course-creation-todo",
+            items: [
+              h("span", [
+                "Edit important details, like description and price, in ", h('a', {href: `https://hyperlink.academy/courses/${props.slug}/${props.id}/settings?tab=Details`}, "course settings"), "."
+              ]),
+              h("span", [
+                "Write a comprehensive curriculum for your course, by editing the ", h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.id}`}, "Curriculum topic"), " in the forum."
+              ]),
+              h("span", [
+                "Create or edit ", h('a', {href: `https://hyperlink.academy/courses/${props.slug}/${props.id}/settings?tab=Templates`}, "templates"), " for reusable forum topics so you don't need to rewrite them for every cohort you run (or you can add these later)."
+              ]),
+              h("span", [
+                "Create your first cohort, in ", h('a', {href: `https://hyperlink.academy/courses/${props.slug}/${props.id}/settings?tab=Cohorts`}, "course settings"), ". It will also be a draft that you need to edit before publishing. We'll guide you through it!"
+              ])
+            ]
+          })
+        ]),
+        h(AccentImg, {height:32, width:36, src:"https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/Flower.png"}),
+        h(Box, {gap:16}, [
+          h('h4', "Once you're ready, you can publish it here!"),
+          h(MarkCourseLive, {id:props.id})
+        ])
+      ]
+    ]),
+    h(LinkButton, {style:{justifySelf: 'right', textDecoration: 'none'}, onClick: ()=>setExpanded(!expanded)}, expanded ? "hide checklist" : "show checklist")
+  ])
 }
 
 export const getStaticProps = async (ctx:any) => {
@@ -385,3 +429,11 @@ export const getStaticPaths = async () => {
     return {params: {id: course.id.toString(), slug: course.slug}}
   }), fallback: true}
 }
+
+
+const BannerContent = styled('div') `
+display: grid; 
+grid-template-columns: min-content auto;
+grid-column-gap: 16px;
+grid-row-gap: 32px;
+`

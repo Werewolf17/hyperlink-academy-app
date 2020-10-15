@@ -12,7 +12,7 @@ import { VerticalTabs, StickyWrapper } from 'components/Tabs'
 import { Pill } from 'components/Pill'
 import { Primary, Destructive, Secondary, BackButton, LinkButton} from 'components/Button'
 import Loader, { PageLoader } from 'components/Loader'
-import { Info } from 'components/Form'
+import { CheckBox, Info, Input } from 'components/Form'
 import { Modal } from 'components/Modal'
 import {TwoColumnBanner} from 'components/Banner'
 import Text from 'components/Text'
@@ -28,6 +28,8 @@ import { courseDataQuery } from 'pages/api/courses/[id]'
 import Head from 'next/head'
 import { CohortEvents } from 'components/pages/cohorts/Events'
 import { CreateEvent } from 'components/pages/cohorts/CreateEvent'
+import { AccentImg } from 'components/Images'
+import { TodoList } from 'components/TodoList'
 
 const COPY = {
   detailsTab: "Details",
@@ -84,7 +86,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
         cohort.cohort_events.length === 0 ? h(WhiteContainer, [
           h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
             h( EmptyImg, {src: '/img/empty.png'}),
-            h('small.textSecondary', "Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
+            h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to thier calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
           ])]) :
             h(CohortEvents, {facilitating: isFacilitator, cohort: cohort.id, events: cohort.cohort_events.map(event => event.events), mutate: (events)=>{
               if(!cohort) return
@@ -195,6 +197,8 @@ grid-template-columns: max-content min-content;
 grid-gap: 16px;
 `
 
+
+// Button to Publish Draft Cohort
 const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
   if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
@@ -214,42 +218,62 @@ const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
             let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data: {live: true}})
             if(res.status === 200) props.mutate({...props.cohort, live: res.result.live})
             setState('complete')
-          }}, state === 'loading' ? h(Loader) : 'Go Live'),
+          }}, state === 'loading' ? h(Loader) : 'Publish!'),
           h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
         ])
       ]),
     ])
   ])
 
-  return h(Destructive, {onClick: async e => {
+  return h(Primary, {onClick: async e => {
     e.preventDefault()
     setState('confirm')
-  }}, 'Go Live!')
+  }}, 'Publish!')
 }
+//End Button to publish cohort
 
+//Modal to complete cohort
 const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
 
   if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
     h(Box, {gap: 32}, [
-      h('h2', "Are you sure?"),
+      h('h2', {style:{textAlign:'center'}}, "Are you sure?"),
       h(Box, {gap: 16}, [
-        'Before closing this course, please check that you’ve done these things!',
-        h(Box.withComponent('ul'), {gap: 16}, [
-          h('li', "Write a retrospective in your cohort forum"),
-          h('li', "Post any artifacts the cohort created in the artifact topic in the course form")
+        'Before closing this course, please...',
+        h(Box, {gap: 16}, [
+          h(CheckBox, [
+            h(Input, {
+              type: 'checkbox',
+            }),
+            h("span", [
+            "Use the ", h(Link, {href: `http://hyperlink.academy/courses/${props.cohort.courses.slug}/${props.cohort.courses.id}/cohorts/${props.cohort.id}/templates?template=Artifact`}, "Artifact template"), " to publicly share any artifacts or final projects produced in the cohort"
+            ]), 
+          ]),
+            h(CheckBox, [
+              h(Input, {
+                type: 'checkbox'
+              }),
+              h("span", [
+              "Use the ", h(Link, {href: `http://hyperlink.academy/courses/${props.cohort.courses.slug}/${props.cohort.courses.id}/cohorts/${props.cohort.id}/templates?template=Retrospective`}, "Retrospective template"), " to post a cohort retro in the forum." 
+              ]),
+            ]),
+          h(Seperator), 
+          h('span', [
+            "You can find more information about artifacts and retros in our ", h(Link, {href: `https://hyperlink.academy/manual/facilitators#facilitating-a-cohort`}, "facilitator guide"), "." 
+          ]),
         ]),
-        h(Box, {gap: 16, style: {textAlign: "right"}}, [
-          h(Primary, {onClick: async e => {
-            e.preventDefault()
-            setState('loading')
-            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data:{completed:true}})
-            if(res.status === 200) props.mutate({...props.cohort, completed: res.result.completed})
-            setState('complete')
-          }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
-          h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
-        ])
       ]),
+      h(Box, {gap: 16, style: {textAlign: "right"}}, [
+        h(Primary, {onClick: async e => {
+          e.preventDefault()
+          setState('loading')
+          let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data:{completed:true}})
+          if(res.status === 200) props.mutate({...props.cohort, completed: res.result.completed})
+          setState('complete')
+        }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
+        h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+      ])
     ])
   ])
 
@@ -258,7 +282,10 @@ const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
     setState('confirm')
   }}, 'Mark as complete')
 }
+//end modal to complete cohorts
 
+
+// Defining Banners (upcoming-facilitator, upcoming-learner, draft)
 const Banners = (props:{
   cohort: Cohort
   mutate: (c:Cohort)=>void
@@ -268,14 +295,7 @@ const Banners = (props:{
   let isStarted = (new Date(props.cohort.start_date)).getTime() - (new Date()).getTime()
   let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`
 
-  if(props.facilitating && !props.cohort.live) return h(TwoColumnBanner, {red: true}, h(Box, {gap:16}, [
-    h(Box, {gap: 8, className: "textSecondary"}, [
-      h('h4', `This cohort isn't live yet!`),
-      h('p', `This cohort is hidden from public view. You can make edits to the cohort forum and the topics within.`),
-      h('p', `When you're ready click the button below to put the cohort live on the site`),
-    ]),
-    h(MarkCohortLive, {cohort:props.cohort, mutate: props.mutate})
-  ]))
+  if(props.facilitating && !props.cohort.live) return h(TODOBanner, props)
 
   if(props.cohort.completed && props.enrolled)  return h(TwoColumnBanner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
@@ -310,6 +330,66 @@ const Banners = (props:{
   }
   return null
 }
+
+const TODOBanner = (props:{
+  cohort:Cohort, 
+  mutate:(c:Cohort)=>void
+}) => {
+  let [expanded, setExpanded] = useState(false)
+
+  return h(TwoColumnBanner, {red: true}, [
+    h(BannerContent, [
+      h(AccentImg, {height:32, width:36, src:"https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/Seedling.png"}),
+      h(Box, {gap:8}, [
+        h('h4', "This cohort is still a draft"),
+        h('p', 'It’s hidden from public view. People can’t join until you publish it.')
+      ]),
+
+      ... !expanded ? [] : [
+        h(AccentImg, {height:32, width:36, src:"https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/Bud.png"}),
+        h(Box, {gap:16}, [
+          h('h4', "Before you publish this cohort make sure that you ...  "),
+          h(TodoList, {
+            persistKey: "cohort-publish-todo",
+            items: [
+              "Add events to your cohort schedule for any live calls or important dates people need to remember.",
+              h("span", [
+                "Fill out ", h(Link, {href: `https://hyperlink.academy/dashboard?tab=Profile`}, "your bio"), " and tell people more about you."
+              ]),
+              h("span", [
+                "Fill out the ", h("a", {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`}, "Notes topic"), " in the forum with  any cohort-specific details. This is visible to everyone, even if they aren't enrolled, so don't put anything private here."
+              ]),
+              h("span", [
+                "Fill out the ", h("a", {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`}, "Getting Started topic"), " in the forum with any first steps learners should take. This will be linked in the welcome email sent to everyone who enrolls."
+              ])
+            ]
+          })
+        ]),
+
+        h(AccentImg, {height:32, width:36, src:"https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/Flower.png"}),
+        h(Box, {gap:16}, [
+          h('h4', "Once you're ready, hit publish and start spreading the word!"),
+          h(MarkCohortLive, {cohort:props.cohort, mutate: props.mutate})
+        ])
+      ]
+    ]),
+
+    h(LinkButton, {style:{justifySelf: 'right', textDecoration: 'none'}, onClick: ()=>setExpanded(!expanded)}, expanded ? "hide checklist" : "show checklist") 
+
+  ])
+
+}
+
+
+const BannerContent = styled('div') `
+display: grid; 
+grid-template-columns: min-content auto;
+grid-column-gap: 16px;
+grid-row-gap: 32px;
+
+`
+
+//End Bannera
 
 export const getStaticProps = async (ctx:any)=>{
   let courseId = parseInt(ctx.params?.id as string || '' )
