@@ -163,7 +163,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
               h(Box, [
                 h('h3', "Information"),
                 h(VerticalTabs, {
-                  selected: selectedTab ? selectedTab : tabKeys[0],
+                  selected: selectedTab && Tabs[selectedTab] ? selectedTab : tabKeys[0],
                   tabs: tabKeys,
                   onChange: (tab)=>{
                     let route = new URL(window.location.href)

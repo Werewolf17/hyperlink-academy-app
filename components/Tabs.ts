@@ -14,7 +14,7 @@ type Props = {
 export const Tabs = (props:Props) => {
   let router = useRouter()
   let tabs = Object.keys(props.tabs).filter(tab => props.tabs[tab] !== null)
-  let selectedTab = router.query.tab as string || tabs[0]
+  let selectedTab = typeof router.query.tab !== 'string' || !props.tabs[router.query.tab] ? tabs[0] : router.query.tab as string
 
   return h(Box, {gap: 32}, [
     h(StickyWrapper, [
