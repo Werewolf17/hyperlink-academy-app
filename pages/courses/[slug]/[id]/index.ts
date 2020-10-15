@@ -256,10 +256,10 @@ const Cohorts = (props:{cohorts: Course['course_cohorts'], user: string, slug: s
     },[[],[]] as Array<Array<ReactElement>>)
 
   return h(Box, {gap:32}, [
-    h('h2', "Upcoming Cohorts"),
+    upcomingCohorts.length === 0 ? null : h('h2', "Upcoming Cohorts"),
     ...upcomingCohorts,
-    h(Seperator),
-    h('h2', 'Ongoing and Past Cohorts'),
+    upcomingCohorts.length === 0 || pastCohorts.length === 0 ? null : h(Seperator),
+    pastCohorts.length === 0 ? null : h('h2', 'Ongoing and Past Cohorts'),
     ...pastCohorts
     ])
 }
