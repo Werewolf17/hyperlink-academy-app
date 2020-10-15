@@ -80,12 +80,19 @@ function CohortSettings(props:{course:Course, mutate: (course:Course)=>void}) {
 
 //feature to add a new cohort to a course
 const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
-  let [newCohort, setNewCohort] = useState({start: '', facilitator: ''})
+  let [newCohort, setNewCohort] = useState({start_date: '', start_time: '', facilitator: ''})
   let [status, callCreateCohort] = useApi<CreateCohortMsg, CreateCohortResponse>([newCohort])
+
+  let timezone = new Date().toLocaleDateString('en-us',{timeZoneName:"short"}).split(', ')[1]
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    let res = await callCreateCohort(`/api/cohorts`, {courseId: props.course.id, ...newCohort})
+
+    let date = newCohort.start_date.split('-').map(x=>parseInt(x))
+    let time = newCohort.start_time.split(':').map(x=>parseInt(x))
+    let start = new Date(date[0], date[1] -1, date[2], time[0], time[1])
+
+    let res = await callCreateCohort(`/api/cohorts`, {courseId: props.course.id, facilitator:newCohort.facilitator, start: start.toISOString()})
     if(res.status === 200) props.mutate({
         ...props.course,
         course_cohorts: [...props.course.course_cohorts, {...res.result, people_in_cohorts:[], courses: {name: props.course.name}}]
@@ -108,21 +115,32 @@ const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
         })||[])
       ])
     ]),
+    h(Box, {h: true, gap: 32}, [
     h(LabelBox, {gap:8}, [
       h('h4', 'Start Date'),
       h(Input, {
         type: 'date',
         required: true,
-        value: newCohort.start,
-        onChange: e => setNewCohort({...newCohort, start: e.currentTarget.value})
+        value: newCohort.start_date,
+        onChange: e => setNewCohort({...newCohort, start_date: e.currentTarget.value})
       })
+    ]),
+    h(LabelBox, {gap:8}, [
+      h('h4', `Start time (${timezone})`),
+      h(Input, {
+        type: 'time',
+        required: true,
+        value: newCohort.start_time,
+        onChange: e => setNewCohort({...newCohort, start_time: e.currentTarget.value})
+      })
+    ]),
     ]),
     h(Primary, {
       style: {justifySelf: 'right'},
       status,
       type: 'submit',
       success: status === 'success',
-      disabled: !newCohort.start || !newCohort.facilitator
+      disabled: !newCohort.start_date || !newCohort.facilitator
     }, 'Add a new Cohort'),
   ])
 }
