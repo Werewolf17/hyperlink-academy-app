@@ -40,38 +40,37 @@ async function handler (req: Request) {
       name: true,
       status: true,
       course_templates: true,
+      course_groupTodiscourse_groups: true,
+      maintainer_groupTodiscourse_groups: true,
       course_cohorts: {
-        select: {id: true}
+        select: {discourse_groups: true}
       }
     },
   })
   if(!course) return {status: 400, result: "ERROR: no course found with that id"} as const
 
-  let id = course.slug + '-' + course.course_cohorts.length
+  let groupName = course.slug + '-' + course.course_cohorts.length
   let admin = await getUsername(msg.facilitator)
   if(!admin) return {status: 404, result: "ERROR: no user found with id: " + msg.facilitator} as const
   let group = await createGroup({
-    name: id, visibility_level:2,
+    name: groupName, visibility_level:2,
     owner_usernames: admin,
     mentionable_level: 3,
     messageable_level: 3
   })
   if(!group) return {status:500, result: "ERRO: unable to create group"} as const
 
-  // If the course is in draft status it's category will be private so we need
-  // to explicitly add the cohort group
-  if(course.status === 'draft') {
-    await updateCategory(course.category_id, {name: course.name, permissions: {
-      // Make sure to keep any existing cohorts as well
-      ...course.course_cohorts.reduce((acc, cohort) => {
-        acc[cohort.id] = 1
-        return acc
-      }, {} as {[i:string]:number}),
-      [id]: 1,
-      [course.slug + '-m']: 1
-    }})
-  }
-  let category = await createCategory(id, {permissions: {[id]:1}, parent_category_id: course.category_id})
+  await updateCategory(course.category_id, {name: course.name, permissions: {
+    // Make sure to keep any existing cohorts as well
+    ...course.course_cohorts.reduce((acc, cohort) => {
+      acc[cohort.discourse_groups.id] = 1
+      return acc
+    }, {} as {[i:string]:number}),
+    [groupName]: 1,
+    [course.maintainer_groupTodiscourse_groups.name]: 1,
+    [course.course_groupTodiscourse_groups.name]: 1
+  }})
+  let category = await createCategory(groupName, {permissions: {[groupName]:1}, parent_category_id: course.category_id})
   if(!category) return {status: 500, result: "ERROR: Could not create cohort category"} as const
 
   await Promise.all(course.course_templates.map( async template => {
@@ -80,7 +79,7 @@ async function handler (req: Request) {
       if(template.name === 'Notes') {
         return updateTopic(category.topic_url, {
           category_id: category.id,
-          title: id + " Notes",
+          title: groupName + " Notes",
           raw: template.content,
           tags: ['note']
         }, admin)
@@ -103,7 +102,12 @@ async function handler (req: Request) {
     data: {
       name: course.course_cohorts.length.toString(),
       category_id: category.id,
-      group_id: group.basic_group.id,
+      discourse_groups:{
+        create:{
+          id: group.basic_group.id,
+          name: groupName
+        }
+      },
       start_date: msg.start,
       courses: {
         connect: {

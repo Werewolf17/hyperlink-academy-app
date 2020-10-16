@@ -35,7 +35,6 @@ import { AccentImg } from 'components/Images'
 import { TodoList } from 'components/TodoList'
 
 const COPY = {
-  courseForum: "Check out the course forum",
   curriculumTab: "Curriculum",
   cohortTab: "All Cohorts",
   activeCohorts: "Your Current Cohorts",
@@ -73,7 +72,6 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course.id )
 
-  let forum = `https://forum.hyperlink.academy/${user ? 'session/sso?return_path=/':''}c/${course.category_id}`
 
   //Setting up the layout for the course page
   return h('div', [
@@ -88,7 +86,6 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       h(Box, {gap: 32}, [
         h(Box, {gap: 16}, [
           h('h1', course?.name),
-          h('span', {style:{color: 'blue'}}, [h('a.mono',{href:forum},  COPY.courseForum), ' ➭'])
         ]),
         h('p.big', course?.description || ''),
 
@@ -239,8 +236,8 @@ function EnrollStatus (props: {
     if (props.maintainer) return h('span.accentRed', [
       "Learners need to be invited to enroll. Invite someone ", h(Link, {href: `/courses/${props.courseSlug}/${props.courseId}/settings`}, h('a', 'here')), '.'])
     if(props.invited) return h('span.accentSuccess', "You're invited!")
-    if(props.loggedIn) return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested!"))
-    return h('div', {}, h('span.accentRed', "This course is invite only. Reach out on the forum if you're interested! If you've been invited, please log in."))
+    if(props.loggedIn) return h('div', {}, h('span.accentRed', "This course is invite only. Reach out to the facilitators if you're interested!"))
+    return h('div', {}, h('span.accentRed', "This course is invite only. If you've been invited, please log in."))
   }
   return null
 }

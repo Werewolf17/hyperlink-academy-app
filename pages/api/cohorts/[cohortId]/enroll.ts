@@ -37,11 +37,13 @@ async function enroll (req: Request) {
     await prisma.course_cohorts.findOne({
       where: {id: cohortId},
       include: {
+        discourse_groups: true,
         people: {
           select:{email: true}
         },
         courses: {
           select: {
+            course_groupTodiscourse_groups: true,
             invite_only: true,
             category_id: true,
             cost: true,
@@ -86,7 +88,8 @@ async function enroll (req: Request) {
         people: {connect: {id: user.id}},
         course_cohorts: {connect: {id: cohortId}}
       }}),
-      addMember(cohort.group_id, user.username),
+      addMember(cohort.discourse_groups.id, user.username),
+      addMember(cohort.courses.course_groupTodiscourse_groups.id, user.username),
       sendCohortEnrollmentEmail(user.email, {
         name: user.display_name || user.username,
         course_start_date: cohort.start_date,

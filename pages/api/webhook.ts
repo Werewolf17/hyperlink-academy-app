@@ -45,9 +45,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       prisma.course_cohorts.findOne({
         where: {id: cohortId},
         include: {
+          discourse_groups: true,
           people: {select:{email:true}},
           courses: {
             select: {
+              course_groupTodiscourse_groups: true,
               category_id: true,
               slug: true,
               name: true
@@ -86,7 +88,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         course_discounts: discount ? {connect:{code: discount.code}} : undefined
       }}),
 
-      addMember(cohort.group_id, username),
+      addMember(cohort.discourse_groups.id, username),
+      addMember(cohort.courses.course_groupTodiscourse_groups.id, username),
       sendCohortEnrollmentEmail(person.email, {
         name: person.display_name || person.username,
         course_start_date: prettyDate(cohort.start_date),
