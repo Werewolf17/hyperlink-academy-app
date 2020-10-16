@@ -33,11 +33,12 @@ async function updateCourse(req: Request) {
       status: true,
       name: true,
       category_id: true,
-      maintainer_group: true,
+      maintainer_groupTodiscourse_groups: true,
+      course_groupTodiscourse_groups: true,
       course_maintainers: {where: {maintainer: user.id}},
       course_cohorts: {
         select: {
-          group_id: true,
+          discourse_groups: true,
           name: true,
         }
       }
@@ -59,14 +60,13 @@ async function updateCourse(req: Request) {
   if(msg.name) {
     slug = slugify(msg.name)
     await Promise.all([
-      updateGroup(course.maintainer_group, slug+'-m'),
+      updateGroup(course.maintainer_groupTodiscourse_groups.name, slug+'-m'),
       updateCategory(course.category_id, {
         name: msg.name,
         slug: slug
       }),
-      course.course_cohorts.map(cohort => {
-        updateGroup(cohort.group_id, slug+'-'+cohort.name)
-      })
+      updateGroup(course.course_groupTodiscourse_groups.name, slug),
+      ...course.course_cohorts.map(cohort => updateGroup(cohort.discourse_groups.name, slug+'-'+cohort.name))
     ])
   }
 

@@ -62,18 +62,27 @@ async function createCourse(req: Request) {
 
   let slug = slugify(msg.name)
 
-  let groupName = slug +'-m'
-  let group = await createGroup({
-    name: groupName,
-    visibility_level: 2,
-    owner_usernames: maintainers.map(m=>m.username),
-    messageable_level: 3,
-    mentionable_level: 3
-  })
-  if(!group) return {status: 500, result: "ERROR: couldn't create course maintainers group"} as const
+  let maintainerGroupName = slug +'-m'
+  let [maintainerGroup, courseGroup] = await Promise.all([
+    createGroup({
+      name: maintainerGroupName,
+      visibility_level: 2,
+      owner_usernames: maintainers.map(m=>m.username),
+      messageable_level: 3,
+      mentionable_level: 3
+    }),
+    createGroup({
+      name: slug,
+      visibility_level: 2,
+      owner_usernames: maintainers.map(m=>m.username),
+      messageable_level: 3,
+      mentionable_level: 3
+    })
+  ])
+  if(!maintainerGroup || !courseGroup) return {status: 500, result: "ERROR: couldn't create course maintainers group"} as const
 
   let category = await createCategory(msg.name, {
-    slug, permissions: {[groupName]:1},
+    slug, permissions: {[maintainerGroupName]:1},
     show_subcategory_list: true,
     subcategory_list_style: "rows_with_featured_topics",
     default_list_filter: "none"
@@ -88,7 +97,18 @@ async function createCourse(req: Request) {
 
   await prisma.courses.create({
     data: {
-      maintainer_group: group.basic_group.id,
+      maintainer_groupTodiscourse_groups: {
+        create:{
+          id: maintainerGroup.basic_group.id,
+          name: maintainerGroupName,
+        }
+      },
+      course_groupTodiscourse_groups: {
+        create:{
+          id: courseGroup.basic_group.id,
+          name: slug
+        }
+      },
       category_id: category.id,
       slug: slugify(msg.name),
       name: msg.name,

@@ -132,8 +132,8 @@ export const createCategory = async (name: string, options?: {
   return false as const
 }
 
-export async function updateGroup(id: number, newName: string) {
-  let result = await fetchWithBackoff(`https://forum.hyperlink.academy/g/${id}.json`, {
+export async function updateGroup(name: string, newName: string) {
+  let result = await fetchWithBackoff(`https://forum.hyperlink.academy/g/${name}.json`, {
     method: "PUT",
     headers: {
       ...headers,
