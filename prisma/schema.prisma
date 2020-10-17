@@ -85,6 +85,7 @@ model courses {
   cohort_max_size                    Int                       @default(0)
   card_image                         String                    @default("/img/new_course.png")
   archived                           Boolean                   @default(false)
+  type                               course_types              @default(course)
   course_group                       Int
   maintainer_group                   Int
   course_groupTodiscourse_groups     discourse_groups          @relation("courses_course_groupTodiscourse_groups", fields: [course_group], references: [id])
@@ -191,4 +192,9 @@ enum discount_types {
 enum template_types {
   prepopulated
   triggered
+}
+
+enum course_types {
+  club
+  course
 }
