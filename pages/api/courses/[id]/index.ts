@@ -49,10 +49,6 @@ async function updateCourse(req: Request) {
     result: `ERROR: user is not maintainer of course ${courseId}`
   } as const
 
-  if(course.status === 'draft' && msg.status === 'live') {
-    if(!await updateCategory(course.category_id, {permissions: {everyone: 1}, name: course.name})) return {status:500, result: "ERROR: unable to update course category"} as const
-  }
-
   if(msg.description && msg.description.length > 200) return {status: 400, result: "ERROR: description must be less than 200 characters"} as const
   if(msg.name && msg.name.length > 50) return {status: 400, result: "ERROR: name must be less than 50 characters"} as const
 
