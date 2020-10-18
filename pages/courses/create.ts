@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import {  Input, Error, Info, Textarea, CheckBox} from 'components/Form'
 import { Primary } from 'components/Button'
-import { LabelBox, FormBox } from 'components/Layout'
+import { LabelBox, FormBox, Box } from 'components/Layout'
 
 import { useApi } from 'src/apiHelpers'
 import { useUserData } from 'src/data'
@@ -34,29 +34,45 @@ const CreateCourse = ()=> {
   }
 
   return h('div', [
-    h('h1', 'Create a new course'),
+    h('h1', 'Create a New Course'),
     status === 'error' ? h(Error, 'An error occured') : null,
     status === 'success' ? h(Info, 'Course created!') : null,
     h(FormBox, {onSubmit}, [
-      h(LabelBox, {gap:8}, [
-        h('h4', 'name'),
+      h(CheckBox, {style:{marginTop: '16px'}}, [
         h(Input, {
-          required: true,
-          type: 'text',
-          value: formData.name,
-          onChange: e=> setFormData({...formData, name: e.currentTarget.value})
-        })
+          type: 'checkbox',
+          checked: formData.type === 'club',
+          onChange: e=> setFormData({...formData, type: e.currentTarget.checked ? 'club' : 'course'})
+        }),
+        h('h4', 'Club? '),
       ]),
       h(LabelBox, {gap:8}, [
-        h('h4', 'description'),
-        h(Textarea, {
-          required: true,
-          value: formData.description,
-          onChange: e=> setFormData({...formData, description: e.currentTarget.value})
-        })
+        h('h4', 'Name'),
+        h(Box, {gap: 4}, [
+          h(Input, {
+            required: true,
+            type: 'text',
+            maxLength: 50,
+            value: formData.name,
+            onChange: e => setFormData({...formData, name: e.currentTarget.value})
+          }),
+          h('small.textSecondary', {style:{justifySelf: 'right'}}, `${formData.name.length}/50`)
+        ])
       ]),
       h(LabelBox, {gap:8}, [
-        h('h4', 'duration'),
+        h('h4', 'Description'),
+        h(Box, {gap: 4}, [
+          h(Textarea, {
+            required: true,
+            maxLength: 200,
+            value: formData.description,
+            onChange: e => setFormData({...formData, description: e.currentTarget.value})
+          }),
+          h('small.textSecondary', {style:{justifySelf: 'right'}}, `${formData.description.length}/200`)
+        ])
+      ]),
+      h(LabelBox, {gap:8}, [
+        h('h4', 'Duration'),
         h(Input, {
           type: 'text',
           value: formData.duration,
@@ -64,14 +80,14 @@ const CreateCourse = ()=> {
         })
       ]),
       h(LabelBox, {gap:8}, [
-        h('h4', 'prerequisites'),
+        h('h4', 'Prerequisites'),
         h(Textarea, {
           value: formData.prerequisites,
           onChange: e=> setFormData({...formData, prerequisites: e.currentTarget.value})
         })
       ]),
       h(LabelBox, {gap:8}, [
-        h('h4', 'cost'),
+        h('h4', 'Cost (USD)'),
         h(Input, {
           required: true,
           type: 'number',
@@ -82,7 +98,7 @@ const CreateCourse = ()=> {
         })
       ]),
       h(LabelBox, {gap:8}, [
-        h('h4', 'maintainers'),
+        h('h4', 'Maintainers'),
         h(Input, {
           required: true,
           type: 'email',
@@ -90,15 +106,7 @@ const CreateCourse = ()=> {
           onChange: e=> setFormData({...formData, maintainers: e.currentTarget.value.split(',')})
         })
       ]),
-      h(CheckBox, [
-        h(Input, {
-          type: 'checkbox',
-          checked: formData.type === 'club',
-          onChange: e=> setFormData({...formData, type: e.currentTarget.checked ? 'club' : 'course'})
-        }),
-        h('h4', 'Club? '),
-      ]),
-      h(Primary, {status, type: 'submit'}, 'submit')
+      h(Primary, {status, type: 'submit'}, 'Submit')
     ])
   ])
 }
