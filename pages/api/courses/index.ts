@@ -33,7 +33,7 @@ export type CreateCourseResponse = ResultType<typeof createCourse>
 export default APIHandler({POST: createCourse, GET: getCourses})
 
 export const coursesQuery = () => prisma.courses.findMany({
-  where: {status: "live", archived: false, type: "course"},
+  where: {status: "live", archived: false},
   include: {
     course_cohorts: {
       where: {AND: [{live:true}, {start_date: {gt: (new Date()).toISOString()}}]},
