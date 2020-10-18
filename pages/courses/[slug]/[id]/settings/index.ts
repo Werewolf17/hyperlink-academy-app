@@ -21,6 +21,8 @@ import { CreateCohortMsg, CreateCohortResponse } from 'pages/api/cohorts'
 import { InviteToCourseMsg, InviteToCourseResponse } from 'pages/api/courses/[id]/invite'
 import { Modal } from 'components/Modal'
 import { DeleteTemplateResult } from 'pages/api/courses/[id]/templates/[templateId]'
+import { ClubSettings } from 'components/pages/courses/ClubSettings'
+import { getTaggedPost } from 'src/discourse'
 
 const COPY = {
   cancelCohort: h('p.textSecondary', [
@@ -44,6 +46,7 @@ function CourseSettings(props:Extract<Props, {notFound:false}>){
   }, [user, course])
   if(!course || !user) return h(PageLoader)
 
+  if(course.type === 'club') return h(ClubSettings, {course, curriculum: props.content})
 
   return h(Box, {gap:64, width: 640}, [
     h(Box, {gap: 16}, [
@@ -397,8 +400,9 @@ export const getStaticProps = async (ctx:any) => {
 
   let data = await courseDataQuery(id)
   if(!data) return {props:{notFound: true}} as const
+  let content = await getTaggedPost(data.category_id, 'curriculum')
 
-  return {props: {notFound: false, id, course: data}, revalidate: 1} as const
+  return {props: {notFound: false, id, course: data, content}, revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {

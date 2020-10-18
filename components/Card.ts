@@ -74,7 +74,7 @@ export const ClubCard = (props: {
   cohort?: {start_date: string, id: number}}) => {
   let started = props.cohort ? (new Date(props.cohort.start_date) < new Date()) : undefined
   return h(Link, {
-    href: `/courses/${props.course.slug}/${props.course.id}`+ (props.cohort ? `/cohorts/${props.cohort?.id}` : ''),
+    href: `/courses/${props.course.slug}/${props.course.id}`+ (props.cohort ? `/cohorts/${props.cohort?.id}` : '/settings'),
     passHref: true
   }, [
     h(ClubCardContainer, [
@@ -99,7 +99,7 @@ grid-gap: 16px;
 padding: 16px;
 `
 
-const ClubCardContainer = styled('div')`
+const ClubCardContainer = styled('a')`
 max-width: 320px;
 height: 352px;
 background-color: white;

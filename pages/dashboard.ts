@@ -47,6 +47,10 @@ const Dashboard = () => {
       if(new Date(a.start_date) < new Date(b.start_date)) return -1
       return 1
     })
+  let [clubs, courses] = userCourses.maintaining_courses.reduce((acc, c)=> {
+    acc[c.type === 'club' ? 0 : 1].push(c)
+    return acc
+  }, [[],[]] as Array<typeof userCourses.maintaining_courses>)
 
   return h(Box, {gap:64}, [
     h('h1', `Hello ${user.display_name || user.username}!`),
@@ -84,12 +88,16 @@ const Dashboard = () => {
               return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
             }))
         ]),
-        Maintaining: userCourses.maintaining_courses.length === 0 ? null : h(Box, {}, [
-          h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.filter(c=>c.type==='course').map(course=>{
-              return h(CourseCard, course)
-            })),
-          h(FlexGrid, {min: 300, mobileMin: 200}, userCourses.maintaining_courses.filter(c=>c.type==='club').map(course=> h(ClubCard, {course})))
+        Maintaining: userCourses.maintaining_courses.length === 0 ? null : h(Box, {gap: 32}, [
+          h(Box, [
+            courses.length > 0 ? h('h2', "Courses") : null,
+            h(FlexGrid, {min: 328, mobileMin: 200}, courses.map(course=>h(CourseCard, course))),
           ]),
+          h(Box, [
+            clubs.length > 0 ? h('h2', "Clubs") : null,
+            h(FlexGrid, {min: 290, mobileMin: 290}, clubs.map(course=> h(ClubCard, {course})))
+          ])
+        ]),
         Profile: h(Settings)
       }}),
   ])

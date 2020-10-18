@@ -33,7 +33,6 @@ import { useMediaQuery } from 'src/hooks'
 import { EnrollButton } from 'components/Course/EnrollButton'
 import { AccentImg } from 'components/Images'
 import { TodoList } from 'components/TodoList'
-import { ClubSettings } from 'components/pages/courses/ClubSettings'
 
 const COPY = {
   curriculumTab: "Curriculum",
@@ -72,8 +71,6 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
 
   let isMaintainer = !!(course?.course_maintainers.find(maintainer => user && maintainer.maintainer === user.id))
   let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course.id )
-
-  if(course.type === 'club') return h(ClubSettings, {course, curriculum: props.content})
 
   //Setting up the layout for the course page
   return h('div', [
