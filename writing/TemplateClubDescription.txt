@@ -1,0 +1,26 @@
+This is a template for including details about this club.
+
+Please edit this topic to include most or all of the elements listed below!
+
+Note that the following will be included on the club details page, and don't have to be added here:
+
+- Title (max 50 characters)
+- Short description (max 200 characters)
+- Cost
+- Requirements (short prerequisites)
+
+## Learning Goals
+
+Replace with: a brief overview of what material the Club will cover, and its overall learning goals. Are there specific outcomes you're aiming for? Any concrete artifacts expected? Questions you're exploring?
+
+## Structure
+
+Replace with: summary of how many sessions, how often you meet, estimate of time required, etc. You don't need a detailed schedule — you'll create an "event" for each meeting.
+
+## Who Should Sign Up
+
+Replace with: description of the ideal participant — who would get the most out of this Club? Who is it *not* for?
+
+## Anything Else…
+
+Replace with: anything else that you think is essential for participants to know! Feel free to rename this section, remove, or add additional ones as needed.

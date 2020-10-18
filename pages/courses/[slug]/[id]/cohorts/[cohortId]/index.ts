@@ -9,7 +9,6 @@ import { InferGetStaticPropsType } from 'next'
 import Enroll from 'components/Course/Enroll'
 import { TwoColumn, Box, Seperator, Sidebar, WhiteContainer} from 'components/Layout'
 import { VerticalTabs, StickyWrapper } from 'components/Tabs'
-import { Pill } from 'components/Pill'
 import { Primary, Destructive, Secondary, BackButton, LinkButton} from 'components/Button'
 import Loader, { PageLoader } from 'components/Loader'
 import { CheckBox, Info, Input } from 'components/Form'
@@ -27,6 +26,7 @@ import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/ap
 import { courseDataQuery } from 'pages/api/courses/[id]'
 import Head from 'next/head'
 import { CohortEvents } from 'components/pages/cohorts/Events'
+import { ClubPage } from 'components/pages/cohorts/ClubPage'
 import { CreateEvent } from 'components/pages/cohorts/CreateEvent'
 import { AccentImg } from 'components/Images'
 import { TodoList } from 'components/TodoList'
@@ -105,28 +105,10 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
       ])
     ]),
     Curriculum: h(Text, {source:props.curriculum?.text}),
-    Members: h(Box, {gap:16}, !cohort ? [] : [
-      ...cohort.people_in_cohorts
-                    .map((person)=>{
-                      return h(LearnerEntry, [
-                        h(Link, {
-                          href: '/people/[id]',
-                          as: `/people/${person.people.username}`
-                        }, h('a', {className: 'notBlue'},person.people.display_name || person.people.username))])
-                    }),
-      h(Seperator),
-      h(LearnerEntry, [
-        h(Link, {
-          href: '/people/[id]',
-          as: `/people/${cohort.people.username}`
-        }, h('a', {className: 'notBlue'}, cohort.people.display_name || cohort.people.username)),
-        h(Pill, {borderOnly: true}, 'facilitator')
-      ]),
-      isFacilitator ? h(Info, [`💡 You can edit your bio in the profile tab on your `, h(Link, {href: '/dashboard'}, h('a', 'dashboard'))]) : null,
-      h(Text, {source: cohort.people.bio || ''})
-    ])
+    Members: h(CohortMembers, {cohort: props.cohort, isFacilitator})
       } as {[k:string]:React.ReactElement}
   let tabKeys = Object.keys(Tabs).filter(t=>!!Tabs[t])
+
   return h('div', {}, [
     h(Head, {children: [
       h('meta', {property:"og:title", content:course.name, key:"title"}),
@@ -136,7 +118,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     ]}),
     h(WelcomeModal, {display:router.query.welcome !== undefined, cohort, user_calendar: profile ? profile.calendar_id : ''}),
     h(Banners, {cohort, mutate, enrolled: !!inCohort, facilitating: isFacilitator}),
-    h(Box, {gap: 32}, [
+    course.type === 'club' ? h(ClubPage, {course, cohort, user, curriculum: props.curriculum, mutate}) : h(Box, {gap: 32}, [
       h(TwoColumn, [
         h('div', {style: {gridColumn: 1}}, [
           h(Box, {gap: 8}, [
@@ -180,6 +162,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   ])
 }
 
+
 export let EmptyImg = styled ('img') `
 image-rendering: pixelated;
 image-rendering: -moz-crisp-edges;
@@ -190,6 +173,26 @@ border: none;
 height: 200px;
 width: 200px;
 `
+
+export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => {
+  return h(Box, {gap:16}, [
+    h('h3', [`Facilitated by `, h(Link, {
+          href: '/people/[id]',
+          as: `/people/${props.cohort.people.username}`
+        }, h('a', {className: 'notBlue'}, props.cohort.people.display_name || props.cohort.people.username))]),
+    props.isFacilitator ? h(Info, [`💡 You can edit your bio in the profile tab on your `, h(Link, {href: '/dashboard'}, h('a', 'dashboard'))]) : null,
+    h(Text, {source: props.cohort.people.bio || ''}),
+    props.cohort.people_in_cohorts.length > 0 ? h('h4', "Members") : null,
+    ...props.cohort.people_in_cohorts
+      .map((person)=>{
+        return h(LearnerEntry, [
+          h(Link, {
+            href: '/people/[id]',
+            as: `/people/${person.people.username}`
+          }, h('a', {className: 'notBlue'},person.people.display_name || person.people.username))])
+      }),
+    ])
+}
 
 let LearnerEntry = styled('div')`
 display: grid;
@@ -204,24 +207,16 @@ const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
     h(Box, {gap: 32}, [
       h('h2', "Are you sure?"),
-      h(Box, {gap: 16}, [
-        'Before going live please check that you’ve done these things!',
-        h(Box.withComponent('ul'), {gap: 16}, [
-          h('li', "Write  the 'notes' topic for any details relevant to your cohort"),
-          h('li', "Fill out the 'Getting Started' topic for the first things learners should do when they enroll.")
-        ]),
-        h('p', [`Check out the `, h('a', {href: 'https://hyperlink.academy/manual/facilitators#creating-a-new-cohort'}, 'facilitator guide'), ' for more details']),
-        h(Box, {gap: 16, style: {textAlign: 'right'}}, [
-          h(Primary, {onClick: async e => {
-            e.preventDefault()
-            setState('loading')
-            let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data: {live: true}})
-            if(res.status === 200) props.mutate({...props.cohort, live: res.result.live})
-            setState('complete')
-          }}, state === 'loading' ? h(Loader) : 'Publish!'),
-          h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
-        ])
-      ]),
+      h(Box, {gap: 16, style: {textAlign: 'right'}}, [
+        h(Primary, {onClick: async e => {
+          e.preventDefault()
+          setState('loading')
+          let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data: {live: true}})
+          if(res.status === 200) props.mutate({...props.cohort, live: res.result.live})
+          setState('complete')
+        }}, state === 'loading' ? h(Loader) : 'Publish!'),
+        h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
+      ])
     ])
   ])
 

@@ -1,6 +1,8 @@
 import { PrismaClient} from '@prisma/client'
+import * as t from 'runtypes'
 import { getUsername, createGroup, createCategory, updateTopic } from '../../../src/discourse'
 import TemplateCourseDescription from '../../../writing/TemplateCourseDescription.txt'
+import TemplateClubDescription from '../../../writing/TemplateClubDescription.txt'
 import {getToken} from '../../../src/token'
 import { ResultType, Request, APIHandler} from '../../../src/apiHelpers'
 import TemplateCohortGettingStarted from 'writing/TemplateCohortGettingStarted.txt'
@@ -15,14 +17,17 @@ import {slugify} from 'src/utils'
 let prisma = new PrismaClient()
 
 export type CourseResult = ResultType<typeof getCourses>
-export type CreateCourseMsg = {
-  description: string
-  name: string
-  cost: number
-  duration: string
-  prerequisites: string
-  maintainers: string[]
-}
+export type CreateCourseMsg = t.Static<typeof CreateCourseMsgValidator>
+const CreateCourseMsgValidator = t.Record({
+  type: t.Union(t.Literal('club'), t.Literal('course'), t.Undefined),
+  description: t.String,
+  name: t.String,
+  cost: t.Number,
+  duration: t.String,
+  prerequisites: t.String,
+  maintainers: t.Array(t.String)
+})
+
 export type CreateCourseResponse = ResultType<typeof createCourse>
 
 export default APIHandler({POST: createCourse, GET: getCourses})
@@ -31,10 +36,9 @@ export const coursesQuery = () => prisma.courses.findMany({
   where: {status: "live", archived: false, type: "course"},
   include: {
     course_cohorts: {
-      where: {live:true},
-      select: {start_date: true},
+      where: {AND: [{live:true}, {start_date: {gt: (new Date()).toISOString()}}]},
+      select: {start_date: true, id: true},
       orderBy: {start_date: "desc"},
-      take: 1
     }
   }
 })
@@ -46,9 +50,10 @@ async function getCourses() {
 
 
 async function createCourse(req: Request) {
-  let msg = req.body as Partial<CreateCourseMsg>
-  if(!msg.cost ||!msg.name
-     || !msg.duration || !msg.description || !msg.maintainers || !msg.prerequisites) return {status: 400, result: "ERROR: missing parameters"} as const
+  let msg
+  try {msg = CreateCourseMsgValidator.check(req.body)}
+  catch(e) {return {status:400, result:e.toString()} as const }
+
   let user = getToken(req)
   if(!user) return {status: 403, result: "ERROR: no user logged in"} as const
 
@@ -90,9 +95,9 @@ async function createCourse(req: Request) {
   if(!category) return {status: 500, result: "ERROR: couldn't create course category"} as const
   await updateTopic(category.topic_url, {
     category_id: category.id,
-    title: `${msg.name} Curriculum`,
+    title: `${msg.name} ${msg.type === 'club' ? "Details" : "Curriculum"}`,
     tags: ['curriculum'],
-    raw: TemplateCourseDescription
+    raw: msg.type === 'club' ? TemplateClubDescription : TemplateCourseDescription
   }, await getUsername(maintainers[0].id))
 
   await prisma.courses.create({
@@ -112,10 +117,15 @@ async function createCourse(req: Request) {
       category_id: category.id,
       slug: slugify(msg.name),
       name: msg.name,
+      status: msg.type === 'club' ? 'live' : 'draft',
+      card_image: msg.type === 'club'
+        ? 'https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/EmojiSet/Sparkle.png,https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/EmojiSet/Sparkle.png,https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/EmojiSet/Sparkle.png'
+        : undefined,
       description: msg.description,
       duration: msg.duration,
       prerequisites: msg.prerequisites,
       cost: msg.cost,
+      type: msg.type,
       course_maintainers: {
         create: msg.maintainers.map(email => {
           return {people: {

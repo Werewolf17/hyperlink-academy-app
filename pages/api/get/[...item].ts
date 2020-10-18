@@ -27,7 +27,7 @@ async function getUserCohorts(req:Request) {
       ]
     },
     include:{
-      courses: {select: {name: true, slug: true, card_image: true, id: true}},
+      courses: {select: {name: true, slug: true, card_image: true, id: true, type: true}},
       cohort_events: {
         select: {
           events: true

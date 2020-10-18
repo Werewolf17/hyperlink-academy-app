@@ -68,6 +68,58 @@ export const SmallCohortCard = (props: Cohort) => {
   ])
 }
 
+export const ClubCard = (props: {
+  course: {slug: string, id: number, card_image: string, name: string, description: string},
+  cohort?: {start_date: string, id: number}}) => {
+  let started = props.cohort ? (new Date(props.cohort.start_date) < new Date()) : undefined
+  return h(Link, {
+    href: `/courses/${props.course.slug}/${props.course.id}`+ (props.cohort ? `/cohorts/${props.cohort?.id}` : ''),
+    passHref: true
+  }, [
+    h(ClubCardContainer, [
+      h(Box, {style:{backgroundColor: colors.accentLightBlue, padding: '16px'}}, [
+        h(Box, {h: true}, props.course.card_image.split(',').map(src=> h('img', {src}))),
+        h('h3', {style:{height: '2.75em'}}, props.course.name)
+      ]),
+      h(ClubCardContent, [
+        h('p', props.course.description),
+        props.cohort ? h('p', `${started ? "Started" : "Starts"} ${prettyDate(props.cohort.start_date)}`) : ''
+      ])
+    ])
+  ])
+}
+
+const ClubCardContent = styled('div')`
+display: grid;
+grid-template-rows: auto 22px;
+height: 100%;
+box-sizing: border-box;
+grid-gap: 16px;
+padding: 16px;
+`
+
+const ClubCardContainer = styled('div')`
+max-width: 320px;
+height: 352px;
+background-color: white;
+border: 1px solid;
+display: grid;
+grid-template-rows: min-content auto;
+border-color: ${colors.grey15};
+text-decoration: none;
+
+color: ${colors.textPrimary};
+
+&:visited {
+color: inherit;
+}
+
+&:hover, &:active, &:focus {
+cursor: pointer;
+box-shadow: 4px 4px ${colors.grey15};
+}
+`
+
 export const BigCohortCard = (props: Cohort & {courses: {name: string, slug: string}}) =>{
   let now = new Date()
   let status: "Completed" | "Upcoming" | "Ongoing" = "Upcoming"

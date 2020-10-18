@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import {  Input, Error, Info, Textarea} from 'components/Form'
+import {  Input, Error, Info, Textarea, CheckBox} from 'components/Form'
 import { Primary } from 'components/Button'
 import { LabelBox, FormBox } from 'components/Layout'
 
@@ -14,12 +14,12 @@ const CreateCourse = ()=> {
   let {data: user} = useUserData()
   let router = useRouter()
   let [formData, setFormData] = useState({
-    courseId: '',
     name: '',
     description: '',
     prerequisites: '',
     duration: "",
     cost: 5,
+    type: 'course' as 'course' | 'club',
     maintainers: [] as string[]
   })
 
@@ -38,15 +38,6 @@ const CreateCourse = ()=> {
     status === 'error' ? h(Error, 'An error occured') : null,
     status === 'success' ? h(Info, 'Course created!') : null,
     h(FormBox, {onSubmit}, [
-      h(LabelBox, {gap:8}, [
-        h('h4','id'),
-        h(Input, {
-          type: 'text',
-          required: true,
-          value: formData.courseId,
-          onChange: e=> setFormData({...formData, courseId: e.currentTarget.value})
-        })
-      ]),
       h(LabelBox, {gap:8}, [
         h('h4', 'name'),
         h(Input, {
@@ -98,6 +89,14 @@ const CreateCourse = ()=> {
           multiple: true,
           onChange: e=> setFormData({...formData, maintainers: e.currentTarget.value.split(',')})
         })
+      ]),
+      h(CheckBox, [
+        h(Input, {
+          type: 'checkbox',
+          checked: formData.type === 'club',
+          onChange: e=> setFormData({...formData, type: e.currentTarget.checked ? 'club' : 'course'})
+        }),
+        h('h4', 'Club? '),
       ]),
       h(Primary, {status, type: 'submit'}, 'submit')
     ])

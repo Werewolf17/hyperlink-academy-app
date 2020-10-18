@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import CourseCard, {FlexGrid} from 'components/Course/CourseCard'
 import {colors} from 'components/Tokens'
 import { Box, WhiteContainer} from 'components/Layout'
-import { BigCohortCard } from 'components/Card'
+import { BigCohortCard, ClubCard } from 'components/Card'
 import { PageLoader } from 'components/Loader'
 // import { AccentImg } from '../components/Images'
 import { useUserCohorts, useUserData, useUserCourses } from 'src/data'
@@ -85,9 +85,10 @@ const Dashboard = () => {
             }))
         ]),
         Maintaining: userCourses.maintaining_courses.length === 0 ? null : h(Box, {}, [
-            h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.map(course=>{
+          h(FlexGrid, {min: 328, mobileMin: 200}, userCourses.maintaining_courses.filter(c=>c.type==='course').map(course=>{
               return h(CourseCard, course)
-            }))
+            })),
+          h(FlexGrid, {min: 300, mobileMin: 200}, userCourses.maintaining_courses.filter(c=>c.type==='club').map(course=> h(ClubCard, {course})))
           ]),
         Profile: h(Settings)
       }}),

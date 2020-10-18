@@ -14,6 +14,7 @@ type Props = {
     live: boolean,
     courses:{
       name: string,
+      type: string,
       slug: string,
       id: number
       card_image: string,
@@ -52,7 +53,11 @@ export function EnrolledCohort(props: Props) {
     ]),
     !first_event ? null :  h(Container, [
       //course image
-      h(Image, {src: props.cohort.courses.card_image}),
+      props.cohort.courses.type === 'course'
+        ? h(Image, {src: props.cohort.courses.card_image})
+        : h(IconsImage, {}, props.cohort.courses.card_image.split(',').map(src => {
+          return h('img', {src, style: {height: "72px", imageRendering: 'pixelated'}})
+        })),
 
       //first event
       !first_event ? null : h(FirstEvent, [
@@ -114,6 +119,24 @@ const Image = styled('img')`
 border: 1px solid;
 image-rendering: pixelated;
 image-rendering: crisp-edges;
+height: 370px;
+width: 166px;
+
+@media(max-width: 1024px) {
+display: none;
+}
+`
+
+const IconsImage = styled('div')`
+border: 1px solid;
+image-rendering: pixelated;
+image-rendering: crisp-edges;
+background-color: ${colors.accentLightBlue};
+display: grid;
+grid-gap: 16px;
+align-content: center;
+justify-items: center;
+grid-template-rows: repeat(3, min-content);
 height: 370px;
 width: 166px;
 
