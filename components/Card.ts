@@ -24,6 +24,7 @@ color: inherit;
 &:hover, &:active, &:focus {
 cursor: pointer;
 box-shadow: 4px 4px ${colors.grey15};
+color: inherit;
 }
 `
 export default Card
