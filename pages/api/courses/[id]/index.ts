@@ -3,26 +3,34 @@ import { getToken } from '../../../../src/token'
 import { PrismaClient } from '@prisma/client'
 import { updateCategory, updateGroup } from '../../../../src/discourse'
 import { slugify } from 'src/utils'
+import * as t from 'runtypes'
 
 const prisma = new PrismaClient()
 
-export type UpdateCourseMsg = Partial<{
-  invite_only: boolean,
-  cost: number,
-  cohort_max_size: number,
-  name: string,
-  status: "live",
-  prerequisites?: string
-  duration?: string
-  description: string
-}>
+export type UpdateCourseMsg = t.Static<typeof UpdateCourseMsgValidator>
+
+const UpdateCourseMsgValidator = t.Partial({
+  invite_only: t.Boolean,
+  cost: t.Number,
+  cohort_max_size: t.Number,
+  name: t.String,
+  card_image: t.String,
+  status: t.Union(t.Literal("live"), t.Literal('draft')),
+  prerequisites: t.String,
+  duration: t.String,
+  description: t.String
+})
+
 export type UpdateCourseResponse = ResultType<typeof updateCourse>
 export type CourseDataResult = ResultType<typeof getCourseData>
 
 export default APIHandler({POST: updateCourse, GET:getCourseData})
 
 async function updateCourse(req: Request) {
-  let msg = req.body as Partial<UpdateCourseMsg>
+  let msg
+  try {msg = UpdateCourseMsgValidator.check(req.body)}
+  catch(e) {return {status:400, result:e.toString()} as const }
+
   let courseId = parseInt(req.query.id as string)
   if(Number.isNaN(courseId)) return {status: 400, result: "ERROR: Course id is not a number"} as const
   let user = getToken(req)
@@ -74,6 +82,7 @@ async function updateCourse(req: Request) {
       cohort_max_size: msg.cohort_max_size,
       duration: msg.duration,
       status: msg.status,
+      card_image: msg.card_image,
       prerequisites: msg.prerequisites,
       description: msg.description,
       cost: msg.cost,

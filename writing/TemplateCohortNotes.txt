@@ -8,11 +8,11 @@ All *other* posts in this forum category are private to participants in this coh
 
 ## Schedule
 
-Replace with: outline of specific dates and times for any synchronous meetings or deadlines for this cohort.
-
-**Please be specific** — include dates, times, timezones, and estimated length for live meetings. This is very important so that participants can make sure their schedule works before signing up.
+Replace with: brief outline of your schedule for this particular cohort, with any important meetings or deadlines.
 
 If your meetings are regularly scheduled (for example, every Monday for six weeks), be sure to list any days when the course will deviate from the norm (rescheduling around holidays, for example).
+
+**Note:** You'll create a detailed schedule of all events on the cohort page, so this is best as a summary.
 
 ## Amendments
 

@@ -4,23 +4,24 @@ Please edit this topic to include most or all of the elements listed below!
 
 Note that the following will be included on the course details page, and don't have to be added here:
 
-- Short description (one-liner elevator pitch of the course)
+- Title (max 50 characters)
+- Short description (max 200 characters)
 - Cost
-- Requirements (short line items; for more detail, include in "Who Should Sign Up")
+- Requirements (short prerequisites)
 
 ## Course Goals
 
 Replace with: a brief overview of what material the course covers, and its overall learning goals.
 
-## Length / Commitment
+## Structure
 
-Replace with: summary of the course schedule — how many sessions; estimate of time required
+Replace with: summary of how many sessions, how often you meet, estimate of time required, etc. You don't need a detailed schedule — you'll create an "event" for each meeting, per cohort.
 
 ## Syllabus / Schedule
 
-Replace with: a detailed outline of what will be covered in each session of the course (typically week by week) — including both synchronous meetings and expectations for asynchronous activities (readings, discussions, etc.) 
+Replace with: an outline of what will be covered in each week of the course (or whatever cadence you choose).
 
-Note that this should be generalized e.g. "Week 1, Week 2…" — when the course is run, each cohort will also include its own specific dates and times.
+Note that this should be generalized e.g. "Week 1, Week 2…" — when the course is run, each cohort's schedule will include its specific dates and times.
 
 ## Artifacts
 

@@ -79,7 +79,7 @@ function CohortSettings(props:{course:Course, mutate: (course:Course)=>void}) {
 }
 
 //feature to add a new cohort to a course
-const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
+export const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
   let [newCohort, setNewCohort] = useState({start_date: '', start_time: '', facilitator: ''})
   let [status, callCreateCohort] = useApi<CreateCohortMsg, CreateCohortResponse>([newCohort])
 
@@ -315,7 +315,7 @@ const EditDetails = (props: {course: Course, mutate:(course:Course)=>void}) => {
   ])
 }
 
-function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
+export function CourseTemplates (props: {course: Course, mutate: (c:Course)=>void}) {
   return h(Box, {gap: 32}, [
     h(Box, [
       h('p', `Each cohort comes with its own community space, and templates to help you populate its structure with topics.`),

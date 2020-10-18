@@ -36,6 +36,7 @@ async function handler (req: Request) {
     select: {
       slug: true,
       id: true,
+      type: true,
       category_id: true,
       name: true,
       status: true,
@@ -76,12 +77,20 @@ async function handler (req: Request) {
   await Promise.all(course.course_templates.map( async template => {
     if(!category) return
     if(template.type === 'prepopulated') {
-      if(template.name === 'Notes') {
+      if(template.name === ('Notes') && course?.type === 'course') {
         return updateTopic(category.topic_url, {
           category_id: category.id,
           title: groupName + " Notes",
           raw: template.content,
           tags: ['note']
+        }, admin)
+      }
+      if(template.name === "Getting Started" && course?.type === 'club') {
+        return updateTopic(category.topic_url, {
+          category_id: category.id,
+          title: " Getting Started",
+          raw: template.content,
+          tags: ['getting-started']
         }, admin)
       }
       else {
