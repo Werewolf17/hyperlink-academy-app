@@ -351,7 +351,7 @@ const TODOBanner = (props:{
               h("span", [
                 "Fill out ", h(Link, {href: `https://hyperlink.academy/dashboard?tab=Profile`}, "your bio"), " and tell people more about you."
               ]),
-              h("span", [
+              props.cohort.courses.type === 'club' ? null : h("span", [
                 "Fill out the ", h("a", {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`}, "Notes topic"), " in the forum with  any cohort-specific details. This is visible to everyone, even if they aren't enrolled, so don't put anything private here."
               ]),
               h("span", [

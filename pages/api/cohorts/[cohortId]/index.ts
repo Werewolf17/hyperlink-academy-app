@@ -114,6 +114,7 @@ export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
           card_image: true,
           cohort_max_size: true,
           id: true,
+          type: true,
           slug: true,
           cost: true,
           duration: true,

@@ -5,7 +5,7 @@ import { CheckBox, Input } from './Form'
 
 let TodoParser = t.Array(t.Boolean)
 
-export function TodoList(props: {items: Array< string | React.ReactElement>, persistKey?: string}) {
+export function TodoList(props: {items: Array< string | React.ReactElement | null>, persistKey?: string}) {
   let [checked, setChecked] = useState (new Array(props.items.length).fill(false))
   useEffect(() => {
     if(!props.persistKey) return
