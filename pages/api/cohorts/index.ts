@@ -64,7 +64,7 @@ async function handler (req: Request) {
   await updateCategory(course.category_id, {name: course.name, permissions: {
     // Make sure to keep any existing cohorts as well
     ...course.course_cohorts.reduce((acc, cohort) => {
-      acc[cohort.discourse_groups.id] = 1
+      acc[cohort.discourse_groups.name] = 1
       return acc
     }, {} as {[i:string]:number}),
     [groupName]: 1,
