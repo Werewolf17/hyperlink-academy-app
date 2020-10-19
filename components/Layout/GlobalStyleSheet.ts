@@ -54,6 +54,10 @@ a:hover {
   color: #00008B;
 }
 
+img {
+image-rendering: pixelated;
+}
+
 h1, h2 {
   font-family: 'Roboto Mono', monospace;
   font-weight: normal;
