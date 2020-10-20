@@ -6,7 +6,8 @@ import { CheckBox, Input } from './Form'
 let TodoParser = t.Array(t.Boolean)
 
 export function TodoList(props: {items: Array< string | React.ReactElement | null>, persistKey?: string}) {
-  let [checked, setChecked] = useState (new Array(props.items.length).fill(false))
+  let items = props.items.filter(i=>!!i)
+  let [checked, setChecked] = useState (new Array(items.length).fill(false))
   useEffect(() => {
     if(!props.persistKey) return
     let savedValue = localStorage.getItem(props.persistKey)
@@ -21,7 +22,7 @@ export function TodoList(props: {items: Array< string | React.ReactElement | nul
     localStorage.setItem(props.persistKey, JSON.stringify(checked))
   },[checked])
 
-  return h(Fragment, props.items.map((todo, index)=>{
+  return h(Fragment, items.map((todo, index)=>{
     return h(CheckBox, [
       h(Input, {
         type: 'checkbox',

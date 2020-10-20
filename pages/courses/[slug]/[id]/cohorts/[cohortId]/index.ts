@@ -345,7 +345,7 @@ const TODOBanner = (props:{
         h(Box, {gap:16}, [
           h('h4', "Before you publish this cohort make sure that you ...  "),
           h(TodoList, {
-            persistKey: "cohort-publish-todo",
+            persistKey: "cohort-publish-todo-"+props.cohort.id,
             items: [
               "Add events to your cohort schedule for any live calls or important dates people need to remember.",
               h("span", [
