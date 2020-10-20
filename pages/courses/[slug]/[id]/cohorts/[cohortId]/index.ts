@@ -7,6 +7,7 @@ import {useState, useEffect} from 'react'
 import { InferGetStaticPropsType } from 'next'
 
 import Enroll from 'components/Course/Enroll'
+import { EnrollButton } from 'components/Course/EnrollButton';
 import { TwoColumn, Box, Seperator, Sidebar, WhiteContainer} from 'components/Layout'
 import { VerticalTabs, StickyWrapper } from 'components/Tabs'
 import { Primary, Destructive, Secondary, BackButton, LinkButton} from 'components/Button'
@@ -20,7 +21,7 @@ import {WelcomeModal} from 'components/pages/cohorts/WelcomeModal'
 import {prettyDate} from 'src/utils'
 import { getTaggedPost } from 'src/discourse'
 import { callApi } from 'src/apiHelpers'
-import { useCohortData, useUserData, useCourseData, Cohort, useProfileData } from 'src/data'
+import { useCohortData, useUserCohorts, useUserData, useCourseData, Cohort, useProfileData } from 'src/data'
 import ErrorPage from 'pages/404'
 import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/api/cohorts/[cohortId]'
 import { courseDataQuery } from 'pages/api/courses/[id]'
@@ -49,6 +50,7 @@ export default WrappedCohortPage
 const CohortPage = (props: Extract<Props, {notFound:false}>) => {
   let router = useRouter()
   let {data: user} = useUserData()
+  let {data: userCohorts} = useUserCohorts()
   let {data:profile} = useProfileData(user ? user.username : undefined)
   let {data: cohort, mutate} = useCohortData(props.cohortId, props.cohort)
   let {data: course} = useCourseData(props.courseId, props.course)
@@ -61,7 +63,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
 
   if(!cohort || !course) return h(PageLoader)
 
-  //let invited = !course.invite_only ? true : !!userCohorts?.invited_courses.find(course=>course.id === props.course?.id )
+  let invited = !!userCohorts?.invited_courses.find(course=>course.id === props.course.id )
   let inCohort = cohort.people_in_cohorts.find(p => p.person === (user ? user.id : undefined))
   let isFacilitator  = !!user && cohort.people.username === user.username
   let isStarted = cohort && new Date() > new Date(cohort.start_date)
@@ -142,6 +144,13 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
                   !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {cohort, mutate}) : null,
                 ])
               ]) :  h(Enroll, {course}),
+              inCohort || isStarted || isFacilitator ? null
+                : h(EnrollButton, {
+                  id: cohort.id,
+                  course: course.id,
+                  max_size: course.cohort_max_size,
+                  learners: cohort.people_in_cohorts.length,
+                  invited: !course.invite_only || invited}, "Join this cohort"),
               h(Box, [
                 h('h3', "Information"),
                 h(VerticalTabs, {

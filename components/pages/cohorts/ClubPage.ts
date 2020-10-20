@@ -58,8 +58,8 @@ export function ClubPage(props:{
           inCohort || isStarted || isFacilitator ? null : h(EnrollButton, {id: props.cohort.id, course: props.course.id, max_size: props.course.cohort_max_size, learners: props.cohort.people_in_cohorts.length, invited: !props.course.invite_only || invited}, "Join this club")
         ])
       ]),
-      h(Seperator),
       h(Box, {gap: 32}, [
+        h(Seperator),
         !isFacilitator && props.cohort.cohort_events.length === 0 ? null : h(Box, {gap:32}, [
           isFacilitator ? h(CreateEvent, {cohort: props.cohort.id, mutate: (c)=>{
             props.mutate({...props.cohort, cohort_events: [...props.cohort.cohort_events, c]})
@@ -84,7 +84,8 @@ export function ClubPage(props:{
       h(Sidebar, [
         inCohort ? null : h(StickyWrapper, [
           h(Box, {gap:32}, [
-            h(Enroll, {course: props.course})
+            h(Enroll, {course: props.course}),
+            inCohort || isStarted || isFacilitator ? null : h(EnrollButton, {id: props.cohort.id, course: props.course.id, max_size: props.course.cohort_max_size, learners: props.cohort.people_in_cohorts.length, invited: !props.course.invite_only || invited}, "Join this club")
           ])
         ])
       ])
