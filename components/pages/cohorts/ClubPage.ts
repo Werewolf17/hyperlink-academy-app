@@ -6,7 +6,7 @@ import { prettyDate } from 'src/utils';
 import { StickyWrapper } from 'components/Tabs';
 import Enroll from 'components/Course/Enroll';
 import { EnrollButton } from 'components/Course/EnrollButton';
-import {LinkButton} from 'components/Button'
+import {LinkButton, Secondary} from 'components/Button'
 import { EmptyImg } from 'pages/dashboard';
 import { CohortEvents } from './Events';
 import { CreateEvent } from './CreateEvent';
@@ -44,6 +44,14 @@ export function ClubPage(props:{
               : `${isStarted ? "Started" : "Starts"} ${prettyDate(props.cohort.start_date)}`),
           ]),
           h('p.big', props.course.description),
+          !inCohort && !isFacilitator ? null : h(Box, [
+            h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`}
+              , h(Secondary, 'Go to the Club forum')),
+            !isFacilitator ? null : h(Link, {
+              href: "/courses/[slug]/[id]/cohorts/[cohortId]/templates",
+              as: `/courses/${props.cohort.courses.slug}/${props.cohort.courses.id}/cohorts/${props.cohort.id}/templates`
+            }, h(Secondary, 'Forum Post from Template')),
+          ]),
           h(Box, [
             h(LinkButton, {onClick: ()=>setShowDetails(!showDetails)}, showDetails ? "hide details" : "show details"),
             showDetails ? h('div', {style:{color: colors.textSecondary}}, [
@@ -82,7 +90,7 @@ export function ClubPage(props:{
         h(CohortMembers, {cohort: props.cohort, isFacilitator})
       ]),
       h(Sidebar, [
-        inCohort ? null : h(StickyWrapper, [
+        inCohort || isFacilitator ? null : h(StickyWrapper, [
           h(Box, {gap:32}, [
             h(Enroll, {course: props.course}),
             inCohort || isStarted || isFacilitator ? null : h(EnrollButton, {id: props.cohort.id, course: props.course.id, max_size: props.course.cohort_max_size, learners: props.cohort.people_in_cohorts.length, invited: !props.course.invite_only || invited}, "Join this club")
