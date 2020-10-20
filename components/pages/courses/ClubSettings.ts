@@ -93,7 +93,7 @@ function Details(props: {course:Course, mutate:(c:Course)=>void, curriculum: {id
   return h(FormBox, {onSubmit, gap:32, style:{width: 400}}, [
     h('h2', 'Edit Club Details'),
     h(Info, [
-      `💡 You can make changes to the club descriptoin by editing `,
+      `💡 You can make changes to the club description by editing `,
       h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.curriculum.id}`}, `this topic`),
       ` in the forum`
     ]),

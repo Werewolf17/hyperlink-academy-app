@@ -37,7 +37,7 @@ export function ClubPage(props:{
       h('div', {style: {gridColumn: 1}}, [
         h(Box, {gap: 32}, [
           h(Box, {gap: 8}, [
-            h(Box, {h: true}, props.course.card_image.split(',').map(src=>h('img', {src}))),
+            h(Box, {h: true}, props.course.card_image.split(',').map(src=>h('img', {src, style:{imageRendering: 'pixelated'}}))),
             h('h1', props.course.name),
             h('h2.textSecondary', props.cohort.completed
               ? `Completed ${prettyDate(props.cohort.completed)}`
@@ -47,8 +47,8 @@ export function ClubPage(props:{
           h(Box, [
             h(LinkButton, {onClick: ()=>setShowDetails(!showDetails)}, showDetails ? "hide details" : "show details"),
             showDetails ? h('div', {style:{color: colors.textSecondary}}, [
-              h(Info, [
-                `💡 You can make changes to the club details by editing `,
+              !isFacilitator ? null : h(Info, [
+                `💡 You can make changes to the club description by editing `,
                 h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.curriculum.id}`}, `this topic`),
                 ` in the forum`
               ]),
