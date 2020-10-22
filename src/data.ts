@@ -54,6 +54,7 @@ export const useUserCourses = ()=>{
   })
 }
 
+export type Courses = Success<CourseResult>
 export const useCourses = (initialData?:Success<CourseResult>) => {
   return useSWR('/api/courses', async (api) => {
     let res = await callApi<null, CourseResult>(api)

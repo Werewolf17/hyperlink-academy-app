@@ -1,25 +1,31 @@
 import h from 'react-hyperscript'
 import { coursesQuery } from 'pages/api/courses'
 import { InferGetStaticPropsType } from 'next'
-import { useCourses } from 'src/data'
+import { useCourses, Courses as CoursesType } from 'src/data'
 import { Box, Seperator } from 'components/Layout'
-import CourseCard, { FlexGrid } from 'components/Course/CourseCard'
-import { ClubCard } from 'components/Card'
 import { Mobile } from 'components/Tokens'
 import styled from '@emotion/styled'
 import { Secondary } from 'components/Button'
+import CourseCard, { FlexGrid } from 'components/Course/CourseCard'
+import { ClubCard } from 'components/Card'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 export default function Courses(props:Props) {
-  let {data: courses} = useCourses(props)
+  let {data: allCourses} = useCourses(props)
 
-  let clubs = courses?.courses
-    .filter(c=> c.type === 'club')
-    .flatMap(course=> {
-      return course.course_cohorts.map(cohort => {
-        return {cohort, course}
-      })
+  let [clubs, courses] = (allCourses ? allCourses : props).courses
+    .sort((a, b)=>{
+      let upcomingCohortA = a.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
+      let upcomingCohortB = b.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
+      if(!upcomingCohortA && !upcomingCohortB) return a.name > b.name ? 1 : -1
+      if(!upcomingCohortA) return 1
+      if(!upcomingCohortB) return -1
+      return new Date(upcomingCohortA.start_date) < new Date(upcomingCohortB?.start_date) ? -1 : 1
     })
+    .reduce((acc, course)=> {
+      acc[course.type === 'club' ? 0 : 1].push(course)
+      return acc
+    }, [[],[]] as CoursesType['courses'][])
 
   return h(Box, {gap: 32} ,[
     h(StickyContainer, [
@@ -48,27 +54,19 @@ export default function Courses(props:Props) {
           h('p.big', `Courses are deep dives into a subject, led by a facilitator experienced in the field.`),
         ]),
         h(FlexGrid, {min: 400, mobileMin: 200},
-          courses?.courses
-            .filter(x=>x.type === 'course')
-            .sort((a, b)=>{
-              let upcomingCohortA = a.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
-              let upcomingCohortB = b.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
-              if(!upcomingCohortA && !upcomingCohortB) return a.name > b.name ? 1 : -1
-              if(!upcomingCohortA) return 1
-              if(!upcomingCohortB) return -1
-              return new Date(upcomingCohortA.start_date) < new Date(upcomingCohortB?.start_date) ? -1 : 1
-            })
-            .map(course => {
-              return h(CourseCard, course)
-            })),
+          courses.map(course => {
+            return h(CourseCard, course)
+          })),
       ]),
       h(Box, {gap:32}, [
         h(Box, {width: 640}, [
           h('h1', {id: 'clubs', style:{scrollMarginTop: '96px'}}, "Clubs"),
           h('p.big', `Clubs are a lightweight way to convene people with shared interests to explore new things together.`),
         ]),
-        h(FlexGrid,{min: 290, mobileMin: 290}, clubs?.map(club => {
-          return h(ClubCard, club)
+        h(FlexGrid,{min: 290, mobileMin: 290}, clubs.flatMap(course=> {
+          return course.course_cohorts.map(cohort => {
+            return h(ClubCard, {cohort, course})
+          })
         }))
       ])
     ])

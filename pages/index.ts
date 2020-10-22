@@ -3,7 +3,6 @@ import styled from '@emotion/styled'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
 
 import Intro from 'writing/Intro.mdx'
-import CourseCard, {FlexGrid} from 'components/Course/CourseCard'
 import { colors, Mobile, Tablet} from 'components/Tokens'
 import { Box, Body} from 'components/Layout'
 import { Primary } from 'components/Button'
@@ -12,6 +11,7 @@ import { useCourses } from 'src/data'
 import {getToken} from 'src/token'
 import NewsletterSignup from 'components/NewsletterSignup'
 import { coursesQuery } from 'pages/api/courses'
+import CoursesAndClubsList from 'pages/courses'
 
 let COPY = {
   hyperlinkTagline: "Hyperlink is a course platform and online school built for seriously effective learning.",
@@ -34,22 +34,7 @@ const Landing = (props:Props) => {
   return h(Box, {gap:48}, [
     h(Welcome),
     h(WhyHyperlink, {}, h(Body, {}, h(Intro))),
-    h(Box, {gap: 16}, [
-      h('h2', {id: 'courses'}, COPY.coursesHeader),
-      !courses ? null : h(FlexGrid, {min: 328, mobileMin: 200},
-                          courses.courses
-                            .sort((a, b)=>{
-                              let upcomingCohortA = a.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
-                              let upcomingCohortB = b.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
-                              if(!upcomingCohortA && !upcomingCohortB) return a.name > b.name ? 1 : -1
-                              if(!upcomingCohortA) return 1
-                              if(!upcomingCohortB) return -1
-                              return new Date(upcomingCohortA.start_date) < new Date(upcomingCohortB?.start_date) ? -1 : 1
-                            })
-                          .map(course => {
-                            return h(CourseCard, course)
-                          })),
-    ]),
+    !courses ? null : h(CoursesAndClubsList, courses),
     h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
       h(Box, {width: 640, ma: true}, [
         h('h2', COPY.courseGardenHeader),
