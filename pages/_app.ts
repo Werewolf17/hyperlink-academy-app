@@ -23,9 +23,9 @@ const App = ({ Component, pageProps}:Props) => {
   return h(Elements, {stripe:stripePromise},[
     h(Head as React.StatelessComponent, [
       h('title', 'hyperlink.academy'),
-      h('meta', {property:"og:title", content:'hyperlink.academy', key:"title"}),
-      h('meta', {property:"og:description", content:'a course platform and online school built for seriously effective learning', key:"description"}),
-      h('meta', {property: "og:image", content: 'https://hyperlink.academy/img/social-logo.png', key: "image"}),
+      h('meta', {property:"og:title", content:'hyperlink.academy', key:"og:title"}),
+      h('meta', {property:"og:description", content:'a course platform and online school built for seriously effective learning', key:"og:description"}),
+      h('meta', {property: "og:image", content: 'https://hyperlink.academy/img/social-logo.png', key: "og:image"}),
     ]),
     h(Layout, {}, [h(Component, {...pageProps})])
   ])

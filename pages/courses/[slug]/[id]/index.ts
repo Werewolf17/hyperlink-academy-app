@@ -75,10 +75,10 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
   //Setting up the layout for the course page
   return h('div', [
     h(Head, {children: [
-      h('meta', {property:"og:title", content:course.name, key:"title"}),
-      h('meta', {property: "og:description", content: course.description, key: "description"}),
-      h('meta', {property: "og:image", content: course.card_image.split(',')[0], key: "image"}),
-      h('meta', {property: "twitter:card", content: "summary"})
+      h('meta', {property:"og:title", content:course.name, key:"og:title"}),
+      h('meta', {property: "og:description", content: course.description, key: "og:description"}),
+      h('meta', {property: "og:image", content: course.card_image.split(',')[0], key: "og:image"}),
+      h('meta', {property: "twitter:card", content: "summary", key:"twitter:card"})
     ]}),
     h(Banners, {draft: course.status === 'draft', id: props.id, isMaintainer, slug: course.slug}),
     h(TwoColumn, [
