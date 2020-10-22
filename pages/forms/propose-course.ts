@@ -11,16 +11,20 @@ export default ()=>{
   let [state, setState] = useState({
     Name: "",
     Email: "",
-    About: "",
+    Topic: "",
     Structure: "",
+    Participants: "",
     Cost: "",
-    References: ""
+    Artifacts: "",
+    Vision: "",
+    References: "",
+    Questions: ""
   })
   let[status, callApi] = useApi<SubmitFormMsg, SubmitFormResponse>([state])
   const onSubmit = (e:React.FormEvent) =>{
     e.preventDefault()
     callApi('/api/submitForm', {
-      base: "appbYajLwQVdNDarG",
+      base: "appR4eeCFwbJVZ2ij",
       data: state
     })
   }
@@ -33,19 +37,23 @@ export default ()=>{
     h(Primary, {onClick: ()=>setState({
       Name: "",
       Email: "",
-      About: "",
+      Topic: "",
       Structure: "",
+      Participants: "",
       Cost: "",
-      References: ""
+      Artifacts: "",
+      Vision: "",
+      References: "",
+      Questions: ""
     })}, "Submit another idea")
   ]) : h(Box, {ma: true, width: 640, gap:32}, [
     h(Box, [
-      h('h1', "Propose a Club"),
+      h('h1', "Propose a Course"),
       h('p.big', `
-If you're interested in running a Club on Hyperlink, we'd love to hear what you
+If you're interested in running a Course on Hyperlink, we'd love to hear what you
 have in mind!`),
       h('p.big', `
-Rough ideas are fine; we can chat more about the details.`),
+Rough ideas are fine; we can chat more about the details :)`),
     ]),
     h(Seperator),
 
@@ -69,18 +77,18 @@ Rough ideas are fine; we can chat more about the details.`),
         ]),
         h(LabelBox,{gap:8}, [
           h('div', [
-            h('h3', "What's the club about?" ),
-            h('small',`In a few words, e.g. "Book club for GEB", or "Working group exploring the future of internet pedagogy"`),
+            h('h3', "What's the course about?" ),
+            h('small',`In a few words, e.g. "Language construction workshop" or "How to build an online community"`),
           ]),
           h(Textarea, {
-            value: state.About,
-            onChange: e=>setState({...state, About: e.currentTarget.value})
+            value: state.Topic,
+            onChange: e=>setState({...state, Topic: e.currentTarget.value})
           })
         ]),
         h(LabelBox,{gap:8}, [
           h('div', [
-            h('h3', "What does the structure look like?" ),
-            h('small',`In a few short paragraphs: what are the goals of the Club? How long is it and how frequently does it meet? What's the workload? Who's the ideal participant?`),
+            h('h3', "What do you imagine the structure looks like?" ),
+            h('small',`In a few short paragraphs: what are the main learning goals? How long is it and how frequently does it meet? What's the workload? Initial thoughts on what the list of sessions could look like?`),
           ]),
           h(Textarea, {
             value: state.Structure,
@@ -89,12 +97,42 @@ Rough ideas are fine; we can chat more about the details.`),
         ]),
         h(LabelBox,{gap:8}, [
           h('div', [
+            h('h3', "Who do you imagine is the ideal participant?" ),
+            h('small',`Who should take this course? Who should *not* take it?`),
+          ]),
+          h(Textarea, {
+            value: state.Participants,
+            onChange: e=>setState({...state, Participants: e.currentTarget.value})
+          })
+        ]),
+        h(LabelBox,{gap:8}, [
+          h('div', [
             h('h3', "How much do you imagine it will cost?" ),
-            h('small',`In USD; rough estimate fine for now. As a serious learning experience, the cost should be > $0! (Our pricing model here is the same as for courses: you set a price, Hyperlink takes a 20% platform fee, you keep 80%)`),
+            h('small',`In USD. rough estimate fine for now; we can discuss further! Our pricing model: you set a price, Hyperlink takes a 20% platform fee, you keep 80%.`),
           ]),
           h(Input, {
             value: state.Cost,
             onChange: e=>setState({...state, Cost: e.currentTarget.value})
+          })
+        ]),
+        h(LabelBox,{gap:8}, [
+          h('div', [
+            h('h3', "What might the artifacts or output of the course look like?" ),
+            h('small',`What are participants making or doing in the course? Any assignments or final projects in mind?`),
+          ]),
+          h(Textarea, {
+            value: state.Artifacts,
+            onChange: e=>setState({...state, Artifacts: e.currentTarget.value})
+          })
+        ]),
+        h(LabelBox,{gap:8}, [
+          h('div', [
+            h('h3', "Can you tell us a bit about yourself and your overall vision for the course?" ),
+            h('small',`How does this fit with your work? Why are you the right person to teach it? How much time do you imagine spending on it? Any long-term ideas for how it might develop?`),
+          ]),
+          h(Textarea, {
+            value: state.Vision,
+            onChange: e=>setState({...state, Vision: e.currentTarget.value})
           })
         ]),
         h(LabelBox, {gap:8},[
@@ -105,6 +143,16 @@ Rough ideas are fine; we can chat more about the details.`),
           h(Textarea, {
             value: state.References,
             onChange: e=>setState({...state, References: e.currentTarget.value})
+          })
+        ]),
+        h(LabelBox, {gap:8},[
+          h('div',[
+            h('h3', "Any questions for us? (Optional)"),
+            h('small', "Let us know if you have further things you'd like to discuss about this idea, or courses on Hyperlink in general!"),
+          ]),
+          h(Textarea, {
+            value: state.Questions,
+            onChange: e=>setState({...state, Questions: e.currentTarget.value})
           })
         ]),
 
