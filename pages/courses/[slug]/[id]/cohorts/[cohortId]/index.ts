@@ -115,7 +115,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
     h(Head, {children: [
       h('meta', {property:"og:title", content:course.name, key:"title"}),
       h('meta', {property: "og:description", content: "Starting " + prettyDate(cohort.start_date), key: "description"}),
-      h('meta', {property: "og:image", content: course.card_image, key: "image"}),
+      h('meta', {property: "og:image", content: course.card_image.split(',')[0], key: "image"}),
       h('meta', {property: "twitter:card", content: "summary"})
     ]}),
     h(WelcomeModal, {display:router.query.welcome !== undefined, cohort, user_calendar: profile ? profile.calendar_id : ''}),
