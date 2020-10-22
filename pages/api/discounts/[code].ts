@@ -7,18 +7,28 @@ export default APIHandler({GET: getDiscount, DELETE: deleteDiscount})
 export type GetDiscountResult = ResultType<typeof getDiscount>
 export type DeleteDiscountResult = ResultType<typeof deleteDiscount>
 
-async function getDiscount(req:Request){
-  let code = req.query.code as string
-  if(!code) return {status: 400, result: "ERROR: no discount code given"} as const
-  let discount = await prisma.course_discounts.findOne({
+export const getDiscountQuery = (code: string) => prisma.course_discounts.findOne({
     where: {code},
     include: {
       courses: {
         select: {
+          card_image: true,
+          name: true,
+          description: true,
           slug: true,
-          id: true
+          id: true,
+          type: true,
+          course_cohorts:{
+            take: 1,
+            orderBy:{start_date:'desc'},
+            where:{start_date: {gte: (new Date()).toISOString()}}
+          }
         }}}
   })
+async function getDiscount(req:Request){
+  let code = req.query.code as string
+  if(!code) return {status: 400, result: "ERROR: no discount code given"} as const
+  let discount = await getDiscountQuery(code)
   if(!discount || discount.deleted) return {status:404, result: "ERROR: no discount found"} as const
   return {status:200, result: discount} as const
 }
