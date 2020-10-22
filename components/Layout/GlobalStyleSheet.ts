@@ -56,6 +56,7 @@ a:hover {
 
 img {
 image-rendering: pixelated;
+image-rendering: crisp-edges;
 }
 
 h1, h2 {
