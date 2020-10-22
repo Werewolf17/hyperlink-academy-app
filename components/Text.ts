@@ -75,4 +75,8 @@ pre {
   border-radius: 2px;
   padding: 16px;  
 }
+
+img {
+max-width: 100%;
+}
 `
