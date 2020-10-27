@@ -244,7 +244,10 @@ function EnrollStatus (props: {
 
 const Cohorts = (props:{cohorts: Course['course_cohorts'], user: string, slug: string, cohort_max_size: number, invited:boolean}) => {
   let [pastCohorts, upcomingCohorts] = props.cohorts
-    .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
+  .filter(c=>{
+    if(c.live) return true
+    return c.facilitator === props.user
+  }).sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
     .reduce((acc, cohort)=>{
       let enrolled = !!cohort.people_in_cohorts.find(p => p.people.id === props.user)
       let facilitating = cohort.facilitator=== props.user
@@ -275,6 +278,8 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
           props.cohort.enrolled ? h(Pill, 'enrolled') : null,
           ' ',
           props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
+          ' ',
+          !props.cohort.live ? h(Pill, {borderOnly: true, red: true}, 'draft') : null,
         ]),
         h('h3', {}, h(Link, {
           href:'/courses/[slug]/[id]/cohorts/[cohortId]',
