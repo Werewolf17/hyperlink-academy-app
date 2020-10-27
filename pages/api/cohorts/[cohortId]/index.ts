@@ -143,11 +143,11 @@ async function getCohortData(req: Request) {
   let data = await cohortDataQuery(cohortId)
   if(!data) return {status: 404, result: `Error: no cohort with id ${cohortId} found`} as const
   let enrolled = data.people_in_cohorts.find(x=>x.person === user?.id) || data.facilitator === user?.id
-  data.cohort_events = data.cohort_events.map(event =>{
+  let cohort_events = data.cohort_events.map(event =>{
     if(!enrolled) {
-      delete event.events.location
+      return {...event, events: {...event.events, location: undefined}}
     }
-    return event as  {events: typeof event.events & {location: undefined}}
+    return event
   })
-  return {status: 200, result: data} as const
+  return {status: 200, result: {...data, cohort_events}} as const
 }
