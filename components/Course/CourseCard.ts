@@ -13,7 +13,7 @@ type Props = {
   slug: string,
   id: number,
   card_image: string,
-  status?:  'draft' | 'live' | null
+  status?:  'draft' | 'live' | 'archived' | null
   course_cohorts:{start_date: string}[]
 }
 

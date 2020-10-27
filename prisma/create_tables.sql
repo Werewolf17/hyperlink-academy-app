@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS people (
 CREATE UNIQUE INDEX people_username_index on people (lower(username));
 CREATE UNIQUE INDEX people_email_index on people (lower(email));
 
-CREATE TYPE course_status AS ENUM ('draft', 'live');
+CREATE TYPE course_status AS ENUM ('draft', 'live', 'archived');
 CREATE TYPE course_types as ENUM ('course', 'club');
 CREATE TABLE IF NOT EXISTS courses (
     id            text NOT NULL UNIQUE PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
