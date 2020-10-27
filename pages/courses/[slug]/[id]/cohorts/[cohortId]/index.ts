@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {useState, useEffect} from 'react'
 import { InferGetStaticPropsType } from 'next'
 
-import Enroll from 'components/Course/Enroll'
+import CourseDetails from 'components/Course/Enroll'
 import { EnrollButton } from 'components/Course/EnrollButton';
 import { TwoColumn, Box, Seperator, Sidebar, WhiteContainer} from 'components/Layout'
 import { VerticalTabs, StickyWrapper } from 'components/Tabs'
@@ -143,7 +143,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
                   }, h(Secondary, 'Forum Post from Template')),
                   !cohort.completed && isFacilitator && isStarted ? h(MarkCohortComplete, {cohort, mutate}) : null,
                 ])
-              ]) :  h(Enroll, {course}),
+              ]) :  h(CourseDetails, {course}),
               inCohort || isStarted || isFacilitator ? null
                 : h(EnrollButton, {
                   id: cohort.id,
@@ -408,15 +408,25 @@ export const getStaticProps = async (ctx:any)=>{
 
   if(!cohort) return {props: {notFound: true}} as const
 
-  cohort.cohort_events = cohort.cohort_events.map(event =>{
-    delete event.events.location
-    return event
+  let cohort_events = cohort.cohort_events.map(event =>{
+    return {...event, events: {...event.events, location: undefined}}
   })
 
-  let notes = await getTaggedPost(cohort.category_id, 'note')
-  let artifacts = await getTaggedPost(cohort.category_id, 'artifact')
-  let curriculum = await getTaggedPost(cohort.courses.category_id, 'curriculum')
-  return {props: {notFound: false, courseId, cohortId, cohort, course, notes, curriculum, artifacts}, revalidate: 1} as const
+  let [notes, artifacts, curriculum] = await Promise.all([
+    getTaggedPost(cohort.category_id, 'note'),
+    getTaggedPost(cohort.category_id, 'artifact'),
+    getTaggedPost(cohort.courses.category_id, 'curriculum')
+  ])
+  return {props: {
+    notFound: false,
+    courseId,
+    cohortId,
+    cohort: {...cohort, cohort_events},
+    course,
+    notes,
+    curriculum,
+    artifacts},
+          revalidate: 1} as const
 }
 
 export const getStaticPaths = () => {
