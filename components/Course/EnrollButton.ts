@@ -1,6 +1,5 @@
 import h from 'react-hyperscript'
 import { useUserData } from "src/data"
-import { useStripe } from "@stripe/react-stripe-js"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { useApi } from "src/apiHelpers"
@@ -9,6 +8,7 @@ import { getDiscounts, setDiscounts } from "src/clientData"
 import { Box } from "components/Layout"
 import { Modal } from "components/Modal"
 import { Primary } from "components/Button"
+import { getStripe } from 'src/utils'
 
 export const EnrollButton:React.FC<{
   id:number,
@@ -18,10 +18,10 @@ export const EnrollButton:React.FC<{
   invited: boolean
 }> = (props) => {
   let {data: user} = useUserData()
-  let stripe = useStripe()
   let router = useRouter()
   let [error, setError] = useState(false)
-  let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([stripe], async (res)=>{
+  let [status, callEnroll] = useApi<EnrollMsg, EnrollResponse>([], async (res)=>{
+    let stripe = await getStripe()
     if(res.zeroCost) await router.push('/courses/[slug]/[id]/cohorts/[cohortId]', `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}?welcome`)
     else await stripe?.redirectToCheckout({sessionId: res.sessionId})
   })
@@ -30,7 +30,6 @@ export const EnrollButton:React.FC<{
     e.preventDefault()
     if(user === false) await router.push('/login?redirect=' + encodeURIComponent(router.asPath))
     if(!props.id) return
-    if(!stripe) return
     let discount = getDiscounts().find(d=>d.course === props.course)
     let res = await callEnroll(`/api/cohorts/${props.id}/enroll`, {discount: discount?.code})
     if(res.status === 403) {

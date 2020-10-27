@@ -1,11 +1,8 @@
 import h from 'react-hyperscript'
 import Head from 'next/head'
-import {loadStripe} from '@stripe/stripe-js';
-import {Elements} from '@stripe/react-stripe-js'
 import Layout from '../components/Layout';
 import * as Sentry from '@sentry/node'
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
+import { Fragment } from 'react';
 
 if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
@@ -20,7 +17,7 @@ type Props = {
 }
 
 const App = ({ Component, pageProps}:Props) => {
-  return h(Elements, {stripe:stripePromise},[
+  return h(Fragment, [
     h(Head as React.StatelessComponent, [
       h('title', 'hyperlink.academy'),
       h('meta', {property:"og:title", content:'hyperlink.academy', key:"og:title"}),
