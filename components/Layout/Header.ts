@@ -27,7 +27,7 @@ export default function Header() {
     h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
     mobile ? h(MobileMenu, {user, mutateUser}) : h(Container, {}, [
       h(FeedbackModal),
-      h(Link, {href: "/blog"}, h(NavLink, 'blog')),
+      h(Link, {href: "/blog", passHref: true}, h(NavLink, 'blog')),
       h(LoginButtons, {user, mutateUser}),
       h(Link, {href: '/courses'}, h('a', {}, h(CoursesButton, 'courses')))
     ]),
@@ -52,7 +52,7 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
       h(LoginButtons, props),
     ]),
     h(Seperator),
-    h(Link, {href: "/blog"}, h(NavLink, {style:{justifySelf: 'right'}}, 'blog')),
+    h(Link, {href: "/blog", passHref:true}, h(NavLink, {style:{justifySelf: 'right'}}, 'blog')),
     h(Seperator),
     h(Feedback)
   ]))
