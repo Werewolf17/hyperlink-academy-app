@@ -6,8 +6,7 @@ import { Box, Seperator } from 'components/Layout'
 import { Mobile } from 'components/Tokens'
 import styled from '@emotion/styled'
 import { Secondary } from 'components/Button'
-import CourseCard, { FlexGrid } from 'components/Course/CourseCard'
-import { ClubCard } from 'components/Card'
+import { ClubCard, CourseCard, FlexGrid } from 'components/Card'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 export default function Courses(props:Props) {
