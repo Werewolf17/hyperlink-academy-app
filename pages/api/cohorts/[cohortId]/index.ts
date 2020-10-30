@@ -59,6 +59,7 @@ async function updateCohort(req:Request) {
       if(!cohort) return
       return {
         email: watcher.email,
+        Metadata: {type: 'course-watching-notification', course: cohort.course.toString()},
         vars: {
           course_name: cohort.courses.name,
           cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohortId}`,
