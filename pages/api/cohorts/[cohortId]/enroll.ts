@@ -5,6 +5,7 @@ import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from 'emails'
 import Stripe from 'stripe'
 import { getToken } from "src/token";
 import { addMember, getTaggedPost } from "src/discourse";
+import { prettyDate } from "src/utils"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
 let prisma = new PrismaClient()
@@ -92,7 +93,7 @@ async function enroll (req: Request) {
       addMember(cohort.courses.course_groupTodiscourse_groups.id, user.username),
       sendCohortEnrollmentEmail(user.email, {
         name: user.display_name || user.username,
-        course_start_date: cohort.start_date,
+        course_start_date: prettyDate(cohort.start_date),
         course_name: cohort.courses.name,
         cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
         cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
