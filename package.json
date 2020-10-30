@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "next",
-    "build": "next build",
+    "build": "npm run build:rss && next build",
+    "build:rss": "node ./src/generateRSS.js",
     "typecheck": "tsc",
     "start": "next start",
     "postinstall": "prisma generate",
@@ -26,6 +27,7 @@
     "airtable": "^0.10.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.1",
+    "feed": "^4.2.1",
     "gray-matter": "^4.0.2",
     "ical.js": "^1.4.0",
     "next": "^10.0.0",

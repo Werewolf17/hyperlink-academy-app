@@ -23,7 +23,12 @@ type  Blog = {
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Blog = (props:Props) => {
   return h(Box, {gap: 64}, [
-    h('h1', 'Hyperblog'),
+    h('div', [
+      h('h1', 'Hyperblog'),
+      h('span', [
+        h('a', {href:'/rss.xml'}, 'rss'), ' ', h('a', {href:"/atom.xml"}, 'atom')
+      ])
+    ]),
     ...props.posts.sort((a, b) => {
       if (new Date(a.date) < new Date(b.date)) return 1
       return -1
