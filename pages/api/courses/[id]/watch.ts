@@ -20,11 +20,11 @@ async function watchCourse(req:Request) {
   if(typeof msg.watching !== 'boolean') return {status: 400, result: "ERROR: no watching property on request"} as const
 
   if(msg.watching === true) {
-    await prisma.people_watching_courses.upsert({
+    await prisma.watching_courses.upsert({
       where: {
-        course_person: {
-          course: courseId,
-          person: user.id,
+        email_course:{
+          course:courseId,
+          email: user.email
         }
       },
       create: {
@@ -33,9 +33,7 @@ async function watchCourse(req:Request) {
             id: courseId
           }
         },
-        people: {
-          connect: {id: user.id}
-        }
+        email: user.email
       },
       update: {
         courses: {
@@ -43,18 +41,16 @@ async function watchCourse(req:Request) {
             id: courseId
           }
         },
-        people: {
-          connect: {id: user.id}
-        }
+        email: user.email
       }
     })
   }
   else {
-    await prisma.people_watching_courses.delete({
+    await prisma.watching_courses.delete({
       where: {
-        course_person: {
+        email_course: {
           course: courseId,
-          person: user.id,
+          email: user.email,
         }
       }
     })

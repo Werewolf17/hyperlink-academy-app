@@ -95,6 +95,7 @@ model courses {
   course_maintainers                 course_maintainers[]
   course_templates                   course_templates[]
   people_watching_courses            people_watching_courses[]
+  watching_courses                   watching_courses[]
 }
 
 model course_templates {
@@ -176,6 +177,14 @@ model discourse_groups {
   course_cohorts                     course_cohorts[]
   course_groupTodiscourse_groups     courses[]        @relation("courses_course_groupTodiscourse_groups")
   maintainer_groupTodiscourse_groups courses[]        @relation("courses_maintainer_groupTodiscourse_groups")
+}
+
+model watching_courses {
+  email   String
+  course  Int
+  courses courses @relation(fields: [course], references: [id])
+
+  @@id([email, course])
 }
 
 enum course_status {

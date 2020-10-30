@@ -72,9 +72,9 @@ async function getUserCourses(req: Request) {
         }
       }
     }),
-    prisma.people_watching_courses.findMany({
+    prisma.watching_courses.findMany({
       where: {
-        person: token.id
+        email: token.email
       }
     })
   ])

@@ -51,19 +51,18 @@ async function updateCohort(req:Request) {
 
   if(cohort.live === false && msg.data.live === true) {
     // If we're toggling a cohort live, notify those watching
-    let watchers = await prisma.people_watching_courses.findMany({
+    let watchers = await prisma.watching_courses.findMany({
       where: {course: cohort.course},
-      select: {people: {select: {email: true, username: true, display_name: true}}}
+      select: {email: true}
     })
     await sendWatchingNotificationEmail(watchers.map(watcher => {
       if(!cohort) return
       return {
-        email: watcher.people.email,
+        email: watcher.email,
         vars: {
           course_name: cohort.courses.name,
           cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohortId}`,
           cohort_start_date: prettyDate(cohort.start_date),
-          name: watcher.people.display_name || watcher.people.username,
           course_description: cohort.courses.description
         }
       }

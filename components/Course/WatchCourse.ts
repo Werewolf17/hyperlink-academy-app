@@ -30,7 +30,7 @@ export function WatchCourse(props:{id: number}) {
         setLoading(false)
         if(res.status === 200) {
           if(watching) mutate({...userCourses, watching_courses: userCourses.watching_courses.filter(x=>x.course !== props.id)})
-          else mutate({...userCourses, watching_courses: [...userCourses.watching_courses, {course: props.id, person: user.id}]})
+          else mutate({...userCourses, watching_courses: [...userCourses.watching_courses, {course: props.id, email: user.email}]})
         }
       }}, loading ? h(Loader) : watching? "Unwatch?" : "Watch this course!" ))
     ])

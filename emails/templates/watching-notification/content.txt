@@ -1,4 +1,4 @@
-Hey {{name}}, a course you're watching on Hyperlink has just scheduled a new cohort!
+A course you're watching on Hyperlink has just scheduled a new cohort!
 
 {{course_name}}
 

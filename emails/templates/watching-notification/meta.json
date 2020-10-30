@@ -5,7 +5,6 @@
   "TemplateType": "Standard",
   "LayoutTemplate": "Hyperlink",
   "TestRenderModel": {
-    "name": "name_Value",
     "course_name": "course_name_Value",
     "course_description": "course_description_Value",
     "cohort_page_url": "cohort_page_url_Value",
