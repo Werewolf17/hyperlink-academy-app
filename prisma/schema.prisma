@@ -125,6 +125,7 @@ model people {
   bio                     String?
   link                    String?
   calendar_id             String                    @unique @default(dbgenerated())
+  pronouns                String?
   admins                  admins[]
   course_cohorts          course_cohorts[]
   course_maintainers      course_maintainers[]

@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 
 export type UpdatePersonMsg = {
   profile?: {
+    pronouns?: string
     display_name?: string,
     link?: string,
     bio?: string,
@@ -42,10 +43,14 @@ async function updatePerson(req: Request) {
   }
 
   if(body.profile) {
-    let data = {display_name: body.profile.display_name, link: body.profile.link, bio: body.profile.bio}
     let newData = await prisma.people.update({
       where:{id: user.id},
-      data
+      data: {
+        display_name: body.profile.display_name,
+        link: body.profile.link,
+        bio: body.profile.bio,
+        pronouns: body.profile.pronouns
+      }
     })
     setHeaders = setTokenHeader({...user, display_name:newData.display_name, link: newData.link, bio: newData.bio})
     await syncSSO({
@@ -88,6 +93,7 @@ export const profileDataQuery = (username: string, loggedIn: boolean)=>{
     where: {username: username},
     select: {
       calendar_id: loggedIn,
+      pronouns: true,
       display_name: true,
       bio: true,
       link: true,

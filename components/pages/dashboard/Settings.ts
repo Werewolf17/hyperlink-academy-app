@@ -14,6 +14,7 @@ import { UpdatePersonMsg, UpdatePersonResult } from 'pages/api/people/[id]'
 const COPY = {
   usernameField: "Username",
   emailField: "Email",
+  pronounsField: "Your Pronouns",
   displayNameField: "Nickname",
   displayNameDescription: "This is displayed when you post on the forum or enroll in a course.",
   linkField: "Link",
@@ -24,24 +25,26 @@ const COPY = {
 
 const Settings = () => {
   let {data: user, mutate} = useUserData()
-  let {data: profile} = useProfileData(user ? user.username : undefined)
+  let {data: profile, mutate:mutateProfile} = useProfileData(user ? user.username : undefined)
   let [formData, setFormData] = useState({
     bio: '',
     display_name: '',
+    pronouns: '',
     link: ''
   })
   let [status, callUpdatePerson] = useApi<UpdatePersonMsg, UpdatePersonResult>([])
 
   useEffect(()=> {
-    if(user) setFormData({bio:user.bio || '', display_name:user.display_name || '', link: user.link || ''})
-  }, [user])
+    if(profile) setFormData({bio:profile.bio || '', display_name:profile.display_name || '', link: profile.link || '', pronouns: profile.pronouns || ''})
+  }, [profile])
 
   if(!user || !profile) return null
 
   const changed =
-    formData.bio !== user.bio ||
-    formData.display_name !== user.display_name ||
-    formData.link !== user.link
+    formData.bio !== profile.bio ||
+    formData.display_name !== profile.display_name ||
+    formData.link !== profile.link ||
+    formData.pronouns !== profile.pronouns
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,6 +53,7 @@ const Settings = () => {
     let res = await callUpdatePerson(`/api/people/${user.username}`, {profile:formData})
     if(res.status === 200) {
       if(user) mutate({...user, ...formData})
+      if(profile) mutateProfile({...profile, ...formData})
     }
   }
 
@@ -67,6 +71,16 @@ const Settings = () => {
           onChange: e=>{
             e.preventDefault()
             setFormData({...formData, display_name: e.currentTarget.value})
+          }
+        })
+      ]),
+      h(LabelBox, {gap:8}, [
+        h('h4', COPY.pronounsField),
+        h(Input,{
+          value: formData.pronouns,
+          onChange: e=>{
+            e.preventDefault()
+            setFormData({...formData, pronouns: e.currentTarget.value})
           }
         })
       ]),
@@ -90,7 +104,8 @@ const Settings = () => {
     ]),
     h(SubmitButtons, [
       h(Destructive, {disabled: !changed, onClick: ()=>{
-        if(user)setFormData({bio: user.bio ||'', display_name: user.display_name||'', link: user.link || ''})
+        if(!profile) return
+        setFormData({bio: profile.bio ||'', display_name: profile.display_name||'', link: profile.link || '', pronouns: profile.pronouns || ''})
       }}, "Discard Changes"),
       h(Primary, {status, type: 'submit', disabled: !changed}, 'Save Changes')
     ])
