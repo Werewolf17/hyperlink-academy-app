@@ -137,20 +137,12 @@ model people_in_cohorts {
   person           String
   cohort           Int
   discount_used    String?
+  amount_paid      Int?
   course_cohorts   course_cohorts    @relation(fields: [cohort], references: [id])
   course_discounts course_discounts? @relation(fields: [discount_used], references: [code])
   people           people            @relation(fields: [person], references: [id])
 
   @@id([person, cohort])
-}
-
-model people_watching_courses {
-  person  String
-  course  Int
-  courses courses @relation(fields: [course], references: [id])
-  people  people  @relation(fields: [person], references: [id])
-
-  @@id([course, person])
 }
 
 model cohort_events {
@@ -186,6 +178,15 @@ model watching_courses {
   courses courses @relation(fields: [course], references: [id])
 
   @@id([email, course])
+}
+
+model people_watching_courses {
+  person  String
+  course  Int
+  courses courses @relation(fields: [course], references: [id])
+  people  people  @relation(fields: [person], references: [id])
+
+  @@id([course, person])
 }
 
 enum course_status {

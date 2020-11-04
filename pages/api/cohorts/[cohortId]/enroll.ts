@@ -86,8 +86,10 @@ async function enroll (req: Request) {
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
     await Promise.all([
       prisma.people_in_cohorts.create({data: {
+        amount_paid: 0,
         people: {connect: {id: user.id}},
-        course_cohorts: {connect: {id: cohortId}}
+        course_cohorts: {connect: {id: cohortId}},
+        course_discounts: discount ? {connect:{code: discount.code}} : undefined
       }}),
       addMember(cohort.discourse_groups.id, user.username),
       addMember(cohort.courses.course_groupTodiscourse_groups.id, user.username),
