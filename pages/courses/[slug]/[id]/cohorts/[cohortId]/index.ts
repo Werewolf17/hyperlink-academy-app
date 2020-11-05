@@ -409,7 +409,7 @@ export const getStaticProps = async (ctx:any)=>{
   if(!cohort) return {props: {notFound: true}} as const
 
   let cohort_events = cohort.cohort_events.map(event =>{
-    return {...event, events: {...event.events, location: undefined}}
+    return {...event, events: {...event.events, location: null}}
   })
 
   let [notes, artifacts, curriculum] = await Promise.all([

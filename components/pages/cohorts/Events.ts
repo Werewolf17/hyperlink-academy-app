@@ -16,7 +16,7 @@ type Event = {
   name: string
   start_date: string,
   end_date: string,
-  location?: string,
+  location: string | null,
   description: string,
 }
 export const CohortEvents = (props: {facilitating: boolean, cohort: number, events: Array<Event>, mutate: (E:Array<Event>)=>void})=>{

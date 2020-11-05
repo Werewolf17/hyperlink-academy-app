@@ -145,7 +145,7 @@ async function getCohortData(req: Request) {
   let enrolled = data.people_in_cohorts.find(x=>x.person === user?.id) || data.facilitator === user?.id
   let cohort_events = data.cohort_events.map(event =>{
     if(!enrolled) {
-      return {...event, events: {...event.events, location: undefined}}
+      return {...event, events: {...event.events, location: null}}
     }
     return event
   })
