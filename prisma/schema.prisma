@@ -137,7 +137,7 @@ model people_in_cohorts {
   person           String
   cohort           Int
   discount_used    String?
-  amount_paid      Int?
+  amount_paid      Int
   course_cohorts   course_cohorts    @relation(fields: [cohort], references: [id])
   course_discounts course_discounts? @relation(fields: [discount_used], references: [code])
   people           people            @relation(fields: [person], references: [id])
