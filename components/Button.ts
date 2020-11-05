@@ -4,17 +4,26 @@ import {colors} from  './Tokens'
 import {Status} from '../src/apiHelpers'
 import { Checkmark } from "./Icons";
 import Loader from "./Loader";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Link from 'next/link'
 
-export const Primary:React.SFC<{disabled?:boolean, status?:Status}&Parameters<typeof PrimaryButton>[0]> =  (props)=>{
+export const Primary:React.FC<{disabled?:boolean, status?:Status}&Parameters<typeof PrimaryButton>[0]> =  (props)=>{
+  let [status, setStatus]= useState(props.status || 'normal')
+  useEffect(()=>{
+    if(props.status) setStatus(props.status)
+    if(props.status === 'success') {
+      let timeout = setTimeout(()=>setStatus('normal'), 1000)
+      return ()=>clearTimeout(timeout)
+    }
+
+  },[props.status])
   let displayComponent = {
     success: Checkmark,
     loading: h(Loader),
     error: props.children as ReactElement,
     normal: props.children as ReactElement
   }
-  return h(PrimaryButton, {...props, success: props.status==='success'}, displayComponent[props.status || 'normal'])
+  return h(PrimaryButton, {...props, success: status==='success'}, displayComponent[status])
 }
 const PrimaryButton = styled('button')<{disabled?: boolean, success?:boolean}>`
 font-family: Roboto Mono;
