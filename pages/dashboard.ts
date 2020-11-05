@@ -9,7 +9,7 @@ import { Box, WhiteContainer} from 'components/Layout'
 import { BigCohortCard, ClubCard, CourseCard, FlexGrid } from 'components/Card'
 import { PageLoader } from 'components/Loader'
 // import { AccentImg } from '../components/Images'
-import { useUserCohorts, useUserData, useUserCourses } from 'src/data'
+import { useUserCohorts, useUserData, useUserCourses, useProfileData } from 'src/data'
 import { Tabs } from 'components/Tabs'
 import Settings from 'components/pages/dashboard/Settings'
 import {Primary, LinkButton} from 'components/Button'
@@ -26,8 +26,9 @@ Garden. Check out some in development, or propose your own!`,
 }
 
 const Dashboard = () => {
-  let {data: user} = useUserData()
+  let {data: user, mutate} = useUserData()
   let {data: cohorts} = useUserCohorts()
+  let {data: profile, mutate:mutateProfile} = useProfileData(user ? user.username : undefined)
   let {data: userCourses} = useUserCourses()
   let router = useRouter()
 
@@ -35,7 +36,7 @@ const Dashboard = () => {
     if(user === false) router.push('/')
   }, [user])
 
-  if(!user || cohorts === undefined || userCourses === undefined) {
+  if(!user || cohorts === undefined || userCourses === undefined || profile === undefined || profile === false) {
     return h(PageLoader)
   }
 
@@ -97,7 +98,10 @@ const Dashboard = () => {
             h(FlexGrid, {min: 290, mobileMin: 290}, clubs.map(course=> h(ClubCard, {course})))
           ])
         ]),
-        Profile: h(Settings)
+        Profile: h(Settings, {profile, user, mutate: p => {
+          if(user) mutate({...user, ...p})
+          if(profile) mutateProfile({...profile, ...p})
+        }})
       }}),
   ])
 }

@@ -119,13 +119,13 @@ model password_reset_keys {
 model people {
   id                      String                    @id
   email                   String                    @unique
-  display_name            String?
+  display_name            String                    @default("")
   password_hash           String                    @unique
   username                String                    @unique
-  bio                     String?
-  link                    String?
+  bio                     String                    @default("")
+  link                    String                    @default("")
   calendar_id             String                    @unique @default(dbgenerated())
-  pronouns                String?
+  pronouns                String                    @default("")
   admins                  admins[]
   course_cohorts          course_cohorts[]
   course_maintainers      course_maintainers[]
