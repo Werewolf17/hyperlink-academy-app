@@ -157,7 +157,7 @@ export async function updateCategory (id: string | number, options: {permissions
   if(result.status !== 200) console.log(await result.text())
   else return true
 }
-export async function getCategory(path: string){
+export async function getCategory(path: string | number){
   let res = await fetchWithBackoff(`https://forum.hyperlink.academy/c/${path}.json`, {
     method: 'GET',
     headers: {

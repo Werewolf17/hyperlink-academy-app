@@ -1,8 +1,7 @@
-
 import { PrismaClient } from "@prisma/client"
 import { ResultType, APIHandler, Request } from "src/apiHelpers"
 import { getToken } from "src/token";
-import { createTopic, getCategory } from "src/discourse";
+import { createTopic } from "src/discourse";
 
 let prisma = new PrismaClient()
 export type PostTopicMsg = {
@@ -29,17 +28,16 @@ async function postTopic(req:Request) {
     select:{
       facilitator: true,
       id: true,
+      category_id: true,
       courses: {select: {id: true, slug: true}}}
   })
   if(!cohort) return {status:404, result: `ERROR: Cannot find cohort ${cohortId} in course ${courseId}`} as const
-
   if(cohort.facilitator !== user.id) return {status:401, result:`ERROR: User is not facilitator of cohort`} as const
-  let category = await getCategory(cohort.courses.slug + '/' + cohort.id)
 
   let topic = await createTopic({
     title: msg.title,
     raw: msg.body,
-    category: category?.topic_list.topics[0].category_id || '',
+    category: cohort.category_id,
     tags: msg.tags
   }, user.username)
   if(!topic)  return {status:500, result: "ERROR: Unable to create topic"} as const
