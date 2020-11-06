@@ -121,6 +121,9 @@ async function enroll (req: Request) {
     }
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
+    payment_intent_data: {
+      transfer_group: cohort.id.toString()
+    },
     line_items: [{
       name: cohort.courses.name +
         (discount ? `, ${discount?.type === 'absolute' ? '$'+discount?.amount : discount?.amount+"%"} Off` : ''),

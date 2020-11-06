@@ -92,6 +92,7 @@ export const profileDataQuery = (username: string, loggedIn: boolean)=>{
   return prisma.people.findOne({
     where: {username: username},
     select: {
+      stripe_connected_accounts: loggedIn,
       calendar_id: loggedIn,
       pronouns: true,
       display_name: true,
