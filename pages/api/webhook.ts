@@ -108,6 +108,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     ])
 
   }
+  if (event.type === 'account.updated') {
+    console.log('yoooo')
+    console.log(event.data.object)
+    const {details_submitted, payouts_enabled, id} = event.data.object as {id: string, details_submitted: boolean, payouts_enabled: boolean, metadata: Stripe.Metadata} ;
+    if(details_submitted) await prisma.stripe_connected_accounts.update({
+      where:{stripe_account:id},
+      data:{
+        connected: true,
+        payouts_enabled
+      }
+    })
+
+  }
 
   res.status(200).end()
 }

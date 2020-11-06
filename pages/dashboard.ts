@@ -98,10 +98,15 @@ const Dashboard = () => {
             h(FlexGrid, {min: 290, mobileMin: 290}, clubs.map(course=> h(ClubCard, {course})))
           ])
         ]),
-        Profile: h(Settings, {profile, user, mutate: p => {
-          if(user) mutate({...user, ...p})
-          if(profile) mutateProfile({...profile, ...p})
-        }})
+        Profile: h(Settings, {
+          facilitator:userCourses.maintaining_courses.length !== 0,
+          profile,
+          user,
+          mutate: p => {
+            if(user) mutate({...user, ...p})
+            if(profile) mutateProfile({...profile, ...p})
+          }
+        })
       }}),
   ])
 }
