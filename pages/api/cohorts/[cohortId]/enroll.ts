@@ -7,7 +7,7 @@ import { getToken } from "src/token";
 import { addMember, getTaggedPost } from "src/discourse";
 import { prettyDate } from "src/utils"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-03-02'});
+const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-08-27'});
 let prisma = new PrismaClient()
 export type EnrollResponse= ResultType<typeof enroll>
 export type EnrollMsg  = rt.Static<typeof EnrollMsgValidator>

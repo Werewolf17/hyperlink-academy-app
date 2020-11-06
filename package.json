@@ -39,7 +39,7 @@
     "react-markdown": "^4.3.1",
     "rehype-slug": "^3.0.0",
     "runtypes": "^5.0.1",
-    "stripe": "^8.83.0",
+    "stripe": "^8.120.0",
     "swr": "^0.3.4",
     "uuid": "^7.0.3"
   },
