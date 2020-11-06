@@ -119,16 +119,19 @@ const StripeSettings = (props:{stripe_connected_accounts: {connected: boolean, p
   let [status, setStatus] = useState<'normal' | 'loading'>('normal')
   console.log(props)
   return h(Box, [
-      h('h3', {id:"connect-stripe"}, 'Link a Stripe account'),
-      h(Primary, {status, onClick: async ()=> {
-        setStatus('loading')
-        let res = await callApi<null, GETConnectStripeResult>('/api/user/connectStripe')
-        if(res.status !== 200) return setStatus('normal')
-        window.location.assign(res.result.url)
-      }}, !props.stripe_connected_accounts?.connected
-        ? 'Connect to Stripe'
-        : props.stripe_connected_accounts.payouts_enabled ? 'Update your Stripe details' : "Finish your Stripe onboarding")
-    ])
+    h('div',[
+      h('h3', {id:"connect-stripe"}, 'Stripe Account'),
+      h('p.textSecondary', 'We use Stripe to handle payments from learners and payouts to facilitators'),
+    ]),
+    h(Primary, {status, onClick: async ()=> {
+      setStatus('loading')
+      let res = await callApi<null, GETConnectStripeResult>('/api/user/connectStripe')
+      if(res.status !== 200) return setStatus('normal')
+      window.location.assign(res.result.url)
+    }}, !props.stripe_connected_accounts?.connected
+      ? 'Connect to Stripe'
+      : props.stripe_connected_accounts.payouts_enabled ? 'Update your Stripe details' : "Finish your Stripe onboarding")
+  ])
 }
 
 export default Settings
