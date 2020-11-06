@@ -7,8 +7,9 @@ import { Input, Textarea, Info } from 'components/Form'
 import { Primary, Destructive } from 'components/Button'
 import { colors } from 'components/Tokens'
 
-import { useApi } from 'src/apiHelpers'
+import { callApi, useApi } from 'src/apiHelpers'
 import { UpdatePersonMsg, UpdatePersonResult } from 'pages/api/people/[id]'
+import { GETConnectStripeResult } from 'pages/api/user/connectStripe'
 
 const COPY = {
   usernameField: "Username",
@@ -25,12 +26,18 @@ type Profile = {
   bio: string,
   display_name: string,
   pronouns: string,
-  link: string
+  link: string,
+  stripe_connected_accounts:{
+    stripe_account: string,
+    payouts_enabled: boolean,
+    connected: boolean
+  } | null
 }
 const Settings = (props:{
   user: {email: string, username: string}
+  facilitator: boolean,
   profile: Profile
-  mutate: (p:Profile)=>void
+  mutate: (p:Omit<Profile, 'stripe_connected_accounts'>)=>void
 }) => {
   let [formData, setFormData] = useState(props.profile)
   let [status, callUpdatePerson] = useApi<UpdatePersonMsg, UpdatePersonResult>([])
@@ -50,9 +57,10 @@ const Settings = (props:{
       props.mutate(formData)
     }
   }
+  console.log(props.profile)
 
-  return h(FormBox, {onSubmit, width: 400, gap: 64}, [
-    h(Box, {gap: 32}, [
+  return h(Box, {gap:64}, [
+    h(FormBox, {onSubmit, width: 400, gap: 32}, [
       h(Box, {gap:8}, [h('h4', 'Username'), h(Info, props.user.username)]),
       h(Box, {gap:8}, [h('h4', 'Email'), h(Info, props.user.email)]),
       h(LabelBox, {gap:8}, [
@@ -95,7 +103,6 @@ const Settings = (props:{
           onChange: e=>setFormData({...formData, bio: e.currentTarget.value})
         })
       ]),
-    ]),
     h(SubmitButtons, [
       h(Destructive, {disabled: !changed, onClick: ()=>{
         if(!props.profile) return
@@ -103,6 +110,27 @@ const Settings = (props:{
       }}, "Discard Changes"),
       h(Primary, {status, type: 'submit', disabled: !changed}, 'Save Changes')
     ])
+  ]),
+    !props.facilitator ? null : h(StripeSettings, {stripe_connected_accounts: props.profile.stripe_connected_accounts})
+  ])
+}
+
+const StripeSettings = (props:{stripe_connected_accounts: {connected: boolean, payouts_enabled:boolean} | null}) => {
+  let [status, setStatus] = useState<'normal' | 'loading'>('normal')
+  console.log(props)
+  return h(Box, [
+    h('div',[
+      h('h3', {id:"connect-stripe"}, 'Stripe Account'),
+      h('p.textSecondary', 'We use Stripe to handle payments from learners and payouts to facilitators'),
+    ]),
+    h(Primary, {status, onClick: async ()=> {
+      setStatus('loading')
+      let res = await callApi<null, GETConnectStripeResult>('/api/user/connectStripe')
+      if(res.status !== 200) return setStatus('normal')
+      window.location.assign(res.result.url)
+    }}, !props.stripe_connected_accounts?.connected
+      ? 'Connect to Stripe'
+      : props.stripe_connected_accounts.payouts_enabled ? 'Update your Stripe details' : "Finish your Stripe onboarding")
   ])
 }
 

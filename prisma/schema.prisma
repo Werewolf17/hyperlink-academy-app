@@ -117,20 +117,21 @@ model password_reset_keys {
 }
 
 model people {
-  id                      String                    @id
-  email                   String                    @unique
-  display_name            String                    @default("")
-  password_hash           String                    @unique
-  username                String                    @unique
-  bio                     String                    @default("")
-  link                    String                    @default("")
-  calendar_id             String                    @unique @default(dbgenerated())
-  pronouns                String                    @default("")
-  admins                  admins[]
-  course_cohorts          course_cohorts[]
-  course_maintainers      course_maintainers[]
-  people_in_cohorts       people_in_cohorts[]
-  people_watching_courses people_watching_courses[]
+  id                        String                     @id
+  email                     String                     @unique
+  display_name              String                     @default("")
+  password_hash             String                     @unique
+  username                  String                     @unique
+  bio                       String                     @default("")
+  link                      String                     @default("")
+  calendar_id               String                     @unique @default(dbgenerated())
+  pronouns                  String                     @default("")
+  admins                    admins[]
+  course_cohorts            course_cohorts[]
+  course_maintainers        course_maintainers[]
+  people_in_cohorts         people_in_cohorts[]
+  people_watching_courses   people_watching_courses[]
+  stripe_connected_accounts stripe_connected_accounts?
 }
 
 model people_in_cohorts {
@@ -187,6 +188,14 @@ model people_watching_courses {
   people  people  @relation(fields: [person], references: [id])
 
   @@id([course, person])
+}
+
+model stripe_connected_accounts {
+  person          String  @unique
+  stripe_account  String  @id
+  connected       Boolean @default(false)
+  payouts_enabled Boolean @default(false)
+  people          people  @relation(fields: [person], references: [id])
 }
 
 enum course_status {
