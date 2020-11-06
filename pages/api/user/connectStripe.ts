@@ -22,6 +22,14 @@ async function GETConnectStripe(req:Request){
   if(!user_data.stripe_connected_accounts) {
     let account = await stripe.accounts.create({
       type: 'express',
+      capabilities:{
+        transfers:{
+          requested: true
+        }
+      },
+      tos_acceptance:{
+        service_agreement: "recipient"
+      },
       metadata:{
         user: user.id
       }
