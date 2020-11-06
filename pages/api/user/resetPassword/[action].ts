@@ -1,9 +1,9 @@
-import {multiRouteHandler, ResultType, Request} from '../../../src/apiHelpers'
+import {multiRouteHandler, ResultType, Request} from 'src/apiHelpers'
 import {PrismaClient} from '@prisma/client'
-import hmac from '../../../src/hmac'
+import hmac from 'src/hmac'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs'
-import {sendResetPasswordEmail} from '../../../emails'
+import {sendResetPasswordEmail} from 'emails'
 
 const prisma = new PrismaClient()
 
