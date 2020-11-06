@@ -9,7 +9,7 @@ import { Primary, LinkButton } from 'components/Button'
 import {AccentImg, HalfLoopImg} from 'components/Images'
 import { useApi } from 'src/apiHelpers'
 import { Result, Msg } from 'pages/api/login'
-import { RequestMsg, RequestResult } from 'pages/api/resetPassword/[action]'
+import { RequestMsg, RequestResult } from 'pages/api/user/resetPassword/[action]'
 import { useUserData } from 'src/data'
 import styled from '@emotion/styled'
 
@@ -116,7 +116,7 @@ const ResetPassword: React.SFC = () => {
   let [status, callResetPassword, setStatus] = useApi<RequestMsg, RequestResult>([email])
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
-    await callResetPassword('/api/resetPassword/request', { email })
+    await callResetPassword('/api/user/resetPassword/request', { email })
   }
 
   switch (status) {

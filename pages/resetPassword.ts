@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { FormBox, LabelBox} from 'components/Layout'
 import {Primary} from 'components/Button'
 import { Input, Error, Info} from 'components/Form'
-import {ResetMsg, ResetResult} from 'pages/api/resetPassword/[action]'
+import {ResetMsg, ResetResult} from 'pages/api/user/resetPassword/[action]'
 import { useApi } from 'src/apiHelpers'
 
 const COPY = {
@@ -38,7 +38,7 @@ const ResetPassword = ()=>{
 
   const onSubmit = async (e:React.FormEvent)=> {
     e.preventDefault()
-    await callResetPassword('/api/resetPassword/reset', {key, password: formData.password})
+    await callResetPassword('/api/user/resetPassword/reset', {key, password: formData.password})
   }
 
   switch(status) {
