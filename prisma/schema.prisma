@@ -195,6 +195,7 @@ model stripe_connected_accounts {
   stripe_account  String  @id
   connected       Boolean @default(false)
   payouts_enabled Boolean @default(false)
+  country         String
   people          people  @relation(fields: [person], references: [id])
 }
 
