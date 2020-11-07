@@ -57,7 +57,7 @@ async function updatePerson(req: Request) {
       external_id: user.id,
       email: user.email,
       username: user.username,
-      name: newData.display_name || '',
+      name: newData.display_name + (newData.pronouns ? `(${newData.pronouns})` : '') || '',
       bio: newData.bio || '',
       website: newData.link || ''
     })
