@@ -92,7 +92,7 @@ export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
       completed: true,
       facilitator: true,
       people: {
-        select: {display_name: true, username: true, bio: true}
+        select: {display_name: true, username: true, bio: true, pronouns: true}
       },
       cohort_events: {
         select: {
@@ -127,6 +127,7 @@ export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
           people: {
             select: {
               display_name: true,
+              pronouns: true,
               username: true,
             }
           }

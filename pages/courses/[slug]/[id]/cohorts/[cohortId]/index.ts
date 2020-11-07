@@ -185,10 +185,13 @@ width: 200px;
 
 export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => {
   return h(Box, {gap:16}, [
-    h('h3', [`Facilitated by `, h(Link, {
-          href: '/people/[id]',
-          as: `/people/${props.cohort.people.username}`
-        }, h('a', {className: 'notBlue'}, props.cohort.people.display_name || props.cohort.people.username))]),
+    h('h3', [
+      `Facilitated by `, h(Link, {
+        href: '/people/[id]',
+        as: `/people/${props.cohort.people.username}`
+      }, h('a', {className: 'notBlue'}, props.cohort.people.display_name || props.cohort.people.username)),
+      props.cohort.people.pronouns ? h('span.textSecondary', {}, ` (${props.cohort.people.pronouns})`) : null
+    ]),
     props.isFacilitator ? h(Info, [`💡 You can edit your bio in the profile tab on your `, h(Link, {href: '/dashboard'}, h('a', 'dashboard'))]) : null,
     h(Text, {source: props.cohort.people.bio || ''}),
     props.cohort.people_in_cohorts.length > 0 ? h('h4', "Members") : null,
@@ -198,7 +201,11 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => 
           h(Link, {
             href: '/people/[id]',
             as: `/people/${person.people.username}`
-          }, h('a', {className: 'notBlue'},person.people.display_name || person.people.username))])
+          }, [
+            h('a', {className: 'notBlue'}, person.people.display_name || person.people.username),
+          ]),
+          person.people.pronouns ? h('span.textSecondary', {}, ` (${person.people.pronouns})`) : null
+        ])
       }),
     ])
 }
@@ -206,7 +213,7 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => 
 let LearnerEntry = styled('div')`
 display: grid;
 grid-template-columns: max-content min-content;
-grid-gap: 16px;
+grid-gap: 8px;
 `
 
 

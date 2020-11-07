@@ -14,7 +14,8 @@ import { profileDataQuery } from 'pages/api/people/[id]'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
-export default (props: Props)=> props.notFound ? h(ErrorPage) : h(Profile, props)
+const ProfilePage = (props: Props)=> props.notFound ? h(ErrorPage) : h(Profile, props)
+export default ProfilePage
 
 const Profile= (props: Extract<Props, {notFound: false}>)=>{
   let router = useRouter()
@@ -28,8 +29,13 @@ const Profile= (props: Extract<Props, {notFound: false}>)=>{
 
   return h(Box, {gap: 32}, [
     h(Box, {gap: 8}, [
-      h('h1', person.display_name || username),
-      h('b', {style: {color: colors.textSecondary}}, `@${username}`),
+      h('h1', [
+        person.display_name || username,
+      ]),
+      h('div', [
+        h('b', {style: {color: colors.textSecondary}}, `@${username}`),
+        person.pronouns ? h('span.textSecondary', ` (${person.pronouns})`) : null
+      ]),
       !person.link ? null : h('a', {href: link}, h('b', person.link)),
     ]),
     !person.bio ? null : h(Box, {width: 640}, h(Text, {source: person.bio}))
