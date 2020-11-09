@@ -139,6 +139,7 @@ model people_in_cohorts {
   cohort           Int
   discount_used    String?
   amount_paid      Int
+  payment_intent   String?
   course_cohorts   course_cohorts    @relation(fields: [cohort], references: [id])
   course_discounts course_discounts? @relation(fields: [discount_used], references: [code])
   people           people            @relation(fields: [person], references: [id])
@@ -195,6 +196,7 @@ model stripe_connected_accounts {
   stripe_account  String  @id
   connected       Boolean @default(false)
   payouts_enabled Boolean @default(false)
+  country         String
   people          people  @relation(fields: [person], references: [id])
 }
 

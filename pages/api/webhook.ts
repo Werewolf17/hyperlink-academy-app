@@ -35,7 +35,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
-    const {metadata, amount_total} = event.data.object as {customer_email:string, amount_total: number, metadata: StripeMetaData} ;
+    const {metadata, amount_total, payment_intent} = event.data.object as {customer_email:string, amount_total: number, metadata: StripeMetaData, payment_intent: string} ;
 
     let cohortId = parseInt(metadata.cohortId)
     let person = await prisma.people.findOne({where: {id: metadata.userId}})
@@ -83,6 +83,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           }
         }}) : null,
       prisma.people_in_cohorts.create({data: {
+        payment_intent,
         amount_paid: amount_total/100,
         people: {connect: {id: metadata.userId}},
         course_cohorts: {connect: {id: cohortId}},
