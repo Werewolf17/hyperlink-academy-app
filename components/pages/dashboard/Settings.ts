@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import { useState } from 'react'
 
 import { Box, LabelBox, FormBox} from 'components/Layout'
-import { Input, Textarea, Info } from 'components/Form'
+import { Input, Textarea, Info, Select } from 'components/Form'
 import { Primary, Destructive } from 'components/Button'
 import { colors } from 'components/Tokens'
 
@@ -117,18 +117,32 @@ const Settings = (props:{
 
 const StripeSettings = (props:{stripe_connected_accounts: {connected: boolean, payouts_enabled:boolean} | null}) => {
   let [status, setStatus] = useState<'normal' | 'loading'>('normal')
-  console.log(props)
-  return h(Box, [
+  let [country, setCountry] = useState('US')
+
+  let onSubmit = async (e:React.FormEvent)=>{
+    e.preventDefault()
+    setStatus('loading')
+    let res = await callApi<null, GETConnectStripeResult>('/api/user/connectStripe?country='+country)
+    if(res.status !== 200) return setStatus('normal')
+    window.location.assign(res.result.url)
+  }
+
+  return h(FormBox, {width: 400, onSubmit}, [
     h('div',[
       h('h3', {id:"connect-stripe"}, 'Stripe Account'),
       h('p.textSecondary', 'We use Stripe to handle payments from learners and payouts to facilitators'),
     ]),
-    h(Primary, {status, onClick: async ()=> {
-      setStatus('loading')
-      let res = await callApi<null, GETConnectStripeResult>('/api/user/connectStripe')
-      if(res.status !== 200) return setStatus('normal')
-      window.location.assign(res.result.url)
-    }}, !props.stripe_connected_accounts?.connected
+    props.stripe_connected_accounts ? null : h(Box, [
+      h('h4', "Select Your Country"),
+      h(Select, {
+        required: true,
+        onChange: e=>setCountry(e.currentTarget.value)
+      }, [
+        h('option', {value: "US"}, "United States of America"),
+        h('option', {value: "CA"}, "Canada")
+      ])
+    ]),
+    h(Primary, {status, type: 'submit'}, !props.stripe_connected_accounts?.connected
       ? 'Connect to Stripe'
       : props.stripe_connected_accounts.payouts_enabled ? 'Update your Stripe details' : "Finish your Stripe onboarding")
   ])

@@ -10,6 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-08-
 export type GETConnectStripeResult = ResultType<typeof GETConnectStripe>
 async function GETConnectStripe(req:Request){
   let user = getToken(req)
+  let country = req.query.country as string
   if(!user) return {status:400, result: "ERROR: no user logged in"} as const
   let user_data = await prisma.people.findOne({where:{id:user.id}, select:{
     course_maintainers:true,
@@ -22,12 +23,16 @@ async function GETConnectStripe(req:Request){
   if(!user_data.stripe_connected_accounts) {
     let account = await stripe.accounts.create({
       type: 'express',
+      country,
       capabilities:{
+        card_payments:{
+          requested: country === 'US'
+        },
         transfers:{
           requested: true
         }
       },
-      tos_acceptance:{
+      tos_acceptance: country === 'US' ? undefined : {
         service_agreement: "recipient"
       },
       metadata:{
@@ -36,11 +41,14 @@ async function GETConnectStripe(req:Request){
     })
     await prisma.stripe_connected_accounts.create({data:{
       people:{connect:{id: user.id}},
-      stripe_account: account.id
+      stripe_account: account.id,
+      country
     }})
     id = account.id
   }
-  else id = user_data.stripe_connected_accounts.stripe_account
+  else {
+    id = user_data.stripe_connected_accounts.stripe_account
+  }
 
   let link = await stripe.accountLinks.create({
     account: id,
