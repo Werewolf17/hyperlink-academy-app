@@ -28,6 +28,12 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
               }
             },
             cohort_events: {
+              where:{
+                OR:[
+                  {everyone: true},
+                  {events:{people_in_events:{some:{people:{calendar_id: calendar_ID}}}}}
+                ]
+              },
               select: {
                 events: true
               }

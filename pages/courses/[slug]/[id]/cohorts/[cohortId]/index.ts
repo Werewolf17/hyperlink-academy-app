@@ -77,7 +77,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
       ])
     ]),
     Schedule: cohort.cohort_events.length === 0 && !isFacilitator ? null : h(Box, {gap: 32}, [
-      isFacilitator ? h(CreateEvent, {cohort: cohort.id, mutate: (c)=>{
+      isFacilitator || inCohort ? h(CreateEvent, {cohort: cohort.id, people: cohort.people_in_cohorts.map(p=>p.people.username),mutate: (c)=>{
         if(!cohort) return
         mutate({...cohort, cohort_events: [...cohort.cohort_events, c]})
       }}) : null,
@@ -85,17 +85,28 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
         (inCohort || isFacilitator) && cohort.cohort_events.length > 0 ? h(Link, {href: "/calendar"}, h(LinkButton, {
           textSecondary: true,
         }, 'add to your calendar')) : null,
-        cohort.cohort_events.length === 0 ? h(WhiteContainer, [
-          h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
-            h( EmptyImg, {src: '/img/empty.png'}),
-            h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to thier calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
-          ])]) :
-            h(CohortEvents, {facilitating: isFacilitator, cohort: cohort.id, events: cohort.cohort_events.map(event => event.events), mutate: (events)=>{
+        cohort.cohort_events.length === 0
+          ? h(WhiteContainer, [
+            h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
+              h( EmptyImg, {src: '/img/empty.png'}),
+              h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to thier calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
+            ])])
+          : h(CohortEvents, {
+            facilitating: isFacilitator,
+            inCohort:!!inCohort,
+            people: cohort.people_in_cohorts.map(p=>p.people.username),
+            cohort: cohort.id,
+            events: cohort.cohort_events.filter(c=>{
+              if(!user || !cohort) return c.everyone
+              if(cohort.facilitator === user.id) return true
+              return c.everyone || c.events.people_in_events.find(p=>user&&p.people.username===user.username)
+            }),
+            mutate: (events)=>{
               if(!cohort) return
               mutate({
-                ...cohort, cohort_events: events.map(event=>{
-                  return{events: {...event, location: event.location || ''}}})})
-            }})
+                ...cohort, cohort_events: events})
+            }
+          })
       ])
     ]),
     ["Cohort Details"]: h(Box, {gap: 64}, [
@@ -415,8 +426,10 @@ export const getStaticProps = async (ctx:any)=>{
 
   if(!cohort) return {props: {notFound: true}} as const
 
-  let cohort_events = cohort.cohort_events.map(event =>{
-    return {...event, events: {...event.events, location: null}}
+  let cohort_events = cohort.cohort_events
+    .filter(c=>c.everyone)
+    .map(event =>{
+      return {...event, events: {...event.events, location: ''}}
   })
 
   let [notes, artifacts, curriculum] = await Promise.all([

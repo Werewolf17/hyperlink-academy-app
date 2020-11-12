@@ -129,7 +129,9 @@ model people {
   admins                    admins[]
   course_cohorts            course_cohorts[]
   course_maintainers        course_maintainers[]
+  events                    events[]
   people_in_cohorts         people_in_cohorts[]
+  people_in_events          people_in_events[]
   people_watching_courses   people_watching_courses[]
   stripe_connected_accounts stripe_connected_accounts?
 }
@@ -150,6 +152,7 @@ model people_in_cohorts {
 model cohort_events {
   cohort         Int
   event          Int
+  everyone       Boolean        @default(true)
   course_cohorts course_cohorts @relation(fields: [cohort], references: [id])
   events         events         @relation(fields: [event], references: [id])
 
@@ -157,13 +160,16 @@ model cohort_events {
 }
 
 model events {
-  id            Int             @unique @default(autoincrement())
-  start_date    String
-  end_date      String
-  name          String
-  location      String
-  description   String
-  cohort_events cohort_events[]
+  id               Int                @unique @default(autoincrement())
+  start_date       String
+  end_date         String
+  name             String
+  location         String
+  description      String
+  created_by       String?
+  people           people?            @relation(fields: [created_by], references: [id])
+  cohort_events    cohort_events[]
+  people_in_events people_in_events[]
 }
 
 model discourse_groups {
@@ -198,6 +204,15 @@ model stripe_connected_accounts {
   payouts_enabled Boolean @default(false)
   country         String
   people          people  @relation(fields: [person], references: [id])
+}
+
+model people_in_events {
+  person String
+  event  Int
+  events events @relation(fields: [event], references: [id])
+  people people @relation(fields: [person], references: [id])
+
+  @@id([person, event])
 }
 
 enum course_status {

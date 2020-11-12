@@ -14,7 +14,8 @@ let CreateEventValidator = t.Record({
   description: t.String,
   location: t.String,
   name: t.String,
-  cohort: t.Number
+  cohort: t.Number,
+  people: t.Union(t.Undefined, t.Array(t.String))
 })
 
 async function createEvent(req:Request) {
@@ -25,15 +26,27 @@ async function createEvent(req:Request) {
   let user = getToken(req)
   if(!user) return {status: 401 , result: "ERROR: no user logged in"} as const
 
-  let cohort = await prisma.course_cohorts.findOne({where: {id: msg.cohort}, select:{facilitator: true}})
+  let cohort = await prisma.course_cohorts.findOne({where: {id: msg.cohort}, select:{facilitator: true, people_in_cohorts: {select:{people: {select: {username: true}}}}}})
   if(!cohort) return {status: 404, result: `ERROR: no cohort with id ${msg.cohort} found`} as const
-  if(cohort.facilitator !== user.id) return {status: 401, result: "ERROR: user is not a facilitator of the cohort"} as const
+
+  if(cohort.facilitator !== user.id &&
+    !cohort.people_in_cohorts.find(p=>user&&p.people.username===user.username)) return {status: 401, result: "ERROR: user is not enrolled or a facilitator of the cohort"} as const
+  if(msg.people){
+    for(let username of msg.people) {
+      if(!cohort.people_in_cohorts.find(p=>p.people.username === username)) return {status:400, result: `ERROR: can't add person who is not part of the cohort`} as const
+    }
+  }
 
   let event = await prisma.cohort_events.create({
-    select: {
-      events: true
+    include: {
+      events: {
+        include: {
+          people_in_events: {select:{people:{select:{username: true, display_name: true}}}},
+        }
+      }
     },
     data: {
+      everyone: msg.people ? msg.people.length === 0 : true,
       course_cohorts: {
         connect: {
           id: msg.cohort
@@ -41,6 +54,12 @@ async function createEvent(req:Request) {
       },
       events: {
         create: {
+          people:{connect:{id: user.id}},
+          people_in_events: !msg.people ? undefined : {
+            create: msg.people.map(p=>{
+              return {people:{connect:{username: p}}}
+            })
+          },
           start_date: msg.start_date,
           end_date: msg.end_date,
           name: msg.name,
