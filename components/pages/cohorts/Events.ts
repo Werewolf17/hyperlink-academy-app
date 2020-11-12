@@ -165,7 +165,11 @@ const Event = (props: {
         event.events.location && expanded ? h('a', {href: event.events.location}, h(Primary,  "Join Event")) : null,
       ]),
       !expanded || event.events.description === '' ? null
-        : h('div', {style: {padding: '32px', backgroundColor: 'white', border: 'dotted 1px'}}, h(Text, {source: event.events.description}))
+        : h(Box, [
+          h('div', {
+            style: {padding: '32px', backgroundColor: 'white', border: 'dotted 1px'}}, h(Text, {source: event.events.description})),
+          event.events.people_in_events.length === 0 ? null : h('p.textSecondary', [h('b', 'Attendees: '), event.events.people_in_events.map(p=>p.people.display_name || p.people.username).join(', ')])
+        ])
     ])
   ])
 }

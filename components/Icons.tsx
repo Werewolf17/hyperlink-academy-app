@@ -16,6 +16,8 @@ export const Pencil = <svg width="14" height="20" viewBox="0 0 14 20" fill="none
 <path d="M14 2.57382L10.2614 0L8.47734 2.75192L12.216 5.32574L14 2.57382Z" fill="#595959"/>
 </svg>
 
-export const Cross = <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const Cross = (props:{width?: number}) => {
+  return <svg width={props.width? props.width : "17"} height="auto" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M16.4513 13.2686C17.0761 13.8935 17.0761 14.9065 16.4513 15.5314C15.8265 16.1562 14.8134 16.1562 14.1886 15.5314L8.91992 10.2627L3.65129 15.5314C3.02645 16.1562 2.01339 16.1562 1.38855 15.5314C0.763712 14.9065 0.763712 13.8935 1.38855 13.2686L6.65718 8L1.38855 2.73137C0.763712 2.10653 0.763712 1.09347 1.38855 0.468629C2.01339 -0.15621 3.02645 -0.15621 3.65129 0.468629L8.91992 5.73726L14.1886 0.468631C14.8134 -0.156208 15.8265 -0.156208 16.4513 0.468631C17.0761 1.09347 17.0761 2.10653 16.4513 2.73137L11.1827 8L16.4513 13.2686Z" fill="currentColor"/>
 </svg>
+}

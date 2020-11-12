@@ -4,10 +4,12 @@ import { FormBox, LabelBox, Box } from 'components/Layout'
 import { colors } from 'components/Tokens'
 import {Cross} from 'components/Icons'
 import { useState } from 'react'
-import { CheckBox, Input, Select, Textarea } from 'components/Form'
+import { Input, Select, Textarea } from 'components/Form'
 import { useApi } from 'src/apiHelpers'
 import { CreateEventMsg, CreateEventResponse } from 'pages/api/events'
 import { Cohort } from 'src/data'
+import styled from '@emotion/styled'
+import { Pill } from 'components/Pill'
 
 type Event = {
   name: string,
@@ -143,34 +145,37 @@ export const EventForm = (props:{onChange: (e: Event)=>void, state: Event, peopl
           onChange: e => props.onChange({...props.state, description: e.currentTarget.value})
         })
       ]),
-    h(LabelBox, {gap: 8}, [
-      h(CheckBox, [
-        h(Input, {
-          type: 'checkbox',
-          checked: props.state.everyone,
-          onChange: (e:React.ChangeEvent<HTMLInputElement>) => props.onChange({...props.state, everyone: e.currentTarget.checked})
-        }), "Invite specific people"
-      ])
-    ]),
-    !props.state.everyone ? null : h(Box, [
+    h(Box, [
+      h('h4', "Attendees"),
       h(Select, {onChange:(e)=>{
         if(e.currentTarget.value !== ''){
           props.onChange({...props.state, people: [...props.state.people, e.currentTarget.value]})
           e.currentTarget.value = ''
         }
       }}, [
-        h('option', {value:''}, ''),
+        h('option', {value:''}, props.state.people.length === 0 ? 'Everyone' : 'Select another attendee'),
         ...props.people
           .filter(p=>!props.state.people.includes(p))
           .map(p=>h('option', {value: p}, p))
       ]),
-      h('h4', "Invited"),
-      h(Box, {gap:8}, props.state.people.map(p=> h('div', {style:{display:'grid', gridTemplateColumns: 'auto min-content', maxWidth: '400px'}}, [
-        p, h(LinkButton, {style:{color: colors.textSecondary}, onClick:(e)=>{
+      h(AttendeeList, props.state.people.map(p=> h('div', {style:{display:'grid', gridTemplateColumns: 'auto min-content', maxWidth: '400px'}}, [
+        h(AttendeePill, [
+        p, ' ', h(LinkButton, {style:{color: colors.textSecondary}, onClick:(e)=>{
           e.preventDefault()
           props.onChange({...props.state, people: props.state.people.filter(person=>person!==p)})
-        }}, Cross)
+        }}, h(Cross, {width: 10}))
+        ])
       ])))
     ])
   ])
 }
+
+let AttendeeList = styled('div')`
+display: flex;
+flex-wrap: wrap;
+`
+
+let AttendeePill = styled(Pill)`
+background-color: ${colors.appBackground};
+margin: 0 8px 8px 0;
+`
