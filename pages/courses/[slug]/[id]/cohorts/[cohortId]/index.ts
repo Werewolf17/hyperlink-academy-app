@@ -77,10 +77,13 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
       ])
     ]),
     Schedule: cohort.cohort_events.length === 0 && !isFacilitator ? null : h(Box, {gap: 32}, [
-      isFacilitator || inCohort ? h(CreateEvent, {cohort: cohort.id, people: cohort.people_in_cohorts.map(p=>p.people.username),mutate: (c)=>{
-        if(!cohort) return
-        mutate({...cohort, cohort_events: [...cohort.cohort_events, c]})
-      }}) : null,
+      isFacilitator || inCohort ? h(CreateEvent, {
+        cohort: cohort.id,
+        people: [...cohort.people_in_cohorts.map(p=>p.people.username), cohort.people.username],
+        mutate: (c)=>{
+          if(!cohort) return
+          mutate({...cohort, cohort_events: [...cohort.cohort_events, c]})
+        }}) : null,
       h(Box, [
         (inCohort || isFacilitator) && cohort.cohort_events.length > 0 ? h(Link, {href: "/calendar"}, h(LinkButton, {
           textSecondary: true,

@@ -69,9 +69,12 @@ export function ClubPage(props:{
       h(Box, {gap: 32}, [
         h(Seperator),
         !isFacilitator && props.cohort.cohort_events.length === 0 ? null : h(Box, {gap:32}, [
-          isFacilitator ? h(CreateEvent, {cohort: props.cohort.id, people:props.cohort.people_in_cohorts.map(p=>p.people.username),  mutate: (c)=>{
-            props.mutate({...props.cohort, cohort_events: [...props.cohort.cohort_events, c]})
-          }}) : null,
+          !isFacilitator ? null : h(CreateEvent, {
+            cohort: props.cohort.id,
+            people: [...props.cohort.people_in_cohorts.map(p=>p.people.username), props.cohort.people.username],
+            mutate: (c)=>{
+              props.mutate({...props.cohort, cohort_events: [...props.cohort.cohort_events, c]})
+            }}),
           (inCohort || isFacilitator) && props.cohort.cohort_events.length > 0 ? h(Link, {href: "/calendar"}, h(LinkButton, {
             textSecondary: true,
           }, 'add to your calendar')) : null,
