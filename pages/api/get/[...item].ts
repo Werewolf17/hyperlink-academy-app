@@ -32,6 +32,7 @@ async function getUserCohorts(req:Request) {
         where:{
           OR:[
             {everyone: true},
+            {events:{people:{id:token.id}}},
             {events:{people_in_events:{some:{people:{id: token.id}}}}}
           ]
         },

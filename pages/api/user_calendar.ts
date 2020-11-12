@@ -31,6 +31,7 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
               where:{
                 OR:[
                   {everyone: true},
+                  {events:{people:{calendar_id:calendar_ID}}},
                   {events:{people_in_events:{some:{people:{calendar_id: calendar_ID}}}}}
                 ]
               },
