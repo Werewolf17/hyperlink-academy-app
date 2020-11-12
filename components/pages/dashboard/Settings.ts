@@ -111,11 +111,10 @@ const Settings = (props:{
       h(Primary, {status, type: 'submit', disabled: !changed}, 'Save Changes')
     ])
   ]),
-    !props.facilitator || props.user.username !== 'jared' ? null : h(StripeSettings, {stripe_connected_accounts: props.profile.stripe_connected_accounts})
+    !props.facilitator ? null : h(StripeSettings, {stripe_connected_accounts: props.profile.stripe_connected_accounts})
   ])
 }
 
-//@ts-ignore
 const StripeSettings = (props:{stripe_connected_accounts: {connected: boolean, payouts_enabled:boolean} | null}) => {
   let [status, setStatus] = useState<'normal' | 'loading'>('normal')
   let [country, setCountry] = useState('US')
