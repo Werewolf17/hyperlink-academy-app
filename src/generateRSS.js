@@ -5,16 +5,11 @@ let path  = require("path")
 
 function generate () {
   let feed = new Feed({
-    title: 'awarm.space',
-    link: 'https://awarm.space',
-    id: 'https://awarm.space',
-    author: {
-      name: "Jared Pereira",
-      email: "jared@awarm.space"
-    },
+    title: 'Hyperlink Library',
+    link: 'https://hyperlink.academy',
+    id: 'https://hyperlink.academy',
     feedLinks: {
-      atom: 'https://awarm.space/atom.xml',
-      rss: 'https://awarm.space/rss.xml'
+      rss: 'https://hyperlink.academy/rss.xml'
     },
     copyright: 'CC0'
   })
@@ -27,6 +22,7 @@ function generate () {
     feed.addItem({
       title: data.title,
       link: 'https://awarm.space/blog' + file.slice(0, -4),
+      author: data.author,
       date: new Date(data.date),
       description: data.description
     })
