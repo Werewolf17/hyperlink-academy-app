@@ -25,9 +25,6 @@ async function GETConnectStripe(req:Request){
       type: 'express',
       country,
       capabilities:{
-        card_payments:{
-          requested: country === 'US'
-        },
         transfers:{
           requested: true
         }
