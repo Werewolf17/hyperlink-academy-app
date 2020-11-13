@@ -16,7 +16,8 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
   let [user_cohorts, facilitator_cohorts] = await Promise.all([
     prisma.people_in_cohorts.findMany({
       where: {
-        people: {calendar_id: calendar_ID}
+        people: {calendar_id: calendar_ID},
+        course_cohorts: {live: true}
       },
       select: {
         course_cohorts: {
@@ -38,6 +39,7 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
     }),
     prisma.course_cohorts.findMany({
       where:{
+        live: true,
         people:{
           calendar_id: calendar_ID
         }
