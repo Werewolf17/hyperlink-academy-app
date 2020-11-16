@@ -71,7 +71,7 @@ const Signup = () => {
     h(LabelBox, {gap:8},[
       h('div', [
         h('h4', "Username"),
-        h('small.textSecondary', "Pick a unique username between 3-20 characters."),
+        h('small.textSecondary', "Pick a unique username between 3-15 characters."),
       ]),
       h(Input, {type: 'text',
                 name: "username",
