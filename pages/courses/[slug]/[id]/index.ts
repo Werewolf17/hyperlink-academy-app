@@ -15,7 +15,7 @@ import Text from 'components/Text'
 import {SmallCohortCard} from 'components/Card'
 import {TwoColumnBanner} from 'components/Banner'
 import {Modal} from 'components/Modal'
-import { Primary, Destructive, Secondary, LinkButton} from 'components/Button'
+import { Primary, Destructive, LinkButton} from 'components/Button'
 import {WatchCourse} from 'components/Course/WatchCourse'
 
 import { getTaggedPost } from 'src/discourse'
@@ -306,7 +306,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
   ])
 }
 //feature to add a new cohort to a course
-function MarkCourseLive(props: {id:number}) {
+function MarkCourseLive(props: {id:number, slug: string}) {
   let {data:course, mutate} = useCourseData(props.id)
   let [state, setState] = useState<'normal'|'confirm'|'loading'|'complete'>('normal')
 
@@ -321,19 +321,20 @@ function MarkCourseLive(props: {id:number}) {
     }
   }
 
-  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=>setState('normal')},[
+  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, closeText:"nevermind", onExit: ()=>setState('normal')},[
     h(Box, {gap: 32}, [
-      h('h2', "Are you sure?"),
+      h('h2', {style:{textAlign:'center'}}, "Are you sure?"),
       h(Box, {gap: 16}, [
         "Before going live please check that you've done these things",
         h(Box.withComponent('ul'), {gap:16}, [
-          h('li', "Written a curriculum"),
-          h('li', "Filled out the getting started template for cohorts")
+          h('li', [
+            "Edit important details in ", h('a', {href: `https://hyperlink.academy/courses/${props.slug}/${props.id}/settings?tab=Details`}, "course settings"), "."
+          ]),
+          h('li', [
+            "Written a ", h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.id}`}, "curriculum"), "."
+          ]),
         ]),
-        h(Box, {gap:16, style:{textAlign: 'right'}}, [
-          h(Primary, {onClick}, state === 'loading' ? h(Loader) : 'Go Live!'),
-          h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
-        ])
+          h(Primary, {style:{justifySelf:'center'}, onClick}, state === 'loading' ? h(Loader) : 'Go Live!')        
       ])
     ])
   ])
@@ -404,7 +405,7 @@ const TODOBanner = (props:{
         h(AccentImg, {height:32, width:36, src:"https://hyperlink-data.nyc3.cdn.digitaloceanspaces.com/icons/Flower.png"}),
         h(Box, {gap:16}, [
           h('h4', "Once you're ready, you can publish it here!"),
-          h(MarkCourseLive, {id:props.id})
+          h(MarkCourseLive, props)
         ])
       ]
     ]),

@@ -28,11 +28,11 @@ function CohortTemplatesPages(props:Props) {
     h(TemplatePage, {template})
   ])
 
-  return h(Box, {width: 640, gap: 64},[
+  return h(Box, {width: 640, gap: 32},[
     h(Box, {gap:16}, [
       h(BackButton, {href: "/courses/[slug]/[id]/cohorts/[cohortId]", as: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}`}, 'Cohort Details'),
       h('h1', "Templates"),
-      h('p', [
+      h('p.big', [
         `Use templates to easily post new topics in your cohort forum! You can create new templates in the `,
         h(Link, {href: '/courses/[slug]/[id]/settings', as:`/courses/${router.query.slug}/${router.query.id}/settings`}, h('a', 'course settings')), `.`
       ])
@@ -83,10 +83,10 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
         h('p', "Your topic has been added")
       ]),
       h(Box, [
-        h('a', {href: 'https://forum.hyperlink.academy/t/'+post}, h(Primary, {style:{width:'100%'}}, "View it here")),
+        h('a', {style:{justifySelf:"center"}, href: 'https://forum.hyperlink.academy/t/'+post}, h(Primary, "View it here")),
       h(Link, {
         href: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`
-      }, h('a', {}, h(Secondary, {style:{width:'100%'}}, 'Back to Templates')))
+      }, h('a', {style:{justifySelf:"center"}}, h(Secondary, 'Back to Templates')))
       ])
     ])) : null,
     h(FormBox, {onSubmit, gap:32}, [

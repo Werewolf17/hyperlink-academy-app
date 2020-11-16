@@ -12,8 +12,9 @@ import { PageLoader } from 'components/Loader'
 import { useUserCohorts, useUserData, useUserCourses, useProfileData } from 'src/data'
 import { Tabs } from 'components/Tabs'
 import Settings from 'components/pages/dashboard/Settings'
-import {Primary, LinkButton} from 'components/Button'
+import {Primary, SmallLinkButton} from 'components/Button'
 import { EnrolledCohort } from 'components/pages/dashboard/EnrolledCohort'
+import { Calendar } from 'components/Icons'
 
 const COPY = {
   coursesHeader: "All Courses",
@@ -66,9 +67,11 @@ const Dashboard = () => {
             ])
           // if enrolled, show grid of enrolled cohorts
             : h(Box, {gap:32}, [
-              h(Link, {href: "/calendar"}, h(LinkButton, {
-                textSecondary: true,
-              }, 'add events to your calendar')),
+              h(Link, {href: "/calendar"}, 
+                h(SmallLinkButton, {textSecondary: true}, 
+                  h(Box, {h:true, gap:8, style: {background: colors.grey95, padding: 16}}, [ Calendar, 'add all events to your calendar'])
+                )),
+
               h(Box, {gap: 64},
                 activeCohorts.map(cohort => {
                   let facilitating = cohort.facilitator === (user ? user.id: '')

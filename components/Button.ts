@@ -97,6 +97,16 @@ cursor: pointer;
 }
 `
 
+export const SmallLinkButton = styled('a')<{textSecondary?: boolean}>`
+color: ${props=>props.textSecondary ? colors.textSecondary : 'blue'};
+text-decoration: underline;
+font-family: 'Lato', sans-serif;
+
+&:hover {
+cursor: pointer;
+}
+`
+
 export const BackButton:React.FC <{href:string, as?:string, shallow?:boolean}> = (props) => {
     return  h('div.textSecondary', [
         '⇠ ' , 

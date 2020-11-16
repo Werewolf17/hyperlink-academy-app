@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react'
 import { Box, FormBox } from 'components/Layout'
 import styled from '@emotion/styled'
 import { colors } from 'components/Tokens'
-import {Pencil} from 'components/Icons'
+import {Calendar, Pencil} from 'components/Icons'
 import { EventForm } from './CreateEvent'
-import { LinkButton, Primary, IconButton, Destructive } from 'components/Button'
+import { SmallLinkButton, LinkButton, Primary, IconButton, Destructive } from 'components/Button'
 import { useApi } from 'src/apiHelpers'
 import { UpdateEventMsg, UpdateEventResult, DeleteEventResult } from 'pages/api/events/[id]'
 import Text from 'components/Text'
@@ -18,7 +18,8 @@ export const CohortEvents = (props: {
   cohort: number,
   people: string[],
   events:Cohort["cohort_events"],
-  mutate: (E:Cohort["cohort_events"])=>void
+  mutate: (E:Cohort["cohort_events"])=>void,
+  showCal: boolean,
 })=>{
   let {data:user} = useUserData()
   let pastEvents = props.events.filter((event)=>new Date() > new Date(event.events.end_date))
@@ -28,9 +29,19 @@ export const CohortEvents = (props: {
         .filter((event)=>showPastEvents ? true : new Date() < new Date(event.events.end_date) )
         .sort((a, b) => new Date(a.events.start_date) > new Date(b.events.start_date) ? 1 : -1)
   return h(Box, [
-    pastEvents.length === 0 ? null : h(LinkButton, {textSecondary: true, onClick: ()=>{
-      setShowPastEvents(!showPastEvents)
-    }}, showPastEvents ? "hide past events" : "show past events"),
+    // (inCohort || isFacilitator) && cohort.cohort_events.length > 0 ? h(Link, {href: "/calendar"}, 
+    h(Box, {h:true, gap:0, style: {gridTemplateColumns: 'auto min-content', gridGap:0}}, [
+
+      pastEvents.length === 0 ? null : h(SmallLinkButton, {textSecondary: true, onClick: ()=>{
+        setShowPastEvents(!showPastEvents)
+      }}, showPastEvents ? "hide past events" : "show past events"),
+      !props.showCal ? null :
+      h(SmallLinkButton, {textSecondary: true, style:{justifySelf: 'end'}}, 
+        h(Box, {h:true, gap:8, style:{textAlign:'right'}}, ['add to your calendar ', Calendar]),
+      ),
+
+    ]),
+
     h(TimelineContainer, {},
       displayedEvents
         .map((event,index) => h(Event, {

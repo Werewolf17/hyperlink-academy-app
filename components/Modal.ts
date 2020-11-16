@@ -4,7 +4,7 @@ import { Fragment, useState, useEffect } from 'react'
 import { Box } from './Layout'
 import {colors} from './Tokens'
 
-export const Modal:React.SFC<{display:boolean, onExit?: Function}> = (props)=>{
+export const Modal:React.SFC<{display:boolean, closeText?:string, onExit?: Function}> = (props)=>{
   let [display, setDisplay] =  useState(props.display)
   useEffect(()=>setDisplay(props.display), [props])
   if(!display) return null
@@ -16,17 +16,17 @@ export const Modal:React.SFC<{display:boolean, onExit?: Function}> = (props)=>{
     h(ModalBlur, {onClick}),
     h(ModalBox, [
       h(Box, {style:{width: '100%'}}, [
-        h(CloseButton, {onClick}, 'close'),
-        props.children as React.ReactElement
+        props.children as React.ReactElement,
+        h(CloseButton, {onClick}, props.closeText||"close"),
       ])
     ])
   ])
 }
 
 const CloseButton = styled('a')`
-font-family: 'Lato', sans-serif;
-font-size: .875rem;
-justify-self: right;
+font-family: 'Roboto Mono', mono;
+font-size: 1rem;
+justify-self: center;
 color: ${colors.textSecondary};
 &:visited {
 color: ${colors.textSecondary};
@@ -50,6 +50,7 @@ left: 50%;
 top: 50%;
 transform: translate(-50%, -50%);
 z-index: 10;
+justify-content: center;
 `
 
 export const ModalBlur = styled('div')`

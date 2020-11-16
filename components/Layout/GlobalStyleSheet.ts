@@ -107,4 +107,8 @@ small {
   line-height: 1.25rem;
   font-size: .875rem;
 }
+
+li{
+  margin-left: 32px;
+}
 `

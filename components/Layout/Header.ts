@@ -98,7 +98,7 @@ const Feedback = ()=> {
       h(Secondary, {
         type: 'submit',
         success:status==='success',
-        style:{justifySelf:'right'}
+        style:{justifySelf:'center'}
       }, "Submit")
     ])
 }
