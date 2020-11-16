@@ -75,20 +75,23 @@ export function ClubPage(props:{
             mutate: (c)=>{
               props.mutate({...props.cohort, cohort_events: [...props.cohort.cohort_events, c]})
             }}),
-          (inCohort || isFacilitator) && props.cohort.cohort_events.length > 0 ? h(Link, {href: "/calendar"}, h(LinkButton, {
-            textSecondary: true,
-          }, 'add to your calendar')) : null,
-          props.cohort.cohort_events.length === 0 ? h(WhiteContainer, [
-            h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
-              h( EmptyImg, {src: '/img/empty.png'}),
-              h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to thier calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
-            ])]) :
-
-            h(CohortEvents, {facilitating: isFacilitator, inCohort: !!inCohort, people:props.cohort.people_in_cohorts.map(p=>p.people.username), cohort: props.cohort.id, events: props.cohort.cohort_events, mutate: (events)=>{
-              props.mutate({
-                ...props.cohort, cohort_events: events})
-            },
-            showCal: (inCohort || isFacilitator) && props.cohort.cohort_events.length > 0
+          props.cohort.cohort_events.length === 0
+            ? h(WhiteContainer, [
+              h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
+                h( EmptyImg, {src: '/img/empty.png'}),
+                h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to thier calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
+              ])])
+            : h(CohortEvents, {
+              facilitating: isFacilitator,
+              inCohort: !!inCohort,
+              people:props.cohort.people_in_cohorts.map(p=>p.people.username),
+              cohort: props.cohort.id,
+              events: props.cohort.cohort_events,
+              mutate: (events)=>{
+                props.mutate({
+                  ...props.cohort, cohort_events: events})
+              },
+              showCal: (inCohort || isFacilitator) && props.cohort.cohort_events.length > 0
             })
         ]),
         h(Seperator),
