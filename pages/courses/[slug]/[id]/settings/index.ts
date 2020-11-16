@@ -366,10 +366,11 @@ function DeleteTemplate(props:{templateName:string, course:Course, mutate:(c:Cou
   let [status, callDelete] = useApi<null, DeleteTemplateResult>([props])
   return h(Fragment, [
     h(Destructive, {onClick: ()=>setState('confirm')}, 'Delete'),
-    h(Modal, {display: state !== 'normal', onExit: ()=>setState('normal')}, [
-      h(Box, {style: {textAlign: 'center'}}, [
+    h(Modal, {display: state !== 'normal', closeText:"nevermind", onExit: ()=>setState('normal')}, [
+      h(Box, {gap:32, style: {textAlign: 'center'}}, [
         h('h3', "Are you sure?"),
-        h(Primary, {status, onClick:async ()=>{
+        h('p', "You can't undo this action!"),
+        h(Primary, {style: {justifySelf:"center"}, status, onClick:async ()=>{
           let res = await callDelete(`/api/courses/${props.course.id}/templates/${props.templateName}`, null, "DELETE")
           if(res.status ===200) {
             props.mutate({
@@ -380,7 +381,6 @@ function DeleteTemplate(props:{templateName:string, course:Course, mutate:(c:Cou
             setState('normal')
           }
         }}, "Yup delete it"),
-        h(Secondary, {onClick: ()=>setState('normal')}, 'Nope, nevermind')
       ])
     ])
   ])

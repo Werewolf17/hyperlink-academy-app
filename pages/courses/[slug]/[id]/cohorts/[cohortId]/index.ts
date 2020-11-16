@@ -10,7 +10,7 @@ import CourseDetails from 'components/Course/Enroll'
 import { EnrollButton } from 'components/Course/EnrollButton';
 import { TwoColumn, Box, Seperator, Sidebar, WhiteContainer} from 'components/Layout'
 import { VerticalTabs, StickyWrapper } from 'components/Tabs'
-import { Primary, Destructive, Secondary, BackButton, LinkButton} from 'components/Button'
+import { Primary, Destructive, Secondary, BackButton, LinkButton } from 'components/Button'
 import Loader, { PageLoader } from 'components/Loader'
 import { CheckBox, Info, Input } from 'components/Form'
 import { Modal } from 'components/Modal'
@@ -108,7 +108,8 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
               if(!cohort) return
               mutate({
                 ...cohort, cohort_events: events})
-            }
+            },
+            showCal: (inCohort || isFacilitator) && cohort.cohort_events.length > 0
           })
       ])
     ]),
@@ -234,7 +235,7 @@ grid-gap: 8px;
 // Button to Publish Draft Cohort
 const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
-  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
+  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, closeText:"nevermind", onExit: ()=> setState('normal')}, [
     h(Box, {gap: 32}, [
       h('h2', "Are you sure?"),
       h(Box, {gap: 16, style: {textAlign: 'right'}}, [
@@ -245,12 +246,11 @@ const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
           if(res.status === 200) props.mutate({...props.cohort, live: res.result.live})
           setState('complete')
         }}, state === 'loading' ? h(Loader) : 'Publish!'),
-        h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
       ])
     ])
   ])
 
-  return h(Primary, {onClick: async e => {
+  return h(Primary, {style: {justifySelf:"center"}, onClick: async e => {
     e.preventDefault()
     setState('confirm')
   }}, 'Publish!')
@@ -261,7 +261,7 @@ const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
 const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
   let [state, setState] = useState<'normal' | 'confirm' | 'loading'| 'complete' >('normal')
 
-  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, onExit: ()=> setState('normal')}, [
+  if(state === 'confirm' || state === 'loading') return h(Modal, {display: true, closeText: "nevermind", onExit: ()=> setState('normal')}, [
     h(Box, {gap: 32}, [
       h('h2', {style:{textAlign:'center'}}, "Are you sure?"),
       h(Box, {gap: 16}, [
@@ -289,16 +289,13 @@ const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
           ]),
         ]),
       ]),
-      h(Box, {gap: 16, style: {textAlign: "right"}}, [
-        h(Primary, {onClick: async e => {
-          e.preventDefault()
-          setState('loading')
-          let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data:{completed:true}})
-          if(res.status === 200) props.mutate({...props.cohort, completed: res.result.completed})
-          setState('complete')
-        }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
-        h(Secondary, {onClick: ()=> setState('normal')}, "Nevermind")
-      ])
+      h(Primary, {style: {justifySelf:'center'}, onClick: async e => {
+        e.preventDefault()
+        setState('loading')
+        let res = await callApi<UpdateCohortMsg, UpdateCohortResponse>(`/api/cohorts/${props.cohort.id}`, {data:{completed:true}})
+        if(res.status === 200) props.mutate({...props.cohort, completed: res.result.completed})
+        setState('complete')
+      }}, state === 'loading' ? h(Loader) : 'Mark this cohort complete'),
     ])
   ])
 
