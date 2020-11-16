@@ -69,9 +69,12 @@ export function ClubPage(props:{
       h(Box, {gap: 32}, [
         h(Seperator),
         !isFacilitator && props.cohort.cohort_events.length === 0 ? null : h(Box, {gap:32}, [
-          isFacilitator ? h(CreateEvent, {cohort: props.cohort.id, mutate: (c)=>{
-            props.mutate({...props.cohort, cohort_events: [...props.cohort.cohort_events, c]})
-          }}) : null,
+          !isFacilitator ? null : h(CreateEvent, {
+            cohort: props.cohort.id,
+            people: [...props.cohort.people_in_cohorts.map(p=>p.people.username), props.cohort.people.username],
+            mutate: (c)=>{
+              props.mutate({...props.cohort, cohort_events: [...props.cohort.cohort_events, c]})
+            }}),
           (inCohort || isFacilitator) && props.cohort.cohort_events.length > 0 ? h(Link, {href: "/calendar"}, h(LinkButton, {
             textSecondary: true,
           }, 'add to your calendar')) : null,
@@ -80,10 +83,9 @@ export function ClubPage(props:{
               h( EmptyImg, {src: '/img/empty.png'}),
               h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to thier calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
             ])]) :
-            h(CohortEvents, {facilitating: isFacilitator, cohort: props.cohort.id, events: props.cohort.cohort_events.map(event => event.events), mutate: (events)=>{
+            h(CohortEvents, {facilitating: isFacilitator, inCohort: !!inCohort, people:props.cohort.people_in_cohorts.map(p=>p.people.username), cohort: props.cohort.id, events: props.cohort.cohort_events, mutate: (events)=>{
               props.mutate({
-                ...props.cohort, cohort_events: events.map(event=>{
-                  return{events: {...event, location: event.location || ''}}})})
+                ...props.cohort, cohort_events: events})
             }})
         ]),
         h(Seperator),

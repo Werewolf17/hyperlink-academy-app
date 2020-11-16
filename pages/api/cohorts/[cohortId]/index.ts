@@ -95,15 +95,10 @@ export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
         select: {display_name: true, username: true, bio: true, pronouns: true}
       },
       cohort_events: {
-        select: {
+        include: {
           events: {
-            select: {
-              id: true,
-              start_date: true,
-              end_date: true,
-              location: true,
-              description: true,
-              name: true
+            include: {
+              people_in_events: {select:{people:{select:{username: true, display_name: true}}}},
             }
           }
         }
@@ -144,7 +139,9 @@ async function getCohortData(req: Request) {
   let data = await cohortDataQuery(cohortId)
   if(!data) return {status: 404, result: `Error: no cohort with id ${cohortId} found`} as const
   let enrolled = data.people_in_cohorts.find(x=>x.person === user?.id) || data.facilitator === user?.id
-  let cohort_events = data.cohort_events.map(event =>{
+  let cohort_events = data.cohort_events
+    .filter(c=>enrolled || c.everyone)
+    .map(event =>{
     if(!enrolled) {
       return {...event, events: {...event.events, location: null}}
     }

@@ -29,6 +29,13 @@ async function getUserCohorts(req:Request) {
     include:{
       courses: {select: {name: true, slug: true, card_image: true, id: true, type: true}},
       cohort_events: {
+        where:{
+          OR:[
+            {everyone: true},
+            {events:{people:{id:token.id}}},
+            {events:{people_in_events:{some:{people:{id: token.id}}}}}
+          ]
+        },
         select: {
           events: true
         }

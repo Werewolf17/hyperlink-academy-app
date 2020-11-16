@@ -10,22 +10,23 @@ import { LinkButton, Primary, IconButton, Destructive } from 'components/Button'
 import { useApi } from 'src/apiHelpers'
 import { UpdateEventMsg, UpdateEventResult, DeleteEventResult } from 'pages/api/events/[id]'
 import Text from 'components/Text'
+import { Cohort, useUserData } from 'src/data'
 
-type Event = {
-  id: number
-  name: string
-  start_date: string,
-  end_date: string,
-  location: string | null,
-  description: string,
-}
-export const CohortEvents = (props: {facilitating: boolean, cohort: number, events: Array<Event>, mutate: (E:Array<Event>)=>void})=>{
-  let pastEvents = props.events.filter((event)=>new Date() > new Date(event.end_date))
+export const CohortEvents = (props: {
+  facilitating: boolean,
+  inCohort: boolean,
+  cohort: number,
+  people: string[],
+  events:Cohort["cohort_events"],
+  mutate: (E:Cohort["cohort_events"])=>void
+})=>{
+  let {data:user} = useUserData()
+  let pastEvents = props.events.filter((event)=>new Date() > new Date(event.events.end_date))
   let [showPastEvents, setShowPastEvents] = useState(pastEvents.length === props.events.length)
 
   let displayedEvents = props.events
-        .filter((event)=>showPastEvents ? true : new Date() < new Date(event.end_date) )
-        .sort((a, b) => new Date(a.start_date) > new Date(b.start_date) ? 1 : -1)
+        .filter((event)=>showPastEvents ? true : new Date() < new Date(event.events.end_date) )
+        .sort((a, b) => new Date(a.events.start_date) > new Date(b.events.start_date) ? 1 : -1)
   return h(Box, [
     pastEvents.length === 0 ? null : h(LinkButton, {textSecondary: true, onClick: ()=>{
       setShowPastEvents(!showPastEvents)
@@ -33,11 +34,14 @@ export const CohortEvents = (props: {facilitating: boolean, cohort: number, even
     h(TimelineContainer, {},
       displayedEvents
         .map((event,index) => h(Event, {
-          key: event.id,
+          user: user ? user.id : undefined,
+          inCohort: props.inCohort,
+          key: event.events.id,
           facilitating: props.facilitating,
           event,
+          people: props.people,
           cohort: props.cohort,
-          mutate: (newEvent:Event) => {
+          mutate: (newEvent) => {
             let events = props.events.slice(0)
             events[index] === newEvent
             return props.mutate(events)
@@ -56,28 +60,33 @@ export const CohortEvents = (props: {facilitating: boolean, cohort: number, even
 }
 
 const Event = (props: {
-  event:Event,
+  event:Cohort["cohort_events"][0],
+  user?: string,
   facilitating: boolean
+  inCohort: boolean
+  people: string[]
   cohort: number,
   last: boolean,
   first: boolean,
-  mutate: (e:Event)=>void,
+  mutate: (e:Cohort["cohort_events"][0])=>void,
   mutateDelete: ()=>void,
 })=>{
   let [editting, setEditing] = useState(false)
   let [expanded, setExpanded] = useState(props.first)
   let event = props.event
-  let start_date = new Date(event.start_date)
-  let end_date = new Date(event.end_date)
+  let start_date = new Date(event.events.start_date)
+  let end_date = new Date(event.events.end_date)
   let past = end_date < new Date()
 
   let [formState, setFormState] = useState({
-    name: event.name,
-    location: event.location || '',
-    description: event.description,
+    everyone: !event.everyone,
+    name: event.events.name,
+    location: event.events.location || '',
+    description: event.events.description,
     start_date: `${start_date.getFullYear()}-${start_date.getMonth()}-${start_date.getDate()}`,
     start_time: `${start_date.getHours()}:${start_date.getMinutes()}`,
     end_time: `${end_date.getHours()}:${end_date.getMinutes()}`,
+    people: props.event.events.people_in_events.map(p=>p.people.username)
   })
 
   let[status, callUpdateEvent] = useApi<UpdateEventMsg, UpdateEventResult>([props], async (event)=>{
@@ -90,12 +99,14 @@ const Event = (props: {
     props.mutateDelete()
   })
   useEffect(()=>setFormState({
-    name: event.name,
-    location: event.location || '',
-    description: event.description,
+    everyone: !event.everyone,
+    name: event.events.name,
+    location: event.events.location || '',
+    description: event.events.description,
     start_date: `${start_date.getFullYear()}-${('0'+(start_date.getMonth()+1)).slice(-2)}-${('0'+start_date.getDate()).slice(-2)}`,
     start_time: start_date.toLocaleTimeString([], {hour:"2-digit", minute: "2-digit", hour12: false}),
     end_time: end_date.toLocaleTimeString([], {hour:"2-digit", minute: "2-digit", hour12: false}),
+    people: event.events.people_in_events.map(p=>p.people.username)
   }),[event])
 
   const onSubmit = (e: React.FormEvent)=>{
@@ -108,28 +119,29 @@ const Event = (props: {
     let start_date = new Date(d1[0], d1[1] -1, d1[2], t1[0], t1[1])
     let end_date = new Date(d1[0], d1[1] - 1, d1[2], t2[0], t2[1])
 
-    callUpdateEvent('/api/events/'+props.event.id, {
-      id: props.event.id,
+    callUpdateEvent('/api/events/'+props.event.events.id, {
+      id: props.event.events.id,
       cohort: props.cohort,
       data: {
         name: event.name,
         description: event.description,
         location: event.location,
         start_date: start_date.toISOString(),
-        end_date: end_date.toISOString()
+        end_date: end_date.toISOString(),
+        people: event.people
       }
     })
   }
 
   return h(EventContainer, {last: props.last, selected: expanded}, [
-    h(Dot, {selected: expanded, onClick: ()=>setExpanded(event.description === '' ? false : !expanded), past}),
+    h(Dot, {selected: expanded, onClick: ()=>setExpanded(event.events.description === '' ? false : !expanded), past}),
     editting ? h(FormBox, {onSubmit}, [
-      h(EventForm, {onChange: setFormState, state:formState}),
+      h(EventForm, {onChange: setFormState, state:formState, people: props.people}),
       h(Box, {h: true, style:{justifySelf: "right", alignItems: "center"}}, [
         h(LinkButton, {textSecondary: true, onClick: ()=>setEditing(false)}, "cancel"),
         h(Destructive, {status: deleteStatus, onClick: (e)=>{
           e.preventDefault()
-          callDeleteEvent('/api/events/'+props.event.id, null, "DELETE")
+          callDeleteEvent('/api/events/'+props.event.events.id, null, "DELETE")
         }}, "Delete Event"),
         h(Primary, {type: 'submit', status}, "Save Changes")
       ])
@@ -143,17 +155,21 @@ const Event = (props: {
         ]
          ),
           h(Box, {h: true, style:{gridTemplateColumns:"auto min-content"}}, [
-            h(EventTitle, {past, onClick: ()=>setExpanded(!expanded)}, event.name),
-            props.facilitating ? h(IconButton, {
+            h(EventTitle, {past, onClick: ()=>setExpanded(!expanded)}, event.events.name),
+            props.facilitating || props.user === event.events.created_by ? h(IconButton, {
               style: {alignSelf: 'baseline'},
               onClick: ()=>setEditing(true)
             }, Pencil) : null
           ]),
         ]),
-        event.location && expanded ? h('a', {href: event.location}, h(Primary,  "Join Event")) : null,
+        event.events.location && expanded ? h('a', {href: event.events.location}, h(Primary,  "Join Event")) : null,
       ]),
-      !expanded || event.description === '' ? null
-        : h('div', {style: {padding: '32px', backgroundColor: 'white', border: 'dotted 1px'}}, h(Text, {source: event.description}))
+      !expanded || event.events.description === '' ? null
+        : h(Box, [
+          h('div', {
+            style: {padding: '32px', backgroundColor: 'white', border: 'dotted 1px'}}, h(Text, {source: event.events.description})),
+          event.events.people_in_events.length === 0 ? null : h('p.textSecondary', [h('b', 'Attendees: '), event.events.people_in_events.map(p=>p.people.display_name || p.people.username).join(', ')])
+        ])
     ])
   ])
 }
