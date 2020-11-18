@@ -224,7 +224,7 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => 
 
 let LearnerEntry = styled('div')`
 display: grid;
-grid-template-columns: max-content min-content;
+grid-template-columns: max-content auto;
 grid-gap: 8px;
 `
 
