@@ -129,7 +129,7 @@ export const EventForm = (props:{onChange: (e: Event)=>void, state: Event, peopl
       h(LabelBox, {gap:8}, [
         h('div', [
           h('h4', "Location"),
-          h('small.textSecondary', "A link to where the conversation will happen (like zoom)")
+          h('small.textSecondary', "A link to where the conversation will happen (like Zoom)")
         ]),
         h(Input, {
           type: 'text',
