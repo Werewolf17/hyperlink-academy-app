@@ -11,6 +11,7 @@ import { useApi } from 'src/apiHelpers'
 import { UpdateEventMsg, UpdateEventResult, DeleteEventResult } from 'pages/api/events/[id]'
 import Text from 'components/Text'
 import { Cohort, useUserData } from 'src/data'
+import { Pill } from 'components/Pill'
 
 export const CohortEvents = (props: {
   facilitating: boolean,
@@ -146,7 +147,8 @@ const Event = (props: {
 
   return h(EventContainer, {last: props.last, selected: expanded}, [
     h(Dot, {selected: expanded, onClick: ()=>setExpanded(event.events.description === '' ? false : !expanded), past}),
-    editting ? h(FormBox, {onSubmit}, [
+    editting
+      ? h(FormBox, {onSubmit}, [
       h(EventForm, {onChange: setFormState, state:formState, people: props.people}),
       h(Box, {h: true, style:{justifySelf: "right", alignItems: "center"}}, [
         h(LinkButton, {textSecondary: true, onClick: ()=>setEditing(false)}, "cancel"),
@@ -156,32 +158,42 @@ const Event = (props: {
         }}, "Delete Event"),
         h(Primary, {type: 'submit', status}, "Save Changes")
       ])
-    ]): h(Box, {}, [
-      h(Box, [
-        h(Box, {gap: 8}, [
-          h('p.textSecondary', {style: {color: past ? colors.grey55 : undefined}}, [
-          h('b', {style:{fontWeight:"900"}}, start_date.toLocaleDateString([], {weekday: 'short', month: "short", day: "numeric"}).toUpperCase()),
-          ' ' + start_date.toLocaleTimeString([], {hour: "numeric", minute: "2-digit", hour12: true, timeZoneName: 'short'}) +
-          ` | ` + getTimeBetween(start_date, end_date) + ' hrs',
-        ]
-         ),
-          h(Box, {h: true, style:{gridTemplateColumns:"auto min-content"}}, [
-            h(EventTitle, {past, onClick: ()=>setExpanded(!expanded)}, event.events.name),
-            props.facilitating || props.user === event.events.created_by ? h(IconButton, {
-              style: {alignSelf: 'baseline'},
-              onClick: ()=>setEditing(true)
-            }, Pencil) : null
-          ]),
-        ]),
-        event.events.location && expanded ? h('a', {href: event.events.location}, h(Primary,  "Join Event")) : null,
-      ]),
-      !expanded || event.events.description === '' ? null
-        : h(Box, [
-          h('div', {
-            style: {padding: '32px', backgroundColor: 'white', border: 'dotted 1px'}}, h(Text, {source: event.events.description})),
-          event.events.people_in_events.length === 0 ? null : h('p.textSecondary', [h('b', 'Attendees: '), event.events.people_in_events.map(p=>p.people.display_name || p.people.username).join(', ')])
-        ])
     ])
+      : h(Box, [
+        h(Box, [
+          h(Box, {gap: 8}, [
+            h('p.textSecondary', {style: {color: past ? colors.grey55 : undefined}}, [
+              h('b', {style:{fontWeight:"900"}}, start_date.toLocaleDateString([], {weekday: 'short', month: "short", day: "numeric"}).toUpperCase()),
+              ' ' + start_date.toLocaleTimeString([], {hour: "numeric", minute: "2-digit", hour12: true, timeZoneName: 'short'}) +
+                ` | ` + getTimeBetween(start_date, end_date) + ' hrs ',
+              (()=>{
+                if(event.everyone) return null
+                switch(event.events.people_in_events.length) {
+                  case 1: return h(Pill, {style:{alignSelf:"center"}}, "Solo")
+                  case 2: return h(Pill, {style:{alignSelf:"center"}}, "1:1")
+                  default: return h(Pill, {style:{alignSelf:"center"}}, "Group")
+                }
+              })()
+            ]),
+            h(Box, {h: true, style:{gridTemplateColumns:"auto auto min-content"}}, [
+              h(EventTitle, {past, onClick: ()=>setExpanded(!expanded)}, [
+                event.events.name
+              ]),
+              props.facilitating || props.user === event.events.created_by ? h(IconButton, {
+                style: {alignSelf: 'baseline', justifySelf: 'right'},
+                onClick: ()=>setEditing(true)
+              }, Pencil) : null
+            ]),
+          ]),
+          event.events.location && expanded ? h('a', {href: event.events.location}, h(Primary,  "Join Event")) : null,
+        ]),
+        !expanded || event.events.description === '' ? null
+          : h(Box, [
+            h('div', {
+              style: {padding: '32px', backgroundColor: 'white', border: 'dotted 1px'}}, h(Text, {source: event.events.description})),
+            event.events.people_in_events.length === 0 ? null : h('p.textSecondary', [h('b', 'Attendees: '), event.events.people_in_events.map(p=>p.people.display_name || p.people.username).join(', ')])
+          ])
+      ])
   ])
 }
 
