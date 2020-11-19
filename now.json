@@ -1,4 +1,7 @@
 {
+  "engines":{
+    "node":"14.13.x"
+  },
   "env": {},
   "cleanUrls": true,
   "regions": ["cle1"]
