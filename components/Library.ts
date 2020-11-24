@@ -9,6 +9,7 @@ import { BackButton, Secondary, Primary } from './Button'
 import { useApi } from 'src/apiHelpers'
 import { NewsletterSignupMsg, NewsletterSignupResponse } from 'pages/api/signup/[action]'
 import { Input, Info } from './Form'
+import Head from 'next/head'
 
 type Props = {
   title: string,
@@ -36,6 +37,11 @@ export const LibraryLayout:React.FC<Props> = (props) =>{
   })
 
   return h('div', [
+    h(Head,{children:[
+      h('meta', {key:"titile", property:"og:title", content:props.title}),
+      h('meta', {key: "og:description", property: "og:description", content: props.description}),
+      h('meta', {key: "og:author", property: "og:author", content: props.author}),
+    ]}),
     h(BackButton, {href:'/library'}, "Library"),
     h(Container, [
       h(Box, {gap: 32, width:640}, [
