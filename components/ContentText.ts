@@ -3,17 +3,19 @@ import h from 'react-hyperscript'
 import Markdown from 'react-markdown'
 import {colors} from './Tokens'
 
-export default (props:{source:string}) => h(BlogTextStyles, {}, h(Markdown, props))
-export const BlogTextStyles = styled('div')`
+export default (props:{source:string}) => h(ContentTextStyles, {}, h(Markdown, props))
+export const ContentTextStyles = styled('div')`
 
-h1:first-of-type { margin-top: 0 !important; margin-left: 0 !important; }
+h1:first-of-type {
+  margin-top: 0 !important; 
+  margin-left: 0 !important; 
+}
 
 h1 {
   margin-bottom: 1rem;
   font-family: 'Roboto Mono', monospace;
   font-weight: bold;
   font-size: 2.8rem;
-
 }
 
 h2 {
@@ -32,8 +34,6 @@ h3 {
   font-weight: 900;
   font-size: 1.35rem;
   font-kerning: normal;
-
-
 }
 
 h4 {
@@ -46,35 +46,33 @@ h4 {
   color: ${colors.textSecondary};
 }
 
-
 p {
   margin-bottom: 1rem;
   margin-top: 0;
   font-size: 1.25rem;
   line-height:155%;
   font-kerning: normal;
-
 }
 
 /* setting the style for numbered list */
 ol {
-  list-style: none;
-  counter-reset: number-list;
+  /* list-style: none; */
+  /* counter-reset: number-list; */
 }
 ol li {
-  counter-increment: number-list;
+  /* counter-increment: number-list; */
 }
 ol li::before {
-  content: counter(number-list) ". ";
-  display: inline-block; 
-  width: 1rem; 
-  margin-left: -1.5em;
-  margin-right: 0.5em; 
-  text-align: right; 
+  /* content: counter(number-list) ". "; */
+  /* display: inline-block; */
+  /* width: 1rem; */
+  /* margin-left: -1.5em; */
+  /* margin-right: 0.5em; */
+  /* text-align: right; */
 }
 
 ul li::before {
-content: '';
+  /* content: ''; */
 }
 
 li {
@@ -82,6 +80,5 @@ li {
   margin-top: .333rem;
   font-size: 1.25rem;
   line-height: 155%;
-
 }
 `

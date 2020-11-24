@@ -14,14 +14,15 @@ function generate () {
     copyright: 'CC0'
   })
 
-  let pages = fs.readdirSync(path.join(__dirname, '../pages/blog'))
+  let pages = fs.readdirSync(path.join(__dirname, '../pages/library'))
 
   pages.map(file => {
-    let content =  fs.readFileSync(path.join(__dirname, '../pages/blog', file))
+    if(fs.lstatSync(path.join('./pages/library/', file)).isDirectory()) return
+    let content =  fs.readFileSync(path.join(__dirname, '../pages/library', file))
     let {data} = matter(content)
     feed.addItem({
       title: data.title,
-      link: 'https://awarm.space/blog' + file.slice(0, -4),
+      link: 'https://hyperlink.academy/library/' + file.slice(0, -4),
       author: data.author,
       date: new Date(data.date),
       description: data.description

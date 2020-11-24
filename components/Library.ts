@@ -3,12 +3,12 @@ import { Children, useState} from 'react'
 import styled from '@emotion/styled'
 
 import { Box, FormBox, LabelBox } from './Layout'
-import { BlogTextStyles } from './BlogText'
+import { ContentTextStyles } from './ContentText'
 import { Tablet, colors } from './Tokens'
 import { BackButton, Secondary, Primary } from './Button'
 import { useApi } from 'src/apiHelpers'
 import { NewsletterSignupMsg, NewsletterSignupResponse } from 'pages/api/signup/[action]'
-import { Input } from './Form'
+import { Input, Info } from './Form'
 
 type Props = {
   title: string,
@@ -16,16 +16,16 @@ type Props = {
   date: string,
   author: string
   toc?: boolean
+  living?: boolean
   topic?: string
 }
 
-export const BlogLayout:React.FC<Props> = (props) =>{
+export const LibraryLayout:React.FC<Props> = (props) =>{
   let TOC = Children.toArray(props.children).filter(x => {
     let component = x as React.ReactElement
     let tag = component?.props?.originalType
     if(typeof tag === 'string') {
       return tag === 'h2'
-
     }
     return false
   }).map(x => {
@@ -36,7 +36,7 @@ export const BlogLayout:React.FC<Props> = (props) =>{
   })
 
   return h('div', [
-    h(BackButton, {href:'/blog'}, "Blog"),
+    h(BackButton, {href:'/library'}, "Library"),
     h(Container, [
       h(Box, {gap: 32, width:640}, [
         h(Box, [
@@ -44,7 +44,13 @@ export const BlogLayout:React.FC<Props> = (props) =>{
             h('h1', props.title),
             h('b.textSecondary', `By ${props.author} | ${props.date}`)
           ]),
-          h(BlogTextStyles, [
+          props.living ?
+            h(Info, [
+              `🌱 This is a `, h('b', `living document`), `. We're constantly learning, and may revisit this piece over time. If you have suggestions for how we can make it better, please `,
+              h('a', {href: "mailto:contact@hyperlink.academy"}, `let us know`),
+              `.`
+            ]) : null,
+          h(ContentTextStyles, [
             props.children as React.ReactElement
           ]),
         ]),
