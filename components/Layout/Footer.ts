@@ -13,7 +13,7 @@ export default function Footer(){
           h('h4', "More Info"),
           h(Link, {href: '/team', passHref: true}, h(FooterLink, 'About the Team')),
           h(Link, {href: '/manual', passHref: true}, h(FooterLink, 'Hyperlink Manual')),
-          h(Link, {href: '/blog', passHref: true}, h(FooterLink, 'Hyperlink Blog')),
+          h(Link, {href: '/library', passHref: true}, h(FooterLink, 'Hyperlink Library')),
           // h(Link, {href: '/faq', passHref: true}, h(FooterLink, 'FAQ')),
         ]),
         h(Box, {gap: 4}, [

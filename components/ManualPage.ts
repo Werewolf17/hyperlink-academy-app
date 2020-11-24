@@ -2,7 +2,7 @@ import {Children} from 'react'
 import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import Link from 'next/link'
-import { BlogTextStyles } from './BlogText'
+import { ContentTextStyles } from './ContentText'
 import { AccentImg } from './Images'
 import { colors, Tablet } from './Tokens'
 import { useRouter } from 'next/router'
@@ -45,7 +45,7 @@ const ManualPage:React.SFC<{image?: string}> = (props) => {
         h(AccentImg , {height:64, width:64, src: '/img/manual.gif', alt: "A gif of a spellbook floating in the air", style: {marginTop:32}}),
       ]),
     ]),
-    h(BlogTextStyles, [
+    h(ContentTextStyles, [
       props.children as React.ReactElement
     ])
   ])
