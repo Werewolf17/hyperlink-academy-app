@@ -204,7 +204,8 @@ overflow: hidden;
   position: absolute;
   height: 370px;
   width: 100%;
-  background:linear-gradient(transparent 320px, ${colors.appBackground});
+  /* background:linear-gradient(transparent 320px, ${colors.appBackground}); */
+  background: linear-gradient(to bottom, rgba(253,252,250,0) 0%,rgba(253,252,250,0) 80%, rgba(253,252,250,1) 100%);
   pointer-events: none;
  }
 
