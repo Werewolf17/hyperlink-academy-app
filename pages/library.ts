@@ -77,7 +77,7 @@ const Library = (props:Props) => {
             h('p.big', collection.description),
             h(Link, {href: "/library/collections/"+slug}, h('a', `See all posts (${posts.length})`))
           ]),
-          h(FlexGrid, {min:250, mobileMin: 200},posts.slice(0,3).map(p=>h(Link, {href:p.path}, h(Card, {style:{height:'min-content'}}, [
+          h(FlexGrid, {min:250, mobileMin: 200},posts.slice(0,3).map(p=>h(Link, {href:p.path, passHref: true}, h(Card, {style:{height:'min-content'}}, [
               h(Box, {gap: 16},[
                 h(Box, {gap: 8}, [
                   h('h3', p.title),
