@@ -123,6 +123,7 @@ export const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
       h('h4', 'Start Date'),
       h(Input, {
         type: 'date',
+        placeholder: 'yyyy-mm-dd',
         required: true,
         value: newCohort.start_date,
         onChange: e => setNewCohort({...newCohort, start_date: e.currentTarget.value})
@@ -132,6 +133,7 @@ export const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
       h('h4', `Start time (${timezone})`),
       h(Input, {
         type: 'time',
+        placeholder: '23:59',
         required: true,
         value: newCohort.start_time,
         onChange: e => setNewCohort({...newCohort, start_time: e.currentTarget.value})

@@ -102,6 +102,7 @@ export const EventForm = (props:{onChange: (e: Event)=>void, state: Event, peopl
           h('h4', 'Date'),
           h(Input, {
             type: 'date',
+            placeholder: 'yyyy-mm-dd',
             required: true,
             value: props.state.start_date,
             onChange: e => props.onChange({...props.state, start_date: e.currentTarget.value})
@@ -111,6 +112,7 @@ export const EventForm = (props:{onChange: (e: Event)=>void, state: Event, peopl
           h('h4', 'Start Time ' + `(${timezone})`),
           h(Input, {
             type: 'time',
+            placeholder: '23:59',
             required: true,
             value: props.state.start_time,
             onChange: e => props.onChange({...props.state, start_time: e.currentTarget.value})
