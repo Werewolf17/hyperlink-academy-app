@@ -52,8 +52,8 @@ export const LibraryLayout:React.FC<Props> = (props) =>{
           ]),
           props.living ?
             h(Info, [
-              `🌱 This is a `, h('b', `living document`), `. We're constantly learning, and may revisit this piece over time. If you have suggestions for how we can make it better, please `,
-              h('a', {href: "mailto:contact@hyperlink.academy"}, `let us know`),
+              `🌱 This is a `, h('b', `living document`), `. We're still learning, and may revisit this piece over time. Suggestions for how we can make it better? Please comment below or `,
+              h('a', {href: "mailto:contact@hyperlink.academy"}, `send us a note`),
               `.`
             ]) : null,
           h(ContentTextStyles, [
