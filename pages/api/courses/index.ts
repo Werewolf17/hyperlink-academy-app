@@ -66,6 +66,7 @@ async function createCourse(req: Request) {
   })
 
   let slug = slugify(msg.name)
+  if(maintainers.length === 0)  return {status:400, result:"ERROR: No maintainers provided, or found with the emails provided"}
 
   let maintainerGroupName = slug +'-m'
   let [maintainerGroup, courseGroup] = await Promise.all([

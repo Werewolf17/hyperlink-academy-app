@@ -103,7 +103,7 @@ const CreateCourse = ()=> {
           required: true,
           type: 'email',
           multiple: true,
-          onChange: e=> setFormData({...formData, maintainers: e.currentTarget.value.split(',')})
+          onChange: e=> setFormData({...formData, maintainers: e.currentTarget.value.split(',').map(x=>x.trim())})
         })
       ]),
       h(Primary, {status, type: 'submit'}, 'Submit')
