@@ -56,6 +56,7 @@ async function updateEvent(req:Request) {
       everyone: msg.data.people ? msg.data.people.length === 0 : undefined,
       events:{
         update:{
+          location: msg.data.location,
           start_date: msg.data.start_date,
           end_date: msg.data.end_date,
           description: msg.data.description,
