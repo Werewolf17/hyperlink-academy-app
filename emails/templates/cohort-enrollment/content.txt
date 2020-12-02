@@ -1,8 +1,10 @@
 Hi {{name}},
 
-You're enrolled in {{course_name}}, starting {{course_start_date}}!
+You're enrolled in {{course_name}}!
 
 Thanks for signing up, we're glad to have you and excited for this cohort of the course to begin.
+
+Add the events to your calendar: https://hyperlink.academy/calendar
 
 Go check out the cohort forum for instructions on what to do to prepare!
 
