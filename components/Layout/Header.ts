@@ -10,7 +10,7 @@ import { Box, Seperator, FormBox} from './index'
 import { useUserData } from '../../src/data'
 import { useMediaQuery } from '../../src/hooks'
 import { Textarea } from '../Form'
-import { Secondary, Primary } from '../Button'
+import { Secondary, Primary, LinkButton } from '../Button'
 import { Modal } from '../Modal'
 import { useApi } from '../../src/apiHelpers'
 import { FeedbackMsg, FeedbackResult } from '../../pages/api/feedback'
@@ -83,21 +83,27 @@ const Feedback = ()=> {
   let router = useRouter()
   let {data:user}= useUserData()
   let [feedback, setFeedback] = useState('')
-  let [status, callFeedback] = useApi<FeedbackMsg, FeedbackResult>([feedback])
+  let [status, callFeedback, setStatus] = useApi<FeedbackMsg, FeedbackResult>([feedback])
   let onSubmit = (e:React.FormEvent)=>{
     e.preventDefault()
     if(status==='success') return
     callFeedback('/api/feedback', {feedback, page: router.pathname, username: user ? user.username : undefined})
   }
 
+  if(status=== 'success') return h(Box, {style: {textAlign: 'center'}}, [
+    COPY.feedbackSuccess,
+    h('br'),
+    h(LinkButton, {onClick: () => {
+      setStatus('normal')
+      setFeedback('')
+    }}, "I have more feedback!")
+  ])
   return h(FormBox, {onSubmit, gap: 16}, [
       h('h4', COPY.feedbackTitle),
-      status === 'success'
-        ? h('div', {style: {textAlign: 'center'}}, COPY.feedbackSuccess)
-        : h(Textarea, {value: feedback, onChange: e=>setFeedback(e.currentTarget.value)}),
+      h(Textarea, {value: feedback, required: true, onChange: e=>setFeedback(e.currentTarget.value)}),
       h(Secondary, {
         type: 'submit',
-        success:status==='success',
+        disabled: feedback === '',
         style:{justifySelf:'center'}
       }, "Submit")
     ])
