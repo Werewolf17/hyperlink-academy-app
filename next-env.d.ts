@@ -44,3 +44,7 @@ declare module "ical.js" {
     }>)
   }
 }
+
+declare module "remark-emoji" {
+  any
+}

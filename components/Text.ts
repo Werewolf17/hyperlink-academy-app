@@ -2,9 +2,10 @@ import styled from '@emotion/styled'
 import h from 'react-hyperscript'
 import Markdown from 'react-markdown'
 import {colors} from './Tokens'
+import emoji from 'remark-emoji'
 
 export default function Text(props:{source:string}) {
-  return h(TextStyles, {}, h(Markdown, props))
+  return h(TextStyles, {}, h(Markdown, {source:props.source, plugins:[emoji]}))
 }
 export const TextStyles = styled('div')`
 
