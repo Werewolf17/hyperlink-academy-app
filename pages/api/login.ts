@@ -30,7 +30,7 @@ const handler = async (req: Request) => {
       display_name:person.display_name,
       bio: person.bio,
       link: person.link,
-      admin: person.admins.length > 0
+      admin: person.admins !== null
     }
     return {
       status: 200 as const,

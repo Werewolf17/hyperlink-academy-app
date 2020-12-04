@@ -1,5 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -77,17 +77,17 @@ model courses {
   duration                           String
   category_id                        Int
   prerequisites                      String
-  invite_only                        Boolean                   @default(false)
-  status                             course_status             @default(draft)
-  slug                               String                    @unique
-  id                                 Int                       @id @default(autoincrement())
-  cohort_max_size                    Int                       @default(0)
-  card_image                         String                    @default("/img/new_course.png")
-  type                               course_types              @default(course)
+  invite_only                        Boolean                        @default(false)
+  status                             course_status                  @default(draft)
+  slug                               String                         @unique
+  id                                 Int                            @id @default(autoincrement())
+  cohort_max_size                    Int                            @default(0)
+  card_image                         String                         @default("/img/new_course.png")
+  type                               course_types                   @default(course)
   course_group                       Int
   maintainer_group                   Int
-  course_groupTodiscourse_groups     discourse_groups          @relation("courses_course_groupTodiscourse_groups", fields: [course_group], references: [id])
-  maintainer_groupTodiscourse_groups discourse_groups          @relation("courses_maintainer_groupTodiscourse_groups", fields: [maintainer_group], references: [id])
+  course_groupTodiscourse_groups     discourse_groups               @relation("courses_course_groupTodiscourse_groups", fields: [course_group], references: [id])
+  maintainer_groupTodiscourse_groups discourse_groups               @relation("courses_maintainer_groupTodiscourse_groups", fields: [maintainer_group], references: [id])
   course_cohorts                     course_cohorts[]
   course_discounts                   course_discounts[]
   course_invites                     course_invites[]
@@ -125,7 +125,7 @@ model people {
   link                      String                     @default("")
   calendar_id               String                     @unique @default(dbgenerated())
   pronouns                  String                     @default("")
-  admins                    admins[]
+  admins                    admins?
   course_cohorts            course_cohorts[]
   course_maintainers        course_maintainers[]
   events                    events[]
@@ -159,16 +159,16 @@ model cohort_events {
 }
 
 model events {
-  id               Int                @unique @default(autoincrement())
-  start_date       String
-  end_date         String
-  name             String
-  location         String
-  description      String
-  created_by       String?
-  people           people?            @relation(fields: [created_by], references: [id])
-  cohort_events    cohort_events[]
-  people_in_events people_in_events[]
+  id                Int                @unique @default(autoincrement())
+  start_date        String
+  end_date          String
+  name              String
+  location          String
+  description       String
+  created_by        String
+  people            people             @relation(fields: [created_by], references: [id])
+  cohort_events     cohort_events[]
+  people_in_events  people_in_events[]
 }
 
 model discourse_groups {
@@ -215,14 +215,14 @@ model people_in_events {
 }
 
 enum course_status {
-  archived
   draft
   live
+  archived
 }
 
 enum discount_types {
-  absolute
   percentage
+  absolute
 }
 
 enum template_types {
@@ -231,6 +231,6 @@ enum template_types {
 }
 
 enum course_types {
-  club
   course
+  club
 }
