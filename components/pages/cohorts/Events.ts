@@ -3,6 +3,7 @@ import { getTimeBetween } from 'src/utils'
 import { useState, useEffect } from 'react'
 import { Box, FormBox } from 'components/Layout'
 import styled from '@emotion/styled'
+import Link from 'next/link'
 import { colors } from 'components/Tokens'
 import {Calendar, Pencil} from 'components/Icons'
 import { EventForm } from './CreateEvent'
@@ -37,9 +38,9 @@ export const CohortEvents = (props: {
         setShowPastEvents(!showPastEvents)
       }}, showPastEvents ? "hide past events" : "show past events"),
       !props.showCal ? null :
-      h(SmallLinkButton, {textSecondary: true, style:{justifySelf: 'end'}}, 
+        h(Link, {href: "/calendar"}, h(SmallLinkButton, {textSecondary: true, style:{justifySelf: 'end'}},
         h(Box, {h:true, gap:8, style:{textAlign:'right'}}, ['add to your calendar ', Calendar]),
-      ),
+      ))
 
     ]),
 
