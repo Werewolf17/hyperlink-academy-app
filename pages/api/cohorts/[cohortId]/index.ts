@@ -3,6 +3,7 @@ import { ResultType, APIHandler, Request } from "src/apiHelpers"
 import { getToken } from "src/token"
 import { sendWatchingNotificationEmail } from "emails"
 import { prettyDate } from "src/utils"
+import produce from "immer"
 
 let prisma = new PrismaClient()
 export type UpdateCohortMsg = {
@@ -81,7 +82,8 @@ async function updateCohort(req:Request) {
   return {status: 200, result: newData} as const
 }
 
-export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
+export const cohortDataQuery = async (id: number, userId?: string)=>{
+  let data = await prisma.course_cohorts.findOne({
     where: {id},
     select: {
       name: true,
@@ -124,28 +126,32 @@ export const cohortDataQuery = (id: number)=>prisma.course_cohorts.findOne({
               display_name: true,
               pronouns: true,
               username: true,
+              email: true,
             }
           }
         },
       }
     },
-})
+  })
+  if(!data) return
+
+  let enrolled = data.people_in_cohorts.find(x=>x.person === userId) || data.facilitator === userId
+  let isFacilitator = data.facilitator  === userId
+
+  let cohort_events = data.cohort_events
+    .filter(c=>enrolled || c.everyone)
+    .map(event => produce(event, (e)=>{if(!enrolled) e.events.location = ''}))
+  let people_in_cohorts = data.people_in_cohorts.map(person => produce(person, (p)=>{if(!isFacilitator)p.people.email = ''}))
+  return {...data, cohort_events, people_in_cohorts}
+}
 
 async function getCohortData(req: Request) {
   let cohortId = parseInt(req.query.cohortId as string)
   if(Number.isNaN(cohortId)) return {status: 400, result: "ERROR: Cohort id is not a number"} as const
   let user = getToken(req)
 
-  let data = await cohortDataQuery(cohortId)
+  let data = await cohortDataQuery(cohortId, user?.id)
   if(!data) return {status: 404, result: `Error: no cohort with id ${cohortId} found`} as const
-  let enrolled = data.people_in_cohorts.find(x=>x.person === user?.id) || data.facilitator === user?.id
-  let cohort_events = data.cohort_events
-    .filter(c=>enrolled || c.everyone)
-    .map(event =>{
-    if(!enrolled) {
-      return {...event, events: {...event.events, location: null}}
-    }
-    return event
-  })
-  return {status: 200, result: {...data, cohort_events}} as const
+
+  return {status: 200, result: data} as const
 }

@@ -30,6 +30,7 @@
     "feed": "^4.2.1",
     "gray-matter": "^4.0.2",
     "ical.js": "^1.4.0",
+    "immer": "^8.0.0",
     "next": "^10.0.2",
     "postmark": "^2.6.0",
     "raw-loader": "^4.0.2",

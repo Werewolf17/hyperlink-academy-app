@@ -119,7 +119,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
       ])
     ]),
     Curriculum: h(Text, {source:props.curriculum?.text}),
-    Members: h(CohortMembers, {cohort: props.cohort, isFacilitator})
+    Members: h(CohortMembers, {cohort: cohort, isFacilitator})
       } as {[k:string]:React.ReactElement}
   let tabKeys = Object.keys(Tabs).filter(t=>!!Tabs[t])
 
@@ -206,7 +206,12 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => 
     ]),
     props.isFacilitator ? h(Info, [`💡 You can edit your bio in the profile tab on your `, h(Link, {href: '/dashboard'}, h('a', 'dashboard'))]) : null,
     h(Text, {source: props.cohort.people.bio || ''}),
-    props.cohort.people_in_cohorts.length > 0 ? h('h4', "Members") : null,
+    props.cohort.people_in_cohorts.length === 0 ? null : h(Box, {h: true}, [
+      h('h4', "Members"),
+      !props.isFacilitator ? null : h('a', {
+        href:`mailto:?bcc=${props.cohort.people_in_cohorts.map(p=>p.people.email).join(',')}`
+      }, 'email everyone')
+    ]),
     ...props.cohort.people_in_cohorts
       .map((person)=>{
         return h(LearnerEntry, [
@@ -423,12 +428,6 @@ export const getStaticProps = async (ctx:any)=>{
 
   if(!cohort) return {props: {notFound: true}} as const
 
-  let cohort_events = cohort.cohort_events
-    .filter(c=>c.everyone)
-    .map(event =>{
-      return {...event, events: {...event.events, location: ''}}
-  })
-
   let [notes, artifacts, curriculum] = await Promise.all([
     getTaggedPost(cohort.category_id, 'note'),
     getTaggedPost(cohort.category_id, 'artifact'),
@@ -438,7 +437,7 @@ export const getStaticProps = async (ctx:any)=>{
     notFound: false,
     courseId,
     cohortId,
-    cohort: {...cohort, cohort_events},
+    cohort,
     course,
     notes,
     curriculum,
