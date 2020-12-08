@@ -85,6 +85,7 @@ async function enroll (req: Request) {
   if(price === 0) {
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
     await Promise.all([
+      discount ? prisma.course_discounts.update({where:{code: discount.code}, data:{redeems:{increment: 1}}}) : null,
       prisma.people_in_cohorts.create({data: {
         amount_paid: 0,
         people: {connect: {id: user.id}},
