@@ -110,7 +110,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
           })
       ])
     ]),
-    ["Cohort Details"]: h(Box, {gap: 64}, [
+    ["Cohort Details"]: !props.notes?.text ? null : h(Box, {gap: 64}, [
       h(Box, {gap: 32},[
         isFacilitator ? h(COPY.updateNotes, {id: props.notes?.id}) : null,
         !props.notes ? null : h(Box, [
