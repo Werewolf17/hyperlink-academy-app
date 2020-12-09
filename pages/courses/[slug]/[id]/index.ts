@@ -176,7 +176,8 @@ function UpcomingCohort(props: {
 
   return h(Box, {h: !mobile, style:{gridAutoColumns: 'auto'}}, [
     h(Box, {gap: 8}, [
-      h('h3', 'Starts ' + prettyDate(props.start_date)),
+      h(Link, {href:`/courses/${router.query.slug}/${props.course}/cohorts/${props.id}`},
+        h('a.notBlue', {style:{textDecoration: 'none'}}, h('h3', 'Starts ' + prettyDate(props.start_date)))),
       h('span', [
         'Facilitated by ',
         h(Link, {

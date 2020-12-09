@@ -47,11 +47,10 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
       h(Link, {href: props.user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
       h(NavLink, {style: {justifySelf: 'right'}, onClick: ()=> {setOpen(false)}}, 'close')
     ]),
-    h(Link, {href: '/courses'}, h('a', {}, h(CoursesButton, 'courses'))),
+    h(Link, {href: '/courses'}, h('a', {style:{textAlign:'right'}}, h(CoursesButton, 'courses'))),
     h(Box, {gap: 16, style: {textAlign: 'right'}}, [
       h(LoginButtons, props),
     ]),
-    h(Seperator),
     h(Link, {href: "/library", passHref:true}, h(NavLink, {style:{justifySelf: 'right'}}, 'library')),
     h(Seperator),
     h(Feedback)
