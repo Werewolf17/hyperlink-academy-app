@@ -34,8 +34,8 @@ async function enroll (req: Request) {
   try {msg = EnrollMsgValidator.check(req.body)}
   catch(e) {return {status:400, result:e.toString()} as const }
 
-  let [cohort, discount] = await Promise.all([
-    await prisma.course_cohorts.findOne({
+  let [cohort, person, discount] = await Promise.all([
+    prisma.course_cohorts.findOne({
       where: {id: cohortId},
       include: {
         discourse_groups: true,
@@ -59,6 +59,7 @@ async function enroll (req: Request) {
         }
       }
     }),
+    prisma.people.findOne({where:{id:user.id}}),
     msg.discount ? prisma.course_discounts.findOne({where: {code: msg.discount}}) : null
   ])
 
@@ -122,6 +123,8 @@ async function enroll (req: Request) {
     }
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
+    customer: person?.stripe_customer_id || undefined,
+    customer_email: person?.stripe_customer_id ? undefined : user.email,
     payment_intent_data: {
       transfer_group: cohort.id.toString()
     },
@@ -134,7 +137,6 @@ async function enroll (req: Request) {
     }],
     cancel_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
     success_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}?welcome`,
-    customer_email: user.email,
     metadata
   });
 

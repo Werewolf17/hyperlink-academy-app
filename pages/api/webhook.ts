@@ -35,7 +35,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
-    const {metadata, amount_total, payment_intent} = event.data.object as {customer_email:string, amount_total: number, metadata: StripeMetaData, payment_intent: string} ;
+    const {metadata, amount_total, payment_intent, customer} = event.data.object as Stripe.Checkout.Session & {metadata: StripeMetaData};
+    if(!amount_total ||!payment_intent || !customer ||
+      typeof payment_intent !== 'string' ||typeof customer !== 'string') return {status: 400, result: "ERROR: missing expected parameters, amount_total, payment_intent, or customer"}
 
     let cohortId = parseInt(metadata.cohortId)
     let person = await prisma.people.findOne({where: {id: metadata.userId}})
@@ -75,6 +77,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let gettingStarted = await getTaggedPost(cohort.category_id, 'getting-started')
 
     await Promise.all([
+      !person.stripe_customer_id ? prisma.people.update({where:{id: person.id}, data:{stripe_customer_id: customer}}) : null,
       discount ? prisma.course_discounts.update({
         where: {code: discount.code},
         data: {
