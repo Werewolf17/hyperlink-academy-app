@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { Box, LabelBox, FormBox } from 'components/Layout'
 import { Input, Error, Info } from 'components/Form'
-import { Primary, LinkButton } from 'components/Button'
+import { Primary } from 'components/Button'
 import {AccentImg, HalfLoopImg} from 'components/Images'
 import { useApi } from 'src/apiHelpers'
 import { Result, Msg } from 'pages/api/login'
@@ -18,9 +18,8 @@ const COPY = {
   passwordInput: "Password",
   resetPassword: "Reset password",
   loginHeader: "Log In",
-  createAccount: "Create a new account",
   wrongLogin: h('div', [
-    "Heck! The email or username didn't match the password. ", h('br'), "If you want, you can ",
+    "The email/username and password don't match", h('br'), "If you want, you can ",
     h(Link, { href: '/login?reset' }, h('a', 'reset your password here')),
     '.'
   ]),
@@ -50,57 +49,44 @@ const Login = () => {
   useEffect(()=> {if (data) router.push(redirect as string || '/dashboard')},[data])
   if (typeof reset !== 'undefined') return h(ResetPassword)
 
-  return h(FormBox, {onSubmit, width: 400, ma: true}, [
-    h(Box, {gap:32}, [
+  return h(FormBox, {onSubmit, width: 400, ma: true, gap: 32}, [
+    h(Box, [
+      h(LoginHeader, [
+        h('h1', COPY.loginHeader),
 
-    h(LoginHeader, [
-      h('h1', COPY.loginHeader),
+        h(HalfLoopImg, {
+          src1: '/img/door-1.gif',
+          src2: '/img/door-2.gif',
+          alt: "an animated gif of a entrance to the sparkle void",
+          startLoop: 1200,
+        }),
+      ]),
+      h('p.textSecondary', ['Or ', h(Link, { href: '/signup' }, h('a', 'sign up')), ' for a new account'])
+    ]),
 
-      h(HalfLoopImg, {
-        src1: '/img/door-1.gif',
-        src2: '/img/door-2.gif',
-        alt: "an animated gif of a entrance to the sparkle void",
-        startLoop: 1200,
+    status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
+
+    h(LabelBox, {gap:8}, [
+      h('h4', COPY.emailOrUsernameInput),
+      h(Input, {
+        type: 'text',
+        value: formData.emailOrUsername,
+        required: true,
+        onChange: (e) => setFormData({ ...formData, emailOrUsername: e.currentTarget.value })
       }),
     ]),
-    
-      // h(Box, {gap:16}, [
-      //   h(HalfLoopImg, {
-      //     src1: '/img/door-1.gif',
-      //     src2: '/img/door-2.gif',
-      //     alt: "an animated gif of a entrance to the sparkle void",
-      //     startLoop: 2500,
-      //   }),
-      //   h('h1', COPY.loginHeader),
-      // ]),
 
-      status === 'error' ? h(Error, {}, COPY.wrongLogin) : null,
-
-      h(LabelBox, {gap:8}, [
-        h('h4', COPY.emailOrUsernameInput),
-        h(Input, {
-          type: 'text',
-          value: formData.emailOrUsername,
-          required: true,
-          onChange: (e) => setFormData({ ...formData, emailOrUsername: e.currentTarget.value })
-        }),
-      ]),
-      
-      h(LabelBox, {gap:8}, [
-        h('h4', COPY.passwordInput),
-        h(Input, {
-          type: 'password',
-          value: formData.password,
-          required: true,
-          onChange: (e) => setFormData({ ...formData, password: e.currentTarget.value })
-        }),
-        h(Link, { href: '/login?reset' }, h(LinkButton, COPY.resetPassword))
-      ]),
-      h(Box, {gap: 8, style: {justifySelf: 'end', justifyItems: "end"}}, [
-        h(Primary, { type: 'submit',status}, COPY.loginButton),
-        h(Link, { href: '/signup' }, h(LinkButton, COPY.createAccount))
-      ])
-    ])
+    h(LabelBox, {gap:8}, [
+      h('h4', COPY.passwordInput),
+      h(Input, {
+        type: 'password',
+        value: formData.password,
+        required: true,
+        onChange: (e) => setFormData({ ...formData, password: e.currentTarget.value })
+      }),
+      h(Link, { href: '/login?reset'}, h('a', {style:{justifySelf:"right"}}, COPY.resetPassword))
+    ]),
+    h(Primary, { type: 'submit',status, style:{justifySelf: "right"}}, COPY.loginButton),
   ])
 }
 
@@ -111,7 +97,7 @@ const RESETCOPY = {
   successHeader: "Check your Email"
 }
 
-const ResetPassword: React.SFC = () => {
+const ResetPassword = () => {
   let [email, setEmail] = useState('')
   let [status, callResetPassword, setStatus] = useApi<RequestMsg, RequestResult>([email])
   const onSubmit = async (e:React.FormEvent) => {

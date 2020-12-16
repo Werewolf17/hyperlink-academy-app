@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
-import { FormBox, LabelBox} from 'components/Layout'
+import { Box, FormBox, LabelBox} from 'components/Layout'
 import {Primary} from 'components/Button'
-import { Input, Error, Info} from 'components/Form'
+import { Error, PasswordInput} from 'components/Form'
 import {ResetMsg, ResetResult} from 'pages/api/user/resetPassword/[action]'
 import { useApi } from 'src/apiHelpers'
 
@@ -30,7 +30,7 @@ const ResetPassword = ()=>{
     if(status === 'success') {
       setTimeout(()=> {
         router.push('/login')
-      }, 5000)
+      }, 3500)
     }
   })
 
@@ -47,26 +47,23 @@ const ResetPassword = ()=>{
       return h(FormBox, {onSubmit, width:400, ma: true }, [
         h('h1', COPY.header),
         h(LabelBox, {gap: 8}, [
-          h('h4', COPY.passwordInput),
-          h(Input, {
+          h('div',[
+            h('h4', COPY.passwordInput),
+            h('small.textSecondary', "Minimum length 8 characters"),
+          ]),
+          h(PasswordInput, {
             type: 'password',
+            minLength: 8,
             value: formData.password,
             onChange: e => setFormData({...formData, password:e.target.value})
           }),
         ]),
-        h(LabelBox, {gap:8}, [
-          h('h4', COPY.confirmInput),
-          h(Input, {
-            type: 'password',
-            value: formData.confirmPassword,
-            onChange: e => setFormData({...formData, confirmPassword:e.target.value})
-          })
-        ]),
         h(Primary, {type: 'submit', status, style: {justifySelf:'end'}}, 'Submit')
       ])
-    case 'success': return h(Info, [
-      'Awesome, we reset your password, go ahead and ',
-      h(Link, {href:'/login'}, h('a', 'login'))
+    case 'success': return h(Box, [
+      h('h1', "Great"),
+      h('p', 'You can now log in with your new password'),
+      h(Link, {href:'/login'}, h('a', h(Primary, 'Log In')))
     ])
     case 'error': return COPY.error
   }
