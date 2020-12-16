@@ -35,21 +35,18 @@ const Landing = (props:Props) => {
 }
 
 const Welcome = () =>{
-  return h(Box, {gap:32}, [
-    //Landing Page Top Banner
-    h(LandingContainer, [
+  return h(LandingContainer, [
+    h(Box, {gap:16}, [
       h(Box, {gap:32}, [
-        //Title and Tagline
-        h(Title, ['hyperlink.', h('wbr'), 'academy']),
-        h(Tagline, COPY.hyperlinkTagline),
-        
-        h(CTAGrid, [
-          h('a', {href:'#courses'}, h(Primary, {}, COPY.registerButton)),
-          h(NewsletterSignup)
-        ]),
+      h(Title, ['hyperlink.', h('wbr'), 'academy']),
+      h(Tagline, COPY.hyperlinkTagline),
+      ]),
+      h(CTAGrid, [
+        h('a', {href:'#courses'}, h(Primary, {}, COPY.registerButton)),
+        h(NewsletterSignup)
       ]),
     ]),
-])
+  ])
 }
 
 let WhyHyperlink = styled('div')`
