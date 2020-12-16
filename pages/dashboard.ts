@@ -63,6 +63,7 @@ const Dashboard = () => {
               h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
                 h( EmptyImg, {src: 'img/empty.png'}),
                 h('small.textSecondary', "Hmmm... Looks like you haven't enolled in anything yet. Check out some available courses in the Course List below!" ),
+                h(Link, {href: '/courses'}, h('a', {style:{marginBottom:'16px'}}, h(Primary, COPY.courseListButton)))
               ]),
             ])
           // if enrolled, show grid of enrolled cohorts
@@ -78,7 +79,7 @@ const Dashboard = () => {
                   return h(EnrolledCohort, {cohort, facilitating})
                 }))
             ]),
-          h(Box, {padding: 32, style:{backgroundColor: colors.grey95}}, [
+          activeCohorts.length === 0 ? null : h(Box, {padding: 32, style:{backgroundColor: colors.accentPeach}}, [
             h(Box, {ma: true, style:{textAlign:"center", justifyItems:"center"}}, [
               h('h2', COPY.courseListHeader),
               h(Link, {href: '/courses'}, h('a', {}, h(Primary, COPY.courseListButton)))
