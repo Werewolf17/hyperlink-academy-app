@@ -6,6 +6,10 @@ export const GlobalStyleSheet = css`
 .accentSuccess { color: ${colors.accentSuccess} };
 .accentRed { color: ${colors.accentRed} };
 
+input::placeholder {
+font-style: italic;
+}
+
 html {
   overflow-y: scroll;
   overflow-x: hidden;

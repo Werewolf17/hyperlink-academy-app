@@ -121,7 +121,7 @@ padding: 16px;
 `
 
 export const Info = styled('div')`
-background-color: ${colors.grey95};
+background-color: ${colors.accentPeach};
 padding: 16px;
 `
 
