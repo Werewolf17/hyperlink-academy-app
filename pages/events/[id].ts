@@ -41,17 +41,20 @@ const EditableEvent = (props: Extract<Props, {notFound: false}>) => {
     location: props.location,
   })
   useEffect(()=>{
+    if(!event) return
+    let start_date = new Date(event.start_date)
+    let end_date = new Date(event.end_date)
     setEdittedEvent({
-    name: props.name,
-    cost: props.standalone_events?.cost || 0,
-    max_attendees: props.standalone_events?.max_attendees || 0,
-    description: props.description,
-    start_date: `${start_date.getFullYear()}-${('0'+(start_date.getMonth()+1)).slice(-2)}-${('0'+start_date.getDate()).slice(-2)}`,
-    start_time: start_date.toLocaleTimeString([], {hour:"2-digit", minute: "2-digit", hour12: false}),
-    end_time: end_date.toLocaleTimeString([], {hour:"2-digit", minute: "2-digit", hour12: false}),
-    location: props.location,
+      name: event.name,
+      cost: event.standalone_events?.cost || 0,
+      max_attendees: event.standalone_events?.max_attendees || 0,
+      description: event.description,
+      start_date: `${start_date.getFullYear()}-${('0'+(start_date.getMonth()+1)).slice(-2)}-${('0'+start_date.getDate()).slice(-2)}`,
+      start_time: start_date.toLocaleTimeString([], {hour:"2-digit", minute: "2-digit", hour12: false}),
+      end_time: end_date.toLocaleTimeString([], {hour:"2-digit", minute: "2-digit", hour12: false}),
+      location: event.location,
   })
-  }, [props])
+  }, [event])
   let [status, callUpdateEvent] = useApi<UpdateEventMsg, UpdateEventResult>([])
 
   if(props === undefined|| !event) return h(PageLoader)
