@@ -39,7 +39,7 @@ export const CreateEvent = (props: {
     people: []
   })
   let [status, callCreateEvent] = useApi<CreateEventMsg, CreateEventResponse>([event], (e)=>{
-    props.mutate(e)
+    if(e.type === 'cohort') props.mutate(e.event)
     setEvent({
       everyone: false,
       people:[],
@@ -63,6 +63,7 @@ export const CreateEvent = (props: {
     let end_date = new Date(d1[0], d1[1] - 1, d1[2], t2[0], t2[1])
 
     callCreateEvent('/api/events', {
+      type: 'cohort',
       people: event.people,
       cohort: props.cohort,
       name: event.name,

@@ -121,7 +121,7 @@ box-shadow: 4px 4px ${colors.grey15};
 }
 `
 
-export const BigCohortCard = (props: Cohort & {courses: {name: string, slug: string}}) =>{
+export const BigCohortCard = (props: Cohort & {courses: {name: string, slug: string}}) => {
   let now = new Date()
   let status: "Completed" | "Upcoming" | "Ongoing" = "Upcoming"
   if(now > new Date(props.start_date)) status = "Ongoing"

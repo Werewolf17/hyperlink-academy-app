@@ -5,8 +5,14 @@ export const prettyDate = (str: string) =>  {
   let today = new Date()
   if(date.getDate()===today.getDate() &&
     date.getMonth()===today.getMonth() &&
-    date.getFullYear()===today.getFullYear()) return "today"
+    date.getFullYear()===today.getFullYear()) return "Today"
   return date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})
+}
+
+export function dateFromDateAndTimeInputs(date: string, time: string){
+  let dateParts = date.split('-').map(x=>parseInt(x))
+  let timeParts = time.split(':').map(x=>parseInt(x))
+  return new Date(dateParts[0], dateParts[1] -1, dateParts[2], timeParts[0], timeParts[1])
 }
 
 export const slugify = (str:string) => {
@@ -30,4 +36,18 @@ export const getStripe = () => {
     stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!)
   }
   return stripePromise
+}
+
+export function formHelper<S>(state:S, setState:(s:S)=>void) {
+  return Object.keys(state).reduce((acc, key)=> {
+    let value =state[key as keyof S]
+    acc[key as keyof S] = {
+      value,
+      onChange: (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>setState({
+        ...state,
+        [key]: typeof value === 'number' ? parseInt(e.currentTarget.value) : e.currentTarget.value
+      })
+    }
+    return acc
+  },  {} as {[k in keyof S]: {value: S[k], onChange: (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>void}})
 }

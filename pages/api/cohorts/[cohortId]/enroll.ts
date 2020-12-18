@@ -1,13 +1,12 @@
 import { PrismaClient } from "@prisma/client"
 import * as rt from 'runtypes'
 import { ResultType, APIHandler, Request } from "src/apiHelpers"
+import {StripePaymentMetaData, stripe} from 'src/stripe'
 import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from 'emails'
-import Stripe from 'stripe'
 import { getToken } from "src/token";
 import { addMember, getTaggedPost } from "src/discourse";
 import { prettyDate } from "src/utils"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET || '', {apiVersion:'2020-08-27'});
 let prisma = new PrismaClient()
 export type EnrollResponse= ResultType<typeof enroll>
 export type EnrollMsg  = rt.Static<typeof EnrollMsgValidator>
@@ -17,12 +16,6 @@ export default APIHandler(enroll)
 let EnrollMsgValidator = rt.Record({
   discount: rt.Union(rt.Undefined, rt.String)
 })
-
-export type StripeMetaData = {
-  cohortId:string,
-  userId:string,
-  discount: string | null
-}
 
 async function enroll (req: Request) {
   let cohortId = parseInt(req.query.cohortId as string)
@@ -116,11 +109,12 @@ async function enroll (req: Request) {
     }
   }
 
-  let metadata: StripeMetaData = {
-      cohortId: cohort.id.toString(),
-      userId: user.id,
-      discount: discount?.code || null
-    }
+  let metadata: StripePaymentMetaData = {
+    type: 'cohort',
+    cohortId: cohort.id.toString(),
+    userId: user.id,
+    discount: discount?.code || null
+  }
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     customer: person?.stripe_customer_id || undefined,

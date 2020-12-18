@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { events, PrismaClient } from "@prisma/client";
 import ICAL from 'ical.js'
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -13,7 +13,7 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
   calendar.updatePropertyWithValue('name', 'Hyperlink Calendar')
   calendar.updatePropertyWithValue('x-wr-calname', 'Hyperlink Calendar')
 
-  let [user_cohorts, facilitator_cohorts] = await Promise.all([
+  let [user_cohorts, facilitator_cohorts, standalone] = await Promise.all([
     prisma.people_in_cohorts.findMany({
       where: {
         people: {calendar_id: calendar_ID},
@@ -64,6 +64,22 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
           }
         }
       }
+    }),
+    prisma.standalone_events.findMany({
+      select: {
+        events: true
+      },
+      where: {
+        events: {
+          people_in_events: {
+            some: {
+              people:{
+                calendar_id: calendar_ID
+              }
+            }
+          }
+        }
+      }
     })
   ])
 
@@ -77,14 +93,19 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
     let cohort_id = cohort.id
     return cohort.cohort_events.map(ev => {return {...ev.events, course, cohort_id}})
   })
-  let events = enrolled_events.concat(facilitating_events)
+
+  let standalone_events = standalone.map(ev=>{
+    return ev.events
+  })
+
+  let events:Array<events & Partial<{course: string, cohort_id: number}>> = standalone_events.concat(enrolled_events).concat(facilitating_events)
 
   for(let event of events) {
     let vevent = new ICAL.Component('vevent')
     let calEvent = new ICAL.Event(vevent)
     calEvent.uid = 'hyperlink-'+event.id
     calEvent.description = event.description
-    calEvent.summary = event.course + ' - ' + event.name
+    calEvent.summary = event.course ? (event.course + ' - ' + event.name) : event.name
     calEvent.location = event.location
     calEvent.startDate = ICAL.Time.fromJSDate(new Date(event.start_date), true)
     calEvent.endDate = ICAL.Time.fromJSDate(new Date(event.end_date), true)
