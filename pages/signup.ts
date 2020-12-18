@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { Box, LabelBox, FormBox} from 'components/Layout'
 import { Input, Error, Info, CheckBox, PasswordInput} from 'components/Form'
-import { Primary, LinkButton} from 'components/Button'
+import { Primary } from 'components/Button'
 import {AccentImg, HalfLoopImg} from 'components/Images'
 import { useUserData } from 'src/data'
 import { callApi, useApi } from 'src/apiHelpers'
@@ -63,6 +63,7 @@ const Signup = () => {
         }),
       ]),
       h('p.big', COPY.headerDescription),
+      h('p.textSecondary', ['Or ', h(Link, {href:"/login"}, h('a', 'log in')), ' with an existing account.'])
     ]),
     status === 'error' ? h(Error, {}, h('div', [
       "A user already exists with that email. Try ", h(Link,{href:'/login'}, h('a', 'logging in')),
@@ -73,21 +74,22 @@ const Signup = () => {
         h('h4', "Username"),
         h('small.textSecondary', "Pick a unique username between 3-15 characters."),
       ]),
-      h(Input, {type: 'text',
-                name: "username",
-                required: true,
-                minLength: 3,
-                maxLength: 15,
-                value: formData.username,
-                onChange: (e)=> {
-                  setFormData({...formData, username:e.currentTarget.value})
-                  if(!usernameValidate(e.currentTarget.value || '')){
-                    e.currentTarget.setCustomValidity('Your username must contain only letters, numbers, underscores, periods or dashes')
-                  }
-                  else {
-                    e.currentTarget.setCustomValidity('')
-                  }
-                }}),
+      h(Input, {
+        type: 'text',
+        name: "username",
+        required: true,
+        minLength: 3,
+        maxLength: 15,
+        value: formData.username,
+        onChange: (e)=> {
+          setFormData({...formData, username:e.currentTarget.value})
+          if(!usernameValidate(e.currentTarget.value || '')){
+            e.currentTarget.setCustomValidity('Your username must contain only letters, numbers, underscores, periods or dashes')
+          }
+          else {
+            e.currentTarget.setCustomValidity('')
+          }
+        }}),
       formData.username.length < 3 ? null :
         !usernameValidate(formData.username) ? h('span.accentRed', 'Your username must contain only letters, numbers, underscores, periods or dashes') :
         usernameValid === null
@@ -129,10 +131,7 @@ const Signup = () => {
         "Sure! Gimme the updates."
       ]),
     ]),
-    h(Box, {gap: 8}, [
-      h(Primary, {status, style: {justifySelf: 'end'}, type: 'submit'}, COPY.submitButton),
-      h(Link, {href:"/login"}, h(LinkButton, {style:{justifySelf: 'end'}}, 'Log in with an existing account'))
-    ])
+    h(Primary, {status, style: {justifySelf: 'end'}, type: 'submit'}, COPY.submitButton),
   ])
 }
 
@@ -159,9 +158,9 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
   if(router.query.verifyEmail && status === null) return null
 
   if(status === 'success') return h(Box, {width: 400, ma:true, gap: 16}, [
-      h('h1', "You're verified!"),
-      h(Info, "Click the button below if you're not redirected in a couple seconds"),
-      h(Primary, {onClick: ()=> router.push('/dashboard')}, 'Back to Hyperlink')
+    h('h1', "All Done!"),
+    h('p.big', "Click the button below if you're not redirected in a couple seconds"),
+    h(Link, {href:'/dashboard'}, h('a', {}, h(Primary, 'Back to Hyperlink')))
   ])
 
   return h(FormBox, {onSubmit, width: 400, ma: true, gap: 32}, [
@@ -169,22 +168,21 @@ const VerifyEmail = (props: {email?:string, resendEmail: any}) =>  {
     h('h1', 'Verify your email'),
     props.email ? h(Box, {gap: 8}, [
       `Sweet! We sent an email with a verification code to`,
-      h(Info, props.email),
+      h(Info, {}, h('b', props.email)),
     ]) : null,
     h(Box, {gap: 8}, [
-      `Copy the code there and submit it here:`,
-      status === 'error' ? h(Error, {}, [
-        'Your email link is invalid or out of date, please try ',
-        h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
-      ]) : null,
-      h('div', {style: {width: '100%'}}, [
-        h(Input, {
-          type: 'text',
-          value: key,
-          onChange: e=>setKey(e.currentTarget.value.trim())
-        })
-      ]),
+      h('h4', `Copy the code there and submit it here:`),
+      h(Input, {
+        spellCheck: false,
+        type: 'text',
+        value: key,
+        onChange: e=>setKey(e.currentTarget.value.trim())
+      })
     ]),
+    status === 'error' ? h(Error, {}, [
+      'Your email link is invalid or out of date, please try ',
+      h(Link, {href:'/signup'}, h('a', 'signing up again' )), '.'
+    ]) : null,
     h(Primary, {type: 'submit', status, style:{justifySelf: 'right'}}, "Confirm your email")
   ])
 }

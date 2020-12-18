@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from 'next'
 
 import Intro from 'writing/Intro.mdx'
-import { colors, Mobile, Tablet} from 'components/Tokens'
+import { Mobile, Tablet} from 'components/Tokens'
 import { Box, Body} from 'components/Layout'
 import { Primary } from 'components/Button'
 // import {TitleImg} from '../components/Images'
@@ -21,10 +21,6 @@ let COPY = {
   emailDescription: "We'll never spam or share your email. You can unsubscribe at any time.",
   emailButton: "Get Updates",
   coursesHeader: "All Courses",
-  courseGardenHeader: "Have an idea for a course?",
-  courseGardenDescription: `Hyperlink courses are created by our community. We seed and grow them in the Course
-Garden. Check out some in development, or propose your own!`,
-  courseGardenLink: "Check out the Course Garden"
 }
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -34,36 +30,23 @@ const Landing = (props:Props) => {
   return h(Box, {gap:48}, [
     h(Welcome),
     h(WhyHyperlink, {}, h(Body, {}, h(Intro))),
-    !courses ? null : h(CoursesAndClubsList, courses),
-    h(Box, { padding: 32, style:{backgroundColor: colors.grey95}}, [
-      h(Box, {width: 640, ma: true}, [
-        h('h2', COPY.courseGardenHeader),
-        COPY.courseGardenDescription,
-        h('span', {style:{color: 'blue', justifySelf: 'end'}}, [
-          h('a.mono',{href: 'https://forum.hyperlink.academy/c/course-garden/'}, COPY.courseGardenLink),
-          h('span', {style: {fontSize: '1.25rem'}}, '\u00A0 ➭')
-        ])
-      ])
-    ]),
+    !courses ? null : h(CoursesAndClubsList, courses)
   ])
 }
 
 const Welcome = () =>{
-  return h(Box, {gap:32}, [
-    //Landing Page Top Banner
-    h(LandingContainer, [
+  return h(LandingContainer, [
+    h(Box, {gap:16}, [
       h(Box, {gap:32}, [
-        //Title and Tagline
-        h(Title, ['hyperlink.', h('wbr'), 'academy']),
-        h(Tagline, COPY.hyperlinkTagline),
-        
-        h(CTAGrid, [
-          h('a', {href:'#courses'}, h(Primary, {}, COPY.registerButton)),
-          h(NewsletterSignup)
-        ]),
+      h(Title, ['hyperlink.', h('wbr'), 'academy']),
+      h(Tagline, COPY.hyperlinkTagline),
+      ]),
+      h(CTAGrid, [
+        h('a', {href:'#courses'}, h(Primary, {}, COPY.registerButton)),
+        h(NewsletterSignup)
       ]),
     ]),
-])
+  ])
 }
 
 let WhyHyperlink = styled('div')`

@@ -13,6 +13,7 @@ export const colors = {
   backgroundRed: "#F9EBE8",
   accentRed: "#C23C1E",
   accentSuccess: "#348C1E",
+  accentPeach: "#F8EFE2",
   accentLightBlue: "#F0F7FA",
   linkHover: "#00008B"
 }

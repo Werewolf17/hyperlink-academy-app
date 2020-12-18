@@ -1,11 +1,12 @@
 import h from 'react-hyperscript'
 import { coursesQuery } from 'pages/api/courses'
 import { InferGetStaticPropsType } from 'next'
+import Link from 'next/link'
 import { useCourses, Courses as CoursesType } from 'src/data'
 import { Box, Seperator } from 'components/Layout'
 import { Mobile } from 'components/Tokens'
 import styled from '@emotion/styled'
-import { Secondary } from 'components/Button'
+import { Primary, Secondary } from 'components/Button'
 import { ClubCard, CourseCard, FlexGrid } from 'components/Card'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
@@ -51,6 +52,7 @@ export default function Courses(props:Props) {
         h(Box, {width: 640}, [
           h('h1', {id: 'courses', style:{scrollMarginTop: '96px'}}, "Courses"),
           h('p.big', `Courses are deep dives into a subject, led by a facilitator experienced in the field.`),
+          h(Link, {href: "/forms/propose-course"}, h('a', {}, h(Primary, 'Propose a new Course!')))
         ]),
         h(FlexGrid, {min: 400, mobileMin: 200},
           courses.map(course => {
@@ -61,6 +63,7 @@ export default function Courses(props:Props) {
         h(Box, {width: 640}, [
           h('h1', {id: 'clubs', style:{scrollMarginTop: '96px'}}, "Clubs"),
           h('p.big', `Clubs are a lightweight way to convene people with shared interests to explore new things together.`),
+          h(Link, {href: "/forms/propose-club"}, h('a', {}, h(Primary, 'Propose a new Club!')))
         ]),
         h(FlexGrid,{min: 290, mobileMin: 290}, clubs.flatMap(course=> {
           return course.course_cohorts.map(cohort => {
