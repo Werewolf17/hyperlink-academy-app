@@ -44,3 +44,7 @@ To call the API from the frontend there is a `callAPI` function that takes both
 those types as type parameters.
 
 bump
+
+## Staging
+
+TBD
