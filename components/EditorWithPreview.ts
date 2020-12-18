@@ -7,8 +7,9 @@ import { useState } from 'react'
 import { Box } from './Layout'
 import { LinkButton } from './Button'
 
-export default function(props:{value: string, onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>void}) {
+export default function EditorWithPreview(props:{height?: number, value: string, onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>void}) {
   let mobile = useMediaQuery('(max-width:640px)')
+
   let [mode, setMode] = useState<'edit'|'preview'>('edit')
   if(mobile) return h(Box, {gap:4}, [
     h('div', {style:{justifySelf: 'right'}}, [
@@ -22,7 +23,7 @@ export default function(props:{value: string, onChange: (e:React.ChangeEvent<HTM
   ])
   return h(EditorPreviewContainer, [
     h(Editor, props),
-    h(Preview, {}, h(Text, {source: props.value}))
+    h(Preview, {height:props.height}, h(Text, {source: props.value}))
   ])
 }
 let EditorPreviewContainer = styled('div')`
@@ -31,9 +32,9 @@ max-width: 1200px;
 grid-template-columns: 50% 50%;
 `
 
-let Editor = styled('textarea')`
+let Editor = styled('textarea')<{height?:number}>`
 box-sizing: border-box;
-height: 512px;
+height: ${props=>props.height ? props.height : 512}px;
 padding: 16px;
 font-family: 'Lato', sans-serif;
 border-color: ${colors.grey55} !important;
@@ -44,12 +45,12 @@ font-size: inherit;
 line-height: inherit;
 `
 
-let Preview = styled('div')`
+let Preview = styled('div')<{height?:number}>`
 overflow: scroll;
 box-sizing: border-box;
 padding: 16px;
 font-size: 16px;
-height: 512px;
+height: ${props=>props.height ? props.height : 512}px;
 background-color:${colors.grey95};
 border-radius: 0 2px 2px 0;
 `

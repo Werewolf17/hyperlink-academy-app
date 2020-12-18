@@ -114,3 +114,15 @@ CREATE TABLE IF NOT EXISTS cohort_events (
   event integer REFERENCES events(id) NOT NULL,
   PRIMARY KEY (cohort, event)
 );
+
+CREATE TABLE IF NOT EXISTS standalone_events (
+  event integer references events(id) NOT NULL PRIMARY KEY,
+  cost integer not null,
+  max_attendees integer
+);
+
+CREATE TABLE standalone_events_in_courses (
+  course integer references courses(id) NOT NULL,
+  standalone_event integer references standalone_events(event) NOT NULL,
+  PRIMARY KEY (course, standalone_event)
+);

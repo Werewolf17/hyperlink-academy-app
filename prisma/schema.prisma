@@ -94,6 +94,7 @@ model courses {
   course_maintainers                 course_maintainers[]
   course_templates                   course_templates[]
   people_watching_courses            people_watching_courses[]
+  standalone_events_in_courses       standalone_events_in_courses[]
   watching_courses                   watching_courses[]
 }
 
@@ -170,6 +171,7 @@ model events {
   people            people             @relation(fields: [created_by], references: [id])
   cohort_events     cohort_events[]
   people_in_events  people_in_events[]
+  standalone_events standalone_events?
 }
 
 model discourse_groups {
@@ -213,6 +215,23 @@ model people_in_events {
   people people @relation(fields: [person], references: [id])
 
   @@id([person, event])
+}
+
+model standalone_events {
+  event                        Int                            @id
+  cost                         Int
+  max_attendees                Int?
+  events                       events                         @relation(fields: [event], references: [id])
+  standalone_events_in_courses standalone_events_in_courses[]
+}
+
+model standalone_events_in_courses {
+  course            Int
+  standalone_event  Int
+  courses           courses           @relation(fields: [course], references: [id])
+  standalone_events standalone_events @relation(fields: [standalone_event], references: [event])
+
+  @@id([course, standalone_event])
 }
 
 enum course_status {

@@ -103,7 +103,7 @@ const Event = (props: {
   })
 
   let[status, callUpdateEvent] = useApi<UpdateEventMsg, UpdateEventResult>([props], async (event)=>{
-    props.mutate(event)
+    if(event.type === 'cohort') props.mutate(event.data)
     setEditing(false)
   })
 
@@ -133,7 +133,7 @@ const Event = (props: {
     let end_date = new Date(d1[0], d1[1] - 1, d1[2], t2[0], t2[1])
 
     callUpdateEvent('/api/events/'+props.event.events.id, {
-      id: props.event.events.id,
+      type: 'cohort',
       cohort: props.cohort,
       data: {
         name: event.name,

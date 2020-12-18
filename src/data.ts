@@ -6,6 +6,7 @@ import { CourseDataResult } from '../pages/api/courses/[id]'
 import { ProfileResult } from '../pages/api/people/[id]'
 import { CourseResult } from '../pages/api/courses'
 import { GetDiscountsResult } from 'pages/api/courses/[id]/discounts'
+import { GETEventResult } from 'pages/api/events/[id]'
 
 export type User = Success<WhoAmIResult>
 export const useUserData = ()=>{
@@ -30,6 +31,13 @@ export const useCourseData = (id?: number | string, initialData?:Success<CourseD
     if(res.status === 200) return res.result
   }, {initialData})
 }
+
+export type Event = Success<GETEventResult>
+export const useEventData = (id: number, initialData?:Event) => useSWR(`/api/events/${id}`, async api => {
+  let res = await callApi<null, GETEventResult>(api)
+  if(res.status === 200) return res.result
+  else return false
+}, {initialData})
 
 export type Cohort = Success<CohortResult>
 export const useCohortData = (cohort?: number, initialData?:Success<CohortResult>) => {
