@@ -14,6 +14,7 @@ import {UpdateCourseMsg, UpdateCourseResponse} from 'pages/api/courses/[id]'
 import { Destructive, Primary } from 'components/Button'
 import { IconPicker } from 'components/IconPicker'
 import {colors} from 'components/Tokens'
+import { DISCOURSE_URL } from 'src/discourse'
 
 export function ClubSettings(props: {course: Course, curriculum: {id: string, text: string}}) {
   let {data: user} = useUserData()
@@ -94,7 +95,7 @@ function Details(props: {course:Course, mutate:(c:Course)=>void, curriculum: {id
     h('h2', 'Edit Club Details'),
     h(Info, [
       `💡 You can make changes to the club description by editing `,
-      h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.curriculum.id}`}, `this topic`),
+      h('a', {href: `${DISCOURSE_URL}/session/sso?return_path=/t/${props.curriculum.id}`}, `this topic`),
       ` in the forum`
     ]),
     h(LabelBox, {gap:8}, [

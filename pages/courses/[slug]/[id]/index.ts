@@ -18,7 +18,7 @@ import {Modal} from 'components/Modal'
 import { Primary, Destructive, LinkButton} from 'components/Button'
 import {WatchCourse} from 'components/Course/WatchCourse'
 
-import { getTaggedPost } from 'src/discourse'
+import { DISCOURSE_URL, getTaggedPost } from 'src/discourse'
 import { useUserData, useUserCohorts, useCourseData, Course, User} from 'src/data'
 import { UpdateCourseMsg, UpdateCourseResponse} from 'pages/api/courses/[id]'
 import { callApi } from 'src/apiHelpers'
@@ -42,7 +42,7 @@ const COPY = {
   enrollButton: "Enroll in a cohort",
   updateCurriculum: (props: {id: string}) => h(Info, [
     `💡 You can make changes to the curriculum by editing `,
-    h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.id}`}, `this topic`),
+    h('a', {href: `${DISCOURSE_URL}/session/sso?return_path=/t/${props.id}`}, `this topic`),
     ` in the forum`
   ])
 }
@@ -332,7 +332,7 @@ function MarkCourseLive(props: {id:number, slug: string}) {
             "Edit important details in ", h('a', {href: `https://hyperlink.academy/courses/${props.slug}/${props.id}/settings?tab=Details`}, "course settings"), "."
           ]),
           h('li', [
-            "Written a ", h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.id}`}, "curriculum"), "."
+            "Written a ", h('a', {href: `${DISCOURSE_URL}/session/sso?return_path=/t/${props.id}`}, "curriculum"), "."
           ]),
         ]),
           h(Primary, {style:{justifySelf:'center'}, onClick}, state === 'loading' ? h(Loader) : 'Go Live!')        
@@ -392,7 +392,7 @@ const TODOBanner = (props:{
                 "Edit important details, like description and price, in ", h('a', {href: `https://hyperlink.academy/courses/${props.slug}/${props.id}/settings?tab=Details`}, "course settings"), "."
               ]),
               h("span", [
-                "Write a comprehensive curriculum for your course, by editing the ", h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.id}`}, "Curriculum topic"), " in the forum."
+                "Write a comprehensive curriculum for your course, by editing the ", h('a', {href: `${DISCOURSE_URL}/session/sso?return_path=/t/${props.id}`}, "Curriculum topic"), " in the forum."
               ]),
               h("span", [
                 "Create or edit ", h('a', {href: `https://hyperlink.academy/courses/${props.slug}/${props.id}/settings?tab=Templates`}, "templates"), " for reusable forum topics so you don't need to rewrite them for every cohort you run (or you can add these later)."

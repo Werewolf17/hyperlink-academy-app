@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse} from 'next'
 import Stripe from 'stripe'
 import {PrismaClient} from '@prisma/client'
-import { getUsername, addMember, getTaggedPost} from '../../src/discourse'
-import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill, sendEventRSVPEmail } from '../../emails';
+import { getUsername, addMember, getTaggedPost, DISCOURSE_URL} from 'src/discourse'
+import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill, sendEventRSVPEmail } from 'emails';
 import { prettyDate } from '../../src/utils';
 import { StripePaymentMetaData } from 'src/stripe';
 
@@ -103,14 +103,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               course_start_date: prettyDate(cohort.start_date),
               course_name: cohort.courses.name,
               cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-              cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
-              get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
+              cohort_forum_url: `${DISCOURSE_URL}/session/sso?return_path=/c/${cohort.category_id}`,
+              get_started_topic_url: `${DISCOURSE_URL}/t/${gettingStarted.id}`
             }),
             sendEnrollNotificationEmaill(cohort.people.email, {
               learner: person.display_name || person.username,
               course: cohort.courses.name,
               cohort_page_url: `https://hyperlink.academy/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-              cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
+              cohort_forum_url: `${DISCOURSE_URL}/session/sso?return_path=/c/${cohort.category_id}`,
             })
           ])
           break

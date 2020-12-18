@@ -12,6 +12,7 @@ import { PageLoader } from 'components/Loader'
 import { useApi } from 'src/apiHelpers'
 import { PostTopicMsg, PostTopicResponse } from 'pages/api/cohorts/[cohortId]/postTopic'
 import { Modal } from 'components/Modal'
+import { DISCOURSE_URL } from 'src/discourse'
 
 export default CohortTemplatesPages
 type Props = InferGetStaticPropsType<typeof getStaticProps>
@@ -83,7 +84,7 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
         h('p', "Your topic has been added")
       ]),
       h(Box, [
-        h('a', {style:{justifySelf:"center"}, href: 'https://forum.hyperlink.academy/t/'+post}, h(Primary, "View it here")),
+        h('a', {style:{justifySelf:"center"}, href: `https://${DISCOURSE_URL}/t/${post}`}, h(Primary, "View it here")),
       h(Link, {
         href: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`
       }, h('a', {style:{justifySelf:"center"}}, h(Secondary, 'Back to Templates')))

@@ -15,6 +15,7 @@ import Text from 'components/Text'
 import {colors} from 'components/Tokens'
 import { useState } from 'react';
 import { Info } from 'components/Form';
+import { DISCOURSE_URL } from 'src/discourse';
 
 export function ClubPage(props:{
   cohort:Cohort,
@@ -45,7 +46,7 @@ export function ClubPage(props:{
           ]),
           h('p.big', props.course.description),
           !inCohort && !isFacilitator ? null : h(Box, [
-            h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`}
+            h('a', {href: `${DISCOURSE_URL}/session/sso?return_path=/c/${props.cohort.category_id}`}
               , h(Secondary, 'Go to the Club forum')),
             !isFacilitator ? null : h(Link, {
               href: "/courses/[slug]/[id]/cohorts/[cohortId]/templates",
@@ -57,7 +58,7 @@ export function ClubPage(props:{
             showDetails ? h('div', {style:{color: colors.textSecondary}}, [
               !isFacilitator ? null : h(Info, [
                 `💡 You can make changes to the club description by editing `,
-                h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/t/${props.curriculum.id}`}, `this topic`),
+                h('a', {href: `${DISCOURSE_URL}/session/sso?return_path=/t/${props.curriculum.id}`}, `this topic`),
                 ` in the forum`
               ]),
               h(Text, {source:props.curriculum?.text})

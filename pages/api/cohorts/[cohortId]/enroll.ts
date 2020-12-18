@@ -4,7 +4,7 @@ import { ResultType, APIHandler, Request } from "src/apiHelpers"
 import {StripePaymentMetaData, stripe} from 'src/stripe'
 import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from 'emails'
 import { getToken } from "src/token";
-import { addMember, getTaggedPost } from "src/discourse";
+import { addMember, DISCOURSE_URL, getTaggedPost } from "src/discourse";
 import { prettyDate } from "src/utils"
 
 let prisma = new PrismaClient()
@@ -93,14 +93,14 @@ async function enroll (req: Request) {
         course_start_date: prettyDate(cohort.start_date),
         course_name: cohort.courses.name,
         cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
-        get_started_topic_url: `https://forum.hyperlink.academy/t/${gettingStarted.id}`
+        cohort_forum_url: `${DISCOURSE_URL}/session/sso?return_path=/c/${cohort.category_id}`,
+        get_started_topic_url: `${DISCOURSE_URL}/t/${gettingStarted.id}`
       }),
       sendEnrollNotificationEmaill(cohort.people.email, {
         learner: user.display_name || user.username,
         course: cohort.courses.name,
         cohort_page_url: `${origin}/courses/${cohort.courses.slug}/${cohort.course}/cohorts/${cohort.id}`,
-        cohort_forum_url: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`,
+        cohort_forum_url: `${DISCOURSE_URL}/session/sso?return_path=/c/${cohort.category_id}`,
       })
     ])
     return {

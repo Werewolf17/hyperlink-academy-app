@@ -6,6 +6,8 @@ let headers = {
       "Api-Username": process.env.DISCOURSE_API_USERNAME || '',
     }
 
+export let DISCOURSE_URL = process.env.NEXT_PUBLIC_DISCOURSE_URL
+
 let fetchWithBackoff = async (url: Parameters<typeof fetch>[0], options:Parameters<typeof fetch>[1], exponent: number = 1):ReturnType<typeof fetch> => {
   let result = await fetch(url, options)
   if(result.status === 429) {
@@ -38,7 +40,7 @@ export async function createGroup(group:{
   messageable_level?: number
 }) {
   if(typeof group.owner_usernames !== 'string') group.owner_usernames = group.owner_usernames.join(',')
-  let result = await fetchWithBackoff('https://forum.hyperlink.academy/admin/groups', {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/admin/groups`, {
     method: 'POST',
     headers: {
       ...headers,
@@ -56,7 +58,7 @@ export async function createGroup(group:{
 
 export async function updateTopic(topic:string, input: {category_id: number, title: string, raw: string, tags: string[]}, username?: string) {
   // Update the title
-  await fetch (`https://forum.hyperlink.academy${topic}`, {
+  await fetch (`${DISCOURSE_URL}${topic}`, {
     method: "PUT",
     headers:{
       "Content-Type": 'application/json; charset=utf-8',
@@ -69,9 +71,9 @@ export async function updateTopic(topic:string, input: {category_id: number, tit
   })
 
   // Update the content
-  let topicData = await (await fetchWithBackoff(`https://forum.hyperlink.academy${topic}.json`, {headers})).json()
+  let topicData = await (await fetchWithBackoff(`${DISCOURSE_URL}${topic}.json`, {headers})).json()
   let postID = topicData.post_stream.posts[0].id
-  await fetch (`https://forum.hyperlink.academy/posts/${postID}`, {
+  await fetch (`${DISCOURSE_URL}/posts/${postID}`, {
     method: "PUT",
     headers:{
       "Content-Type": 'application/json; charset=utf-8',
@@ -85,7 +87,7 @@ export async function updateTopic(topic:string, input: {category_id: number, tit
   })
 
   // Update the owner
-  if(username) await fetchWithBackoff(`https://forum.hyperlink.academy/t/${topicData.id}/change-owner`, {
+  if(username) await fetchWithBackoff(`${DISCOURSE_URL}/t/${topicData.id}/change-owner`, {
     method: "POST",
     headers: {
       "Content-Type": 'application/json; charset=utf-8',
@@ -96,7 +98,7 @@ export async function updateTopic(topic:string, input: {category_id: number, tit
 }
 
 export async function createTopic(input:{title: string, category: number | string, raw: string, tags?: string[]}, asUser?: string) {
-  let result = await fetchWithBackoff('https://forum.hyperlink.academy/posts.json', {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/posts.json`, {
     method: "POST",
     headers: {
       "Content-Type": 'application/json; charset=utf-8',
@@ -119,7 +121,7 @@ export const createCategory = async (name: string, options?: {
   subcategory_list_style?: "rows_with_featured_topics",
   default_list_filter?:"none"
 }) => {
-  let result = await fetchWithBackoff('https://forum.hyperlink.academy/categories.json', {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/categories.json`, {
     method: 'POST',
     headers: {
       ...headers,
@@ -133,7 +135,7 @@ export const createCategory = async (name: string, options?: {
 }
 
 export async function updateGroup(name: string, newName: string) {
-  let result = await fetchWithBackoff(`https://forum.hyperlink.academy/g/${name}.json`, {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/g/${name}.json`, {
     method: "PUT",
     headers: {
       ...headers,
@@ -146,7 +148,7 @@ export async function updateGroup(name: string, newName: string) {
 }
 
 export async function updateCategory (id: string | number, options: {permissions?: {[key:string]: number}, name: string, slug?: string}) {
-  let result = await fetchWithBackoff(`https://forum.hyperlink.academy/categories/${id}`, {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/categories/${id}`, {
     method: "PUT",
     headers: {
       ...headers,
@@ -158,7 +160,7 @@ export async function updateCategory (id: string | number, options: {permissions
   else return true
 }
 export async function getCategory(path: string | number){
-  let res = await fetchWithBackoff(`https://forum.hyperlink.academy/c/${path}.json`, {
+  let res = await fetchWithBackoff(`${DISCOURSE_URL}/c/${path}.json`, {
     method: 'GET',
     headers: {
       ...headers,
@@ -173,7 +175,7 @@ export async function getCategory(path: string | number){
 }
 
 export const getUsername = async (userId:string):Promise<string | undefined> => {
-  let result = await fetchWithBackoff('https://forum.hyperlink.academy/u/by-external/' + userId + '.json', {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/u/by-external/${userId}.json`, {
     method: "GET",
     headers
   })
@@ -185,7 +187,7 @@ export const getUsername = async (userId:string):Promise<string | undefined> => 
 }
 
 export const getGroupId = async (groupName:string) => {
-  let result = await fetchWithBackoff('https://forum.hyperlink.academy/groups/' + groupName + '.json', {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/groups/${groupName}.json`, {
     method: "GET",
     headers
   })
@@ -194,21 +196,21 @@ export const getGroupId = async (groupName:string) => {
 }
 
 export const addMember = async (groupId:number, username: string) => {
-      let result = await fetchWithBackoff(`https://forum.hyperlink.academy/groups/${groupId}/members.json`, {
-        method: "PUT",
-        headers: {
-          ...headers,
-          "Content-Type": 'application/json; charset=utf-8',
-        },
-        body: JSON.stringify({
-          usernames: username
-        })
-      })
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/groups/${groupId}/members.json`, {
+    method: "PUT",
+    headers: {
+      ...headers,
+      "Content-Type": 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify({
+      usernames: username
+    })
+  })
   return result.status  === 200
 }
 
 export const getTaggedPost = async (c: string | number, tag: string) => {
-  let res = await fetchWithBackoff(`https://forum.hyperlink.academy/c/${c}.json`, {
+  let res = await fetchWithBackoff(`${DISCOURSE_URL}/c/${c}.json`, {
     method: 'GET',
     headers: {
       ...headers,
@@ -220,7 +222,7 @@ export const getTaggedPost = async (c: string | number, tag: string) => {
   let category = await res.json() as Category
   let topicID = category.topic_list.topics.find((topic) => topic.tags.includes(tag))?.id
   if(!topicID) return {text: '', id: ''}
-  let topicRequest = await fetchWithBackoff('https://forum.hyperlink.academy/raw/' + topicID, {headers})
+  let topicRequest = await fetchWithBackoff(`${DISCOURSE_URL}/raw/${topicID}`, {headers})
   return {text: await topicRequest.text(), id: topicID}
 }
 
@@ -241,7 +243,7 @@ export const syncSSO = async (params: {[key:string]: string})=>{
   const sig = crypto.createHmac('sha256', process.env.DISCOURSE_SECRET || '');
 
   sig.update(payload)
-  return fetchWithBackoff(`https://forum.hyperlink.academy/admin/users/sync_sso`, {
+  return fetchWithBackoff(`${DISCOURSE_URL}/admin/users/sync_sso`, {
     method: "POST",
     headers: {
       "Api-Key": process.env.DISCOURSE_API_KEY || '',
@@ -256,7 +258,7 @@ export const syncSSO = async (params: {[key:string]: string})=>{
 }
 
 export async function createPost(params:{topic_id: number,raw:string}) {
-  let result = await fetchWithBackoff('https://forum.hyperlink.academy/posts.json', {
+  let result = await fetchWithBackoff(`${DISCOURSE_URL}/posts.json`, {
     method: "POST",
     headers: {
       "Content-Type": 'application/json; charset=utf-8',
