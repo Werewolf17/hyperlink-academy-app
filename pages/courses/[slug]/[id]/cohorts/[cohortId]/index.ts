@@ -204,10 +204,12 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => 
       }, h('a', {className: 'notBlue'}, props.cohort.people.display_name || props.cohort.people.username)),
       props.cohort.people.pronouns ? h('span.textSecondary', {}, ` (${props.cohort.people.pronouns})`) : null
     ]),
+
     props.isFacilitator ? h(Info, [`💡 You can edit your bio in the profile tab on your `, h(Link, {href: '/dashboard'}, h('a', 'dashboard'))]) : null,
+
     h(Text, {source: props.cohort.people.bio || ''}),
     props.cohort.people_in_cohorts.length === 0 ? null : h(Box, {h: true}, [
-      h('h4', "Members"),
+      h('h4', ["Members ", h('span.textSecondary', `(${props.cohort.people_in_cohorts.length}${props.cohort.courses.cohort_max_size !== 0 ? `/${props.cohort.courses.cohort_max_size}` :''})`)]),
       !props.isFacilitator ? null : h('a', {
         href:`mailto:?bcc=${props.cohort.people_in_cohorts.map(p=>p.people.email).join(',')}`
       }, 'email everyone')
