@@ -30,7 +30,6 @@ import { PrismaClient } from '@prisma/client'
 import { prettyDate } from 'src/utils'
 import { useRouter } from 'next/router'
 import { useMediaQuery } from 'src/hooks'
-import { EnrollButton } from 'components/Course/EnrollButton'
 import { AccentImg } from 'components/Images'
 import { TodoList } from 'components/TodoList'
 
@@ -89,7 +88,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
         h('p.big', course?.description || ''),
 
         upcomingCohorts.length > 0 && (activeCohorts.length === 0)
-          ? h(Box, {padding: 32, style: {backgroundColor: colors.grey95}},[
+          ? h(Box, {padding: 32, style: {backgroundColor: colors.accentPeach}},[
             ...upcomingCohorts.flatMap(cohort=>{
               return [
                 h(UpcomingCohort, {
@@ -133,7 +132,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
       h(Sidebar, [
         h(StickyWrapper, [
           h(Enroll, {course}, [
-            h(Box, {gap: 32}, [
+            h(Box, [
               h(EnrollStatus, {
                 courseId: course.id,
                 courseSlug: course.slug,
@@ -145,7 +144,7 @@ const CoursePage = (props:Extract<Props, {notFound: false}>) => {
                 enrolled,
                 upcoming:upcomingCohorts.length !== 0,
               }),
-              !isMaintainer ? null : h(Seperator),
+              h(Seperator),
               !isMaintainer ? h(WatchCourse, {id: course.id}) : h(Box, [
                 h(Box, {gap:8}, [
                   h('h3', "You maintain this course"),
@@ -175,7 +174,7 @@ function UpcomingCohort(props: {
   let mobile = useMediaQuery('(max-width:420px)')
 
   return h(Box, {h: !mobile, style:{gridAutoColumns: 'auto'}}, [
-    h(Box, {gap: 8}, [
+    h(Box, {gap: 4}, [
       h(Link, {href:`/courses/${router.query.slug}/${props.course}/cohorts/${props.id}`},
         h('a.notBlue', {style:{textDecoration: 'none'}}, h('h3', 'Starts ' + prettyDate(props.start_date)))),
       h('span', [
@@ -186,19 +185,15 @@ function UpcomingCohort(props: {
         }, h('a.notBlue', {style: {textDecoration: 'underline'}},
              props.people.display_name || props.people.username)),
       ]),
+      props.cohort_max_size === 0 ? null : props.cohort_max_size > props.learners_enrolled
+        ? h('span.accentSuccess', `${props.cohort_max_size - props.learners_enrolled} ${props.cohort_max_size - props.learners_enrolled === 1 ? 'spot' : 'spots'} left!`)
+        : h('span.accentRed', `Sorry! This cohort is full.`)
     ]),
-    h(Box, {gap:8, style: {justifySelf: mobile ? 'left' : 'right', textAlign: mobile ? 'left' : 'right', alignItems: 'center'}}, [
-      h(EnrollButton, {
-        id: props.id,
-        course: props.course,
-        max_size: props.cohort_max_size,
-        learners: props.learners_enrolled,
-        invited: !props.invite_only || props.invited
-      }, 'Enroll'),
+    h(Box, {gap:8, style: {justifySelf: mobile ? 'left' : 'right', textAlign: mobile ? 'left' : 'right', alignContent: 'center'}}, [
       (props.cohort_max_size !== 0 && props.cohort_max_size  === props.learners_enrolled) ? null : h(Link, {
         href: '/courses/[slug]/[id]/cohorts/[cohortId]',
         as: `/courses/${router.query.slug}/${props.course}/cohorts/${props.id}`
-      }, h('a', {}, h('b', 'See schedule')))
+      }, h('a', {}, h(Primary, 'See schedule')))
     ])
   ])
 }
@@ -273,36 +268,30 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
   let past = new Date(props.cohort.start_date) < new Date()
 
   return h(Box, {h: true, style:{gridAutoColumns:'auto'}}, [
-    h(Box, {gap: 16}, [
-      h(Box, {gap: 8}, [
-        !props.cohort.enrolled && !props.cohort.facilitating ? null : h('div', [
-          props.cohort.enrolled ? h(Pill, 'enrolled') : null,
-          ' ',
-          props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
-          ' ',
-          !props.cohort.live ? h(Pill, {borderOnly: true, red: true}, 'draft') : null,
-        ]),
-        h('h3', {}, h(Link, {
-          href:'/courses/[slug]/[id]/cohorts/[cohortId]',
-          as:  `/courses/${props.slug}/${props.cohort.course}/cohorts/${id}`
-        }, h('a', {style: {textDecoration: 'none'}}, `#${props.cohort.name} ${props.cohort.courses.name}`))),
+    h(Box, {gap: 4}, [
+      !props.cohort.enrolled && !props.cohort.facilitating ? null : h('div', [
+        props.cohort.enrolled ? h(Pill, 'enrolled') : null,
+        ' ',
+        props.cohort.facilitating ? h(Pill, {borderOnly: true}, 'facilitating') : null,
+        ' ',
+        !props.cohort.live ? h(Pill, {borderOnly: true, red: true}, 'draft') : null,
       ]),
+      h('h3', {}, h(Link, {
+        href:'/courses/[slug]/[id]/cohorts/[cohortId]',
+        as:  `/courses/${props.slug}/${props.cohort.course}/cohorts/${id}`
+      }, h('a', {style: {textDecoration: 'none'}}, `#${props.cohort.name} ${props.cohort.courses.name}`))),
       h(Box, {style: {color: colors.textSecondary}, gap: 4}, [
         h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
-        h('div', `Facilitated by ${props.cohort.people.display_name || props.cohort.people.username}`)
-      ])
+        h('div', [`Facilitated by `,  h(Link, {href:`/people/${props.cohort.people.username}`}, h('a', props.cohort.people.display_name || props.cohort.people.username))])
+      ]),
+      props.cohort_max_size === 0 ? null : props.cohort_max_size > props.cohort.people_in_cohorts.length
+        ? h('span.accentSuccess', `${props.cohort_max_size - props.cohort.people_in_cohorts.length} ${props.cohort_max_size - props.cohort.people_in_cohorts.length === 1 ? 'spot' : 'spots'} left!`)
+        : h('span.accentRed', `Sorry! This cohort is full.`)
     ]),
-    past || props.cohort.enrolled || props.cohort.facilitating ? null : h(Box, {gap:8, style: {alignItems: 'center', alignSelf: 'end', justifySelf: 'right', textAlign: 'right'}}, [
-      h(EnrollButton, {
-        id: props.cohort.id,
-        course: props.cohort.course,
-        max_size: props.cohort_max_size,
-        learners: props.cohort.people_in_cohorts.length,
-        invited: props.invited,
-      }, 'Enroll'),
-      (props.cohort_max_size !== 0 && props.cohort_max_size  === props.cohort.people_in_cohorts.length) ? null : h(Link, {
+    past || props.cohort.enrolled || props.cohort.facilitating ? null : h(Box, {gap:8, style: {alignItems: 'center', alignContent: 'center', justifySelf: 'right', textAlign: 'right'}}, [
+      h(Link, {
         href: `/courses/${router.query.slug}/${props.cohort.course}/cohorts/${props.cohort.id}`
-      }, h('a', {}, h('b', 'See schedule')))
+      }, h('a', {}, h(Primary, 'See schedule')))
     ])
   ])
 }

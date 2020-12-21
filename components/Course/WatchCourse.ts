@@ -3,7 +3,6 @@ import h from 'react-hyperscript'
 import { useState } from 'react'
 
 import { useUserData, useUserCourses } from 'src/data'
-import { colors } from 'components/Tokens'
 import { WatchCourseMsg, WatchCourseResult } from 'pages/api/courses/[id]/watch'
 import { callApi } from 'src/apiHelpers'
 import Loader  from 'components/Loader'
@@ -59,7 +58,7 @@ let EmailWatching = (props:{id: number})=>{
       h('b', [watching ? "You're watching this course" : "Email me when new cohorts are scheduled"]),
       watching ? null : h(FormBox, {gap:8, onSubmit}, [
         h(Input, {value:email, type: 'email', placeholder: 'your email', onChange:(e)=>setEmail(e.currentTarget.value)}),
-        h(LinkButton, {type: 'submit', style:{justifySelf:'right'}}, loading ? h(Loader) : "submit" )
+        h(LinkButton, {type: 'submit', style:{justifySelf:'right'}}, loading ? h(Loader) : "subscribe" )
       ])
     ])
   ])
@@ -72,12 +71,8 @@ image-rendering: crisp-edges;
 `
 
 const WatchCourseBox = styled('div')`
-padding: 16px;
 max-width: 300px;
 display: grid;
 grid-gap: 16px;
 grid-template-columns: min-content auto;
-border: 1px dashed;
-border-color: ${colors.borderColor};
-background-color: white;
 `
