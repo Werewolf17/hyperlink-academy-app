@@ -19,7 +19,7 @@ import Text from 'components/Text'
 import {WelcomeModal} from 'components/pages/cohorts/WelcomeModal'
 
 import {prettyDate} from 'src/utils'
-import { getTaggedPost } from 'src/discourse'
+import { DISCOURSE_URL, getTaggedPost } from 'src/discourse'
 import { callApi } from 'src/apiHelpers'
 import { useCohortData, useUserCohorts, useUserData, useCourseData, Cohort, useProfileData } from 'src/data'
 import ErrorPage from 'pages/404'
@@ -39,7 +39,7 @@ const COPY = {
   participants: "Participants",
   updateNotes: (props: {id: string}) => h(Info, [
     `💡 You can make changes to the cohort details by editing `,
-    h('a', {href: `https://forum.hyperlink.academy/t/${props.id}`}, `this topic`),
+    h('a', {href: `${DISCOURSE_URL}/t/${props.id}`}, `this topic`),
     ` in the forum`
   ])
 }
@@ -147,7 +147,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
             h(Box, {gap: 32}, [
               inCohort || isFacilitator || cohort.completed ? h(Box, {}, [
                 !inCohort && !isFacilitator ? null : h(Box, [
-                  h('a', {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${cohort.category_id}`}
+                  h('a', {href: `${DISCOURSE_URL}/session/sso?return_path=/c/${cohort.category_id}`}
                     , h(Primary, 'Go to the forum')),
                   !isFacilitator ? null : h(Link, {
                     href: "/courses/[slug]/[id]/cohorts/[cohortId]/templates",
@@ -204,10 +204,12 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => 
       }, h('a', {className: 'notBlue'}, props.cohort.people.display_name || props.cohort.people.username)),
       props.cohort.people.pronouns ? h('span.textSecondary', {}, ` (${props.cohort.people.pronouns})`) : null
     ]),
+
     props.isFacilitator ? h(Info, [`💡 You can edit your bio in the profile tab on your `, h(Link, {href: '/dashboard'}, h('a', 'dashboard'))]) : null,
+
     h(Text, {source: props.cohort.people.bio || ''}),
     props.cohort.people_in_cohorts.length === 0 ? null : h(Box, {h: true}, [
-      h('h4', "Members"),
+      h('h4', ["Members ", h('span.textSecondary', `(${props.cohort.people_in_cohorts.length}${props.cohort.courses.cohort_max_size !== 0 ? `/${props.cohort.courses.cohort_max_size}` :''})`)]),
       !props.isFacilitator ? null : h('a', {
         href:`mailto:?bcc=${props.cohort.people_in_cohorts.map(p=>p.people.email).join(',')}`
       }, 'email everyone')
@@ -317,7 +319,7 @@ const Banners = (props:{
   enrolled?: boolean,
 })=>{
   let isStarted = (new Date(props.cohort.start_date)).getTime() - (new Date()).getTime()
-  let forum = `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`
+  let forum = `https://${DISCOURSE_URL}/session/sso?return_path=/c/${props.cohort.category_id}`
 
   if(props.facilitating && !props.cohort.live) return h(TODOBanner, props)
 
@@ -381,10 +383,10 @@ const TODOBanner = (props:{
                 "Fill out ", h(Link, {href: `https://hyperlink.academy/dashboard?tab=Profile`}, "your bio"), " and tell people more about you."
               ]),
               props.cohort.courses.type === 'club' ? null : h("span", [
-                "Fill out the ", h("a", {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`}, "Notes topic"), " in the forum with  any cohort-specific details. This is visible to everyone, even if they aren't enrolled, so don't put anything private here."
+                "Fill out the ", h("a", {href: `${DISCOURSE_URL}/session/sso?return_path=/c/${props.cohort.category_id}`}, "Notes topic"), " in the forum with  any cohort-specific details. This is visible to everyone, even if they aren't enrolled, so don't put anything private here."
               ]),
               h("span", [
-                "Fill out the ", h("a", {href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`}, "Getting Started topic"), " in the forum with any first steps learners should take. This will be linked in the welcome email sent to everyone who enrolls."
+                "Fill out the ", h("a", {href: `${DISCOURSE_URL}/session/sso?return_path=/c/${props.cohort.category_id}`}, "Getting Started topic"), " in the forum with any first steps learners should take. This will be linked in the welcome email sent to everyone who enrolls."
               ])
             ]
           })

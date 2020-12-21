@@ -2,6 +2,7 @@ import { APIHandler, Request, ResultType } from "src/apiHelpers";
 import { PrismaClient } from "@prisma/client";
 import { getToken } from "src/token";
 import * as t from 'runtypes'
+import produce from "immer";
 
 let prisma = new PrismaClient()
 export default APIHandler({
@@ -44,7 +45,7 @@ export const eventDataQuery = async (id: number, userId?:string)=>{
     where: {id},
     include:{
       people: {select:{display_name: true, username: true, bio: true, id: true}},
-      people_in_events: {include:{people:{select:{display_name: true, username: true, pronouns: true}}}},
+      people_in_events: {include:{people:{select:{display_name: true, username: true, pronouns: true, email: true}}}},
       cohort_events: true,
       standalone_events: {
         include: {
@@ -54,10 +55,12 @@ export const eventDataQuery = async (id: number, userId?:string)=>{
     }
   })
   if(!event) return
+  let people_in_events = event.people_in_events.map(person=>produce(person, p=>{if(event?.created_by!==userId)p.people.email=''}))
+
   if(userId != event.created_by && !event.people_in_events.find(p=>p.person===userId)) {
-    return {...event, location: ''}
+    return {...event, people_in_events, location: ''}
   }
-  return event
+  return {...event, people_in_events}
 }
 
 async function getEvent(req:Request) {
@@ -131,7 +134,7 @@ async function updateEvent(req:Request) {
             standalone_events_in_courses: true,
             events: {include: {
               people: true,
-              people_in_events: {where: {person: user.id}, include:{people:{select:{display_name: true, username: true, pronouns: true}}}}
+              people_in_events: {where: {person: user.id}, include:{people:{select:{display_name: true, username: true, pronouns: true, email: true}}}}
             }},
           },
           data: {

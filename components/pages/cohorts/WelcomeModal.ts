@@ -7,6 +7,7 @@ import { prettyDate } from 'src/utils'
 import { Primary, Secondary } from 'components/Button'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { DISCOURSE_URL } from 'src/discourse'
 
 export const WelcomeModal = (props: {display:boolean, cohort:Cohort} ) => {
   let router = useRouter()
@@ -34,7 +35,7 @@ export const WelcomeModal = (props: {display:boolean, cohort:Cohort} ) => {
         `Head to the cohort forum to introduce yourself and see what you'll be doing on your first day`),
       h('a', {
         style: {margin: 'auto'},
-        href: `https://forum.hyperlink.academy/session/sso?return_path=/c/${props.cohort.category_id}`
+        href: `${DISCOURSE_URL}/session/sso?return_path=/c/${props.cohort.category_id}`
       }, h(Primary, "Get started")),
     ])
   ]))

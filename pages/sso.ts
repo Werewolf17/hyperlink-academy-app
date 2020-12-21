@@ -5,7 +5,7 @@ import {useRouter} from 'next/router'
 import { GetServerSideProps } from 'next'
 
 import {getToken} from 'src/token'
-import { makeSSOPayload } from 'src/discourse'
+import { DISCOURSE_URL, makeSSOPayload } from 'src/discourse'
 
 type Props = {error:boolean}
 const SSO = ({error}:Props) => {
@@ -40,7 +40,7 @@ export const getServerSideProps:GetServerSideProps = async ({req,res, query}) =>
   let {nonce} = querystring.parse(Buffer.from(sso as string, 'base64').toString())
 
   res.writeHead(301, {
-    Location: "https://forum.hyperlink.academy/session/sso_login?"
+    Location: `${DISCOURSE_URL}/session/sso_login?`
       + makeSSOPayload({
         nonce:nonce as string ,
         email:token.email,
