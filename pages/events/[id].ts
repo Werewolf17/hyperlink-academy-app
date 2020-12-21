@@ -119,7 +119,13 @@ const Event = (props: Extract<Props, {notFound: false}> & {facilitating: boolean
       h(Box, {}, [
         h('h2', `Facilitated by ${props.people.display_name || props.people.username}`),
         h(Text, {source: props.people.bio || ''}),
-        h('h4', [`Attending `, h('span.textSecondary', `(${props.people_in_events.length}/${props.standalone_events.max_attendees})`)]),
+
+        h(Box, {h:true}, [
+          h('h4', [`Attending `, h('span.textSecondary', `(${props.people_in_events.length}/${props.standalone_events.max_attendees})`)]),
+          !props.facilitating ? null : h('a', {
+            href:`mailto:?bcc=${props.people_in_events.map(p=>p.people.email).join(',')}`
+          }, 'email everyone')
+        ]),
         ...props.people_in_events.map(person=>h(Box, {h:true, gap:4}, [
           h(Link, {
             href: '/people/[id]',
@@ -198,7 +204,7 @@ const Details = (props:{
               if(result.status===200) {
                 if(result.result.enrolled) props.mutate((data)=>{
                   if(!data || !user) return data
-                  return {...data, people_in_events:[{person: user.id, event: props.id, people:{username: user.username, display_name: user.display_name || '', pronouns: ''}}]}
+                  return {...data, people_in_events:[{person: user.id, event: props.id, people:{username: user.username, display_name: user.display_name || '', pronouns: '', email:''}}]}
 
                 })
                 else  {
