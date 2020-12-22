@@ -17,9 +17,17 @@ export default function Courses(props:Props) {
     .sort((a, b)=>{
       let upcomingCohortA = a.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
       let upcomingCohortB = b.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
+
+      // if no cohorts sort by name
       if(!upcomingCohortA && !upcomingCohortB) return a.name > b.name ? 1 : -1
+
+      // move courses with no cohorts earlier
       if(!upcomingCohortA) return 1
       if(!upcomingCohortB) return -1
+
+      // move full cohorts to the end
+      if(a.cohort_max_size === upcomingCohortA.people_in_cohorts.length) return 1
+      if(b.cohort_max_size === upcomingCohortB.people_in_cohorts.length) return -1
       return new Date(upcomingCohortA.start_date) < new Date(upcomingCohortB?.start_date) ? -1 : 1
     })
     .reduce((acc, course)=> {
