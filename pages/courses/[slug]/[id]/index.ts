@@ -284,7 +284,7 @@ const Cohort = (props: {cohort: Course['course_cohorts'][0] & {facilitating?: bo
         h('strong', cohortPrettyDate(props.cohort.start_date, props.cohort.completed)),
         h('div', [`Facilitated by `,  h(Link, {href:`/people/${props.cohort.people.username}`}, h('a', props.cohort.people.display_name || props.cohort.people.username))])
       ]),
-      props.cohort_max_size === 0 ? null : props.cohort_max_size > props.cohort.people_in_cohorts.length
+      props.cohort_max_size === 0 || props.cohort.completed ? null : props.cohort_max_size > props.cohort.people_in_cohorts.length
         ? h('span.accentSuccess', `${props.cohort_max_size - props.cohort.people_in_cohorts.length} ${props.cohort_max_size - props.cohort.people_in_cohorts.length === 1 ? 'spot' : 'spots'} left!`)
         : h('span.accentRed', `Sorry! This cohort is full.`)
     ]),

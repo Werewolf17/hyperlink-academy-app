@@ -37,7 +37,7 @@ export const coursesQuery = () => prisma.courses.findMany({
   include: {
     course_cohorts: {
       where: {AND: [{live:true}, {start_date: {gt: (new Date()).toISOString()}}]},
-      select: {start_date: true, id: true},
+      select: {start_date: true, id: true, people_in_cohorts: {select:{cohort: true}}},
       orderBy: {start_date: "desc"},
     }
   }
