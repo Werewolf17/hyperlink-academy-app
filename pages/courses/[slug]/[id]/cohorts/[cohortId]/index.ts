@@ -3,14 +3,14 @@ import h from 'react-hyperscript'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, Fragment} from 'react'
 import { InferGetStaticPropsType } from 'next'
 
 import CourseDetails from 'components/Course/Enroll'
 import { EnrollButton } from 'components/Course/EnrollButton';
 import { TwoColumn, Box, Seperator, Sidebar, WhiteContainer} from 'components/Layout'
 import { VerticalTabs, StickyWrapper } from 'components/Tabs'
-import { Primary, Destructive, Secondary, BackButton, LinkButton } from 'components/Button'
+import { Primary, Destructive, DestructiveSmallButton, Secondary, BackButton, LinkButton } from 'components/Button'
 import Loader, { PageLoader } from 'components/Loader'
 import { CheckBox, Info, Input } from 'components/Form'
 import { Modal } from 'components/Modal'
@@ -20,7 +20,7 @@ import {WelcomeModal} from 'components/pages/cohorts/WelcomeModal'
 
 import {prettyDate} from 'src/utils'
 import { DISCOURSE_URL, getTaggedPost } from 'src/discourse'
-import { callApi } from 'src/apiHelpers'
+import { callApi, useApi } from 'src/apiHelpers'
 import { useCohortData, useUserCohorts, useUserData, useCourseData, Cohort, useProfileData } from 'src/data'
 import ErrorPage from 'pages/404'
 import { cohortDataQuery, UpdateCohortMsg, UpdateCohortResponse } from 'pages/api/cohorts/[cohortId]'
@@ -31,6 +31,7 @@ import { ClubPage } from 'components/pages/cohorts/ClubPage'
 import { CreateEvent } from 'components/pages/cohorts/CreateEvent'
 import { AccentImg } from 'components/Images'
 import { TodoList } from 'components/TodoList'
+import { UnEnrollMsg, UnEnrollResponse } from 'pages/api/cohorts/[cohortId]/enroll'
 
 const COPY = {
   detailsTab: "Details",
@@ -119,7 +120,7 @@ const CohortPage = (props: Extract<Props, {notFound:false}>) => {
       ])
     ]),
     Curriculum: h(Text, {source:props.curriculum?.text}),
-    Members: h(CohortMembers, {cohort: cohort, isFacilitator})
+    Members: h(CohortMembers, {cohort: cohort, isFacilitator, mutate})
       } as {[k:string]:React.ReactElement}
   let tabKeys = Object.keys(Tabs).filter(t=>!!Tabs[t])
 
@@ -195,7 +196,7 @@ height: 200px;
 width: 200px;
 `
 
-export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => {
+export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean, mutate: (c:Cohort)=>void}) => {
   return h(Box, {gap:16}, [
     h('h3', [
       `Facilitated by `, h(Link, {
@@ -216,25 +217,77 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean}) => 
     ]),
     ...props.cohort.people_in_cohorts
       .map((person)=>{
-        return h(LearnerEntry, [
-          h(Link, {
-            href: '/people/[id]',
-            as: `/people/${person.people.username}`
-          }, [
-            h('a', {className: 'notBlue'}, person.people.display_name || person.people.username),
+        return h('div', {style:{display: 'grid', gridTemplateColumns: "auto auto"}}, [
+          h(Box, {h: true}, [
+            h(Link, {
+              href: '/people/[id]',
+              as: `/people/${person.people.username}`
+            }, [
+              h('a', {className: 'notBlue'}, person.people.display_name || person.people.username),
+            ]),
+            person.people.pronouns ? h('span.textSecondary', {}, ` (${person.people.pronouns})`) : null,
           ]),
-          person.people.pronouns ? h('span.textSecondary', {}, ` (${person.people.pronouns})`) : null
+          !props.isFacilitator ? null : h(Unenroll, {
+            personID: person.person,
+            cohortID: props.cohort.id,
+            username: person.people.username,
+            display_name: person.people.display_name,
+            removeMember: ()=>{
+              props.mutate({...props.cohort, people_in_cohorts: props.cohort.people_in_cohorts.filter(p=>p.person!== person.person)})
+            }
+          })
         ])
       }),
     ])
 }
 
-let LearnerEntry = styled('div')`
-display: grid;
-grid-template-columns: max-content auto;
-grid-gap: 8px;
-`
-
+const Unenroll = (props:{
+  personID: string,
+  username: string,
+  cohortID:number,
+  display_name: string | undefined,
+  removeMember: ()=>void
+})=>{
+  let [state, setState]= useState<'normal'| 'confirm'>('normal')
+  let [status, callUnenroll] = useApi<UnEnrollMsg, UnEnrollResponse>([state])
+  return h(Fragment, [
+    h(DestructiveSmallButton, {onClick:()=>{
+      setState('confirm')
+    }, style:{justifySelf:"right"}}, "unenroll"),
+    h(Modal, {display: state==='confirm', onExit:()=>setState('normal'), hideCloseButton: true} ,[
+      status === 'success'
+        ? h(Box, {gap:32, style:{textAlign:'center', justifyItems:'center'}}, [
+          h(Box, [
+          h(Box,[
+            h('h2', "Unenrolled!"),
+            h('p', [`You've unenrolled `, h('b', props.display_name || props.username), ` from this cohort`]),
+            h('p', [`They'll be refunded within 5 business days`]),
+            h(Secondary, {onClick:()=>setState('normal'), style:{width:"250px"}}, "exit")
+          ] ),
+          ])
+        ])
+        : h(Box, {gap:32, style:{textAlign:'center', justifyItems:'center'}}, [
+          h(Box,[
+            h('h2', "Un-Enroll and Issue Refund"),
+            h('p', [
+              `You are about to un-enroll `, h('b', props.display_name || props.username), ` from this cohort`
+            ]),
+          ]),
+          h(Box, {gap:8}, [
+            h(Destructive, {status, onClick:async ()=>{
+              let result = await  callUnenroll(`/api/cohorts/${props.cohortID}/enroll`, {
+                person: props.personID
+              }, "DELETE")
+              if(result.status===200){
+                props.removeMember()
+              }
+            }, style:{width:"250px"}}, 'Un-enroll'),
+            h(Secondary, {onClick:()=>setState('normal'), style:{width:"250px"}}, "Cancel")
+          ])
+        ])
+    ])
+  ])
+}
 
 // Button to Publish Draft Cohort
 const MarkCohortLive = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
@@ -401,9 +454,7 @@ const TODOBanner = (props:{
     ]),
 
     h(LinkButton, {style:{justifySelf: 'right', textDecoration: 'none'}, onClick: ()=>setExpanded(!expanded)}, expanded ? "hide checklist" : "show checklist") 
-
   ])
-
 }
 
 
