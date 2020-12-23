@@ -323,7 +323,7 @@ const Banners = (props:{
 
   if(props.facilitating && !props.cohort.live) return h(TODOBanner, props)
 
-  if(props.cohort.completed && props.enrolled)  return h(TwoColumnBanner, [
+  if(props.cohort.completed && (props.enrolled || props.facilitating))  return h(TwoColumnBanner, [
     h(Box, {gap: 8, className: "textSecondary"}, [
       h('h4', `You completed this course on ${prettyDate(props.cohort.completed || '')}!`),
       h('p', [`This cohort's `, h('a', {href: forum}, 'private forum'), ` will always be open! Feel free to come back whenever`])
