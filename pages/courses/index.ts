@@ -64,7 +64,7 @@ export default function Courses(props:Props) {
         ]),
         h(FlexGrid, {min: 400, mobileMin: 200},
           courses.map(course => {
-            return h(CourseCard, course)
+            return h(CourseCard, {...course, key: course.id})
           })),
       ]),
       h(Box, {gap:32}, [
@@ -75,7 +75,7 @@ export default function Courses(props:Props) {
         ]),
         h(FlexGrid,{min: 290, mobileMin: 290}, clubs.flatMap(course=> {
           return course.course_cohorts.map(cohort => {
-            return h(ClubCard, {cohort, course})
+            return h(ClubCard, {cohort, course, key: cohort.id})
           })
         }))
       ])
