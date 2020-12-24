@@ -96,7 +96,7 @@ export function ClubPage(props:{
             })
         ]),
         h(Seperator),
-        h(CohortMembers, {cohort: props.cohort, isFacilitator})
+        h(CohortMembers, {cohort: props.cohort, isFacilitator, mutate:props.mutate})
       ]),
       h(Sidebar, [
         inCohort || isFacilitator ? null : h(StickyWrapper, [

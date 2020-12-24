@@ -4,6 +4,7 @@ import verifiyEmailMetadata from './templates/welcome/meta.json'
 import resetPasswordMetadata from './templates/password-reset/meta.json'
 import inviteToCourseMetadata from './templates/invite-to-course/meta.json'
 import enrollNotificationMetada from './templates/enroll-notfication/meta.json'
+import unenrollMetadata from './templates/cohort-unenroll/meta.json'
 import watchingNotificationMetadata from './templates/watching-notification/meta.json'
 import eventRSVPMetadata from './templates/event-rsvp/meta.json'
 
@@ -18,6 +19,7 @@ export const sendEventRSVPEmail = sendEmail(eventRSVPMetadata)
 export const sendInviteToCourseEmail = sendEmail(inviteToCourseMetadata)
 export const sendEnrollNotificationEmaill = sendEmail(enrollNotificationMetada)
 export const sendWatchingNotificationEmail = sendBatchEmail(watchingNotificationMetadata)
+export const sendUnenrollEmail = sendEmail(unenrollMetadata)
 
 type EmailMetadata = {
   Alias: string,

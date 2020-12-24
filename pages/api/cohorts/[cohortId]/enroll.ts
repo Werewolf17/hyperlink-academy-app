@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client"
 import * as rt from 'runtypes'
 import { ResultType, APIHandler, Request } from "src/apiHelpers"
 import {StripePaymentMetaData, stripe} from 'src/stripe'
-import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill } from 'emails'
+import { sendCohortEnrollmentEmail, sendEnrollNotificationEmaill, sendUnenrollEmail } from 'emails'
 import { getToken } from "src/token";
 import { addMember, DISCOURSE_URL, getTaggedPost } from "src/discourse";
 import { prettyDate } from "src/utils"
@@ -10,11 +10,20 @@ import { prettyDate } from "src/utils"
 let prisma = new PrismaClient()
 export type EnrollResponse= ResultType<typeof enroll>
 export type EnrollMsg  = rt.Static<typeof EnrollMsgValidator>
+export type UnEnrollMsg = rt.Static<typeof UnEnrollMsgValidator>
+export type UnEnrollResponse=ResultType<typeof unenroll>
 
-export default APIHandler(enroll)
+export default APIHandler({
+  POST: enroll,
+  DELETE: unenroll
+})
 
 let EnrollMsgValidator = rt.Record({
   discount: rt.Union(rt.Undefined, rt.String)
+})
+
+let UnEnrollMsgValidator = rt.Record({
+  person: rt.String,
 })
 
 async function enroll (req: Request) {
@@ -138,4 +147,75 @@ async function enroll (req: Request) {
     status: 200,
     result: {sessionId: session.id}
   } as const
+}
+async function unenroll (req: Request) {
+  let cohortId = parseInt(req.query.cohortId as string)
+  if(Number.isNaN(cohortId)) return {status: 400, result: "ERROR: Cohort id is not a number"} as const
+  let user = getToken(req)
+  if(!user) return {status: 401, result: "Error: no user logged in"} as const
+
+  let msg:UnEnrollMsg
+  try {msg = UnEnrollMsgValidator.check(req.body)}
+  catch(e) {return {status:400, result:e.toString()} as const }
+
+  let [cohort] = await Promise.all([
+    prisma.course_cohorts.findOne({
+      where: {id: cohortId},
+      include: {
+        courses:{
+          select:{
+            name: true
+          }
+        },
+        discourse_groups: true,
+        people: {
+          select:{email: true}
+        },
+        people_in_cohorts: {
+          select: {person: true, payment_intent: true, amount_paid: true, people:{select:{display_name: true, email: true, username: true}}}
+        }
+      }
+    }),
+  ])
+  if(!cohort) return {status:404, result:"ERROR: no cohort found with id: "+cohortId} as const
+  if(user.id !== cohort.facilitator) return {status:401, result:"ERROR: user is not facilitator of this cohort"} as const
+
+  let person = cohort.people_in_cohorts.find(p=>p.person===msg.person)
+  if(!person) return {status:404, result: "ERROR: User is not in cohort"} as const
+  if(!person.payment_intent) return{status:500, result:"ERROR:"} as const
+
+
+  await Promise.all([
+    sendUnenrollEmail(person.people.email, {
+      name: person.people.display_name || person.people.username,
+      course_name:  cohort.courses.name,
+      paid: person. amount_paid > 0 ? 'true' : ''
+    }),
+    prisma.people_in_cohorts.delete({where:{person_cohort:{
+      person: msg.person,
+      cohort: cohortId
+    }}}),
+    prisma.refunds.create({
+      data:{
+        payment_intent: person.payment_intent,
+        amount: person.amount_paid,
+        cohort_refunds: {
+          create:{
+            course_cohorts: {
+              connect:{
+                id: cohortId
+              }
+            },
+            people:{
+              connect: {id: person.person}
+            }
+          }
+        }
+      }
+    }),
+    stripe.refunds.create({payment_intent: person.payment_intent})
+  ])
+
+  return {status: 200, result: {payment_intent: person.payment_intent, person: person.person}} as const
+
 }
