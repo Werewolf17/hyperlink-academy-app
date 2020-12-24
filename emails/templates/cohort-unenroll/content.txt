@@ -1,0 +1,9 @@
+Hi {{name}},
+
+You've been un-enrolled from {{course_name}}
+
+If this is unexpected, please contatct the facilitator of your cohort
+
+{{^ paid}}
+We've refunded your course fee in full, and this should be reflected in your account within a couple days.
+{{/paid}}

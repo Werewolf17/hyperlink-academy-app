@@ -1,0 +1,12 @@
+{
+  "Name": "Cohort Unenroll",
+  "Alias": "cohort-unenroll",
+  "Subject": "You've been unenroll from {{course_name}}",
+  "TemplateType": "Standard",
+  "LayoutTemplate": "Hyperlink",
+  "TestRenderModel": {
+    "name": "name_Value",
+    "course_name": "course_name_Value",
+    "paid": "paid_Value"
+  }
+}
