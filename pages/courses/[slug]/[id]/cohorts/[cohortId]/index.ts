@@ -197,7 +197,13 @@ width: 200px;
 `
 
 export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean, mutate: (c:Cohort)=>void}) => {
-  return h(Box, {gap:16}, [
+  let [unenrollState, setUnenrollState] = useState<{personID:string, username: string, cohortID:number, display_name?:string, removeMember:()=>void}>()
+  return h(Fragment, [
+    !unenrollState ? null : h(UnenrollModal, {
+      display: !!unenrollState, onExit:()=>setUnenrollState(undefined),
+      ...unenrollState
+    }),
+    h(Box, {gap:16}, [
     h('h3', [
       `Facilitated by `, h(Link, {
         href: '/people/[id]',
@@ -227,65 +233,60 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean, muta
             ]),
             person.people.pronouns ? h('span.textSecondary', {}, ` (${person.people.pronouns})`) : null,
           ]),
-          !props.isFacilitator ? null : h(Unenroll, {
-            personID: person.person,
-            cohortID: props.cohort.id,
-            username: person.people.username,
-            display_name: person.people.display_name,
-            removeMember: ()=>{
-              props.mutate({...props.cohort, people_in_cohorts: props.cohort.people_in_cohorts.filter(p=>p.person!== person.person)})
-            }
-          })
+          !props.isFacilitator ? null : h(DestructiveSmallButton, {onClick:()=>{
+            setUnenrollState({
+              personID: person.person,
+              cohortID: props.cohort.id,
+              username: person.people.username,
+              display_name: person.people.display_name,
+              removeMember: ()=>{
+                props.mutate({...props.cohort, people_in_cohorts: props.cohort.people_in_cohorts.filter(p=>p.person!== person.person)})
+              }
+            })
+          }, style:{justifySelf:"right"}}, "unenroll")
         ])
       }),
     ])
+  ])
 }
 
-const Unenroll = (props:{
+const UnenrollModal = (props:{
   personID: string,
   username: string,
   cohortID:number,
-  display_name: string | undefined,
+  display_name?: string,
   removeMember: ()=>void
+  display: boolean,
+  onExit: ()=>void
 })=>{
-  let [state, setState]= useState<'normal'| 'confirm'>('normal')
-  let [status, callUnenroll] = useApi<UnEnrollMsg, UnEnrollResponse>([state])
-  return h(Fragment, [
-    h(DestructiveSmallButton, {onClick:()=>{
-      setState('confirm')
-    }, style:{justifySelf:"right"}}, "unenroll"),
-    h(Modal, {display: state==='confirm', onExit:()=>setState('normal'), hideCloseButton: true} ,[
-      status === 'success'
-        ? h(Box, {gap:32, style:{textAlign:'center', justifyItems:'center'}}, [
-          h(Box, [
-          h(Box,[
-            h('h2', "Unenrolled!"),
-            h('p', [`You've unenrolled `, h('b', props.display_name || props.username), ` from this cohort`]),
-            h('p', [`They'll be refunded within 5 business days`]),
-            h(Secondary, {onClick:()=>setState('normal'), style:{width:"250px"}}, "exit")
-          ] ),
-          ])
-        ])
-        : h(Box, {gap:32, style:{textAlign:'center', justifyItems:'center'}}, [
-          h(Box,[
-            h('h2', "Un-Enroll and Issue Refund"),
-            h('p', [
-              `You are about to un-enroll `, h('b', props.display_name || props.username), ` from this cohort`
-            ]),
+  let [status, callUnenroll] = useApi<UnEnrollMsg, UnEnrollResponse>([])
+  return h(Modal, {display: props.display, onExit:props.onExit, hideCloseButton: true} ,[
+    status === 'success'
+      ? h(Box, {style:{textAlign:'center', justifyItems:'center'}}, [
+        h('h2', "Unenrolled!"),
+        h('p', [`You've unenrolled `, h('b', props.display_name || props.username), ` from this cohort`]),
+        h('p', [`They'll be refunded within 5 business days`]),
+        h(Secondary, {onClick:props.onExit, style:{width:"250px"}}, "exit")
+      ])
+      : h(Box, {gap:32, style:{textAlign:'center', justifyItems:'center'}}, [
+        h(Box,[
+          h('h2', "Un-Enroll and Issue Refund"),
+          h('p', [
+            `You are about to un-enroll `, h('b', props.display_name || props.username), ` from this cohort`
           ]),
-          h(Box, {gap:8}, [
-            h(Destructive, {status, onClick:async ()=>{
-              let result = await  callUnenroll(`/api/cohorts/${props.cohortID}/enroll`, {
-                person: props.personID
-              }, "DELETE")
-              if(result.status===200){
-                props.removeMember()
-              }
-            }, style:{width:"250px"}}, 'Un-enroll'),
-            h(Secondary, {onClick:()=>setState('normal'), style:{width:"250px"}}, "Cancel")
-          ])
+        ]),
+        h(Box, {gap:8}, [
+          h(Destructive, {status, onClick:async ()=>{
+            let result = await  callUnenroll(`/api/cohorts/${props.cohortID}/enroll`, {
+              person: props.personID
+            }, "DELETE")
+            if(result.status===200){
+              props.removeMember()
+            }
+          }, style:{width:"250px"}}, 'Un-enroll'),
+          h(Secondary, {onClick:props.onExit, style:{width:"250px"}}, "Cancel")
         ])
-    ])
+      ])
   ])
 }
 
