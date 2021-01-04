@@ -26,8 +26,9 @@ export default function Courses(props:Props) {
       if(!upcomingCohortB) return -1
 
       // move full cohorts to the end
-      if(a.cohort_max_size === upcomingCohortA.people_in_cohorts.length) return 1
-      if(b.cohort_max_size === upcomingCohortB.people_in_cohorts.length) return -1
+      if(a.cohort_max_size === upcomingCohortA.people_in_cohorts.length && b.cohort_max_size !== upcomingCohortB.people_in_cohorts.length) return 1
+      if(b.cohort_max_size === upcomingCohortB.people_in_cohorts.length && a.cohort_max_size !== upcomingCohortA.people_in_cohorts.length) return -1
+
       if(upcomingCohortA.start_date === upcomingCohortB.start_date) return a.name > b.name ? 1 : -1
       return new Date(upcomingCohortA.start_date) < new Date(upcomingCohortB?.start_date) ? -1 : 1
     })
