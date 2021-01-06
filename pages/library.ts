@@ -39,10 +39,10 @@ export const collections = {
   //   title: "Changelog",
   //   description: "Behind the scenes on Hyperlink development.",
   // },
-  // "interviews": {
-  //   title: "Interviews",
-  //   description: "Conversations with amazing teachers and learners.",
-  // },
+  "interviews": {
+    title: "Interviews",
+    description: "Conversations with amazing teachers and learners.",
+  },
   // "resources": {
   //   title: "Resources",
   //   description: "Our favorite projects, websites, syllabi, and other learning resources.",
