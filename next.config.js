@@ -20,6 +20,13 @@ const COMMIT_SHA =
   VERCEL_BITBUCKET_COMMIT_SHA
 
 module.exports = withSourceMaps({
+  redirects: ()=>{
+    return [{
+      source: "/blog/:path*",
+      destination: "/library/:path",
+      permanent: true
+    }]
+  },
   pageExtensions: ['js', 'jsx', 'ts', 'md', 'mdx', 'txt'],
   webpack: (config, options) => {
     if (!options.isServer) {
