@@ -170,6 +170,7 @@ model events {
   created_by        String
   people            people             @relation(fields: [created_by], references: [id])
   cohort_events     cohort_events[]
+  no_account_rsvps  no_account_rsvps[]
   people_in_events  people_in_events[]
   standalone_events standalone_events?
 }
@@ -234,6 +235,14 @@ model standalone_events_in_courses {
   @@id([course, standalone_event])
 }
 
+model no_account_rsvps {
+  email  String
+  name   String
+  event  Int
+  events events @relation(fields: [event], references: [id])
+
+  @@id([email, event])
+}
 enum course_status {
   draft
   live

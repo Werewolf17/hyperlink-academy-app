@@ -1,18 +1,24 @@
 import {PrismaClient} from '@prisma/client'
-import { sendEventRSVPEmail } from 'emails'
+import { sendEventRSVPEmail, sendEventRSVPNoAccountEmail } from 'emails'
 import { APIHandler, Request, ResultType } from "src/apiHelpers"
 import { stripe, StripePaymentMetaData } from 'src/stripe'
 import { getToken } from "src/token"
 import { prettyDate } from 'src/utils'
+import { createEventInvite } from 'src/calendar'
 
 let prisma = new PrismaClient()
 
 export default APIHandler(POSTEventRSVP)
 
+export type EventRSVPMessage = {
+  email: string,
+  name: string
+} | null
+
 export type EventRSVPResult = ResultType<typeof POSTEventRSVP>
 async function POSTEventRSVP(req:Request){
   let user = getToken(req)
-  if(!user) return {status:400, result:"ERROR: no user logged in"} as const
+  let msg  = req.body as EventRSVPMessage
 
   let eventId = parseInt(req.query.id as string)
   if(Number.isNaN(eventId)) return {status: 400, result: "ERROR: event id is not a number"} as const
@@ -22,13 +28,54 @@ async function POSTEventRSVP(req:Request){
     events:{
       select:{
         name: true,
+        description: true,
         id: true,
+        location: true,
         start_date: true,
-        people_in_events: true
+        end_date: true,
+        people_in_events: true,
+        no_account_rsvps: true
       }
     }
   }})
   if(!event) return {status:404, result: "ERROR: no event found"} as const
+
+  if(!user) {
+    if(!msg?.email || !msg?.name) return {status:400, result:"ERROR: no user logged in"} as const
+    if(event.cost !== 0) return {status: 401, result: "ERROR: must be logged in to RSVP to paid event"} as const
+    if(event.events.no_account_rsvps.find(x=>x.email=== msg?.email)) {
+      return {status: 200, result: {enrolled: true}} as const
+    }
+
+    let Content = Buffer.from(createEventInvite({
+      id: event.events.id,
+      description: event.events.description,
+      start_date: event.events.start_date,
+      end_date: event.events.end_date,
+      summary: event.events.name,
+      location: event.events.location
+    }).toString()).toString('base64')
+
+    await Promise.all([
+      sendEventRSVPEmail(msg.email, {
+        name: msg.name,
+        event_page_url: `https://hyperlink.academy/events/${event.events.id}`,
+        event_start_date: prettyDate(event.events.start_date),
+        event_name: event.events.name
+      }, {Attachments: [
+        {Name: "event.ics", ContentType: "text/calender", ContentID: null, Content}
+      ]}),
+      prisma.no_account_rsvps.create({
+       data: {
+          events: {connect:{id: event.events.id}},
+          email: msg.email,
+          name: msg.name
+        }
+      })
+    ])
+
+    return {status: 200, result: {enrolled: true}} as const
+  }
 
   if(event.events.people_in_events.find(x=>x.person === user?.id)) {
     return {status:400, result: "ERROR: user is already enrolled"} as const
@@ -36,7 +83,7 @@ async function POSTEventRSVP(req:Request){
 
   if(event.cost == 0) {
     await Promise.all([
-      sendEventRSVPEmail(user.email, {
+      sendEventRSVPNoAccountEmail(user.email, {
         name: user.display_name || user.username,
         event_page_url: `https://hyperlink.academy/events/${event.events.id}`,
         event_start_date: prettyDate(event.events.start_date),

@@ -2,7 +2,7 @@ import h from 'react-hyperscript'
 import { eventDataQuery, UpdateEventMsg, UpdateEventResult } from "pages/api/events/[id]"
 import ErrorPage from 'pages/404'
 import { InferGetStaticPropsType } from "next"
-import { dateFromDateAndTimeInputs, getStripe, prettyDate } from 'src/utils'
+import { dateFromDateAndTimeInputs, getStripe, prettyDate, formHelper } from 'src/utils'
 import { Box, FormBox, Seperator, Sidebar, TwoColumn } from 'components/Layout'
 import {colors} from 'components/Tokens'
 import Text from 'components/Text'
@@ -11,8 +11,9 @@ import { useEventData, useUserData } from 'src/data'
 import { PageLoader } from 'components/Loader'
 import { Fragment, useEffect, useState } from 'react'
 import { EventForm } from 'pages/events/create'
+import { Input } from 'components/Form'
 import { useApi } from 'src/apiHelpers'
-import { EventRSVPResult } from 'pages/api/events/[id]/rsvp'
+import { EventRSVPResult, EventRSVPMessage } from 'pages/api/events/[id]/rsvp'
 import { useRouter } from 'next/router'
 import { StickyWrapper } from 'components/Tabs'
 import Link from 'next/link'
@@ -121,7 +122,9 @@ const Event = (props: Extract<Props, {notFound: false}> & {facilitating: boolean
         h(Text, {source: props.people.bio || ''}),
 
         h(Box, {h:true}, [
-          h('h4', [`Attending `, h('span.textSecondary', `(${props.people_in_events.length}/${props.standalone_events.max_attendees})`)]),
+          h('h4', [`Attending `, h('span.textSecondary', props.standalone_events.max_attendees !== 0 ?
+            `(${props.people_in_events.length + props.no_account_rsvps.length}/${props.standalone_events.max_attendees})` :
+            `(${props.people_in_events.length + props.no_account_rsvps.length})`)]),
           !props.facilitating ? null : h('a', {
             href:`mailto:?bcc=${props.people_in_events.map(p=>p.people.email).join(',')}`
           }, 'email everyone')
@@ -134,6 +137,9 @@ const Event = (props: Extract<Props, {notFound: false}> & {facilitating: boolean
             h('a', {className: 'notBlue'}, person.people.display_name || person.people.username),
           ]),
           person.people.pronouns ? h('span.textSecondary', {}, ` (${person.people.pronouns})`) : null
+        ])),
+        ...props.no_account_rsvps.map(person=>h(Box, {h:true, gap:4}, [
+          person.name
         ]))
       ]),
     ]),
@@ -180,12 +186,14 @@ const Details = (props:{
   location: string,
   facilitating: boolean,
 })=>{
-  let [status, callRSVP] = useApi<null, EventRSVPResult>([])
+  let [status, callRSVP] = useApi<EventRSVPMessage, EventRSVPResult>([])
   let {data: user} = useUserData()
   let router=useRouter()
 
-  return h(Box, {h: true}, [
-    h(Box,{style:{alignSelf: 'center'}}, [
+  let [formState, setFormState] = useState({email: '', name: ''})
+  let form = formHelper(formState, setFormState)
+
+  return h(Box,{style:{alignSelf: 'center'}}, [
       h(Box, {h:true}, [
         h('div', {style:{alignSelf:'center'}}, [
           h('h3',  `${prettyDate(props.start_date)}`),
@@ -197,7 +205,33 @@ const Details = (props:{
       h(Box, {gap:4}, [
         props.rsvpd || props.facilitating ?
           h('a', {href: props.location}, h(Primary, "Join Event"))
-          : h(Primary, {onClick: async ()=> {
+          : props.cost === 0 && !user ?
+          status === 'success'
+          ? h(Box, [h('p.accentSuccess', "You're RSVP'd! Check your email for an event invite, and any updates")])
+          : h(FormBox, {onSubmit: async (e) => {
+            e.preventDefault()
+            let result = await callRSVP(`/api/events/${props.id}/rsvp`, {
+              email: form.email.value,
+              name: form.name.value
+            })
+            if(result.status === 200) props.mutate((data)=>{
+              if(!data || !user) return data
+              return {
+                ...data,
+                no_accounts_rsvps: [...data.no_account_rsvps, {name: form.name.value, email:''}]
+              }
+            })
+          }}, [
+            h(Input, {placeholder: "Your email", type: 'email', ...form.email}),
+            h(Input, {placeholder: "Your name", ...form.name}),
+            h(Primary, {
+              status,
+              type: 'submit',
+              style: {justifySelf: 'right'},
+            }, "RSVP")
+          ])
+        : h(Primary, {
+          onClick: async ()=> {
             if(user === false) router.push('/login?redirect=' + encodeURIComponent(router.asPath))
             else {
               let result = await callRSVP(`/api/events/${props.id}/rsvp`)
@@ -216,7 +250,6 @@ const Details = (props:{
           }, status}, "RSVP"),
         !(props.rsvpd) && props.max_attendees ? h('b', `${props.attendees}/${props.max_attendees} spots filled`) : null,
       ])
-    ])
   ])
 }
 

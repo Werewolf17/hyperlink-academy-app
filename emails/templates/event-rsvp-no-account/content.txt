@@ -1,0 +1,7 @@
+Hi {{name}}
+
+You've RSVP'd to {{event_name}} on {{event_start_date}}
+
+Add this event to your calendar: https with the attached file.
+
+If you have questions just hit reply on this email.

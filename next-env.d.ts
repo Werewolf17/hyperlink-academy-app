@@ -22,6 +22,7 @@ declare module "ical.js" {
   }
   class Event {
     constructor(component?:Component)
+    organizer: string
     summary: string
     description: string
     uid: string
