@@ -7,6 +7,7 @@ import enrollNotificationMetada from './templates/enroll-notfication/meta.json'
 import watchingNotificationMetadata from './templates/watching-notification/meta.json'
 import eventRSVPMetadata from './templates/event-rsvp/meta.json'
 import eventRSVPNoAccountMetadata from './templates/event-rsvp-no-account/meta.json'
+import eventUpdateNoAccount from './templates/event-update-no-account/meta.json'
 
 import { Hash } from 'postmark/dist/client/models/client/SupportingTypes'
 
@@ -17,6 +18,7 @@ export const sendVerificationEmail = sendEmail(verifiyEmailMetadata)
 export const sendCohortEnrollmentEmail = sendEmail(cohortEnrollmentMetadata)
 export const sendEventRSVPEmail = sendEmail(eventRSVPMetadata)
 export const sendEventRSVPNoAccountEmail = sendEmail(eventRSVPNoAccountMetadata)
+export const sendEventUpdateNoAccountEmail = sendBatchEmail(eventUpdateNoAccount)
 export const sendInviteToCourseEmail = sendEmail(inviteToCourseMetadata)
 export const sendEnrollNotificationEmaill = sendEmail(enrollNotificationMetada)
 export const sendWatchingNotificationEmail = sendBatchEmail(watchingNotificationMetadata)
@@ -40,7 +42,7 @@ export function sendEmail<T extends EmailMetadata>(meta:T) {
   }
 }
 export function sendBatchEmail<T extends EmailMetadata>(meta:T) {
-  return (msgs:Array<{email: string, vars: T["TestRenderModel"], Metadata?: Hash<string>} | undefined>) => {
+  return (msgs:Array<{email: string, vars: T["TestRenderModel"],data?: Partial<{Metadata?:Hash<string>, Attachments: Array<{Name: string, Content: string, ContentType: string, ContentID: string | null}>}>} | undefined>) => {
     if(process.env.NODE_ENV === 'production') return client.sendEmailBatchWithTemplates(msgs.filter(x=>x!== undefined).map(msg=>{
       return {
         From: 'Hyperlink accounts@hyperlink.academy',
@@ -48,7 +50,7 @@ export function sendBatchEmail<T extends EmailMetadata>(meta:T) {
         TemplateAlias: meta.Alias,
         TemplateModel: msg?.vars || {},
         MessageStream: "notifications",
-        Metadata: msg?.Metadata
+        ...msg?.data
       }
     }))
     console.log(msgs)
