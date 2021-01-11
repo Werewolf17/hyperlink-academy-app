@@ -80,4 +80,12 @@ pre {
 img {
 max-width: 100%;
 }
+
+blockquote {
+  background-color: ${colors.accentPeach};
+  margin: 0 0 8px 0;
+  padding: 16px 32px 4px 32px;
+  color: ${colors.textSecondary};
+  font-style: italic;
+}
 `
