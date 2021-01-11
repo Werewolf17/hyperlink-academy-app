@@ -35,6 +35,7 @@ model course_cohorts {
   courses           courses             @relation(fields: [course], references: [id])
   people            people              @relation(fields: [facilitator], references: [id])
   cohort_events     cohort_events[]
+  cohort_refunds    cohort_refunds[]
   people_in_cohorts people_in_cohorts[]
 }
 
@@ -128,6 +129,7 @@ model people {
   pronouns                  String                     @default("")
   stripe_customer_id        String?
   admins                    admins?
+  cohort_refunds            cohort_refunds[]
   course_cohorts            course_cohorts[]
   course_maintainers        course_maintainers[]
   events                    events[]
@@ -232,6 +234,21 @@ model standalone_events_in_courses {
   standalone_events standalone_events @relation(fields: [standalone_event], references: [event])
 
   @@id([course, standalone_event])
+}
+
+model cohort_refunds {
+  refund         String          @id
+  person         String?
+  cohort         Int?
+  course_cohorts course_cohorts? @relation(fields: [cohort], references: [id])
+  people         people?         @relation(fields: [person], references: [id])
+  refunds        refunds         @relation(fields: [refund], references: [payment_intent])
+}
+
+model refunds {
+  payment_intent String          @id
+  amount         Int
+  cohort_refunds cohort_refunds?
 }
 
 enum course_status {
