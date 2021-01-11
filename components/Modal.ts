@@ -4,7 +4,7 @@ import { Fragment, useState, useEffect } from 'react'
 import { Box } from './Layout'
 import {colors} from './Tokens'
 
-export const Modal:React.SFC<{display:boolean, closeText?:string, onExit?: Function}> = (props)=>{
+export const Modal:React.SFC<{display:boolean, closeText?:string, onExit?: Function, hideCloseButton?: true}> = (props)=>{
   let [display, setDisplay] =  useState(props.display)
   useEffect(()=>setDisplay(props.display), [props])
   if(!display) return null
@@ -17,7 +17,7 @@ export const Modal:React.SFC<{display:boolean, closeText?:string, onExit?: Funct
     h(ModalBox, [
       h(Box, {style:{width: '100%'}}, [
         props.children as React.ReactElement,
-        h(CloseButton, {onClick}, props.closeText||"close"),
+        props.hideCloseButton ? null : h(CloseButton, {onClick}, props.closeText||"close"),
       ])
     ])
   ])

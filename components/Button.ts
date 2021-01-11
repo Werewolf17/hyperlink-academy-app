@@ -87,6 +87,21 @@ color: ${colors.grey55};
 `}}
 `
 
+export const DestructiveSmallButton = styled('button')`
+color: ${colors.accentRed};
+border: none;
+font-size: 1rem;
+background-color: inherit;
+
+&:focus {
+outline: none;
+}
+
+&:hover {
+cursor: pointer;
+}
+`
+
 export const LinkButton = styled('a')<{textSecondary?: boolean}>`
 color: ${props=>props.textSecondary ? colors.textSecondary : 'blue'};
 text-decoration: underline;
