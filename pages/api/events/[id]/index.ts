@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import { getToken } from "src/token";
 import * as t from 'runtypes'
 import produce from "immer";
+import { sendEventUpdateNoAccountEmail } from "emails";
+import { createEventInvite } from "src/calendar";
 
 let prisma = new PrismaClient()
 export default APIHandler({
@@ -40,12 +42,12 @@ let UpdateEventValidator = t.Intersect(
   ))
 
 export const eventDataQuery = async (id: number, userId?:string)=>{
-  console.log(userId)
   let event = await prisma.events.findOne({
     where: {id},
     include:{
       people: {select:{display_name: true, username: true, bio: true, id: true}},
       people_in_events: {include:{people:{select:{display_name: true, username: true, pronouns: true, email: true}}}},
+      no_account_rsvps: true,
       cohort_events: true,
       standalone_events: {
         include: {
@@ -56,11 +58,12 @@ export const eventDataQuery = async (id: number, userId?:string)=>{
   })
   if(!event) return
   let people_in_events = event.people_in_events.map(person=>produce(person, p=>{if(event?.created_by!==userId)p.people.email=''}))
+  let no_accounts_rsvps = event.no_account_rsvps.map(person=>event?.created_by!==userId ? {...person, email:''} : person)
 
   if(userId != event.created_by && !event.people_in_events.find(p=>p.person===userId)) {
     return {...event, people_in_events, location: ''}
   }
-  return {...event, people_in_events}
+  return {...event, people_in_events, no_accounts_rsvps}
 }
 
 async function getEvent(req:Request) {
@@ -84,7 +87,7 @@ async function updateEvent(req:Request) {
   let user = getToken(req)
   if(!user) return {status: 401 , result: "ERROR: no user logged in"} as const
 
-  let event = await prisma.events.findOne({where:{id: eventId}, select:{created_by: true}})
+  let event = await prisma.events.findOne({where:{id: eventId}, select:{id: true, created_by: true, no_account_rsvps: true, name: true}})
   if(!event) return {status:404, result: 'ERROR: no event found'} as const
 
   switch(msg.type){
@@ -134,6 +137,7 @@ async function updateEvent(req:Request) {
             standalone_events_in_courses: true,
             events: {include: {
               people: true,
+              no_account_rsvps: true,
               people_in_events: {where: {person: user.id}, include:{people:{select:{display_name: true, username: true, pronouns: true, email: true}}}}
             }},
           },
@@ -150,6 +154,30 @@ async function updateEvent(req:Request) {
             }
           }
         })
+
+        if(msg.data.start_date || msg.data.end_date || msg.data.location || msg.data.location || msg.data.name) {
+          let Content = Buffer.from(createEventInvite({
+            id: newEvent.events.id,
+            description: newEvent.events.description,
+            start_date: newEvent.events.start_date,
+            end_date: newEvent.events.end_date,
+            summary: newEvent.events.name,
+            location: newEvent.events.location
+          }).toString()).toString('base64')
+
+          await sendEventUpdateNoAccountEmail(event.no_account_rsvps.map(rsvp=> {
+            return {
+              email: rsvp.email,
+              vars: {
+                name: rsvp.name,
+                event_name: event?.name || '',
+                event_page_url: `https://hyperlink.academy/events/${event?.id}`,
+              },
+              data: {Attachments: [
+                {Name: "event.ics", ContentType: "text/calender", ContentID: null, Content}]}}
+          }))
+        }
+
         return {status: 200, result: {type: 'standalone', data: newEvent}} as const
       }
   }

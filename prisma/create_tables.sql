@@ -109,6 +109,13 @@ CREATE TABLE IF NOT EXISTS events (
    description text NOT NULL
 );
 
+create table if not exists no_account_rsvps (
+   email text not null,
+   name text not null,
+   event integer references events(id) not null,
+   primary key (email, event)
+)
+
 CREATE TABLE IF NOT EXISTS cohort_events (
   cohort integer REFERENCES course_cohorts(id) NOT NULL,
   event integer REFERENCES events(id) NOT NULL,

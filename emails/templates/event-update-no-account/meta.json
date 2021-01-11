@@ -1,0 +1,12 @@
+{
+  "Name": "Event update no account",
+  "Alias": "event-update-no-account",
+  "Subject": "{{event_name}} has been updated",
+  "TemplateType": "Standard",
+  "LayoutTemplate": "Hyperlink",
+  "TestRenderModel": {
+    "name": "name_Value",
+    "event_name": "event_name_Value",
+    "event_page_url": "cohort_page_url_Value"
+  }
+}

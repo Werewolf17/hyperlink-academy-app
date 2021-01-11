@@ -1,0 +1,7 @@
+Hi {{name}}
+
+An event you RSVP'd to, {{event_name}} has been updated.
+
+Add it to your calendar: https with the attached file.
+
+If you have questions just hit reply on this email.
