@@ -153,6 +153,7 @@ const Event = (props: Extract<Props, {notFound: false}> & {facilitating: boolean
             facilitating: props.facilitating,
             id: props.id,
             start_date: props.start_date,
+            end_date: props.end_date,
             mutate: props.mutate,
             rsvpd: props.rsvpd,
             location: props.location
@@ -175,8 +176,9 @@ const Banner = (props:{start_date: string, setEditting: (b:boolean)=>void})=>{
   ])
 }
 
-const Details = (props:{
+type DetailsProps = {
   start_date: string,
+  end_date: string,
   attendees: number,
   cost:number,
   mutate: ReturnType<typeof useEventData>['mutate'],
@@ -185,13 +187,8 @@ const Details = (props:{
   rsvpd: boolean,
   location: string,
   facilitating: boolean,
-})=>{
-  let [status, callRSVP] = useApi<EventRSVPMessage, EventRSVPResult>([])
-  let {data: user} = useUserData()
-  let router=useRouter()
-
-  let [formState, setFormState] = useState({email: '', name: ''})
-  let form = formHelper(formState, setFormState)
+}
+const Details = (props:DetailsProps)=>{
 
   return h(Box,{style:{alignSelf: 'center'}}, [
       h(Box, {h:true}, [
@@ -202,55 +199,67 @@ const Details = (props:{
         h(Seperator),
         h('h1', props.cost !== 0 ? `$${props.cost}` : "FREE"),
       ]),
-      h(Box, {gap:4}, [
-        props.rsvpd || props.facilitating ?
-          h('a', {href: props.location}, h(Primary, "Join Event"))
-          : props.cost === 0 && !user ?
-          status === 'success'
-          ? h(Box, [h('p.accentSuccess', "You're RSVP'd! Check your email for an event invite, and any updates")])
-          : h(FormBox, {onSubmit: async (e) => {
-            e.preventDefault()
-            let result = await callRSVP(`/api/events/${props.id}/rsvp`, {
-              email: form.email.value,
-              name: form.name.value
-            })
-            if(result.status === 200) props.mutate((data)=>{
-              if(!data || !user) return data
-              return {
-                ...data,
-                no_accounts_rsvps: [...data.no_account_rsvps, {name: form.name.value, email:''}]
-              }
-            })
-          }}, [
-            h(Input, {placeholder: "Your email", type: 'email', ...form.email}),
-            h(Input, {placeholder: "Your name", ...form.name}),
-            h(Primary, {
-              status,
-              type: 'submit',
-              style: {justifySelf: 'right'},
-            }, "RSVP")
-          ])
-        : h(Primary, {
-          onClick: async ()=> {
-            if(user === false) router.push('/login?redirect=' + encodeURIComponent(router.asPath))
-            else {
-              let result = await callRSVP(`/api/events/${props.id}/rsvp`)
-              if(result.status===200) {
-                if(result.result.enrolled) props.mutate((data)=>{
-                  if(!data || !user) return data
-                  return {...data, people_in_events:[{person: user.id, event: props.id, people:{username: user.username, display_name: user.display_name || '', pronouns: '', email:''}}]}
-
-                })
-                else  {
-                  let stripe = await getStripe()
-                  stripe?.redirectToCheckout({sessionId: result.result.sessionId})
-                }
-              }
-            }
-          }, status}, "RSVP"),
-        !(props.rsvpd) && props.max_attendees ? h('b', `${props.attendees}/${props.max_attendees} spots filled`) : null,
-      ])
+    h(JoinButton, props),
+    !(props.rsvpd) && props.max_attendees ? h('b', `${props.attendees}/${props.max_attendees} spots filled`) : null,
   ])
+}
+
+const JoinButton = (props:DetailsProps)=>{
+  let [status, callRSVP] = useApi<EventRSVPMessage, EventRSVPResult>([])
+  let {data: user} = useUserData()
+  let router=useRouter()
+
+  let [formState, setFormState] = useState({email: '', name: ''})
+  let form = formHelper(formState, setFormState)
+
+  if(new Date(props.end_date) < new Date()) return h('p.big', "This event has concluded")
+
+  if(props.rsvpd || props.facilitating) return h('a', {href: props.location}, h(Primary, "Join Event"))
+
+  if(props.cost === 0 && !user) {
+    if(status === 'success') return h('p.accentSuccess', "You're RSVP'd! Check your email for an event invite, and any updates")
+    return h(FormBox, {onSubmit: async (e) => {
+        e.preventDefault()
+        let result = await callRSVP(`/api/events/${props.id}/rsvp`, {
+          email: form.email.value,
+          name: form.name.value
+        })
+        if(result.status === 200) props.mutate((data)=>{
+          if(!data || !user) return data
+          return {
+            ...data,
+            no_accounts_rsvps: [...data.no_account_rsvps, {name: form.name.value, email:''}]
+          }
+        })
+      }}, [
+        h(Input, {placeholder: "Your email", type: 'email', ...form.email}),
+        h(Input, {placeholder: "Your name", ...form.name}),
+        h(Primary, {
+          status,
+          type: 'submit',
+          style: {justifySelf: 'right'},
+        }, "RSVP")
+      ])
+  }
+
+  return h(Primary, {
+      onClick: async ()=> {
+        if(user === false) router.push('/login?redirect=' + encodeURIComponent(router.asPath))
+        else {
+          let result = await callRSVP(`/api/events/${props.id}/rsvp`)
+          if(result.status===200) {
+            if(result.result.enrolled) props.mutate((data)=>{
+              if(!data || !user) return data
+              return {...data, people_in_events:[{person: user.id, event: props.id, people:{username: user.username, display_name: user.display_name || '', pronouns: '', email:''}}]}
+
+            })
+            else  {
+              let stripe = await getStripe()
+              stripe?.redirectToCheckout({sessionId: result.result.sessionId})
+            }
+          }
+        }
+      }, status}, "RSVP")
 }
 
 export const getStaticProps = async (ctx:any)=>{
