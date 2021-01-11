@@ -195,12 +195,12 @@ type DetailsProps = {
   facilitating: boolean,
 }
 const Details = (props:DetailsProps)=>{
-
+  let start_date = new Date(props.start_date)
   return h(Box,{style:{alignSelf: 'center'}}, [
       h(Box, {h:true}, [
         h('div', {style:{alignSelf:'center'}}, [
           h('h3',  `${prettyDate(props.start_date)}`),
-          h('h4.textSecondary', ` @ ${(new Date(props.start_date)).toLocaleTimeString([], {hour12: true, minute: '2-digit', hour:'numeric', timeZoneName: "short"})}`),
+          h('h4.textSecondary', `${start_date.toLocaleDateString([], {weekday: 'short'})} @ ${start_date.toLocaleTimeString([], {hour12: true, minute: '2-digit', hour:'numeric', timeZoneName: "short"})}`),
         ]),
         h(Seperator),
         h('h1', props.cost !== 0 ? `$${props.cost}` : "FREE"),
