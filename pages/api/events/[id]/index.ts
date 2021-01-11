@@ -42,7 +42,6 @@ let UpdateEventValidator = t.Intersect(
   ))
 
 export const eventDataQuery = async (id: number, userId?:string)=>{
-  console.log(userId)
   let event = await prisma.events.findOne({
     where: {id},
     include:{
