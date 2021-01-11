@@ -234,11 +234,13 @@ const JoinButton = (props:DetailsProps)=>{
       }}, [
         h(Input, {placeholder: "Your email", type: 'email', ...form.email}),
         h(Input, {placeholder: "Your name", ...form.name}),
+        h(Box, {gap: 4, style:{justifySelf: 'right', textAlign: 'right'}}, [
         h(Primary, {
           status,
           type: 'submit',
-          style: {justifySelf: 'right'},
-        }, "RSVP")
+        }, "RSVP"),
+          h(Link, {href: `/login?redirect=${encodeURIComponent(router.asPath)}`}, h('a', 'or sign in'))
+        ])
       ])
   }
 
