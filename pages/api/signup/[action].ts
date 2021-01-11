@@ -123,18 +123,31 @@ const checkUser = async (email:string):Promise<boolean> => {
 
 
 const createUser = async (input:{email:string, password_hash:string, username: string}) => {
-  let data = {
-    ...input,
-    id: uuidv4()
-  }
+  let previousEvents = await prisma.no_account_rsvps.findMany({where:{email: {equals: input.email, mode:'insensitive'}}})
+  let user
   try {
-    await prisma.people.create({data})
-    await prisma.activation_keys.deleteMany({where:{email:input.email}})
+    [user] = await Promise.all([
+      prisma.people.create({
+        data:{
+          ...input,
+          id: uuidv4(),
+          people_in_events: {
+            create: previousEvents.map(ev=>{
+              return {
+                events: {connect: {id: ev.event}}
+              }
+            })
+          }
+        }
+      }),
+      prisma.activation_keys.deleteMany({where:{email:input.email}}),
+      previousEvents.length > 0 ? prisma.no_account_rsvps.deleteMany({where:{email: {equals: input.email, mode:'insensitive'}}}) : undefined
+    ])
   } catch(e) {
     console.log(e)
     return false
   }
-  return data.id
+  return user.id
 }
 
 const getActivationKey = async (hash: string)=> {
