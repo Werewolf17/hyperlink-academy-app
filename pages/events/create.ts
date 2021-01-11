@@ -39,7 +39,6 @@ const CreateEvent = ()=> {
   let [status, callCreateEvent] = useApi<CreateEventMsg, CreateEventResponse>([])
 
   if(user === false) router.push('/')
-  if(user &&  user.admin === false) router.push('/dashboard')
 
   const onSubmit = async (e:React.FormEvent) => {
     e.preventDefault()
