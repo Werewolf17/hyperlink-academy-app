@@ -37,7 +37,7 @@ export const coursesQuery = () => prisma.courses.findMany({
   include: {
     course_cohorts: {
       where: {AND: [{live:true}, {start_date: {gt: (new Date()).toISOString()}}]},
-      select: {start_date: true, id: true},
+      select: {start_date: true, id: true, people_in_cohorts: {select:{cohort: true}}},
       orderBy: {start_date: "desc"},
     }
   }
@@ -61,7 +61,7 @@ async function createCourse(req: Request) {
   if(!isAdmin) return {status: 403, result: "ERROR: user is not an admin"} as const
 
   let maintainers = await prisma.people.findMany({
-    where: {email: {in: msg.maintainers}},
+    where: {email: {in: msg.maintainers, mode: 'insensitive'}},
     select: {username: true, id: true}
   })
 

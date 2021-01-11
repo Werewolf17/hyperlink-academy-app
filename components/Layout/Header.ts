@@ -6,10 +6,10 @@ import { useState, Fragment, useEffect } from 'react'
 
 import {colors, Mobile} from '../Tokens'
 import { Logo } from '../Icons'
-import { Box, Seperator, FormBox} from './index'
+import { Box, Seperator, FormBox, LabelBox} from './index'
 import { useUserData } from '../../src/data'
 import { useMediaQuery } from '../../src/hooks'
-import { Textarea } from '../Form'
+import { Textarea, Input } from '../Form'
 import { Secondary, Primary, LinkButton } from '../Button'
 import { Modal } from '../Modal'
 import { useApi } from '../../src/apiHelpers'
@@ -81,12 +81,17 @@ const LoginButtons = (props:{user:any, mutateUser:any}) => {
 const Feedback = ()=> {
   let router = useRouter()
   let {data:user}= useUserData()
-  let [feedback, setFeedback] = useState('')
-  let [status, callFeedback, setStatus] = useApi<FeedbackMsg, FeedbackResult>([feedback])
+  let [form, setForm] = useState({email: '', feedback: ''})
+  let [status, callFeedback, setStatus] = useApi<FeedbackMsg, FeedbackResult>([])
   let onSubmit = (e:React.FormEvent)=>{
     e.preventDefault()
     if(status==='success') return
-    callFeedback('/api/feedback', {feedback, page: router.pathname, username: user ? user.username : undefined})
+    callFeedback('/api/feedback', {
+      feedback:form.feedback,
+      email: user ? undefined : form.email,
+      page: router.pathname,
+      username: user ? user.username : undefined
+    })
   }
 
   if(status=== 'success') return h(Box, {style: {textAlign: 'center'}}, [
@@ -94,18 +99,22 @@ const Feedback = ()=> {
     h('br'),
     h(LinkButton, {onClick: () => {
       setStatus('normal')
-      setFeedback('')
+      setForm({...form, feedback: ''})
     }}, "I have more feedback!")
   ])
   return h(FormBox, {onSubmit, gap: 16}, [
-      h('h4', COPY.feedbackTitle),
-      h(Textarea, {value: feedback, required: true, onChange: e=>setFeedback(e.currentTarget.value)}),
-      h(Secondary, {
-        type: 'submit',
-        disabled: feedback === '',
-        style:{justifySelf:'center'}
-      }, "Submit")
-    ])
+    h('h4', COPY.feedbackTitle),
+    h(Textarea, {value: form.feedback, required: true, onChange: e=>setForm({...form, feedback: e.currentTarget.value})}),
+    user ? null : h(LabelBox, [
+      h('h4', "Your email (optional)"),
+      h(Input, {type: 'email', value: form.email, onChange: e=>setForm({...form, email: e.currentTarget.value})}),
+    ]),
+    h(Secondary, {
+      type: 'submit',
+      disabled: form.feedback === '',
+      style:{justifySelf:'center'}
+    }, "Submit")
+  ])
 }
 
 const FeedbackModal = ()=>{

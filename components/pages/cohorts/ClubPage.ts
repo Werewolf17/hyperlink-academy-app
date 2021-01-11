@@ -70,7 +70,7 @@ export function ClubPage(props:{
       h(Box, {gap: 32}, [
         h(Seperator),
         !isFacilitator && props.cohort.cohort_events.length === 0 ? null : h(Box, {gap:32}, [
-          !isFacilitator ? null : h(CreateEvent, {
+          !isFacilitator && !inCohort ? null : h(CreateEvent, {
             cohort: props.cohort.id,
             people: [...props.cohort.people_in_cohorts.map(p=>p.people.username), props.cohort.people.username],
             mutate: (c)=>{
