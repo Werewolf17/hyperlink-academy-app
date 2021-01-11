@@ -18,6 +18,7 @@ import { useRouter } from 'next/router'
 import { StickyWrapper } from 'components/Tabs'
 import Link from 'next/link'
 import { TwoColumnBanner } from 'components/Banner'
+import Head from 'next/head'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const EventPage = (props: Props)=> props.notFound ? h(ErrorPage) : h(EditableEvent, props)
@@ -97,6 +98,11 @@ const EditableEvent = (props: Extract<Props, {notFound: false}>) => {
   ])
   return h('div', [
     user&&props.people.id === user.id ? h(TwoColumnBanner,{red:true}, h(Banner, {start_date: props.start_date, setEditting})) : null,
+    h(Head, {children: [
+      h('meta', {property:"og:title", content:event.name, key:"og:title"}),
+      h('meta', {property: "og:description", content: event.description, key: "og:description"}),
+      h('meta', {property: "twitter:card", content: "summary", key:"twitter:card"})
+    ]}),
     h(Event, {
       notFound: false as false,
       ...event,
