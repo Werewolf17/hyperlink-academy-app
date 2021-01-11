@@ -133,3 +133,15 @@ CREATE TABLE standalone_events_in_courses (
   standalone_event integer references standalone_events(event) NOT NULL,
   PRIMARY KEY (course, standalone_event)
 );
+
+
+CREATE TABLE refunds (
+  payment_intent text primary key not null,
+  amount integer not null
+);
+
+CREATE TABLE cohort_refunds (
+  refund text REFERENCES refunds(payment_intent) primary key,
+  person text references people(id),
+  cohort integer REFERENCES course_cohorts(id),
+);
