@@ -10,11 +10,15 @@ import { colors } from 'components/Tokens'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 export default function Events(props:Props) {
+  let [pastEvents, upcomingEvents] = props.events.reduce((acc, event)=>{
+    if(new Date(event.events.start_date) < new Date()) acc[0].push(event)
+    else acc[1].push(event)
+    return acc
+  }, [[],[]] as Array<typeof props.events>)
+
   return h(Box, {gap:64}, [
-    h(Box, [
-      h('h1', "Events"),
-    ]),
-    h(FlexGrid, {min: 400, mobileMin: 300}, props.events.map(ev=> h(Link, {passHref:true, href:`/events/${ev.event}`}, h(EventCard, [
+    h('h1', "Upcoming Events"),
+    h(FlexGrid, {min: 400, mobileMin: 300}, upcomingEvents.map(ev => h(Link, {passHref:true, href:`/events/${ev.event}`}, h(EventCard, [
       h(EventCardHeader),
       h(Box, {padding:16, style:{border: '1px solid', borderTop: 'none', borderRadius: '2px'}}, [
         h(Box, {gap:8},[
@@ -26,7 +30,19 @@ export default function Events(props:Props) {
           h('span.textSecondary', `${ev.cost === 0 ? "FREE" : '$'+ev.cost}`)
         ])
       ])
-    ]))))
+    ])))),
+    h(Box, {gap:32}, [
+      h('h2', "Past Events"),
+      h(FlexGrid, {min: 400, mobileMin: 300}, pastEvents.map(ev => h(Link, {passHref:true, href:`/events/${ev.event}`}, h(EventCard, [
+        h(EventCardHeader),
+        h(Box, {padding:16, style:{border: '1px solid', borderTop: 'none', borderRadius: '2px'}}, [
+          h(Box, {gap:8},[
+            h('h3', ev.events.name),
+            h('span',  `${prettyDate(ev.events.start_date)} @ ${(new Date(ev.events.start_date)).toLocaleTimeString([], {hour12: true, minute: '2-digit', hour:'numeric', timeZoneName: "short"})}`),
+          ]),
+        ])
+      ]))))
+    ])
   ])
 }
 
