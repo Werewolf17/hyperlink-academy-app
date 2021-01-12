@@ -338,7 +338,7 @@ const MarkCohortComplete = (props:{cohort:Cohort, mutate:(c:Cohort)=>void})=> {
                 type: 'checkbox'
               }),
               h("span", [
-              "Use the ", h(Link, {href: `http://hyperlink.academy/courses/${props.cohort.courses.slug}/${props.cohort.courses.id}/cohorts/${props.cohort.id}/templates?template=Retrospective`}, "Retrospective template"), " to post a cohort retro in the forum." 
+              "Use the ", h(Link, {href: `http://hyperlink.academy/courses/${props.cohort.courses.slug}/${props.cohort.courses.id}/cohorts/${props.cohort.id}/templates?template=Retro`}, "Retrospective template"), " to post a cohort retro in the forum." 
               ]),
             ]),
           h(Seperator), 
