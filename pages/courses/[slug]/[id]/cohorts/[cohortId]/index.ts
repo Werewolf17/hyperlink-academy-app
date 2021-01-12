@@ -233,17 +233,21 @@ export const CohortMembers = (props:{cohort:Cohort, isFacilitator: boolean, muta
             ]),
             person.people.pronouns ? h('span.textSecondary', {}, ` (${person.people.pronouns})`) : null,
           ]),
-          !props.isFacilitator ? null : h(DestructiveSmallButton, {onClick:()=>{
-            setUnenrollState({
-              personID: person.person,
-              cohortID: props.cohort.id,
-              username: person.people.username,
-              display_name: person.people.display_name,
-              removeMember: ()=>{
-                props.mutate({...props.cohort, people_in_cohorts: props.cohort.people_in_cohorts.filter(p=>p.person!== person.person)})
-              }
-            })
-          }, style:{justifySelf:"right"}}, "unenroll")
+          !props.isFacilitator ? null : 
+          h('div', {style:{justifySelf:"right"}}, [
+            h('a', {style:{marginRight:"10px"}, href:`mailto:${person.people.email}`}, "email"),
+            h(DestructiveSmallButton, {onClick:()=>{
+              setUnenrollState({
+                personID: person.person,
+                cohortID: props.cohort.id,
+                username: person.people.username,
+                display_name: person.people.display_name,
+                removeMember: ()=>{
+                  props.mutate({...props.cohort, people_in_cohorts: props.cohort.people_in_cohorts.filter(p=>p.person!== person.person)})
+                }
+              })
+            }}, "unenroll")
+          ])
         ])
       }),
     ])
