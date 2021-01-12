@@ -10,10 +10,15 @@ import { colors } from 'components/Tokens'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 export default function Events(props:Props) {
-  let [pastEvents, upcomingEvents] = props.events.reduce((acc, event)=>{
-    if(new Date(event.events.start_date) < new Date()) acc[0].push(event)
-    else acc[1].push(event)
-    return acc
+  let [pastEvents, upcomingEvents] = props.events
+    .sort((a, b)=>{
+      if(a.events.start_date === b.events.start_date) return a.events.name > b.events.name ? 1 : -1
+      return a.events.start_date > b.events.start_date ?  1 : -1
+    })
+    .reduce((acc, event)=>{
+      if(new Date(event.events.start_date) < new Date()) acc[0].push(event)
+      else acc[1].push(event)
+      return acc
   }, [[],[]] as Array<typeof props.events>)
 
   return h(Box, {gap:64}, [
