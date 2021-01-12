@@ -373,7 +373,7 @@ const Banners = (props:{
   enrolled?: boolean,
 })=>{
   let isStarted = (new Date(props.cohort.start_date)).getTime() - (new Date()).getTime()
-  let forum = `https://${DISCOURSE_URL}/session/sso?return_path=/c/${props.cohort.category_id}`
+  let forum = `${DISCOURSE_URL}/session/sso?return_path=/c/${props.cohort.category_id}`
 
   if(props.facilitating && !props.cohort.live) return h(TODOBanner, props)
 
