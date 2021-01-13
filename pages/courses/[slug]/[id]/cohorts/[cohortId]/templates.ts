@@ -84,7 +84,7 @@ function TemplatePage(props: {template: Props['templates'][0]}) {
         h('p', "Your topic has been added")
       ]),
       h(Box, [
-        h('a', {style:{justifySelf:"center"}, href: `https://${DISCOURSE_URL}/t/${post}`}, h(Primary, "View it here")),
+        h('a', {style:{justifySelf:"center"}, href: `${DISCOURSE_URL}/t/${post}`}, h(Primary, "View it here")),
       h(Link, {
         href: `/courses/${router.query.slug}/${router.query.id}/cohorts/${router.query.cohortId}/templates`
       }, h('a', {style:{justifySelf:"center"}}, h(Secondary, 'Back to Templates')))
