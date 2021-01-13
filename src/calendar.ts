@@ -23,7 +23,6 @@ export const createEventInvite = (props:{
   calEvent.location = props.location
   calEvent.startDate = ICAL.Time.fromJSDate(new Date(props.start_date), true)
   calEvent.endDate = ICAL.Time.fromJSDate(new Date(props.end_date), true)
-  calEvent.organizer= "mailto:contact@hyperlink.academy"
 
   calendar.addSubcomponent(vevent)
   return calendar
