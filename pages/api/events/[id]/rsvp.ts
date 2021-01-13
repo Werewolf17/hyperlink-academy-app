@@ -57,7 +57,7 @@ async function POSTEventRSVP(req:Request){
     }).toString()).toString('base64')
 
     await Promise.all([
-      sendEventRSVPEmail(msg.email, {
+      sendEventRSVPNoAccountEmail(msg.email, {
         name: msg.name,
         event_page_url: `https://hyperlink.academy/events/${event.events.id}`,
         event_start_date: prettyDate(event.events.start_date),
@@ -83,7 +83,7 @@ async function POSTEventRSVP(req:Request){
 
   if(event.cost == 0) {
     await Promise.all([
-      sendEventRSVPNoAccountEmail(user.email, {
+      sendEventRSVPEmail(user.email, {
         name: user.display_name || user.username,
         event_page_url: `https://hyperlink.academy/events/${event.events.id}`,
         event_start_date: prettyDate(event.events.start_date),
