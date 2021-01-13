@@ -9,7 +9,7 @@ import Text from 'components/Text'
 import { Primary, Secondary, Destructive } from 'components/Button'
 import { useEventData, useUserData } from 'src/data'
 import { PageLoader } from 'components/Loader'
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { EventForm } from 'pages/events/create'
 import { Input } from 'components/Form'
 import { useApi } from 'src/apiHelpers'
@@ -97,7 +97,7 @@ const EditableEvent = (props: Extract<Props, {notFound: false}>) => {
     ])
   ])
   return h('div', [
-    user&&props.people.id === user.id ? h(TwoColumnBanner,{red:true}, h(Banner, {start_date: props.start_date, setEditting})) : null,
+    user&&props.people.id === user.id ? h(Banner, {start_date: props.start_date, setEditting}) : null,
     h(Head, {children: [
       h('meta', {property:"og:title", content:event.name, key:"og:title"}),
       h('meta', {property: "og:description", content: event.description, key: "og:description"}),
@@ -172,13 +172,14 @@ const Event = (props: Extract<Props, {notFound: false}> & {facilitating: boolean
 
 const Banner = (props:{start_date: string, setEditting: (b:boolean)=>void})=>{
   let start_date = new Date(props.start_date)
-  if(start_date > new Date()) return h(Fragment, [
+  if(start_date > new Date()) return h(TwoColumnBanner, {red: true}, [
     h('span', {style:{alignSelf: 'center'}}, "You're facilitating this event"),
     h(Secondary, {onClick: ()=>props.setEditting(true)}, "Edit Event")
   ])
 
-  else return h(Box, [
-    `Congrats! You hosted this event on ${prettyDate(props.start_date)}`
+  return h(TwoColumnBanner, {red: true}, [
+    h('span', {style:{alignSelf: 'center'}}, `Congrats! You hosted this event on ${prettyDate(props.start_date)}. You can edit the description to add any artifacts.`),
+    h(Secondary, {onClick: ()=>props.setEditting(true)}, "Edit Event")
   ])
 }
 
