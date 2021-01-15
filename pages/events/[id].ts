@@ -116,6 +116,11 @@ const EditableEvent = (props: Extract<Props, {notFound: false}>) => {
 
 const Event = (props: Extract<Props, {notFound: false}> & {facilitating: boolean, rsvpd: boolean, mutate: ReturnType<typeof useEventData>["mutate"]}) => {
   if(!props.standalone_events) return h(ErrorPage)
+
+  let emails = props.people_in_events
+    .map(p=>p.people.email)
+    .concat(props.no_account_rsvps.map(p=>p.email))
+
   return h(TwoColumn, [
     h(Box, {gap:32, width: 640}, [
       h('h1', props.name),
@@ -132,7 +137,7 @@ const Event = (props: Extract<Props, {notFound: false}> & {facilitating: boolean
             `(${props.people_in_events.length + props.no_account_rsvps.length}/${props.standalone_events.max_attendees})` :
             `(${props.people_in_events.length + props.no_account_rsvps.length})`)]),
           !props.facilitating ? null : h('a', {
-            href:`mailto:?bcc=${props.people_in_events.map(p=>p.people.email).join(',')}`
+            href:`mailto:?bcc=${emails.join(',')}`
           }, 'email everyone')
         ]),
         ...props.people_in_events.map(person=>h(Box, {h:true, gap:4}, [
