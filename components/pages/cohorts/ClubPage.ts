@@ -80,7 +80,7 @@ export function ClubPage(props:{
             ? h(WhiteContainer, [
               h(Box, {gap:16, style: {maxWidth: 400, textAlign: 'center', margin: 'auto'}}, [
                 h( EmptyImg, {src: '/img/empty.png'}),
-                h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to thier calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
+                h('small.textSecondary', "Events are great for scheduling live calls or other important cohort dates. Learners can add these to their calendars. Looks like you haven't created any events yet. Hit the button above to schedule one!!" ),
               ])])
             : h(CohortEvents, {
               facilitating: isFacilitator,
