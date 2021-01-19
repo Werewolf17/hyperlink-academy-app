@@ -15,6 +15,8 @@ import { Modal } from '../Modal'
 import { useApi } from '../../src/apiHelpers'
 import { FeedbackMsg, FeedbackResult } from '../../pages/api/feedback'
 
+import {DISCOURSE_URL} from 'src/discourse'
+
 const COPY = {
   feedbackTitle: "Tell us what's on your mind!",
   feedbackSuccess: "🎉 Thank you for your thoughts 🎉"
@@ -22,7 +24,7 @@ const COPY = {
 
 export default function Header() {
   const {data: user, mutate:mutateUser}= useUserData()
-  let mobile = useMediaQuery('(max-width:420px)')
+  let mobile = useMediaQuery('(max-width:768px)')
   return h(HeaderContainer, [
     h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
     mobile ? h(MobileMenu, {user, mutateUser}) : h(Container, {}, [
@@ -42,12 +44,14 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
     router.events.on('routeChangeComplete', handleRouteChange)
     return ()=>{ router.events.off('routeChangeComplete', handleRouteChange)}
   },[router])
-  if(open) return h(FullPageOverlay, {}, h(Box, {gap: 32, padding: 24}, [
+  if(open) return h(FullPageOverlay, {}, h(Box, {gap: 32, padding: 32}, [
     h(HeaderContainer, [
       h(Link, {href: props.user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
-      h(NavLink, {style: {justifySelf: 'right'}, onClick: ()=> {setOpen(false)}}, 'close')
+      h(Container, [
+        h(Link, {href: '/courses'}, h('a', {style:{textAlign:'right'}}, h(CoursesButton, 'courses'))),
+        h(NavLink, {style: {justifySelf: 'right'}, onClick: ()=> {setOpen(false)}}, 'close')
+      ])
     ]),
-    h(Link, {href: '/courses'}, h('a', {style:{textAlign:'right'}}, h(CoursesButton, 'courses'))),
     h(Box, {gap: 16, style: {textAlign: 'right'}}, [
       h(LoginButtons, props),
     ]),
@@ -55,7 +59,10 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
     h(Seperator),
     h(Feedback)
   ]))
-  else return h(NavLink, {style: {justifySelf: 'right'}, onClick:()=>setOpen(true)}, 'menu')
+  else return h(Container, [
+    h(Link, {href: '/courses'}, h('a', {style:{textAlign:'right'}}, h(CoursesButton, 'courses'))),
+    h(NavLink, {style: {justifySelf: 'right', paddingLeft: '10px'}, onClick:()=>setOpen(true)}, 'menu')
+  ])
 }
 
 const LoginButtons = (props:{user:any, mutateUser:any}) => {
@@ -67,6 +74,7 @@ const LoginButtons = (props:{user:any, mutateUser:any}) => {
   ])
   else {
     return h(Fragment, [
+      h(NavLink, {href:DISCOURSE_URL}, 'forum'),
       h(NavLink, {onClick: async (e)=>{
         e.preventDefault()
         let res = await fetch('/api/logout')
