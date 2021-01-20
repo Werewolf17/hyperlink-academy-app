@@ -101,6 +101,7 @@ const EditableEvent = (props: Extract<Props, {notFound: false}>) => {
     h(Head, {children: [
       h('meta', {property:"og:title", content:event.name, key:"og:title"}),
       h('meta', {property: "og:description", content: event.description, key: "og:description"}),
+      h('meta', {property: "og:image", content: 'https://hyperlink.academy/img/social-logo.png', key: "og:image"}),
       h('meta', {property: "twitter:card", content: "summary", key:"twitter:card"})
     ]}),
     h(Event, {
