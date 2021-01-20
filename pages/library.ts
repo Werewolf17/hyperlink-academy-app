@@ -54,7 +54,7 @@ export const collections = {
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 const Library = (props:Props) => {
   return h(Box, {gap: 32}, [
-    h(Box, {gap: 32, h: true}, [
+    h(Box, {gap: 32, h: true, style:{display:"flex", flexWrap:"wrap"}}, [
       h('h1', 'Hyperlink Library'),
       h('a', {href:'/rss.xml', style:{alignSelf: 'center'}}, RSS),
       h('a', {href:'/library/latest', style:{alignSelf: 'center', float: 'right'}}, 'chronological feed'),
