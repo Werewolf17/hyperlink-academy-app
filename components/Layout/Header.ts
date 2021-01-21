@@ -58,20 +58,29 @@ const LearnMenu = ()=>{
   ])
 }
 
-let LearnMenuItems = ()=> h(Box, {style:{textAlign:'right'}}, [
-        h('div', [
-          h(Link, {href:"/courses"}, h(NavLink,{}, h('b', 'courses'))),
-          h('p', "structured deep learning")
-        ]),
-        h('div', [
-          h(Link, {href:"/courses#clubs"}, h(NavLink,{}, h('b', 'clubs'))),
-          h('p', "social peer learning")
-        ]),
-        h('div', [
-          h(Link, {href:"/events"}, h(NavLink,{}, h('b', 'events'))),
-          h('p', "single sessions")
-        ]),
+let LearnMenuItems = ()=> h('div', {style:{textAlign:'right', display:"grid"}}, [
+  h(Link, {href:"/courses"},h(LearnMenuItem, [
+    h('b', 'courses'),
+    h('p', "structured deep learning")
+  ])),
+  h(Link, {href:"/courses#clubs"}, h(LearnMenuItem, [
+    h('b', 'clubs'),
+    h('p', "social peer learning")
+  ])),
+  h(Link, {href:"/events"}, h(LearnMenuItem, [
+    h('b', 'events'),
+    h('p', "single sessions")
+  ])),
       ])
+
+let LearnMenuItem = styled('a')`
+&:hover {
+background-color: ${colors.accentLightBlue};
+cursor: pointer;
+}
+
+padding:8px 16px;
+`
 
 const Dropdown = styled('nav')`
 position: absolute;
@@ -82,7 +91,6 @@ z-index: 9;
 border: 1px solid;
 border-radius: 2px;
 margin-left: -120px;
-padding:16px;
 transform: translate(0px, 8px);
 background-color:${colors.appBackground};
 `
@@ -100,20 +108,21 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
     h(HeaderContainer, {style:{paddingBottom:"0px"}}, [
       h(Link, {href: props.user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
       h(Container, [
-        h(NavLink, {style: {justifySelf: 'right'}, onClick: ()=> {setOpen(false)}}, 'close')
+        h(LinkButton, {style: {justifySelf: 'right', textDecoration:"none"}, onClick: ()=> {setOpen(false)}}, 'close')
       ])
     ]),
     h(LearnMenuItems),
-    !props.user ? null : h(NavLink, {href:DISCOURSE_URL}, 'forum'),
+    !props.user ? null : h(NavLink, {href:DISCOURSE_URL, style:{justifySelf:"Right"}}, h('b', 'forum')),
     h(Link, {href: "/library", passHref:true}, h(NavLink, {style:{justifySelf: 'right'}}, h('b', 'library'))),
     h(Seperator),
     h(Box, {gap: 16, style: {textAlign: 'right'}}, [
       h(LoginButtons, props),
     ]),
+    h(Seperator),
     !props.user ? null : h(Feedback)
   ]))
   else return h(Container, [
-    h(NavLink, {style: {justifySelf: 'right', paddingLeft: '10px'}, onClick:()=>setOpen(true)}, 'menu')
+    h(LinkButton, {style: {justifySelf: 'right', paddingLeft: '10px', textDecoration: "none"}, onClick:()=>setOpen(true)}, 'menu')
   ])
 }
 
@@ -197,7 +206,7 @@ top: 0;
 left: 0;
 width: 100vw;
 height: 100vh;
-background-color: white;
+background-color: ${colors.appBackground};
 `
 
 const Container = styled('div')`
