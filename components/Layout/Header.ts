@@ -60,15 +60,15 @@ const LearnMenu = ()=>{
 
 let LearnMenuItems = ()=> h('div', {style:{textAlign:'right', display:"grid"}}, [
   h(Link, {href:"/courses"},h(LearnMenuItem, [
-    h('b', 'courses'),
+    h('b.mono', 'courses'),
     h('p', "structured deep learning")
   ])),
   h(Link, {href:"/courses#clubs"}, h(LearnMenuItem, [
-    h('b', 'clubs'),
+    h('b.mono', 'clubs'),
     h('p', "social peer learning")
   ])),
   h(Link, {href:"/events"}, h(LearnMenuItem, [
-    h('b', 'events'),
+    h('b.mono', 'events'),
     h('p', "single sessions")
   ])),
       ])
@@ -79,6 +79,7 @@ background-color: ${colors.accentLightBlue};
 cursor: pointer;
 }
 
+color:${colors.textSecondary};
 padding:8px 16px;
 `
 
@@ -111,15 +112,28 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
         h(LinkButton, {style: {justifySelf: 'right', textDecoration:"none"}, onClick: ()=> {setOpen(false)}}, 'close')
       ])
     ]),
-    h(LearnMenuItems),
-    !props.user ? null : h(NavLink, {href:DISCOURSE_URL, style:{justifySelf:"Right"}}, h('b', 'forum')),
-    h(Link, {href: "/library", passHref:true}, h(NavLink, {style:{justifySelf: 'right'}}, h('b', 'library'))),
-    h(Seperator),
-    h(Box, {gap: 16, style: {textAlign: 'right'}}, [
-      h(LoginButtons, props),
-    ]),
-    h(Seperator),
-    !props.user ? null : h(Feedback)
+    h(Box, {style:{textAlign: "right"}},[
+      h(Link, {href:"/courses"},h(NavLink, [
+        h('b', 'courses'),
+        h('p', "structured deep learning")
+      ])),
+      h(Link, {href:"/courses#clubs"}, h(NavLink, [
+        h('b', 'clubs'),
+        h('p', "social peer learning")
+      ])),
+      h(Link, {href:"/events"}, h(NavLink, [
+        h('b', 'events'),
+        h('p', "single sessions")
+      ])),
+      !props.user ? null : h(NavLink, {href:DISCOURSE_URL}, h('b', 'forum')),
+      h(Link, {href: "/library", passHref:true}, h(NavLink, {}, h('b', 'library'))),
+      h(Seperator),
+      h(Box, {gap: 16, style: {textAlign: 'right'}}, [
+        h(LoginButtons, props),
+      ]),
+      h(Seperator),
+      !props.user ? null : h(Feedback)
+    ])
   ]))
   else return h(Container, [
     h(LinkButton, {style: {justifySelf: 'right', paddingLeft: '10px', textDecoration: "none"}, onClick:()=>setOpen(true)}, 'menu')
