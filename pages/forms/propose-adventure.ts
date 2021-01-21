@@ -76,7 +76,7 @@ Submit the form below, and if it's a good fit, we'll invite you to join an upcom
         h(LabelBox,{gap:8}, [
           h('div', [
             h('h3', "What's your project about, in a sentence or two?" ),
-            h('small',`For example: I'm writing a book about personal librarianship; I'm doing a daily animation challenge; I'm reading through a curriculum on speculative futures`),
+            h('small',`For example: "I'm writing a book about personal librarianship" or "I'm doing a daily animation challenge"`),
           ]),
           h(Textarea, {
             value: state.About,
@@ -85,8 +85,8 @@ Submit the form below, and if it's a good fit, we'll invite you to join an upcom
 		]),
 		h(LabelBox, {gap:8},[
           h('div',[
-            h('h3', "How would you rate your experience / comfort level in this area, on a scale of 1 to 5?"),
-            h('small', `For example, if you're doing an painting project, 1 = I'm totally new to painting; 3 = I've taken a bunch of art classes; 3 = I've painted for years and had gallery shows`),
+            h('h3', "How experienced are you in this area? (Scale of 1 to 5)"),
+            h('small', `Where 1 = "totally new thing for me" and 5 = "I've been doing this for years"`),
           ]),
           h(Input, {
             value: state.Experience,
@@ -98,7 +98,7 @@ Submit the form below, and if it's a good fit, we'll invite you to join an upcom
             h('h3', "What's your estimated project length / timeline?" ),
             h('small',`Is this a one-month project? A one-year project? Ongoing / TBD?`),
           ]),
-          h(Textarea, {
+          h(Input, {
             value: state.Timeline,
             onChange: e=>setState({...state, Timeline: e.currentTarget.value})
           })
@@ -126,7 +126,7 @@ Submit the form below, and if it's a good fit, we'll invite you to join an upcom
 		h(LabelBox, {gap:8},[
           h('div',[
             h('h3', "What might you make and share as an artifact?"),
-            h('small', `For example: I'll publish a blog post with my reading notes twice a week; I'll share a daily Instagram post; I'll complete a book outline`),
+            h('small', `For example: "I'll publish weekly reading notes on my blog" or "I'll share a daily Instagram post"`),
           ]),
           h(Textarea, {
             value: state.Artifacts,
@@ -135,8 +135,8 @@ Submit the form below, and if it's a good fit, we'll invite you to join an upcom
 		]),
 		h(LabelBox, {gap:8},[
           h('div',[
-            h('h3', "What's the first month you can join? Any hard time constraints?"),
-            h('small', `For example: "I'd like to start in February and can make any time outside weekdays 10am-6pm EST" (we'll keep this in mind as we plan future cohorts)`),
+            h('h3', "When can you start, and what time works best?"),
+            h('small', `For example: "I'd like to start in February and evenings EST are best" (this helps us plan future cohorts)`),
           ]),
           h(Textarea, {
             value: state.Scheduling,
