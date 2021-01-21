@@ -29,8 +29,9 @@ export default function Header() {
     h(Link, {href: user ? '/dashboard' : '/', passHref:true}, h('a', [Logo])),
     mobile ? h(MobileMenu, {user, mutateUser}) : h(Container, {}, [
       h(LoginButtons, {user, mutateUser}),
-      !user ? null : h(NavLink, {href:DISCOURSE_URL}, 'forum'),
+      !user ? null : h(FeedbackModal),
       h(Seperator, {style:{height:"100%"}}),
+      !user ? null : h(NavLink, {href:DISCOURSE_URL}, 'forum'),
       h(Link, {href: "/library", passHref: true}, h(NavLink, 'library')),
       h(LearnMenu)
     ]),
@@ -109,6 +110,7 @@ const MobileMenu = (props:{user:any, mutateUser: any}) => {
     h(Box, {gap: 16, style: {textAlign: 'right'}}, [
       h(LoginButtons, props),
     ]),
+    !props.user ? null : h(Feedback)
   ]))
   else return h(Container, [
     h(NavLink, {style: {justifySelf: 'right', paddingLeft: '10px'}, onClick:()=>setOpen(true)}, 'menu')
@@ -123,15 +125,13 @@ const LoginButtons = (props:{user:any, mutateUser:any}) => {
     h(Link, {href: '/login' + redirect}, h(NavLink, "log in")),
   ])
   else {
-    return h(Fragment, [
-      h(NavLink, {onClick: async (e)=>{
-        e.preventDefault()
-        let res = await fetch('/api/logout')
-        if(res.status === 200) {
-          props.mutateUser(false)
-        }
-      }}, 'logout')
-    ])
+    return h(NavLink, {onClick: async (e)=>{
+      e.preventDefault()
+      let res = await fetch('/api/logout')
+      if(res.status === 200) {
+        props.mutateUser(false)
+      }
+    }}, 'logout')
   }
 }
 
