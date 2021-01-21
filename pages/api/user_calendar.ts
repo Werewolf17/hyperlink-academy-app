@@ -70,15 +70,14 @@ export default async function getUserEvents(req: NextApiRequest, res: NextApiRes
         events: true
       },
       where: {
-        events: {
-          people_in_events: {
-            some: {
-              people:{
-                calendar_id: calendar_ID
-              }
-            }
+        OR:[
+          {
+            events: {people_in_events: {some: {people:{calendar_id: calendar_ID}}}}
+          },
+          {
+            events:{people:{calendar_id: calendar_ID}}
           }
-        }
+        ]
       }
     })
   ])
