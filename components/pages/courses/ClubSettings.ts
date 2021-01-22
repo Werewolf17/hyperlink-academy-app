@@ -3,7 +3,7 @@ import { useUserData, useCourseData, Course } from 'src/data'
 import { PageLoader } from 'components/Loader'
 import { Box, LabelBox, FormBox } from 'components/Layout'
 import { Tabs } from 'components/Tabs'
-import { AddCohort, CourseTemplates } from 'pages/courses/[slug]/[id]/settings'
+import { AddCohort, CourseTemplates, Invites } from 'pages/courses/[slug]/[id]/settings'
 import {Discounts} from './settings/Discounts'
 import { prettyDate } from 'src/utils'
 import { Info, Input, Textarea } from 'components/Form'
@@ -38,6 +38,7 @@ something you want to do, but you can’t find it here, shoot us an email (`,
     h(Tabs, {
       tabs: {
         Cohorts: h(Cohorts, {course, mutate}),
+        Invites: h(Invites, {course, mutate}),
         Details: h(Details, {course, mutate, curriculum: props.curriculum}),
         Discounts: h(Discounts, {course:course.id}),
         Templates: h(CourseTemplates, {course, mutate}),

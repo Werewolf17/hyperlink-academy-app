@@ -150,7 +150,7 @@ export const AddCohort = (props:{course:Course, mutate:(c:Course)=>void})=> {
   ])
 }
 
-const Invites = (props:{course:Course, mutate: (c:Course) => void})=> {
+export const Invites = (props:{course:Course, mutate: (c:Course) => void})=> {
   let [emailOrUsername, setEmailOrUsername] = useState('')
   let [invite_only, setInviteOnly] = useState(props.course.invite_only)
   let [valid, setValid] = useState<null | boolean>(null)
