@@ -8,12 +8,13 @@ import { ReactElement, useEffect } from 'react'
 import { useLocalDiscounts, setDiscounts } from 'src/clientData'
 import { callApi } from 'src/apiHelpers'
 import { GetDiscountResult } from 'pages/api/discounts/[code]'
+import Text from 'components/Text'
 
 type Props = {
-  course?: Course
+  course: Course
 }
 
-const Enroll:React.SFC<Props> = (props) => {
+const Enroll:React.FC<Props> = (props) => {
   let {data: discounts} = useLocalDiscounts()
   let price = props.course?.cost || 0
   let discount = discounts?.find(d=>d.course == props.course?.id)
@@ -44,7 +45,7 @@ const Enroll:React.SFC<Props> = (props) => {
       props.course?.cohort_max_size === 0 ? null : h('b', `Up to ${props.course?.cohort_max_size} learners`),
       h(Box, {gap: 4}, [
         h('b', 'Prerequisites'),
-        h('p', props.course?.prerequisites)
+        h(Text, {source: props.course?.prerequisites, disallowedTypes:["heading" as const]})
       ]),
     ]),
     props.children as ReactElement ,
