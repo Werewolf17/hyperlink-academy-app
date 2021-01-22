@@ -5,6 +5,7 @@ export const GlobalStyleSheet = css`
 .bgtextSecondary { background-color: ${colors.textSecondary} };
 .accentSuccess { color: ${colors.accentSuccess} };
 .accentRed { color: ${colors.accentRed} };
+.mono {font-family: 'Roboto Mono', mono;}
 
 input::placeholder {
 font-style: italic;
@@ -37,9 +38,6 @@ a.notBlue:hover {
   color: ${colors.linkHover};
 }
 
-a.mono {
-  font-family: 'Roboto Mono', mono;
-}
 
 a.notBlue:visited {
   color: inherit;
