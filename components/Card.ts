@@ -23,6 +23,7 @@ color: inherit;
 
 &:hover, &:active, &:focus {
 cursor: pointer;
+transform: translate(-4px, -4px);
 box-shadow: 4px 4px ${colors.grey15};
 color: inherit;
 }
@@ -70,21 +71,19 @@ export const SmallCohortCard = (props: Cohort) => {
 }
 
 export const ClubCard = (props: {
-  course: {slug: string, id: number, card_image: string, name: string, description: string},
-  cohort?: {start_date: string, id: number}}) => {
-  let started = props.cohort ? (new Date(props.cohort.start_date) < new Date()) : undefined
+  slug: string, id: number, card_image: string, name: string, description: string,
+}) => {
   return h(Link, {
-    href: `/courses/${props.course.slug}/${props.course.id}`+ (props.cohort ? `/cohorts/${props.cohort?.id}` : '/settings'),
+    href: `/courses/${props.slug}/${props.id}`,
     passHref: true
   }, [
     h(ClubCardContainer, [
       h(Box, {style:{backgroundColor: colors.accentLightBlue, padding: '16px'}}, [
-        h(Box, {h: true}, props.course.card_image.split(',').map(src=> h('img', {src}))),
-        h('h3', {style:{height: '2.75em'}}, props.course.name)
+        h(Box, {h: true}, props.card_image.split(',').map(src=> h('img', {src}))),
+        h('h3', {style:{height: '2.75em'}}, props.name)
       ]),
       h(ClubCardContent, [
-        h('p', props.course.description),
-        props.cohort ? h('p', `${started ? "Started" : "Starts"} ${prettyDate(props.cohort.start_date)}`) : ''
+        h('p', props.description),
       ])
     ])
   ])
@@ -117,6 +116,7 @@ color: inherit;
 
 &:hover, &:active, &:focus {
 cursor: pointer;
+transform: translate(-4px, -4px);
 box-shadow: 4px 4px ${colors.grey15};
 }
 `

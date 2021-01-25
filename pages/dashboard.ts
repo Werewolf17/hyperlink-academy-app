@@ -99,7 +99,7 @@ const Dashboard = () => {
           ]),
           h(Box, [
             clubs.length > 0 ? h('h2', "Clubs") : null,
-            h(FlexGrid, {min: 290, mobileMin: 290}, clubs.map(course=> h(ClubCard, {course})))
+            h(FlexGrid, {min: 290, mobileMin: 290}, clubs.map(course=> h(ClubCard, course)))
           ])
         ]),
         Profile: h(Settings, {

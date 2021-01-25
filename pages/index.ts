@@ -25,7 +25,7 @@ let COPY = {
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const Landing = (props:Props) => {
-  let {data: courses} = useCourses(props)
+  let {data: courses} = useCourses({initialData:props})
 
   return h(Box, {gap:48}, [
     h(Welcome),
