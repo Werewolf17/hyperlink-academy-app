@@ -49,11 +49,13 @@ export default ()=>{
   ]) : h(Box, {ma: true, width: 640, gap:32}, [
     h(Box, [
       h('h1', "Propose a Course"),
-      h('p.big', `
-If you're interested in running a Course on Hyperlink, we'd love to hear what you
-have in mind!`),
-      h('p.big', `
-Rough ideas are fine; we can chat more about the details :)`),
+      h('p.big', `If you're interested in running a Course on Hyperlink, we'd love to hear what you have in mind!`),
+      h('p.big', [
+        `Courses on Hyperlink are developed in the `, 
+        h('a', {href: "https://hyperlink.academy/courses/the-meta-course/1"}, `Meta Course`), 
+        `.`
+      ]),
+      h('p.big', `We'll review your proposal and if it seems like a good fit, invite you to join an upcoming Meta Course cohort.`),
     ]),
     h(Seperator),
 

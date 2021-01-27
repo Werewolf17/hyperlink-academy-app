@@ -41,11 +41,9 @@ export default ()=>{
   ]) : h(Box, {ma: true, width: 640, gap:32}, [
     h(Box, [
       h('h1', "Propose a Club"),
-      h('p.big', `
-If you're interested in running a Club on Hyperlink, we'd love to hear what you
-have in mind!`),
-      h('p.big', `
-Rough ideas are fine; we can chat more about the details.`),
+      h('p.big', `If you're interested in running a Club on Hyperlink, we'd love to hear what you have in mind!`),
+      h('p.big', `Clubs on Hyperlink can run any time, with just about any topic or structure. We encourage experiments :)`),
+      h('p.big', `We'll review your idea, and get back to you soon to confirm it's a good fit, then set up a draft and prepare for launch!`),
     ]),
     h(Seperator),
 
