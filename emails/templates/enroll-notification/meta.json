@@ -7,7 +7,7 @@
   "TestRenderModel": {
     "learner": "learner_Value",
     "course": "course_Value",
-    "cohort_page_url": "cohort_page_Value",
-    "cohort_forum_url": "cohort_name_Value"
+    "cohort_forum_url": "cohort_forum_url_Value",
+    "cohort_page_url": "cohort_page_url_Value"
   }
 }
