@@ -1,12 +1,13 @@
 import h from 'react-hyperscript'
 import Link from 'next/link'
 import { useCourses, Courses } from 'src/data'
-import { Box, Seperator } from 'components/Layout'
+import { Box } from 'components/Layout'
 import { colors} from 'components/Tokens'
-import { Primary, Secondary } from 'components/Button'
+import { Primary } from 'components/Button'
 import { ClubCard, CourseCard, FlexGrid } from 'components/Card'
 import {WatchCourseInline} from 'components/Course/WatchCourse'
-import { prettyDate } from 'src/utils'
+import { CourseCohortCard, ClubCohortCard} from 'components/Cards/CohortCard'
+import styled from '@emotion/styled'
 
 export function CourseAndClubList(props:{initialData:Courses, type: "club" | "course"}) {
   let {data: allCourses} = useCourses({initialData:props.initialData, type: props.type})
@@ -27,8 +28,9 @@ export function CourseAndClubList(props:{initialData:Courses, type: "club" | "co
       return new Date(upcomingCohortA.start_date) < new Date(upcomingCohortB?.start_date) ? -1 : 1
   })
 
-  let [min, mobileMin] = props.type === 'club' ? [290, 290] : [400, 200]
+  let [min, mobileMin] = props.type === 'club' ? [290, 290] : [400, 400]
   let CardComponent =  props.type === 'club' ? ClubCard : CourseCard
+  let CohortCardComponent = props.type === 'club' ? ClubCohortCard : CourseCohortCard
 
   return h(Box, {gap: 32} ,[
     props.type === 'club' ?h(Box, {width: 640}, [
@@ -41,40 +43,50 @@ export function CourseAndClubList(props:{initialData:Courses, type: "club" | "co
         h('p.big', `Courses are deep dives into a subject, led by a facilitator experienced in the field.`),
         h(Link, {href: "/forms/propose-course"}, h('a', {}, h(Primary, 'Propose a new Course!')))
       ]),
-    h('h3.textSecondary', "Upcoming"),
+    h('h3.textSecondary', "Upcoming " + (props.type === 'club' ? "Clubs" : "Cohorts")),
     h(FlexGrid, {min , mobileMin},
-      upcoming.map(course => {
-        return h('div', [
-          h(CardComponent, {...course, key: course.id}),
-          h(Box, {padding: 16, gap: 8, style:{backgroundColor:colors.accentPeach}}, course.course_cohorts.flatMap(c=>[
-            h(Box, {h:true, style:{gridTemplateColumns:"auto auto"}}, [
-              h('div', [
-                h('b',`Cohort #${c.name}`),
-                h('p', `Starts ${prettyDate(c.start_date)}`),
-                course.cohort_max_size === 0 ? null : course.cohort_max_size > c.people_in_cohorts.length
-                  ? h('span.accentSuccess', `${course.cohort_max_size - c.people_in_cohorts.length} ${course.cohort_max_size - c.people_in_cohorts.length === 1 ? 'spot' : 'spots'} left!`)
-                  : h('span.accentRed', `Sorry! This cohort is full.`)
-              ]),
-              h(Link, {href:`/courses/${course.slug}/${course.id}/cohorts/${c.id}`},
-                h('a', {style:{justifySelf:"right"}}, h(Secondary, "Details")))
-            ]),
-            h(Seperator)
-          ]).slice(0, -1))
-        ])
+      upcoming.flatMap(course => {
+        return course.course_cohorts.map(cohort=>{
+          return h(CohortCardComponent, {...cohort, course})
+        })
       })),
     h('h3.textSecondary', `All ${props.type==='club' ? "Clubs" : "Courses"}`),
     h('p.textSecondary', {style:{maxWidth:640}}, `If anything looks interesting, be sure to watch it to get updates when a new
 cohort is available AND inspire the facilitator to plan new cohorts`),
     h(FlexGrid, {min, mobileMin},
       inactive.map(course => {
-        return h('div', [
-          h(CardComponent, {...course}),
-          h(Box, {padding: 16, gap: 8, style:{backgroundColor:colors.accentPeach}}, [
-            h('div', {style:{justifySelf: "right"}}, [
-              h(WatchCourseInline, {id: course.id})
-            ])
-          ])
+        if(props.type==='club') return h(CourseContainer, [
+          h(ClubHeader, course.card_image.split(',').map(src=> h('img', {src}))),
+          h(Link, {href:`/courses/${course.slug}/${course.id}`}, h('a.notBlue', {style:{textDecoration:'none'}}, h('h3', course.name))),
+          h('p', course.description),
+          h(WatchCourseInline, {id: course.id})
+        ])
+        else return h(Box, {h:true, style:{gridAutoColumns:"auto"}}, [
+              h('img', {src: course.small_image, style:{height: '128px', border: '1px solid', borderRadius: '64px', boxSizing:"border-box"}}),
+              h(CourseContainer, [
+                h(Link, {href:`/courses/${course.slug}/${course.id}`}, h('a.notBlue', {style:{textDecoration:'none'}}, h('h3', course.name))),
+                h('p', course.description),
+                h(WatchCourseInline, {id: course.id})
+              ])
         ])
       })),
   ])
 }
+
+const CourseContainer = styled('div')`
+display: grid;
+grid-gap: 16px;
+grid-template-rows: min-content auto min-content min-content;
+`
+
+const ClubHeader = styled("div")`
+background-color: ${colors.accentLightBlue};
+border: 1px solid;
+border-color: ${colors.borderColor};
+border-radius: 2px;
+width: min-content;
+display: grid;
+grid-template-columns: repeat(3, min-content);
+grid-gap: 16px;
+padding: 8px;
+`

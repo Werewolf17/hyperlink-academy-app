@@ -158,8 +158,12 @@ export function CourseCard(props:{
   slug: string,
   id: number,
   card_image: string,
-  status?:  'draft' | 'live' | 'archived' | null
-  course_cohorts:{start_date: string}[]
+  status?:  'draft' | 'live' | 'archived' | null,
+  cohort: {
+    name: string,
+    id: number,
+    people_in_cohort: Array
+  }
 }) {
   let upcomingCohort = props.course_cohorts.filter(c=>new Date(c.start_date) > new Date())[0]
 

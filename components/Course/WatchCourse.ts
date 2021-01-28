@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import h from 'react-hyperscript'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 
 import { useUserData, useUserCourses } from 'src/data'
 import { WatchCourseMsg, WatchCourseResult } from 'pages/api/courses/[id]/watch'
@@ -9,8 +9,9 @@ import Loader  from 'components/Loader'
 import { Box, FormBox } from 'components/Layout'
 import {Bell} from 'components/Icons'
 import { Input } from 'components/Form'
-import { IconButton, LinkButton } from 'components/Button'
+import { IconButton, LinkButton, Primary } from 'components/Button'
 import { useDebouncedEffect } from 'src/hooks'
+import { Modal } from 'components/Modal'
 
 export function WatchCourse(props:{id: number}) {
   let {data: userCourses, mutate} = useUserCourses()
@@ -43,6 +44,7 @@ export function WatchCourse(props:{id: number}) {
 export function WatchCourseInline(props:{id:number}) {
   let {data: userCourses, mutate} = useUserCourses()
   let {data: user} = useUserData()
+  let [open, setOpen] = useState(false)
   let watching = userCourses?.watching_courses.find(c=> c.course === props.id)
 
   useDebouncedEffect(async ()=>{
@@ -52,17 +54,47 @@ export function WatchCourseInline(props:{id:number}) {
 
   const onClick = async (e:React.MouseEvent)=>{
     e.preventDefault()
-    if(!user || !userCourses) return
+    if(!user || !userCourses) return setOpen(true)
     if(watching) mutate({...userCourses, watching_courses: userCourses.watching_courses.filter(x=>x.course !== props.id)}, false)
     else mutate({...userCourses, watching_courses: [...userCourses.watching_courses, {course: props.id, email: user.email}]}, false)
   }
 
   // Should probably throttle toggles to this at some point!
-  if(user===false) return h(EmailWatching, props)
-  return h(Box, {gap: 8, h: true}, [
-    h('p.textSecondary', [watching ? "You're watching this course" : "Want emails on new cohorts?"]),
-    h(IconButton, {onClick}, h(Bell, {blue: !!watching}))
+  return h(Fragment, [
+    h(Modal, {display: open, onExit:()=>setOpen(false)}, [
+      h(EmailWatchingModal, props)
+    ]),
+    h(Box, {gap: 8, h: true}, [
+      h(IconButton, {onClick}, h(Bell, {blue: !!watching})),
+      h('p.textSecondary', [watching ? "You're watching this course" : "Want emails on new cohorts?"])
+    ])
   ])
+}
+
+let EmailWatchingModal = (props: {id:number}) => {
+  let [watching, setWatching] = useState(false)
+  let [email, setEmail] = useState('')
+  let [loading, setLoading] = useState(false)
+
+  const onSubmit = async (e:React.FormEvent) =>{
+    e.preventDefault()
+    if(loading || !email) return
+    setLoading(true)
+    let res = await callApi<WatchCourseMsg, WatchCourseResult>(`/api/courses/${props.id}/watch`, {watching: !watching, email: email})
+    setLoading(false)
+    if(res.status === 200) {
+      setWatching(true)
+    }
+  }
+
+  return  h(Box, {gap: 8}, [
+    h('b', [watching ? "You're watching this course" : "Email me when new cohorts are scheduled"]),
+    watching ? null : h(FormBox, {gap:8, onSubmit}, [
+      h(Input, {value:email, type: 'email', placeholder: 'your email', onChange:(e)=>setEmail(e.currentTarget.value)}),
+      h(Primary, {type: 'submit', disabled: !email, style:{justifySelf:'center'}}, loading ? h(Loader) : "Subscribe" )
+    ])
+  ])
+
 }
 
 let EmailWatching = (props:{id: number})=>{
