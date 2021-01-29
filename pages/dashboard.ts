@@ -5,8 +5,9 @@ import styled from '@emotion/styled'
 import { useEffect } from 'react'
 
 import {colors} from 'components/Tokens'
-import { Box, WhiteContainer} from 'components/Layout'
-import { BigCohortCard, ClubCard, CourseCard, FlexGrid } from 'components/Card'
+import { Box, WhiteContainer, FlexGrid} from 'components/Layout'
+import {ClubCohortCard, CourseCohortCard} from 'components/Cards/CohortCard'
+import {ClubListing, CourseListing} from 'components/pages/CourseAndClubList'
 import { PageLoader } from 'components/Loader'
 // import { AccentImg } from '../components/Images'
 import { useUserCohorts, useUserData, useUserCourses, useProfileData } from 'src/data'
@@ -87,19 +88,19 @@ const Dashboard = () => {
           ]),
         ]),
         Completed: completedCohorts.length === 0 ? null : h(Box, [
-          h(FlexGrid, {min: 250, mobileMin:250}, completedCohorts.map(cohort => {
-              let facilitating = cohort.facilitator === (user ? user.id: '')
-              return h(BigCohortCard, {...cohort, enrolled: !facilitating, facilitating})
+          h(FlexGrid, {min: 400, mobileMin:400}, completedCohorts.map(cohort => {
+            if(cohort.courses.type === 'club') return ClubCohortCard({...cohort, course: cohort.courses})
+            return h(CourseCohortCard, {...cohort, course:cohort.courses})
             }))
         ]),
         Maintaining: userCourses.maintaining_courses.length === 0 ? null : h(Box, {gap: 32}, [
           h(Box, [
             courses.length > 0 ? h('h2', "Courses") : null,
-            h(FlexGrid, {min: 328, mobileMin: 200}, courses.map(course=>h(CourseCard, course))),
+            h(FlexGrid, {min: 400, mobileMin: 400}, courses.map(course=>h(CourseListing, course))),
           ]),
           h(Box, [
             clubs.length > 0 ? h('h2', "Clubs") : null,
-            h(FlexGrid, {min: 290, mobileMin: 290}, clubs.map(course=> h(ClubCard, course)))
+            h(FlexGrid, {min: 290, mobileMin: 290}, clubs.map(course=> h(ClubListing, course)))
           ])
         ]),
         Profile: h(Settings, {

@@ -2,8 +2,8 @@ import h from 'react-hyperscript'
 import { InferGetStaticPropsType } from "next"
 import { getPublicEventsQuery } from "pages/api/events"
 import Link from 'next/link'
-import { Box, Seperator } from 'components/Layout'
-import Card, { FlexGrid } from 'components/Card'
+import { Box, Seperator, FlexGrid } from 'components/Layout'
+import { Card } from 'components/Cards'
 import styled from '@emotion/styled'
 import { prettyDate } from 'src/utils'
 import { colors } from 'components/Tokens'

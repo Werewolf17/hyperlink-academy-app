@@ -10,7 +10,8 @@ type Props = {
   id: number,
   name: string,
   start_date: string,
-  people_in_cohorts: Array<object>,
+  people_in_cohorts?: Array<object>,
+  completed?: string | null,
   course:{
     id: number,
     slug: string,
@@ -21,7 +22,7 @@ type Props = {
   }
 }
 export const CourseCohortCard = (props:Props) => {
-  let spotsLeft = props.course.cohort_max_size === 0 ? null : props.course.cohort_max_size - props.people_in_cohorts.length
+  let spotsLeft = props.course.cohort_max_size === 0 || !props.people_in_cohorts ? null : props.course.cohort_max_size - props.people_in_cohorts.length
   return h(Link,{
     href:`/courses/${props.course.slug}/${props.course.id}/cohorts/${props.id}`
   }, h(Container, [
@@ -35,7 +36,7 @@ export const CourseCohortCard = (props:Props) => {
       ]),
       h('p.textSecondary', props.course.description),
       h('span', [
-        h('b', `Starts ${prettyDate(props.start_date)} ${spotsLeft ? '| ' : ""}`),
+        h('b', `${cohortPrettyDate(props.start_date, props.completed)} ${spotsLeft ? '| ' : ""}`),
         !!spotsLeft && h('span.accentSuccess', `${spotsLeft} spots left!`)
       ])
     ])
@@ -75,7 +76,7 @@ display: none;
 `
 
 export const ClubCohortCard = (props: Props) => {
-  let spotsLeft = props.course.cohort_max_size === 0 ? null : props.course.cohort_max_size - props.people_in_cohorts.length
+  let spotsLeft = props.course.cohort_max_size === 0 || !props.people_in_cohorts ? null : props.course.cohort_max_size - props.people_in_cohorts.length
   return h(Link, {
     href: `/courses/${props.course.slug}/${props.id}`,
     passHref: true
@@ -92,7 +93,7 @@ export const ClubCohortCard = (props: Props) => {
         h('p', props.course.description),
         h('div', [
           h('span', [
-            h('b', `Starts ${prettyDate(props.start_date)} ${spotsLeft ? '| ' : ""}`),
+            h('b', `${cohortPrettyDate(props.start_date, props.completed)} ${spotsLeft ? '| ' : ""}`),
             !!spotsLeft && h('span.accentSuccess', `${spotsLeft} spots left!`)
           ])
         ])
@@ -131,3 +132,9 @@ transform: translate(-4px, -4px);
 box-shadow: 4px 4px ${colors.grey15};
 }
 `
+
+export const cohortPrettyDate = (start_date: string, completed?: string | null)=>{
+  if(completed) return `${prettyDate(start_date)} - ${prettyDate(completed || '')}`
+  if(new Date() > new Date(start_date)) return `Started ${prettyDate(start_date)}`
+  return `Starts ${prettyDate(start_date)}`
+}

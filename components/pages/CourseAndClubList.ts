@@ -1,13 +1,13 @@
 import h from 'react-hyperscript'
 import Link from 'next/link'
 import { useCourses, Courses } from 'src/data'
-import { Box } from 'components/Layout'
+import { Box, FlexGrid } from 'components/Layout'
 import { colors} from 'components/Tokens'
 import { Primary } from 'components/Button'
-import { ClubCard, CourseCard, FlexGrid } from 'components/Card'
 import {WatchCourseInline} from 'components/Course/WatchCourse'
 import { CourseCohortCard, ClubCohortCard} from 'components/Cards/CohortCard'
 import styled from '@emotion/styled'
+import { Pill } from 'components/Pill'
 
 export function CourseAndClubList(props:{initialData:Courses, type: "club" | "course"}) {
   let {data: allCourses} = useCourses({initialData:props.initialData, type: props.type})
@@ -29,7 +29,6 @@ export function CourseAndClubList(props:{initialData:Courses, type: "club" | "co
   })
 
   let [min, mobileMin] = props.type === 'club' ? [290, 290] : [400, 400]
-  let CardComponent =  props.type === 'club' ? ClubCard : CourseCard
   let CohortCardComponent = props.type === 'club' ? ClubCohortCard : CourseCohortCard
 
   return h(Box, {gap: 32} ,[
@@ -55,21 +54,40 @@ export function CourseAndClubList(props:{initialData:Courses, type: "club" | "co
 cohort is available AND inspire the facilitator to plan new cohorts`),
     h(FlexGrid, {min, mobileMin},
       inactive.map(course => {
-        if(props.type==='club') return h(CourseContainer, [
-          h(ClubHeader, course.card_image.split(',').map(src=> h('img', {src}))),
-          h(Link, {href:`/courses/${course.slug}/${course.id}`}, h('a.notBlue', {style:{textDecoration:'none'}}, h('h3', course.name))),
-          h('p', course.description),
-          h(WatchCourseInline, {id: course.id})
-        ])
-        else return h(Box, {h:true, style:{gridAutoColumns:"auto"}}, [
-              h('img', {src: course.small_image, style:{height: '128px', border: '1px solid', borderRadius: '64px', boxSizing:"border-box"}}),
-              h(CourseContainer, [
-                h(Link, {href:`/courses/${course.slug}/${course.id}`}, h('a.notBlue', {style:{textDecoration:'none'}}, h('h3', course.name))),
-                h('p', course.description),
-                h(WatchCourseInline, {id: course.id})
-              ])
-        ])
+        if(props.type==='club') return h(ClubListing, course)
+        return h(CourseListing, course)
       })),
+  ])
+}
+
+type ListingProps = {
+  card_image: string,
+  small_image: string,
+  id: number,
+  slug: string,
+  description: string,
+  name: string,
+  status: "live" | "draft" | "archived"
+}
+export const ClubListing = (props:ListingProps)=>{
+  return h(CourseContainer, [
+    h(ClubHeader, props.card_image.split(',').map(src=> h('img', {src}))),
+    h(Link, {href:`/courses/${props.slug}/${props.id}`}, h('a.notBlue', {style:{textDecoration:'none'}}, h('h3', props.name))),
+    props.status === 'draft' ? h(Pill, {red:true}, 'draft') : null,
+    h('p', props.description),
+    h(WatchCourseInline, {id: props.id})
+  ])
+}
+
+export const CourseListing = (props:ListingProps)=>{
+  return h(Box, {h:true, style:{gridAutoColumns:"auto"}}, [
+    h('img', {src: props.small_image, style:{height: '128px', border: '1px solid', borderRadius: '64px', boxSizing:"border-box"}}),
+    h(CourseContainer, [
+      h(Link, {href:`/courses/${props.slug}/${props.id}`}, h('a.notBlue', {style:{textDecoration:'none'}}, h('h3', props.name))),
+      props.status === 'draft' ? h(Pill, {red:true}, 'draft') : null,
+      h('p', props.description),
+      h(WatchCourseInline, {id: props.id})
+    ])
   ])
 }
 
