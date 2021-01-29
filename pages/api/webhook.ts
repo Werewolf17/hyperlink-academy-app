@@ -128,7 +128,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             sendEventRSVPEmail(person.email, {
               name: person.display_name || person.username,
               event_page_url: `https://hyperlink.academy/events/${event.events.id}`,
-              event_start_date: prettyDate(event.events.start_date),
               event_name: event.events.name
             }),
             prisma.people_in_events.create({data:{

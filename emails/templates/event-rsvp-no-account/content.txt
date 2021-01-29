@@ -1,10 +1,14 @@
 Hi {{name}}
 
-You've RSVP'd to {{event_name}} on {{event_start_date}}
+You've RSVP'd to {{event_name}}!
 
-Add this event to your calendar: https with the attached file.
+View details here: {{event_page_url}}
+
+Add this event to your calendar with the attached file.
 
 If you have questions just hit reply on this email.
 
 Create an account on hyperlink to easily RSVP to events like this, or enroll in
-a course or club: "https://hyperlink.academy/signup"
+a course or club: 
+
+https://hyperlink.academy/signup

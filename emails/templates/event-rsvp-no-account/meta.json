@@ -7,7 +7,6 @@
   "TestRenderModel": {
     "name": "name_Value",
     "event_name": "event_name_Value",
-    "event_start_date": "event_start_date_Value",
     "event_page_url": "cohort_page_url_Value"
   }
 }

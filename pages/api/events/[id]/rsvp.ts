@@ -3,7 +3,6 @@ import { sendEventRSVPEmail, sendEventRSVPNoAccountEmail } from 'emails'
 import { APIHandler, Request, ResultType } from "src/apiHelpers"
 import { stripe, StripePaymentMetaData } from 'src/stripe'
 import { getToken } from "src/token"
-import { prettyDate } from 'src/utils'
 import { createEventInvite } from 'src/calendar'
 
 let prisma = new PrismaClient()
@@ -60,7 +59,6 @@ async function POSTEventRSVP(req:Request){
       sendEventRSVPNoAccountEmail(msg.email, {
         name: msg.name,
         event_page_url: `https://hyperlink.academy/events/${event.events.id}`,
-        event_start_date: prettyDate(event.events.start_date),
         event_name: event.events.name
       }, {Attachments: [
         {Name: "event.ics", ContentType: "text/calender", ContentID: null, Content}
@@ -86,7 +84,6 @@ async function POSTEventRSVP(req:Request){
       sendEventRSVPEmail(user.email, {
         name: user.display_name || user.username,
         event_page_url: `https://hyperlink.academy/events/${event.events.id}`,
-        event_start_date: prettyDate(event.events.start_date),
         event_name: event.events.name
       }),
       prisma.people_in_events.create({
