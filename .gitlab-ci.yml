@@ -9,7 +9,7 @@ emails:
     - npm i postmark-cli -g
     - postmark templates push ./emails/templates -f
   only:
-    - master
+    - main
 
 typechecking:
   stage: init
